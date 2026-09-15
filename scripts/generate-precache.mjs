@@ -1,0 +1,10 @@
+import { readdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+const root=new URL("../dist/client/",import.meta.url);
+const files=await readdir(root,{recursive:true});
+const assets=files.filter(path=>(path.startsWith("assets/")||path.startsWith("_next/static/"))&&/\.(js|css|woff2?)$/.test(path)).sort().map(path=>"/"+path);
+if(!assets.length)throw new Error("No client assets to precache");
+const source=await readFile(new URL("sw.js",root),"utf8");
+const version=createHash("sha256").update(source+assets.join("\n")).digest("hex").slice(0,16);
+await writeFile(new URL("sw.js",root),source.replace("__BUILD__",version).replace("/*__ASSETS__*/ []",JSON.stringify(assets)));
+console.log("Offline shell prepared:",assets.length,"hashed assets");

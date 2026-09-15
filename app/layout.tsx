@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "Diario scolastico digitale offline-first per voti, agenda e assenze.",
   manifest: "/manifest.webmanifest",
   applicationName: "iPagell",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "iPagell" },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "iPagell" },
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -32,9 +32,7 @@ export default function RootLayout({
   return (
     <html lang="it" suppressHydrationWarning>
       <head>
-        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-startup-image" href="/splash/iphone-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" />
         <link rel="apple-touch-startup-image" href="/splash/iphone-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" />
         <link rel="apple-touch-startup-image" href="/splash/iphone-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)" />

@@ -1,39 +1,40 @@
-const CACHE = "ipagell-shell-v1";
+// Build replaces these markers with a content hash and the exact static assets.
+const CACHE = "ipagell-shell-__BUILD__";
+const ASSETS = /*__ASSETS__*/ [];
 const CORE = ["/", "/offline.html", "/manifest.webmanifest", "/favicon.svg", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon-180.png"];
+const ALLOWED = new Set([...CORE, ...ASSETS]);
 
-self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CORE)).then(() => self.skipWaiting()));
+self.addEventListener("install", event => {
+  event.waitUntil(caches.open(CACHE).then(async cache => {
+    // The root contains only the generic client shell, never an account snapshot.
+    await cache.addAll([...new Set([...CORE, ...ASSETS])].map(path=>new Request(path,{credentials:"omit",cache:"reload"})));
+    // Activate on next app launch to avoid replacing assets under an open editor.
+  }));
 });
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))).then(() => self.clients.claim()));
+self.addEventListener("activate", event => {
+  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith("ipagell-shell-")&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()));
 });
-
-self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
-  const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
-  if (event.request.mode === "navigate") {
-    event.respondWith(fetch(event.request).then((response) => {
-      const copy = response.clone();
-      caches.open(CACHE).then((cache) => cache.put(event.request, copy));
-      return response;
-    }).catch(async () => (await caches.match(event.request)) || (await caches.match("/")) || caches.match("/offline.html")));
+self.addEventListener("fetch", event => {
+  const url=new URL(event.request.url);
+  if(event.request.method!=="GET"||url.origin!==self.location.origin)return;
+  // Strict allowlist: APIs, authentication, RSC payloads and arbitrary navigations
+  // are network-only. Cache API does not enforce HTTP no-store on our behalf.
+  if(event.request.headers.has("RSC")||event.request.headers.has("Next-Router-State-Tree"))return;
+  if(event.request.mode==="navigate"){
+    if(url.pathname!=="/")return;
+    event.respondWith(fetch(event.request).catch(async()=> {
+      const cache=await caches.open(CACHE);
+      return (await cache.match("/"))||(await cache.match("/offline.html"))||Response.error();
+    }));
     return;
   }
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
-    if (response.ok && ["script", "style", "image", "font"].includes(event.request.destination)) {
-      const copy = response.clone();
-      caches.open(CACHE).then((cache) => cache.put(event.request, copy));
-    }
-    return response;
-  })));
+  if(!ALLOWED.has(url.pathname)||url.pathname==="/"||url.search)return;
+  event.respondWith(caches.open(CACHE).then(async cache=>(await cache.match(event.request))||fetch(event.request)));
 });
-
-self.addEventListener("notificationclick", (event) => {
+self.addEventListener("notificationclick",event=>{
   event.notification.close();
-  event.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then((windows) => {
-    const existing = windows.find((client) => "focus" in client);
-    return existing ? existing.focus() : clients.openWindow("/?view=agenda");
+  event.waitUntil(clients.matchAll({type:"window",includeUncontrolled:true}).then(windows=>{
+    const existing=windows.find(client=>"focus" in client);
+    return existing?existing.focus():clients.openWindow("/?view=agenda");
   }));
 });

@@ -70,6 +70,18 @@ export interface Preferences {
   absenceThresholdHours: number;
   currentSemesterId: string;
   gradeGoal: number;
+  reduceMotion?: boolean;
+  school?: string;
+}
+
+export interface AccountIdentity {
+  id: string;
+  username: string;
+}
+export interface DiarySnapshot {
+  data: SchoolData;
+  preferences: Preferences;
+  revision: number;
 }
 
 export interface SchoolData {
