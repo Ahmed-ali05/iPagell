@@ -1,0 +1,24 @@
+{
+  "id": "/",
+  "name": "iPagell — Diario scolastico",
+  "short_name": "iPagell",
+  "description": "Voti, agenda, assenze e statistiche scolastiche, sempre disponibili offline.",
+  "lang": "it-CH",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#f2f4f9",
+  "theme_color": "#f2f4f9",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Aggiungi voto", "short_name": "Nuovo voto", "url": "/?action=grade", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Apri agenda", "short_name": "Agenda", "url": "/?view=agenda", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
