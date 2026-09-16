@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import {
   ArrowRight,
   BarChart3,
@@ -13,6 +14,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { LegacyEntryRedirect } from "@/components/legacy-entry-redirect";
+import { identity } from "@/lib/server/auth";
 import styles from "./marketing-page.module.css";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -142,7 +144,23 @@ const structuredData = {
   ],
 };
 
-export default function Home() {
+export default async function Home() {
+  const requestHeaders = await headers();
+  const hostname = requestHeaders.get("host") ?? "ipagell.website";
+  const forwardedProtocol = requestHeaders.get("x-forwarded-proto");
+  const protocol =
+    forwardedProtocol === "http" || forwardedProtocol === "https"
+      ? forwardedProtocol
+      : hostname.startsWith("localhost") || hostname.startsWith("127.0.0.1")
+        ? "http"
+        : "https";
+  const user = await identity(
+    new Request(`${protocol}://${hostname}/`, {
+      headers: { cookie: requestHeaders.get("cookie") ?? "" },
+    }),
+  );
+  if (user) redirect("/app");
+
   return (
     <main className={styles.page}>
       <LegacyEntryRedirect />
