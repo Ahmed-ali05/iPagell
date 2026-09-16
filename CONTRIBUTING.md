@@ -2,9 +2,11 @@
 
 [Indice](README.md) · [Roadmap e checklist](docs/PRODOTTO.md)
 
+Grazie per l'interesse nel progetto. Issue e pull request mirate sono benvenute; prima di iniziare un cambiamento ampio, aprire una discussione descrivendo problema, obiettivo e perimetro.
+
 ## Prima di cambiare il codice
 
-Leggere architettura, sicurezza e il percorso utente interessato. Descrivere problema, destinatario, comportamento atteso e ciò che resta fuori scope. Usare account/dati sintetici; non inserire diari reali nel repository. L’assenza di una licenza applicativa esplicita non concede automaticamente diritti di riutilizzo: chiarirli con il titolare prima di redistribuire. Conservare le licenze dei componenti vendorizzati.
+Leggere architettura, sicurezza e il percorso utente interessato. Descrivere problema, destinatario, comportamento atteso e ciò che resta fuori scope. Usare account/dati sintetici; non inserire diari reali nel repository. Conservare le licenze dei componenti vendorizzati.
 
 ## Criterio di completamento
 

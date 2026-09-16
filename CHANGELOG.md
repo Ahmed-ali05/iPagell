@@ -6,6 +6,7 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 
 ### Documentazione e gestione del progetto
 
+- Repository preparato per la pubblicazione open source con README riorganizzato, metadati GitHub e licenza MIT.
 - README corretto: account interni, backend D1 e preferenze sincronizzate, non più descrizione “solo locale”.
 - Guida utente, architettura, API, manutenzione e documento di sicurezza.
 - Cinque profili d’uso, roadmap prioritaria con criteri d’accettazione, checklist di rilascio e linee guida per contribuire.

@@ -1,7 +1,15 @@
 {
   "name": "ipagell",
   "version": "0.1.0",
+  "description": "Diario scolastico personale per voti, agenda, assenze e statistiche.",
   "private": true,
+  "license": "MIT",
+  "author": "Ahmed-ali05",
+  "homepage": "https://ipagell.ahmed-2005-taverbe.chatgpt.site",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ahmed-ali05/iPagell.git"
+  },
   "engines": {
     "node": ">=22.13.0"
   },
