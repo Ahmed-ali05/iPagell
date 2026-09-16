@@ -49,7 +49,7 @@ export async function PATCH(request: Request, context: Context) {
     if (!parsed.success)
       return json({ error: "Controlla nome e descrizione" }, 400);
     const repository = classRepository();
-    await repository.update(classId, parsed.data);
+    await repository.update(classId, parsed.data, user.id);
     return json({ class: await repository.get(user, classId) });
   } catch (error) {
     return errorResponse(error);
@@ -65,7 +65,7 @@ export async function DELETE(request: Request, context: Context) {
     const classId = await params(context);
     if (!classId) return json({ error: "Classe non trovata" }, 404);
     await requireClassPermission(user, classId, "class:delete");
-    await classRepository().remove(classId);
+    await classRepository().remove(classId, user.id);
     return json({ ok: true });
   } catch (error) {
     return errorResponse(error);

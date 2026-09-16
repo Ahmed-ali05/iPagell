@@ -1,11 +1,9 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
   Archive,
-  ArrowDownToLine,
-  ArrowUpFromLine,
   BarChart3,
   Bell,
   BookOpen,
@@ -23,7 +21,6 @@ import {
   Layers3,
   ListFilter,
   Moon,
-  MoreHorizontal,
   Pencil,
   Plus,
   Settings2,
@@ -34,7 +31,6 @@ import {
   Upload,
   UserRoundCheck,
   UsersRound,
-  X,
 } from "lucide-react";
 import {
   Bar,
@@ -54,7 +50,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -79,6 +74,10 @@ import { useDiary } from "@/hooks/use-diary";
 import { gradeSchema } from "@/lib/validation";
 import { EntryDialog, type ModalType } from "@/components/entry-dialog";
 import { ClassesView } from "@/components/classes-view";
+import { PersonalEventDialog } from "@/components/class-events-panel";
+import { useClassAgenda } from "@/hooks/use-class-agenda";
+import { subscriptionAgenda, type AgendaDisplayItem, type ClassSubscription } from "@/lib/classes/events";
+import { backupWithClassAgenda } from "@/lib/classes/backup";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   formatGrade,
@@ -88,14 +87,12 @@ import {
   subjectAverage,
 } from "@/lib/calculations";
 import {
-  createBackup,
   parseBackup,
   downloadBackup,
   legacyBackup,
 } from "@/lib/account-storage";
 import type {
   Absence,
-  AgendaItem,
   BackupPayload,
   Grade,
   Preferences,
@@ -127,11 +124,6 @@ const nav = [
 ] as const;
 
 const uid = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
-const todayInput = () => {
-  const date = new Date();
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-};
 const formatDate = (date: string, options?: Intl.DateTimeFormatOptions) =>
   new Intl.DateTimeFormat(
     "it-CH",
@@ -206,6 +198,9 @@ export function IPagellApp() {
 
 function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const { data, preferences } = session.diary!;
+  const classAgenda = useClassAgenda(session.user!.id);
+  const allAgenda = useMemo(() => [...data.agenda, ...subscriptionAgenda(classAgenda.items.filter(s => !data.agenda.some(a => a.id === `class-snapshot-${s.id}`)))], [data.agenda, classAgenda.items]);
+  const [personalEvent, setPersonalEvent] = useState<ClassSubscription | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [modal, setModal] = useState<ModalType>(null);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
@@ -248,16 +243,17 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     )
       return;
     const now = Date.now();
-    const dueSoon = data.agenda.filter(
+    const dueSoon = allAgenda.filter(
       (item) =>
         item.semesterId === preferences.currentSemesterId &&
         item.reminder &&
+        (!(item as AgendaDisplayItem).shared || !classAgenda.status) &&
         !item.completed &&
         new Date(item.dueAt).getTime() > now &&
         new Date(item.dueAt).getTime() - now < 12 * 60 * 60 * 1000,
     );
     dueSoon.forEach((item) => {
-      const key = `ipagell-notified-${session.user!.id}-${item.id}`;
+      const key = `ipagell-notified-${session.user!.id}-${item.id}-${item.dueAt}`;
       if (localStorage.getItem(key)) return;
       navigator.serviceWorker.ready
         .then((registration) =>
@@ -271,7 +267,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         .then(() => localStorage.setItem(key, "1"))
         .catch(() => undefined);
     });
-  }, [data, preferences]);
+  }, [data, preferences, allAgenda, classAgenda.status, session.user]);
 
   useEffect(() => {
     if (!preferences) return;
@@ -291,8 +287,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     return () => media.removeEventListener("change", apply);
   }, [preferences]);
 
-  const updateData = (recipe: (current: SchoolData) => SchoolData) =>
-    session.commit(recipe);
+  const commitDiary = session.commit;
+  const updateData = useCallback((recipe: (current: SchoolData) => SchoolData) =>
+    commitDiary(recipe), [commitDiary]);
   const reportError = (error: unknown) =>
     toast.error(
       error instanceof Error ? error.message : "Salvataggio non riuscito",
@@ -330,10 +327,10 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         );
         return {
           average: generalAverage(data.subjects, semesterGrades),
-          openActivities: data.agenda.filter(
+          openActivities: allAgenda.filter(
             (item) =>
               item.semesterId === preferences.currentSemesterId &&
-              !item.completed,
+              !item.completed && (item as AgendaDisplayItem).shared?.event.status !== "cancelled",
           ).length,
           absenceHours: data.absences
             .filter((item) => item.semesterId === preferences.currentSemesterId)
@@ -393,7 +390,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       },
     });
     return () => lifecycle.abort();
-  }, [data, preferences]);
+  }, [data, preferences, allAgenda, updateData]);
 
   const currentSemester =
     data.semesters.find(
@@ -402,8 +399,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const semesterGrades = data.grades.filter(
     (grade) => grade.semesterId === currentSemester.id,
   );
-  const semesterAgenda = data.agenda.filter(
-    (item) => item.semesterId === currentSemester.id,
+  const semesterAgenda: AgendaDisplayItem[] = allAgenda.filter(
+    (item) => item.semesterId === currentSemester.id || ((item as AgendaDisplayItem).shared && !data.semesters.some(s => s.id === item.semesterId)),
   );
   const semesterAbsences = data.absences.filter(
     (absence) => absence.semesterId === currentSemester.id,
@@ -454,7 +451,10 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   };
 
   const exportBackup = () => {
-    downloadBackup(createBackup(data, preferences));
+    try {
+      downloadBackup(backupWithClassAgenda(data, preferences, classAgenda.items));
+      toast.success("Backup pronto. Gli eventi di classe sono inclusi come copie personali.");
+    } catch (error) { reportError(error); }
   };
 
   const importBackup = async (file?: File) => {
@@ -526,6 +526,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                 ? `Buongiorno, ${preferences.studentName}`
                 : nav.find((item) => item.id === activeTab)?.label}
             </h1>
+            <span className="space-context">{activeTab === "classes" ? "Condiviso · solo con i membri" : activeTab === "agenda" || activeTab === "home" ? "Il tuo spazio · attività personali e classi scelte da te" : "Privato · visibile solo a te"}</span>
           </div>
           <div className="top-actions">
             {activeTab !== "classes" && (
@@ -633,6 +634,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           </section>
         )}
 
+        {["home","agenda","classes"].includes(activeTab) && classAgenda.status && <div className="class-sync-status" role="status"><span>{classAgenda.status}</span><button onClick={() => void classAgenda.refresh()}>Aggiorna</button></div>}
         <div className="view-stage" key={activeTab}>
           {activeTab === "home" && (
             <Dashboard
@@ -652,7 +654,11 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               items={semesterAgenda}
               subjects={data.subjects}
               onAdd={() => setModal("agenda")}
-              onToggle={(id) =>
+              onClasses={() => setActiveTab("classes")}
+              onPersonal={setPersonalEvent}
+              onToggle={(id) => {
+                const shared = semesterAgenda.find(item => item.id === id)?.shared;
+                if (shared) { void classAgenda.update(shared, {completed: !shared.completed}).catch(reportError); return; }
                 saveAction((current) => ({
                   ...current,
                   agenda: current.agenda.map((item) =>
@@ -660,18 +666,19 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                       ? { ...item, completed: !item.completed }
                       : item,
                   ),
-                }))
-              }
-              onDelete={(id) =>
+                }));
+              }}
+              onDelete={(id) => {
+                const shared = semesterAgenda.find(item => item.id === id)?.shared;
                 setRemoval({
-                  title: "Eliminare questa attività?",
+                  title: shared ? "Rimuovere solo dalla tua agenda? L’evento della classe non cambia." : "Eliminare questa attività?",
                   run: () =>
-                    updateData((current) => ({
+                    shared ? classAgenda.remove(shared) : updateData((current) => ({
                       ...current,
                       agenda: current.agenda.filter((item) => item.id !== id),
                     })),
-                })
-              }
+                });
+              }}
               onNotifications={requestNotifications}
             />
           )}
@@ -729,6 +736,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             <ClassesView
               currentUserId={session.user!.id}
               defaultDisplayName={preferences.studentName}
+              data={data}
+              semesterId={currentSemester.id}
+              agenda={classAgenda}
             />
           )}
         </div>
@@ -938,6 +948,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {personalEvent && <PersonalEventDialog item={personalEvent} data={data} controller={classAgenda} onClose={() => setPersonalEvent(null)} />}
       <Toaster position="top-center" richColors />
     </main>
   );
@@ -967,7 +978,7 @@ function Dashboard({
 }: {
   data: SchoolData;
   grades: Grade[];
-  agenda: AgendaItem[];
+  agenda: AgendaDisplayItem[];
   absences: Absence[];
   average: number | null;
   goal: number;
@@ -976,7 +987,7 @@ function Dashboard({
   onManageSubjects: () => void;
 }) {
   const upcoming = agenda
-    .filter((item) => !item.completed)
+    .filter((item) => !item.completed && item.shared?.event.status !== "cancelled")
     .sort((a, b) => a.dueAt.localeCompare(b.dueAt));
   const nextTest = upcoming[0];
   const countdown = nextTest ? getCountdown(nextTest.dueAt) : null;
@@ -1011,9 +1022,10 @@ function Dashboard({
           <>
             <div className="subject-kicker">
               <span style={{ background: subject?.color }} />{" "}
-              {subject?.name ?? "Materia"}
+              {subject?.name ?? nextTest.shared?.event.subject ?? "Materia"}
             </div>
             <h2>{nextTest.title}</h2>
+            {nextTest.shared && <span className="agenda-origin">{nextTest.shared.detachedAt ? "Personale · da " : "Classe · "}{nextTest.shared.event.className}</span>}
             <p>
               {titleCase(
                 formatDate(nextTest.dueAt, {
@@ -1121,7 +1133,7 @@ function Dashboard({
               <div>
                 <b>{item.title}</b>
                 <small>
-                  {itemSubject?.name} · {formatDate(item.dueAt)}
+                  {itemSubject?.name ?? item.shared?.event.subject} · {formatDate(item.dueAt)}{item.shared ? ` · ${item.shared.detachedAt ? "Copia personale" : item.shared.event.className}` : ""}
                 </small>
               </div>
               <ChevronRight size={18} />
@@ -1207,20 +1219,26 @@ function Dashboard({
 }
 
 function AgendaView({
-  items,
+  items: allItems,
   subjects,
   onAdd,
   onToggle,
   onDelete,
   onNotifications,
+  onClasses,
+  onPersonal,
 }: {
-  items: AgendaItem[];
+  items: AgendaDisplayItem[];
   subjects: Subject[];
   onAdd: () => void;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onNotifications: () => void;
+  onClasses: () => void;
+  onPersonal: (item: ClassSubscription) => void;
 }) {
+  const [scope, setScope] = useState("all");
+  const items = allItems.filter(item => scope === "all" || (scope === "private" ? !item.shared || !!item.shared.detachedAt : !!item.shared && !item.shared.detachedAt));
   const [month, setMonth] = useState(
     () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   );
@@ -1238,9 +1256,10 @@ function AgendaView({
     <section className="module-view">
       <div className="module-toolbar">
         <div>
-          <p>Compiti e verifiche, in un solo posto.</p>
+          <p>La tua agenda. Il completamento resta sempre personale.</p>
         </div>
         <div>
+          <button className="soft-button" onClick={onClasses}><UsersRound size={18} /> Dalle classi</button>
           <button className="soft-button" onClick={onNotifications}>
             <Bell size={18} /> Promemoria
           </button>
@@ -1249,6 +1268,7 @@ function AgendaView({
           </button>
         </div>
       </div>
+      <div className="agenda-scope" aria-label="Origine delle attività">{[["all","Tutte"],["private","Personali"],["class","Dalle classi"]].map(([id,label]) => <button key={id} aria-pressed={scope === id} onClick={() => setScope(id)}>{label}</button>)}</div>
       <Tabs defaultValue="calendar" className="agenda-tabs">
         <TabsList className="segmented">
           <TabsTrigger value="calendar">
@@ -1355,7 +1375,7 @@ function AgendaView({
                             key={event.id}
                             style={{
                               background: findSubject(subjects, event.subjectId)
-                                ?.color,
+                                ?.color ?? "#7772d5",
                             }}
                             title={event.title}
                           />
@@ -1387,6 +1407,7 @@ function AgendaView({
                 subjects={subjects}
                 onToggle={onToggle}
                 onDelete={onDelete}
+                onPersonal={onPersonal}
                 compact
               />
             </div>
@@ -1398,6 +1419,7 @@ function AgendaView({
             subjects={subjects}
             onToggle={onToggle}
             onDelete={onDelete}
+            onPersonal={onPersonal}
           />
         </TabsContent>
       </Tabs>
@@ -1410,12 +1432,14 @@ function AgendaList({
   subjects,
   onToggle,
   onDelete,
+  onPersonal,
   compact = false,
 }: {
-  items: AgendaItem[];
+  items: AgendaDisplayItem[];
   subjects: Subject[];
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
+  onPersonal: (item: ClassSubscription) => void;
   compact?: boolean;
 }) {
   return (
@@ -1431,7 +1455,7 @@ function AgendaList({
           const subject = findSubject(subjects, item.subjectId);
           return (
             <article
-              className={item.completed ? "completed" : ""}
+              className={`${item.completed ? "completed" : ""} ${item.shared?.event.status === "cancelled" ? "cancelled" : ""}`}
               key={item.id}
             >
               <button
@@ -1459,9 +1483,11 @@ function AgendaList({
                     className="subject-dot"
                     style={{ background: subject?.color }}
                   />
-                  {subject?.name}
+                  {subject?.name ?? item.shared?.event.subject}
                 </div>
                 <h4>{item.title}</h4>
+                {item.shared && <button className="agenda-origin" onClick={() => onPersonal(item.shared!)}>{item.shared.event.status === "cancelled" ? "Annullato · " : ""}{item.shared.detachedAt ? "Personale · da " : "Classe · "}{item.shared.event.className} <Settings2 size={12} /></button>}
+                {item.description && <p className="agenda-description">{item.description}</p>}
                 <small>
                   {item.kind === "test" ? "Verifica" : "Compito"} ·{" "}
                   {new Intl.DateTimeFormat("it-CH", {

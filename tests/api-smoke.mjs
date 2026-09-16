@@ -42,6 +42,7 @@ async function api(path, method, body, cookie) {
       Origin: base,
       "Content-Type": "application/json",
       "CF-Connecting-IP": testIp,
+      "X-IPagell-Account": accounts.find(a=>a.cookie===cookie)?.id ?? "",
       ...(cookie ? { Cookie: cookie } : {}),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -199,6 +200,12 @@ try {
   );
   check(createdClass.status, 201, "class owner creates a class");
   const classId = createdClass.data.class.id;
+  const eventInput = {title:"Verifica condivisa",subject:"Matematica",kind:"test",description:"Capitolo 4",dueAt:"2026-10-10T08:00:00.000Z",status:"active"};
+  const eventPath = `/api/classes/${classId}/events`;
+  const createdEvent = await api(eventPath,"POST",eventInput,a.cookie);
+  check(createdEvent.status,201,"owner creates shared event");
+  const eventId=createdEvent.data.id;
+  check((await api(eventPath,"GET",undefined,b.cookie)).status,404,"outsider cannot list shared events");
   check(
     (await api(`/api/classes/${classId}`, "GET", undefined, b.cookie)).status,
     404,
@@ -219,6 +226,30 @@ try {
   );
   check(joined.status, 201, "second account joins with code");
   check(joined.data.class.members.length, 2, "joined class lists two members");
+  const diaryB=await call("/api/account", registration, b.cookie);
+  check(diaryB.status,201,"member has separate private diary");
+  const optionsA={semesterId:diary.data.semesters[0].id,subjectId:diary.data.subjects[0].id,reminder:true};
+  const optionsB={semesterId:diaryB.data.diary.data.semesters[0].id,subjectId:"",reminder:false};
+  const subA=await api(`/api/class-events/${eventId}/subscription`,"POST",optionsA,a.cookie);
+  check(subA.status,201,"subscribe to event with private subject and reminder");
+  const subB=await api(`/api/class-events/${eventId}/subscription`,"POST",optionsB,b.cookie);
+  check(subB.status,201,"another member subscribes independently");
+  const subAId=subA.data.subscriptions[0].id,subBId=subB.data.subscriptions[0].id;
+  check((await api(`/api/class-events/${eventId}/subscription`,"POST",optionsA,a.cookie)).status,409,"duplicate subscription rejected");
+  check((await api(`/api/class-agenda/${subAId}`,"PATCH",{revision:1,completed:true},b.cookie)).status,409,"member cannot modify another private subscription");
+  check((await api(`/api/class-agenda/${subBId}`,"PATCH",{revision:1,subjectId:optionsA.subjectId},b.cookie)).status,400,"private subject cannot reference another diary");
+  const complete=await api(`/api/class-agenda/${subAId}`,"PATCH",{revision:1,completed:true},a.cookie);
+  check(complete.status,200,"completion is personal");
+  check((await api("/api/class-agenda","GET",undefined,b.cookie)).data.subscriptions[0].completed,false,"completion not shared");
+  check((await api(`/api/class-agenda/${subAId}`,"PATCH",{revision:1,reminder:false},a.cookie)).status,409,"stale personal revision rejected");
+  check((await api(`${eventPath}/${eventId}`,"PATCH",{...eventInput,title:"Forbidden",revision:1},b.cookie)).status,409,"member cannot edit another member's event");
+  check((await api(`${eventPath}/${eventId}`,"PATCH",{...eventInput,title:"Verifica aggiornata",revision:1},a.cookie)).status,200,"event update accepted");
+  check((await api(`${eventPath}/${eventId}`,"PATCH",{...eventInput,revision:1},a.cookie)).status,409,"stale shared revision rejected");
+  const updatedB=(await api("/api/class-agenda","GET",undefined,b.cookie)).data.subscriptions[0];
+  check(updatedB.event.title,"Verifica aggiornata","linked snapshot follows class revision");
+  check(updatedB.reminder,false,"shared update preserves private reminder");
+  const publicEvent=(await api(eventPath,"GET",undefined,b.cookie)).data.events[0];
+  check(["completed","reminder","semesterId","subjectId","subscriptions"].some(k=>k in publicEvent),false,"class response excludes personal data");
   check(
     (
       await api(
@@ -250,6 +281,26 @@ try {
     b.cookie,
   );
   check(moderatorInvite.status, 201, "moderator creates invite");
+  const extraEvent=await api(eventPath,"POST",{...eventInput,title:"Evento di prova"},b.cookie);
+  check(extraEvent.status,201,"member can contribute events");
+  const extraId=extraEvent.data.id;
+  let extraSub=(await api(`/api/class-events/${extraId}/subscription`,"POST",optionsB,b.cookie)).data.subscriptions.find(s=>s.event.id===extraId);
+  check((await api(`${eventPath}/${extraId}`,"PATCH",{...eventInput,status:"cancelled",revision:1},b.cookie)).status,200,"event can be cancelled");
+  check((await api("/api/class-agenda","GET",undefined,b.cookie)).data.subscriptions.find(s=>s.id===extraSub.id).event.status,"cancelled","cancellation reaches linked personal agenda");
+  check((await api(`/api/class-agenda/${extraSub.id}`,"PATCH",{revision:extraSub.revision,personalEvent:eventInput},b.cookie)).status,409,"linked event cannot be privately overwritten");
+  const manualDetach=await api(`/api/class-agenda/${extraSub.id}`,"PATCH",{revision:extraSub.revision,detach:true},b.cookie);
+  check(manualDetach.status,200,"explicit make personal works");
+  extraSub=manualDetach.data.subscriptions.find(s=>s.id===extraSub.id);
+  check(!!extraSub.detachedAt,true,"manual detach has persistent timestamp");
+  check((await api(`${eventPath}/${extraId}`,"PATCH",{...eventInput,title:"Nuova versione",revision:2},b.cookie)).status,200,"cancelled event can be restored");
+  check((await api("/api/class-agenda","GET",undefined,b.cookie)).data.subscriptions.find(s=>s.id===extraSub.id).event.status,"cancelled","manual copy stops receiving updates");
+  check((await api(`/api/class-agenda/${extraSub.id}`,"DELETE",{revision:extraSub.revision},b.cookie)).status,200,"manual copy removal leaves shared event");
+  extraSub=(await api(`/api/class-events/${extraId}/subscription`,"POST",optionsB,b.cookie)).data.subscriptions.find(s=>s.event.id===extraId);
+  check((await api(`${eventPath}/${extraId}`,"DELETE",{revision:3},b.cookie)).status,200,"shared event can be deleted");
+  extraSub=(await api("/api/class-agenda","GET",undefined,b.cookie)).data.subscriptions.find(s=>s.id===extraSub.id);
+  check(extraSub.event.status,"cancelled","deleting event preserves cancelled personal snapshot");
+  check(!!extraSub.detachedAt,true,"deleted event copy is detached");
+  await api(`/api/class-agenda/${extraSub.id}`,"DELETE",{revision:extraSub.revision},b.cookie);
   check(
     (
       await api(
@@ -291,6 +342,14 @@ try {
     404,
     "former member loses access",
   );
+  const detachedA=(await api("/api/class-agenda","GET",undefined,a.cookie)).data.subscriptions[0];
+  check(!!detachedA.detachedAt,true,"leaving detaches subscription atomically");
+  check(detachedA.event.title,"Verifica aggiornata","leaving keeps latest snapshot");
+  check(detachedA.completed,true,"leaving preserves private completion");
+  check((await api(`${eventPath}/${eventId}`,"PATCH",{...eventInput,revision:2},a.cookie)).status,404,"former member cannot edit shared event");
+  check((await api(`${eventPath}/${eventId}`,"PATCH",{...eventInput,title:"Solo per la classe",revision:2},b.cookie)).status,200,"current owner can moderate event");
+  check((await api("/api/class-agenda","GET",undefined,a.cookie)).data.subscriptions[0].event.title,"Verifica aggiornata","detached snapshot no longer follows class");
+  check((await api("/api/classes/join","POST",{code:ownerInvite.data.invite.code,displayName:"A"},a.cookie)).status,409,"departure requires newly issued invitation");
   check(
     (
       await api(
@@ -313,6 +372,11 @@ try {
     0,
     "deleted class leaves no membership",
   );
+  const detachedB=(await api("/api/class-agenda","GET",undefined,b.cookie)).data.subscriptions[0];
+  check(!!detachedB.detachedAt,true,"deleting class preserves detached personal copy");
+  check(detachedB.event.title,"Solo per la classe","deleting class preserves latest version");
+  check((await api(`/api/class-agenda/${subBId}`,"PATCH",{revision:detachedB.revision,personalEvent:{...eventInput,title:"Titolo personale"}},b.cookie)).status,200,"detached copy can be edited privately");
+  check((await api(`/api/class-agenda/${subAId}`,"DELETE",{revision:detachedA.revision},a.cookie)).status,200,"private copy can be removed");
   const recovery = await call("/api/auth/recover", {
     username: a.username,
     recoveryCode: a.recovery,
@@ -367,6 +431,12 @@ try {
     });
   check(last.status, 429, "distributed attempt limit");
 } finally {
+  for (const a of accounts) {
+    const listed=await api("/api/classes","GET",undefined,a.cookie);
+    for(const c of listed.data.classes??[]) if(c.role==="owner") {
+      await api(`/api/classes/${c.id}`,"DELETE",{},a.cookie);
+    }
+  }
   for (const a of accounts) {
     const r = await call(
       "/api/auth/security",

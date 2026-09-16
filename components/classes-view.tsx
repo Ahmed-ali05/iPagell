@@ -13,7 +13,10 @@ import {
   UserMinus,
   UsersRound,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { ClassEventsPanel } from "@/components/class-events-panel";
+import type { SchoolData } from "@/types/domain";
+import type { ClassAgendaController } from "@/hooks/use-class-agenda";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -83,10 +86,17 @@ const dateLabel = (value: number) =>
 export function ClassesView({
   currentUserId,
   defaultDisplayName,
+  data,
+  semesterId,
+  agenda,
 }: {
   currentUserId: string;
   defaultDisplayName: string;
+  data: SchoolData;
+  semesterId: string;
+  agenda: ClassAgendaController;
 }) {
+  const detailSequence = useRef(0);
   const [classes, setClasses] = useState<ClassSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ClassDetail | null>(null);
@@ -109,12 +119,16 @@ export function ClassesView({
     detail?.role === "owner" || detail?.role === "moderator";
 
   const loadDetail = useCallback(async (id: string) => {
+    const ticket = ++detailSequence.current;
     const result = await request<{ class: ClassDetail }>(`/api/classes/${id}`);
+    if (ticket !== detailSequence.current) return;
     setDetail(result.class);
+    setInvites([]);
     if (result.class.role === "owner" || result.class.role === "moderator") {
       const inviteResult = await request<{ invites: ClassInvite[] }>(
         `/api/classes/${id}/invites`,
       );
+      if (ticket !== detailSequence.current) return;
       setCheckedAt(Date.now());
       setInvites(inviteResult.invites);
     } else setInvites([]);
@@ -329,8 +343,7 @@ export function ClassesView({
     <>
       <div className="classes-toolbar">
         <div>
-          <span className="eyebrow">Spazio condiviso</span>
-          <p>Solo membri invitati. Il diario personale resta privato.</p>
+          <span className="eyebrow">Le tue classi</span>
         </div>
         <div>
           <button className="soft-button" onClick={() => setJoinOpen(true)}>
@@ -345,7 +358,7 @@ export function ClassesView({
       {error && (
         <section className="sync-banner" role="alert">
           <p>{error}</p>
-          <button className="soft-button" onClick={() => void loadClasses()}>
+          <button className="soft-button" onClick={() => void loadClasses().catch(cause => setError(cause instanceof Error ? cause.message : "Classi non disponibili"))}>
             Riprova
           </button>
         </section>
@@ -427,6 +440,11 @@ export function ClassesView({
                   </div>
                 </section>
 
+                <ClassEventsPanel key={detail.id} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} />
+
+                <details className="class-administration">
+                  <summary>Membri e gestione della classe <span>{detail.memberCount} {detail.memberCount === 1 ? "membro" : "membri"}</span></summary>
+                  <div className="class-detail-stack">
                 <section className="panel members-panel">
                   <div className="panel-title">
                     <div>
@@ -594,6 +612,7 @@ export function ClassesView({
                               body: "{}",
                             });
                             await loadClasses();
+                            await agenda.refresh();
                           },
                         })
                       }
@@ -614,6 +633,7 @@ export function ClassesView({
                               { method: "DELETE", body: "{}" },
                             );
                             await loadClasses();
+                            await agenda.refresh();
                           },
                         })
                       }
@@ -622,6 +642,8 @@ export function ClassesView({
                     </button>
                   )}
                 </section>
+                  </div>
+                </details>
               </>
             )}
           </div>
@@ -730,8 +752,7 @@ export function ClassesView({
               <button
                 className="primary-button"
                 onClick={() => {
-                  void navigator.clipboard.writeText(inviteLink);
-                  toast.success("Link copiato");
+                  void navigator.clipboard.writeText(inviteLink).then(() => toast.success("Link copiato")).catch(() => toast.error("Copia non disponibile. Condividi il codice mostrato."));
                 }}
               >
                 <Clipboard /> Copia link

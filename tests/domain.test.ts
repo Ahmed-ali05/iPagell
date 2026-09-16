@@ -8,6 +8,8 @@ import {
   daySchema,
 } from "../lib/validation";
 import { createDiary } from "../lib/new-diary";
+import { backupWithClassAgenda } from "../lib/classes/backup";
+import { subscriptionAgenda, eventFields, type ClassSubscription } from "../lib/classes/events";
 import {
   generalAverage,
   subjectAverage,
@@ -35,6 +37,26 @@ const fixture = () =>
     endDate: "2027-01-31",
     preset: "sig",
   });
+test("class agenda backups become valid private copies without altering the diary", () => {
+  const diary=fixture();
+  const subscription:ClassSubscription={id:crypto.randomUUID(),semesterId:diary.preferences.currentSemesterId,subjectId:"",completed:false,reminder:true,revision:1,detachedAt:null,event:{id:crypto.randomUUID(),classId:crypto.randomUUID(),className:"3A",authorId:crypto.randomUUID(),authorName:"Compagno",subject:"Fisica",kind:"test",title:"Onde",description:"Capitolo 2",dueAt:"2026-10-10T08:00:00.000Z",status:"cancelled",revision:2,updatedAt:Date.now()}};
+  const backup=backupWithClassAgenda(diary.data,diary.preferences,[subscription]);
+  assert.ok(backupSchema.safeParse(backup).success);
+  assert.equal(diary.data.agenda.length,0);
+  assert.equal(backup.data.agenda.length,1);
+  assert.equal(backup.data.agenda[0].title,"[Annullato] Onde");
+  assert.equal(backup.data.agenda[0].reminder,false);
+  assert.equal(backup.data.subjects.at(-1)?.name,"Fisica");
+  assert.equal(JSON.stringify(backup).includes(subscription.event.authorId!),false);
+  assert.equal(backupWithClassAgenda(backup.data,backup.preferences,[subscription]).data.agenda.length,1);
+  assert.equal(subscriptionAgenda([subscription])[0].reminder,false);
+});
+test("shared event schema rejects private fields and invalid timestamps",()=>{
+  const event={subject:"Matematica",kind:"test",title:"Verifica",dueAt:"2026-10-10T08:00:00.000Z"};
+  assert.ok(eventFields.safeParse(event).success);
+  assert.equal(eventFields.safeParse({...event,completed:true}).success,false);
+  assert.equal(eventFields.safeParse({...event,dueAt:"not-a-date"}).success,false);
+});
 test("new accounts start without any personal demo results", () => {
   const d = fixture();
   assert.equal(d.data.grades.length, 0);

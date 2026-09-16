@@ -25,6 +25,7 @@ export async function DELETE(request: Request, context: Context) {
     await classRepository().revokeInvite(
       parsedClassId.data,
       parsedInviteId.data,
+      user.id,
     );
     return json({ ok: true });
   } catch (error) {

@@ -22,6 +22,20 @@
       "when": 1789562976028,
       "tag": "0002_loving_roland_deschain",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1789566072892,
+      "tag": "0003_melted_dark_phoenix",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1789567010348,
+      "tag": "0004_glossy_stranger",
+      "breakpoints": true
     }
   ]
 }

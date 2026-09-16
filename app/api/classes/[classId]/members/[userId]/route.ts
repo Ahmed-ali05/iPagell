@@ -64,7 +64,7 @@ export async function PATCH(request: Request, context: Context) {
       );
     } else if (parsed.data.operation === "role") {
       await requireClassPermission(user, route.classId, "role:manage");
-      await repository.updateRole(route.classId, route.userId, parsed.data.role);
+      await repository.updateRole(route.classId, route.userId, parsed.data.role, user.id);
     } else {
       await requireClassPermission(user, route.classId, "class:transfer");
       await repository.transfer(route.classId, user.id, route.userId);
@@ -99,7 +99,7 @@ export async function DELETE(request: Request, context: Context) {
           403,
         );
     }
-    await repository.removeMember(route.classId, route.userId);
+    await repository.removeMember(route.classId, route.userId, user.id);
     return json({ ok: true });
   } catch (error) {
     return errorResponse(error);

@@ -77,6 +77,7 @@ export function activeAccountId() {
 export async function forgetLocal(id?: string) {
   localStorage.removeItem(ACTIVE_KEY);
   if (!id) return;
+  localStorage.removeItem(`ipagell-class-agenda-v1:${id}`);
   const db = await openDb();
   try {
     await new Promise<void>((resolve, reject) => {

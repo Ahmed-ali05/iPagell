@@ -2088,5 +2088,63 @@ fieldset { padding:0; border:0; min-width:0; }
   .invite-list .soft-button { margin-left:32px; }
 }
 @media(max-width:430px) {
-  .mobile-tabs button { font-size:.68rem; }
+  .mobile-tabs button { font-size:.75rem; }
+}
+
+.space-context { display:block; margin-top:7px; color:var(--subtle); font-size:.75rem; line-height:1.5; }
+.class-sync-status { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; color:var(--subtle); font-size:.8rem; }
+.class-sync-status button { color:var(--accent); min-height:36px; }
+.agenda-scope { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 20px; }
+.agenda-scope button { padding:8px 14px; min-height:40px; border-radius:999px; color:var(--subtle); font-size:.8rem; border:1px solid transparent; }
+.agenda-scope button[aria-pressed=true] { background:var(--accent-soft); border-color:var(--line); color:var(--accent); }
+.agenda-origin { display:inline-flex; align-items:center; gap:5px; font-size:.75rem; font-weight:600; line-height:1.5; color:var(--accent); background:var(--accent-soft); border-radius:6px; padding:3px 7px; margin:4px 0; max-width:100%; overflow-wrap:anywhere; }
+button.agenda-origin { min-height:32px; text-align:left; }
+.hero-card .agenda-origin { color:inherit; background:rgba(255,255,255,.12); }
+.agenda-description { font-size:.8rem; color:var(--subtle); margin:5px 0; white-space:pre-wrap; overflow-wrap:anywhere; }
+.class-events-panel { min-width:0; }
+.class-events-panel .panel-title>.primary-button { display:inline-flex; align-items:center; justify-content:center; gap:7px; width:auto; height:auto; min-height:42px; padding:10px 14px; white-space:nowrap; color:white; background:var(--accent); font-size:.8rem; }
+.class-event-filters { display:flex; align-items:center; gap:10px; margin:20px 0 12px; }
+.class-event-filters>input { flex:1; min-width:100px; background:var(--secondary); border:1px solid var(--line); padding:11px 12px; border-radius:10px; color:var(--ink); font-size:.875rem; }
+.class-event-list article { display:flex; align-items:flex-start; gap:14px; padding:20px 0; border-top:1px solid var(--line); }
+.shared-event-date { display:grid; place-items:center; flex-shrink:0; min-width:48px; min-height:62px; padding:8px; border-radius:12px; background:var(--accent-soft); color:var(--accent); }
+.shared-event-date b { font-size:1.3rem; }
+.shared-event-date small { font-size:.75rem; }
+.class-event-copy { flex:1; min-width:0; }
+.class-event-copy h4 { font-size:1rem; margin:7px 0; overflow-wrap:anywhere; }
+.class-event-copy p { color:var(--subtle); white-space:pre-wrap; overflow-wrap:anywhere; font-size:.875rem; line-height:1.6; margin:10px 0; }
+.class-event-copy small { font-size:.75rem; color:var(--subtle); }
+.class-event-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; gap:5px; max-width:190px; }
+.class-event-actions button { min-height:40px; }
+.class-events-empty { display:grid; place-items:center; gap:10px; padding:36px 15px; text-align:center; color:var(--subtle); }
+.class-events-empty svg { color:var(--accent); }
+.class-events-empty h4 { color:var(--ink); font-size:1rem; margin:0; }
+.class-events-empty p { margin:0; font-size:.875rem; }
+.cancelled h4 { text-decoration:line-through; }
+.class-administration>summary { cursor:pointer; padding:17px 0; border-top:1px solid var(--line); color:var(--subtle); font-size:.875rem; }
+.class-administration>summary>span { float:right; font-size:.75rem; }
+.personal-checkbox { display:flex!important; align-items:center; gap:10px; }
+.personal-checkbox input { width:18px!important; height:18px; flex-shrink:0; }
+.shared-event-dialog { max-height:88dvh; overflow-y:auto; }
+.detach-action { border-top:1px solid var(--line); padding-top:14px; font-size:.8rem; color:var(--subtle); }
+.detach-action button { margin:5px 6px 0 0; }
+@media(max-width:680px) {
+  .class-events-panel { padding:20px; }
+  .class-switcher { padding:10px; border-radius:18px; }
+  .class-switcher .panel-title { display:none; }
+  .class-switcher-list>button { padding:8px; }
+  .class-switcher-list>button>span { width:34px; height:34px; border-radius:10px; }
+  .class-hero { padding:18px; border-radius:20px; gap:14px; }
+  .class-hero h2 { font-size:1.5rem; margin:10px 0 5px; }
+  .class-hero p { font-size:.875rem; }
+  .class-hero .soft-button,.class-hero .primary-button { min-height:38px; padding:8px 12px; font-size:.8rem; }
+  .classes-toolbar { gap:10px; }
+  .class-events-panel .panel-title { align-items:flex-start; gap:12px; }
+  .class-events-panel .panel-title .primary-button { padding:10px; font-size:.75rem; }
+  .class-event-list article { flex-wrap:wrap; }
+  .class-event-actions { width:100%; max-width:none; justify-content:flex-start; padding-left:62px; }
+  .class-event-filters { flex-wrap:wrap; }
+  .class-event-filters>input { flex-basis:100%; }
+  .space-context { max-width:270px; }
+  .agenda-origin { font-size:.75rem; }
+  .class-administration>summary>span { float:none; margin-left:8px; }
 }

@@ -123,3 +123,41 @@ export const classInvites = sqliteTable(
     ),
   ],
 );
+
+export const classEvents = sqliteTable("class_events", {
+  id: text("id").primaryKey(),
+  classId: text("class_id").notNull().references(() => classes.id, { onDelete: "cascade" }),
+  authorId: text("author_id").references(() => accounts.id, { onDelete: "set null" }),
+  subject: text("subject").notNull(),
+  kind: text("kind").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull().default(""),
+  dueAt: text("due_at").notNull(),
+  status: text("status").notNull().default("active"),
+  revision: integer("revision").notNull().default(1),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+}, (t) => [index("class_events_due_idx").on(t.classId, t.dueAt),
+  check("class_events_kind_check", sql`${t.kind} in ('task','test')`),
+  check("class_events_status_check", sql`${t.status} in ('active','cancelled')`)]);
+
+export const classDepartures = sqliteTable("class_departures", {
+  classId: text("class_id").notNull().references(() => classes.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => accounts.id, { onDelete: "cascade" }),
+  departedAt: integer("departed_at").notNull(),
+}, (t) => [primaryKey({ columns: [t.classId, t.userId] })]);
+
+// Snapshot survives event/class deletion. Private preferences never enter class responses.
+export const classSubscriptions = sqliteTable("class_event_subscriptions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().references(() => accounts.id, { onDelete: "cascade" }),
+  sourceEventId: text("source_event_id").notNull(),
+  eventId: text("event_id").references(() => classEvents.id, { onDelete: "set null" }),
+  snapshot: text("snapshot").notNull(),
+  semesterId: text("semester_id").notNull(),
+  subjectId: text("subject_id").notNull().default(""),
+  completed: integer("completed").notNull().default(0),
+  reminder: integer("reminder").notNull().default(0),
+  revision: integer("revision").notNull().default(1),
+  detachedAt: integer("detached_at"),
+}, (t) => [uniqueIndex("class_subscriptions_user_event_idx").on(t.userId, t.sourceEventId), index("class_subscriptions_event_idx").on(t.eventId)]);

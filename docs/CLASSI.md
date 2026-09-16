@@ -2,7 +2,7 @@
 
 [Indice](../README.md) · [Piano prodotto](PRODOTTO.md) · [Sicurezza](../SECURITY.md)
 
-Specifica di prodotto e tecnica. Il gruppo privato C1 — creazione, membri, ruoli e inviti — è disponibile. Agenda condivisa, annunci e materiali restano pianificati per le fasi successive.
+Specifica di prodotto e tecnica. C1 (gruppi), C2 (eventi) e C3 (agenda personale collegata) sono implementati. Annunci, materiali e le estensioni C4/C5 restano pianificati.
 
 ## Obiettivo
 
@@ -105,16 +105,28 @@ POST             /api/classes/join
 GET, PATCH, DELETE /api/classes/:classId/members/:userId
 ```
 
-Pianificati per C2:
+Disponibili per C2/C3:
 
 ```text
 GET, POST       /api/classes/:classId/events
 PATCH, DELETE   /api/classes/:classId/events/:eventId
-POST, DELETE    /api/class-events/:eventId/subscription
-PATCH            /api/class-events/:eventId/subscription
+POST            /api/class-events/:eventId/subscription
+GET             /api/class-agenda
+PATCH, DELETE   /api/class-agenda/:subscriptionId
 ```
 
-Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di eventi useranno una revisione attesa per non sovrascrivere modifiche concorrenti. In C1 le liste hanno limiti server; la paginazione completa rientra nella fase C4.
+Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di eventi e campi personali richiedono una revisione attesa. Le scritture condivise verificano il permesso nella stessa query; le richieste C2/C3 verificano anche l'account atteso. Limiti: 500 eventi per classe, 500 sottoscrizioni per account. La paginazione completa rientra in C4.
+
+### Integrazione attuale
+
+- Home, calendario, elenco e riepilogo WebMCP includono gli eventi scelti dall'utente. Voti, assenze e statistiche non vengono condivisi.
+- Le materie di classe sono etichette suggerite dagli eventi esistenti; non esiste ancora una tassonomia con archiviazione. L'associazione alla materia del diario è privata.
+- Completamento, promemoria e periodo personale hanno persistenza separata dal diario e sono accessibili solo al titolare. I promemoria funzionano ad app aperta, non sono notifiche push programmate.
+- L'ultima agenda collegata è disponibile senza rete nella cache locale separata per account. Le modifiche condivise e delle sottoscrizioni richiedono connessione. La cache viene rimossa su logout o sessione non valida.
+- Aggiornamenti attivi ogni 30 secondi, al ritorno nell'app e alla riconnessione; nessuna promessa di aggiornamento istantaneo.
+- Trigger transazionali conservano le copie su uscita, rimozione, eliminazione evento o classe. Le copie scollegate sono modificabili dal solo titolare; un evento eliminato rimane annullato nella copia.
+- Il backup esporta gli eventi scelti come copie personali senza collegamenti o identità dei compagni. Importare quel backup non ricrea appartenenze o inviti. Una copia già importata non viene duplicata dall'agenda collegata.
+- Uscita/rimozione richiedono un invito emesso successivamente per rientrare.
 
 ## Sicurezza, privacy e abuso
 
@@ -132,8 +144,8 @@ Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di event
 |---|---|---|---|
 | C0 — fondazioni | Completata | Migrazioni, autorizzazioni riusabili, feature flag e test ruoli | Nessuna rotta visibile; matrice permessi coperta dai test |
 | C1 — gruppo | Completata | Creazione classe, membri, link/codice, revoca, uscita e trasferimento | Due account possono completare il ciclo senza accessi residui |
-| C2 — agenda | Pianificata | Materie condivise, eventi, aggiornamenti e annullamenti | Concorrenza e autorizzazioni verificate |
-| C3 — personale | Pianificata | Sottoscrizione, campi personali, scollegamento e cache offline | L'evento resta utile senza rete e dopo l'uscita |
+| C2 — agenda | Implementata | Etichette materia, eventi, aggiornamenti e annullamenti | Concorrenza e autorizzazioni verificate |
+| C3 — personale | Implementata | Sottoscrizione, campi personali, scollegamento e cache offline | Snapshot conservato dopo uscita e cancellazione; lettura offline |
 | C4 — cura | Pianificata | Attività minima, segnalazioni, liste grandi, accessibilità e notifiche in-app | Prova con più classi e dataset realistico |
 | C5 — materiali | Pianificata | Annunci, link e poi file con storage/scansione | Politica dati e infrastruttura file approvate |
 
