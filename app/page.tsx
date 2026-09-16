@@ -332,7 +332,7 @@ export default async function Home() {
       <footer className={styles.footer}>
         <div className={styles.brand}><span className={styles.logo}>iP</span><span>iPagell</span></div>
         <p>Il diario scolastico personale per vedere il semestre con più chiarezza.</p>
-        <Link href="/app">Accedi all’app</Link>
+        <a href="/app">Accedi all’app</a>
       </footer>
     </main>
   );
