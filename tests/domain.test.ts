@@ -21,6 +21,10 @@ import {
   type ClassAction,
   type ClassRole,
 } from "../lib/classes/permissions";
+import {
+  createInviteCode,
+  normalizeInviteCode,
+} from "../lib/classes/validation";
 const fixture = () =>
   createDiary({
     name: "Test",
@@ -180,4 +184,11 @@ test("class access rejects unknown roles and stays disabled by default", () => {
   assert.equal(classFeatureEnabled(undefined), false);
   assert.equal(classFeatureEnabled("true"), false);
   assert.equal(classFeatureEnabled(" enabled "), true);
+});
+
+test("class invite codes are unambiguous and normalize separators", () => {
+  const code = createInviteCode();
+  assert.match(code, /^[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}(?:-[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{4}){2}$/);
+  assert.equal(normalizeInviteCode(code.toLowerCase()), code.replaceAll("-", ""));
+  assert.equal(normalizeInviteCode("IIII-OOOO-1111"), null);
 });

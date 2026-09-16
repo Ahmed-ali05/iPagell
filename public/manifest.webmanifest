@@ -19,6 +19,7 @@
   ],
   "shortcuts": [
     { "name": "Aggiungi voto", "short_name": "Nuovo voto", "url": "/?action=grade", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Apri agenda", "short_name": "Agenda", "url": "/?view=agenda", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Apri agenda", "short_name": "Agenda", "url": "/?view=agenda", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Apri classi", "short_name": "Classi", "url": "/?view=classes", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }

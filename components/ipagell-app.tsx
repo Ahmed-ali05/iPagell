@@ -33,6 +33,7 @@ import {
   TrendingUp,
   Upload,
   UserRoundCheck,
+  UsersRound,
   X,
 } from "lucide-react";
 import {
@@ -77,6 +78,7 @@ import { AccountSecurity } from "@/components/account-security";
 import { useDiary } from "@/hooks/use-diary";
 import { gradeSchema } from "@/lib/validation";
 import { EntryDialog, type ModalType } from "@/components/entry-dialog";
+import { ClassesView } from "@/components/classes-view";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   formatGrade,
@@ -102,7 +104,7 @@ import type {
   Subject,
 } from "@/types/domain";
 
-type TabId = "home" | "agenda" | "grades" | "absences" | "stats";
+type TabId = "home" | "agenda" | "grades" | "absences" | "stats" | "classes";
 
 declare global {
   interface Document {
@@ -121,6 +123,7 @@ const nav = [
   { id: "grades", label: "Voti", icon: GraduationCap },
   { id: "absences", label: "Assenze", icon: UserRoundCheck },
   { id: "stats", label: "Statistiche", icon: BarChart3 },
+  { id: "classes", label: "Classi", icon: UsersRound },
 ] as const;
 
 const uid = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
@@ -150,6 +153,7 @@ function findSubject(subjects: Subject[], id?: string) {
 function getCountdown(value: string) {
   const target = new Date(value);
   const now = new Date();
+  const past = target.getTime() < now.getTime();
   const days = Math.max(
     0,
     Math.round(
@@ -158,9 +162,9 @@ function getCountdown(value: string) {
         86_400_000,
     ),
   );
-  if (days === 0) return { value: "Oggi", small: "" };
-  if (days === 1) return { value: "1", small: "giorno" };
-  return { value: String(days), small: "giorni" };
+  if (days === 0) return { value: "Oggi", small: "", past };
+  if (days === 1) return { value: "1", small: "giorno", past };
+  return { value: String(days), small: "giorni", past };
 }
 
 export function IPagellApp() {
@@ -220,11 +224,18 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
-    if (query.get("view") === "agenda") setActiveTab("agenda");
-    if (query.get("action") === "grade") {
-      setActiveTab("grades");
-      setModal("grade");
-    }
+    queueMicrotask(() => {
+      if (query.get("view") === "agenda") setActiveTab("agenda");
+      if (
+        query.get("view") === "classes" ||
+        window.location.hash.includes("join=")
+      )
+        setActiveTab("classes");
+      if (query.get("action") === "grade") {
+        setActiveTab("grades");
+        setModal("grade");
+      }
+    });
   }, []);
 
   useEffect(() => {
@@ -517,20 +528,22 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             </h1>
           </div>
           <div className="top-actions">
-            <NativeSelect
-              aria-label="Semestre corrente"
-              value={currentSemester.id}
-              onChange={(event) =>
-                savePreference({ currentSemesterId: event.target.value })
-              }
-              className="semester-select"
-            >
-              {data.semesters.map((semester) => (
-                <NativeSelectOption key={semester.id} value={semester.id}>
-                  {semester.name}
-                </NativeSelectOption>
-              ))}
-            </NativeSelect>
+            {activeTab !== "classes" && (
+              <NativeSelect
+                aria-label="Semestre corrente"
+                value={currentSemester.id}
+                onChange={(event) =>
+                  savePreference({ currentSemesterId: event.target.value })
+                }
+                className="semester-select"
+              >
+                {data.semesters.map((semester) => (
+                  <NativeSelectOption key={semester.id} value={semester.id}>
+                    {semester.name}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            )}
             <button aria-label="Cambia tema" onClick={toggleTheme}>
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -544,19 +557,21 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         </header>
 
         <div className="account-toolbar">
-          <NativeSelect
-            aria-label="Periodo del diario"
-            value={currentSemester.id}
-            onChange={(event) =>
-              savePreference({ currentSemesterId: event.target.value })
-            }
-          >
-            {data.semesters.map((s) => (
-              <NativeSelectOption key={s.id} value={s.id}>
-                {s.name} · {s.schoolYear}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
+          {activeTab !== "classes" && (
+            <NativeSelect
+              aria-label="Periodo del diario"
+              value={currentSemester.id}
+              onChange={(event) =>
+                savePreference({ currentSemesterId: event.target.value })
+              }
+            >
+              {data.semesters.map((s) => (
+                <NativeSelectOption key={s.id} value={s.id}>
+                  {s.name} · {s.schoolYear}
+                </NativeSelectOption>
+              ))}
+            </NativeSelect>
+          )}
           <span className={`sync-status ${session.status}`} role="status">
             {
               {
@@ -708,6 +723,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               semester={currentSemester}
               grades={semesterGrades}
               goal={preferences.gradeGoal}
+            />
+          )}
+          {activeTab === "classes" && (
+            <ClassesView
+              currentUserId={session.user!.id}
+              defaultDisplayName={preferences.studentName}
             />
           )}
         </div>
@@ -978,7 +999,7 @@ function Dashboard({
           </span>
           {nextTest && (
             <span className="date-pill">
-              {new Date(nextTest.dueAt).getTime() < Date.now()
+              {countdown?.past
                 ? "Scaduta · da completare"
                 : countdown?.value === "Oggi"
                   ? "Oggi"

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals-new.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ipagell.website"),
   title: "iPagell — Il tuo semestre, sotto controllo",
   description: "Diario scolastico digitale offline-first per voti, agenda e assenze.",
   manifest: "/manifest.webmanifest",

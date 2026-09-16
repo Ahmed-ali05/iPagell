@@ -18,7 +18,8 @@ Service worker: solo shell e asset statici; nessuna API in cache
 | Percorso | Responsabilità |
 |---|---|
 | `app/page.tsx`, `app/layout.tsx` | Entrata, metadati e PWA |
-| `components/ipagell-app.tsx` | Navigazione, viste e impostazioni; componente ancora da scomporre |
+| `components/ipagell-app.tsx` | Navigazione, viste personali e impostazioni; componente ancora da scomporre |
+| `components/classes-view.tsx` | Classi private, membri, ruoli, inviti e azioni amministrative C1 |
 | `components/account-gate.tsx`, `account-security.tsx`, `entry-dialog.tsx` | Accesso/onboarding, gestione credenziali, inserimento dati |
 | `hooks/use-diary.ts` | Fasi dell’app, accodamento per istanza, copia locale e server |
 | `lib/validation.ts`, `auth-validation.ts` | Schemi runtime e limiti; riferimento per dati accettati |
@@ -92,6 +93,6 @@ Il service worker non forza `skipWaiting`: un aggiornamento può attendere la ch
 
 ## Confine delle estensioni future
 
-Le fondamenta delle classi e degli inviti usano tabelle normalizzate separate da `diaries.payload`: una classe non deve poter leggere o dedurre voti, assenze o preferenze private. L'accesso applicativo resta disattivato per impostazione predefinita finché il flusso C1 non è completo. Gli eventi importati saranno sottoscrizioni unite all'agenda dall'interfaccia, non copie nascoste nel diario.
+Classi, appartenenze e inviti usano tabelle normalizzate separate da `diaries.payload`: una classe non può leggere o dedurre voti, assenze o preferenze private. Ogni endpoint verifica sessione, appartenenza e ruolo; i segreti degli inviti sono conservati soltanto come digest e i link usano il frammento URL, che non viene inviato al server. Gli eventi C2 saranno sottoscrizioni unite all'agenda dall'interfaccia, non copie nascoste nel diario.
 
 I documenti dello spazio studio AI richiederanno object storage, coda di elaborazione e indice di ricerca separati. Non inserire file, testo estratto o embedding nel payload del diario e non eseguire analisi AI nella richiesta HTTP di upload.

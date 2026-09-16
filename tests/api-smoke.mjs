@@ -35,6 +35,20 @@ async function call(path, body, cookie, extra = {}) {
     headers: response.headers,
   };
 }
+async function api(path, method, body, cookie) {
+  const response = await fetch(base + path, {
+    method,
+    headers: {
+      Origin: base,
+      "Content-Type": "application/json",
+      "CF-Connecting-IP": testIp,
+      ...(cookie ? { Cookie: cookie } : {}),
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const data = await response.json();
+  return { status: response.status, data };
+}
 function check(value, expected, label) {
   assert.deepEqual(value, expected, label);
   passed++;
@@ -172,6 +186,132 @@ try {
     (await call("/api/account", undefined, a.cookie)).status,
     200,
     "session remains valid after oversized request",
+  );
+  const createdClass = await api(
+    "/api/classes",
+    "POST",
+    {
+      name: "Classe QA",
+      description: "Dati sintetici",
+      displayName: "A",
+    },
+    a.cookie,
+  );
+  check(createdClass.status, 201, "class owner creates a class");
+  const classId = createdClass.data.class.id;
+  check(
+    (await api(`/api/classes/${classId}`, "GET", undefined, b.cookie)).status,
+    404,
+    "non-member cannot read class",
+  );
+  const ownerInvite = await api(
+    `/api/classes/${classId}/invites`,
+    "POST",
+    { expiresInDays: 7, maxUses: 2 },
+    a.cookie,
+  );
+  check(ownerInvite.status, 201, "owner creates invite");
+  const joined = await api(
+    "/api/classes/join",
+    "POST",
+    { code: ownerInvite.data.invite.code, displayName: "B" },
+    b.cookie,
+  );
+  check(joined.status, 201, "second account joins with code");
+  check(joined.data.class.members.length, 2, "joined class lists two members");
+  check(
+    (
+      await api(
+        `/api/classes/${classId}/invites`,
+        "POST",
+        { expiresInDays: 7, maxUses: 1 },
+        b.cookie,
+      )
+    ).status,
+    403,
+    "ordinary member cannot create invite",
+  );
+  check(
+    (
+      await api(
+        `/api/classes/${classId}/members/${b.id}`,
+        "PATCH",
+        { operation: "role", role: "moderator" },
+        a.cookie,
+      )
+    ).status,
+    200,
+    "owner promotes moderator",
+  );
+  const moderatorInvite = await api(
+    `/api/classes/${classId}/invites`,
+    "POST",
+    { expiresInDays: 7, maxUses: 1 },
+    b.cookie,
+  );
+  check(moderatorInvite.status, 201, "moderator creates invite");
+  check(
+    (
+      await api(
+        `/api/classes/${classId}/invites/${moderatorInvite.data.invite.id}`,
+        "DELETE",
+        {},
+        b.cookie,
+      )
+    ).status,
+    200,
+    "moderator revokes invite",
+  );
+  check(
+    (
+      await api(
+        `/api/classes/${classId}/members/${b.id}`,
+        "PATCH",
+        { operation: "transfer" },
+        a.cookie,
+      )
+    ).status,
+    200,
+    "owner transfers class",
+  );
+  check(
+    (
+      await api(
+        `/api/classes/${classId}/members/${a.id}`,
+        "DELETE",
+        {},
+        a.cookie,
+      )
+    ).status,
+    200,
+    "former owner leaves class",
+  );
+  check(
+    (await api(`/api/classes/${classId}`, "GET", undefined, a.cookie)).status,
+    404,
+    "former member loses access",
+  );
+  check(
+    (
+      await api(
+        "/api/classes/join",
+        "POST",
+        { code: moderatorInvite.data.invite.code, displayName: "A" },
+        a.cookie,
+      )
+    ).status,
+    409,
+    "revoked invite cannot be reused",
+  );
+  check(
+    (await api(`/api/classes/${classId}`, "DELETE", {}, b.cookie)).status,
+    200,
+    "new owner deletes class",
+  );
+  check(
+    (await api("/api/classes", "GET", undefined, b.cookie)).data.classes.length,
+    0,
+    "deleted class leaves no membership",
   );
   const recovery = await call("/api/auth/recover", {
     username: a.username,

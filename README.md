@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://ipagell.ahmed-2005-taverbe.chatgpt.site"><strong>Apri l'app</strong></a>
+  <a href="https://ipagell.website"><strong>Apri l'app</strong></a>
   ·
   <a href="docs/GUIDA-UTENTE.md">Guida utente</a>
   ·
@@ -36,6 +36,7 @@
 - **Account e sincronizzazione:** sessioni protette, diario personale su D1 e controllo dei conflitti tramite revisione.
 - **Uso offline:** copia locale in IndexedDB, shell PWA installabile e backup JSON esportabile.
 - **Configurazione flessibile:** semestri, materie, colori, tipologie e scala 1–6 personalizzabili.
+- **Classi private:** gruppi su invito con ruoli, membri e codici revocabili, senza condividere voti o assenze.
 
 ## Stato del progetto
 
@@ -91,7 +92,7 @@ Le prove API creano dati sintetici e devono essere eseguite soltanto contro un a
 | [Sicurezza](SECURITY.md) | Confini di fiducia e segnalazioni riservate |
 | [Changelog](CHANGELOG.md) | Evoluzione e note di rilascio |
 
-Le specifiche [Classi](docs/CLASSI.md) e [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md) descrivono possibili sviluppi futuri, non funzionalità già disponibili.
+La specifica [Classi](docs/CLASSI.md) distingue il gruppo C1 già disponibile dalle fasi condivise successive. [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md) resta un possibile sviluppo futuro.
 
 ## Contribuire
 

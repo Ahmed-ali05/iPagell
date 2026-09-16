@@ -2,7 +2,7 @@
 
 [Indice](../README.md) · [Piano prodotto](PRODOTTO.md) · [Sicurezza](../SECURITY.md)
 
-Specifica di prodotto e tecnica. Le funzioni descritte qui sono **pianificate e non ancora disponibili** nella versione pubblicata. Le fondamenta C0 sono state avviate: schema isolato, matrice permessi riusabile e interruttore di rilascio spento per impostazione predefinita.
+Specifica di prodotto e tecnica. Il gruppo privato C1 — creazione, membri, ruoli e inviti — è disponibile. Agenda condivisa, annunci e materiali restano pianificati per le fasi successive.
 
 ## Obiettivo
 
@@ -89,9 +89,11 @@ Le tabelle sono nuove e normalizzate; non vanno inserite dentro `diaries.payload
 
 Le foreign key eliminano le dipendenze interne quando una classe viene cancellata. Prima di rimuovere accesso o classe, le sottoscrizioni dell'utente vengono rese autonome usando lo snapshot già memorizzato. L'attività amministrativa non contiene il testo dei contenuti e viene conservata al massimo 90 giorni.
 
-## Contratto API previsto
+## Contratto API
 
-Gli endpoint saranno same-origin e autenticati con la sessione esistente. Il server ricava sempre l'identità dal cookie e verifica l'appartenenza alla classe per ogni oggetto.
+Gli endpoint sono same-origin e autenticati con la sessione esistente. Il server ricava sempre l'identità dal cookie e verifica l'appartenenza alla classe per ogni oggetto.
+
+Disponibili in C1:
 
 ```text
 GET, POST       /api/classes
@@ -101,13 +103,18 @@ GET, POST       /api/classes/:classId/invites
 DELETE          /api/classes/:classId/invites/:inviteId
 POST             /api/classes/join
 GET, PATCH, DELETE /api/classes/:classId/members/:userId
+```
+
+Pianificati per C2:
+
+```text
 GET, POST       /api/classes/:classId/events
 PATCH, DELETE   /api/classes/:classId/events/:eventId
 POST, DELETE    /api/class-events/:eventId/subscription
 PATCH            /api/class-events/:eventId/subscription
 ```
 
-Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di eventi usano una revisione attesa per non sovrascrivere modifiche concorrenti. Le liste sono paginate fin dal primo rilascio.
+Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di eventi useranno una revisione attesa per non sovrascrivere modifiche concorrenti. In C1 le liste hanno limiti server; la paginazione completa rientra nella fase C4.
 
 ## Sicurezza, privacy e abuso
 
@@ -123,14 +130,14 @@ Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di event
 
 | Fase | Stato | Contenuto | Criterio di uscita |
 |---|---|---|---|
-| C0 — fondazioni | Completata, funzione spenta | Migrazioni, autorizzazioni riusabili, feature flag e test ruoli | Nessuna rotta visibile; matrice permessi coperta dai test |
-| C1 — gruppo | Pianificata | Creazione classe, membri, link/codice, revoca, uscita e trasferimento | Due account possono completare il ciclo senza accessi residui |
+| C0 — fondazioni | Completata | Migrazioni, autorizzazioni riusabili, feature flag e test ruoli | Nessuna rotta visibile; matrice permessi coperta dai test |
+| C1 — gruppo | Completata | Creazione classe, membri, link/codice, revoca, uscita e trasferimento | Due account possono completare il ciclo senza accessi residui |
 | C2 — agenda | Pianificata | Materie condivise, eventi, aggiornamenti e annullamenti | Concorrenza e autorizzazioni verificate |
 | C3 — personale | Pianificata | Sottoscrizione, campi personali, scollegamento e cache offline | L'evento resta utile senza rete e dopo l'uscita |
 | C4 — cura | Pianificata | Attività minima, segnalazioni, liste grandi, accessibilità e notifiche in-app | Prova con più classi e dataset realistico |
 | C5 — materiali | Pianificata | Annunci, link e poi file con storage/scansione | Politica dati e infrastruttura file approvate |
 
-Le fondamenta C0 possono essere preparate dietro l'interruttore spento; non abilitare la funzione né iniziare il rilascio C1 prima di chiudere i P0 di affidabilità applicabili nella [roadmap](PRODOTTO.md). Ogni fase ha migrazione reversibile, test API e UI, documentazione e rilascio separato.
+L'interruttore server permette di disattivare l'area Classi in caso di incidente. C1 è pubblicata come prima versione controllata; non ampliarne la promozione prima di chiudere i P0 di affidabilità applicabili nella [roadmap](PRODOTTO.md). Ogni fase ha test API e UI, documentazione e rilascio separato.
 
 ### Avvio C0
 

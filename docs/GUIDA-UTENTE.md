@@ -4,7 +4,7 @@
 
 ## Primo accesso
 
-1. Apri [iPagell](https://ipagell.ahmed-2005-taverbe.chatgpt.site) e scegli **Crea un account**.
+1. Apri [iPagell](https://ipagell.website) e scegli **Crea un account**.
 2. Scegli un nome utente di 3–32 caratteri: lettere, numeri, punto, trattino o underscore; il primo carattere deve essere una lettera o un numero. Maiuscole e minuscole non distinguono account diversi.
 3. Usa una password unica di 15–128 caratteri. Puoi usare il gestore password del dispositivo.
 4. Conserva il codice di recupero mostrato dopo la registrazione. È una chiave d’accesso: non inviarlo a nessuno e non inserirlo nelle segnalazioni di problemi.
@@ -27,6 +27,7 @@ La prima apertura online serve a preparare la copia offline. L’installazione s
 | Voti | Registrare risultati, selezionare materia e simulare il voto necessario |
 | Assenze | Registrare data, ore e tipologia; impostare una soglia personale |
 | Statistiche | Confrontare materie, andamento e periodi presenti |
+| Classi | Creare o raggiungere un gruppo privato, gestire membri e inviti |
 | Impostazioni | Gestire materie e semestri, tema, movimento, backup e account |
 
 Il selettore del periodo cambia i voti, le attività e le assenze visualizzati. Le materie sono condivise tra i periodi dello stesso diario. Archiviare un semestre non lo rende immutabile.
@@ -46,6 +47,14 @@ Nel simulatore scegli obiettivo, tipologia e peso della prossima prova. Il risul
 Registra la durata in ore; una voce senza materia può rappresentare più lezioni, non necessariamente una giornata intera. La soglia è personale e non certifica i limiti della tua scuola. Ritardi e uscite sono conteggiati in base alle ore inserite.
 
 I promemoria attuali sono avvisi ad app aperta, previo consenso. Non sono una sveglia affidabile ad app chiusa: per scadenze importanti usa anche il calendario del dispositivo.
+
+## Classi private
+
+Apri **Classi** e scegli **Nuova classe** per creare un gruppo. Diventi proprietario e puoi generare un link o un codice con scadenza e numero massimo di ingressi. Chi riceve il link accede al proprio account iPagell e sceglie il nome da mostrare nella classe.
+
+Il proprietario può nominare o revocare moderatori, rimuovere membri, modificare la classe, trasferire la proprietà ed eliminarla. I moderatori possono creare o revocare inviti e rimuovere membri ordinari. Un membro può cambiare il proprio nome visibile o uscire. Il proprietario deve prima trasferire la proprietà oppure eliminare la classe.
+
+Voti, assenze, medie, preferenze e diario personale non vengono mostrati alla classe. La prima versione condivisa gestisce gruppo e accessi; eventi e agenda condivisa arriveranno nella fase C2.
 
 ## Salvataggio, offline e conflitti
 

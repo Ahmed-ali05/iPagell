@@ -75,8 +75,22 @@ export async function POST(request: Request) {
           { error: "Scrivi esattamente il tuo nome utente per confermare." },
           400,
         );
+      const ownedClass = await db
+        .prepare("SELECT name FROM classes WHERE owner_id=? LIMIT 1")
+        .bind(user.id)
+        .first<{ name: string }>();
+      if (ownedClass)
+        return json(
+          {
+            error: `Prima trasferisci o elimina la classe “${ownedClass.name}”.`,
+          },
+          409,
+        );
       // D1 batch is transactional. Both deletes use the reauthenticated version.
       const results = await db.batch([
+        db
+          .prepare("DELETE FROM class_invites WHERE created_by=?")
+          .bind(user.id),
         db
           .prepare(
             "DELETE FROM diaries WHERE user_id=? AND EXISTS(SELECT 1 FROM accounts WHERE id=? AND auth_version=?)",
@@ -87,7 +101,7 @@ export async function POST(request: Request) {
           .bind(user.id, account.auth_version),
       ]);
       // D1 changes may include cascading session deletions.
-      if (results[1].meta.changes < 1)
+      if (results[2].meta.changes < 1)
         return json({ error: "Account cambiato. Accedi di nuovo." }, 409);
     }
     const response = json({ ok: true });

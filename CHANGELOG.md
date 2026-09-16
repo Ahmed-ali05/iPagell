@@ -4,6 +4,13 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 
 ## Non rilasciato
 
+### Classi private C1
+
+- Nuova area Classi per creare un gruppo, entrare tramite link o codice e scegliere il proprio nome visibile.
+- Proprietari e moderatori possono creare e revocare inviti; il proprietario gestisce ruoli, trasferimento ed eliminazione.
+- Uscita e rimozione revocano subito l’accesso; voti, assenze e diario personale restano fuori dallo spazio condiviso.
+- Aggiornati sito e inviti per usare il dominio principale `ipagell.website`.
+
 ### Fondamenta classi C0
 
 - Aggiunte tabelle normalizzate per classi, membri e inviti, separate dal diario personale.

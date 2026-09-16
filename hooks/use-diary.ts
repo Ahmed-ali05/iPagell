@@ -189,7 +189,7 @@ export function useDiary() {
     }
   }, [publish, setStatus, sync]);
   useEffect(() => {
-    void load();
+    queueMicrotask(() => void load());
   }, [load]);
 
   const enqueue = useCallback((work: () => Promise<void>) => {

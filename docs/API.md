@@ -18,6 +18,12 @@ Ogni mutazione richiede `Origin` uguale all’origine della richiesta e `Content
 | `GET /api/account` | Nessuno; sessione richiesta | 200: `user`, `diary` oppure `null` |
 | `POST /api/account` | Profilo iniziale; sessione richiesta | 201: `user`, `diary` con revisione 1 |
 | `PUT /api/diary` | Snapshot e revisione; sessione richiesta | 200: `revision` incrementata |
+| `GET, POST /api/classes` | GET senza corpo; POST con nome, descrizione e nome visibile | Elenco classi oppure 201: classe creata |
+| `GET, PATCH, DELETE /api/classes/:classId` | PATCH con nome e descrizione; DELETE con `{}` | Dettaglio, modifica o eliminazione della classe |
+| `POST /api/classes/join` | `code`, `displayName` | 201: ingresso nella classe |
+| `GET, POST /api/classes/:classId/invites` | POST con `expiresInDays`, `maxUses` | Metadati inviti oppure 201 con codice mostrato una volta |
+| `DELETE /api/classes/:classId/invites/:inviteId` | `{}` | Revoca immediata dell’invito |
+| `GET, PATCH, DELETE /api/classes/:classId/members/:userId` | PATCH con operazione nome, ruolo o trasferimento | Lettura, modifica ruolo/nome, uscita o rimozione |
 
 `user = { id, username }`. Registrazione account e creazione diario sono due passaggi distinti: dopo la prima, `GET /api/account` può restituire `diary: null`. Un username duplicato restituisce 409; non esiste idempotency key per registrazione o recupero.
 
@@ -52,6 +58,20 @@ Schema della busta (notazione descrittiva, non un JSON da inviare):
 `expectedUserId` serve a rilevare cambi account nella scheda, non ad autorizzare l’accesso. Il proprietario viene sempre ricavato dal cookie. Nessun endpoint accetta un ID per leggere il diario di un altro account. Per i campi completi, vedere [tipi](../types/domain.ts) e [schemi runtime](../lib/validation.ts).
 
 Un 409 conserva il server invariato per quella richiesta. Non incrementare artificialmente la revisione per forzare una scrittura: leggere, confrontare e chiedere una decisione esplicita all’utente.
+
+### Classi e inviti
+
+Tutti gli endpoint Classi richiedono la sessione iPagell. Un identificativo valido non concede accesso: il server verifica l’appartenenza e il ruolo per ogni oggetto. I membri vedono soltanto il nome visualizzato scelto nella classe, non username o credenziali.
+
+Il codice invito contiene 12 caratteri non ambigui e può essere scritto con o senza trattini. Il server conserva solo SHA-256 del codice. Il codice in chiaro compare soltanto nella risposta di creazione; i successivi `GET` restituiscono scadenza, utilizzi e stato. I link inseriscono il codice nel frammento `#join=`, che non viene inviato nella richiesta HTTP.
+
+Operazioni membro:
+
+- `{ operation: "display-name", displayName }`: soltanto sul proprio profilo nella classe;
+- `{ operation: "role", role: "moderator" | "member" }`: soltanto il proprietario;
+- `{ operation: "transfer" }`: trasferisce la proprietà al membro indicato e rende membro il proprietario precedente.
+
+Un moderatore può rimuovere membri ordinari, non proprietario o altri moderatori. Il proprietario non può uscire o eliminare il proprio account finché non trasferisce o elimina le classi possedute.
 
 ### Operazioni sensibili
 
