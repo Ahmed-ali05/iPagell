@@ -1,5 +1,9 @@
 # Revisione iPagell — 16 settembre 2026
 
+[Indice](../README.md) · [Guida utente](GUIDA-UTENTE.md) · [Priorità e verifiche ancora aperte](PRODOTTO.md)
+
+Questo documento conserva l’esito della revisione iniziale. Le verifiche riportate sono storiche, non vengono ripetute automaticamente a ogni modifica della documentazione.
+
 Revisione mirata di codice, sicurezza e cinque profili d’uso. Non è una certificazione o un penetration test indipendente.
 
 ## Cinque prospettive
