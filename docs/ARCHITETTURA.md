@@ -25,7 +25,7 @@ Service worker: solo shell e asset statici; nessuna API in cache
 | `lib/calculations.ts` | Medie, simulatore e andamento incrementale |
 | `lib/account-storage.ts` | IndexedDB, backup e recupero legacy |
 | `lib/server/` | Sessioni, hashing, controlli HTTP e query parametrizzate |
-| `db/schema.ts`, `drizzle/` | Schema D1 e migrazioni versionate |
+| `db/schema.ts`, `drizzle/` | Schema D1 e migrazioni versionate, incluse le fondamenta isolate delle classi |
 | `public/`, `scripts/generate-precache.mjs` | Asset PWA e generazione allowlist del service worker |
 
 React/TypeScript, Tailwind e componenti Radix/Shadcn; grafici Recharts. Vinext/Vite produce il Worker e il client usando convenzioni compatibili con Next. Non trattare il repository come un server Next standard. Il backend usa D1 tramite binding `DB`; nessun R2 configurato e nessun servizio email.
@@ -38,6 +38,9 @@ React/TypeScript, Tailwind e componenti Radix/Shadcn; grafici Recharts. Vinext/V
 | `sessions` | Digest token, account, versione credenziali, scadenza; FK con cancellazione a cascata |
 | `auth_limits` | Chiave digest del bucket, tentativi, scadenza |
 | `diaries` | Un payload JSON per `user_id`, revisione, creazione e aggiornamento |
+| `classes` | Identità, proprietario e impostazioni del gruppo; nessun dato del diario personale |
+| `class_members` | Appartenenza, nome visualizzato e ruolo proprietario/moderatore/membro |
+| `class_invites` | Solo digest dell'invito, limiti, scadenza, utilizzi e revoca |
 
 `diaries.user_id` è una chiave primaria, ma **non ha una FK SQL verso accounts**: l’integrità è attualmente mantenuta dalle API e dalla cancellazione transazionale. Non inserire snapshot tramite SQL operativo senza verificarne il proprietario.
 
@@ -89,6 +92,6 @@ Il service worker non forza `skipWaiting`: un aggiornamento può attendere la ch
 
 ## Confine delle estensioni future
 
-Classi, inviti ed eventi condivisi useranno tabelle normalizzate separate da `diaries.payload`: una classe non deve poter leggere o dedurre voti, assenze o preferenze private. Gli eventi importati saranno sottoscrizioni unite all'agenda dall'interfaccia, non copie nascoste nel diario.
+Le fondamenta delle classi e degli inviti usano tabelle normalizzate separate da `diaries.payload`: una classe non deve poter leggere o dedurre voti, assenze o preferenze private. L'accesso applicativo resta disattivato per impostazione predefinita finché il flusso C1 non è completo. Gli eventi importati saranno sottoscrizioni unite all'agenda dall'interfaccia, non copie nascoste nel diario.
 
 I documenti dello spazio studio AI richiederanno object storage, coda di elaborazione e indice di ricerca separati. Non inserire file, testo estratto o embedding nel payload del diario e non eseguire analisi AI nella richiesta HTTP di upload.

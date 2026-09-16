@@ -16,6 +16,7 @@ Il build genera `dist/server/wrangler.json`, il Worker, gli asset e il service w
 ```bash
 npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0000_glorious_crusher_hogan.sql
 npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0001_amused_tombstone.sql
+npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0002_loving_roland_deschain.sql
 ```
 
 Questi comandi non sono idempotenti e non registrano una cronologia Wrangler delle migrazioni: sono il bootstrap manuale dello schema attuale. Non rieseguirli su un database già inizializzato. Il percorso assoluto di persistenza evita di creare accidentalmente un database sotto `dist/server/`. Non aggiungere `--remote`: la produzione è gestita tramite Sites.

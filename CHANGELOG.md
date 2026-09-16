@@ -4,6 +4,12 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 
 ## Non rilasciato
 
+### Fondamenta classi C0
+
+- Aggiunte tabelle normalizzate per classi, membri e inviti, separate dal diario personale.
+- Introdotta una matrice centralizzata dei permessi per proprietario, moderatore e membro, coperta da test.
+- Aggiunto un interruttore server spento per impostazione predefinita: nessuna schermata o rotta classi è ancora esposta.
+
 ### Documentazione e gestione del progetto
 
 - Repository preparato per la pubblicazione open source con README riorganizzato, metadati GitHub e licenza MIT.

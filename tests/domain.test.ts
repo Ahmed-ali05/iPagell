@@ -14,6 +14,13 @@ import {
   neededGrade,
 } from "../lib/calculations";
 import { checkMutation, readJson } from "../lib/server/http";
+import {
+  canClassAction,
+  classFeatureEnabled,
+  parseClassRole,
+  type ClassAction,
+  type ClassRole,
+} from "../lib/classes/permissions";
 const fixture = () =>
   createDiary({
     name: "Test",
@@ -131,4 +138,46 @@ test("CSRF and streamed body size checks", async () => {
       4096,
     ),
   );
+});
+
+test("class role permissions match the product matrix", () => {
+  const allowed: Record<ClassRole, ClassAction[]> = {
+    owner: [
+      "class:view",
+      "content:create",
+      "content:update-own",
+      "content:moderate",
+      "invite:manage",
+      "member:remove",
+      "role:manage",
+      "class:manage",
+      "class:delete",
+      "class:transfer",
+    ],
+    moderator: [
+      "class:view",
+      "content:create",
+      "content:update-own",
+      "content:moderate",
+      "invite:manage",
+      "member:remove",
+    ],
+    member: ["class:view", "content:create", "content:update-own"],
+  };
+  const actions = allowed.owner;
+  for (const role of ["owner", "moderator", "member"] as const)
+    for (const action of actions)
+      assert.equal(
+        canClassAction(role, action),
+        allowed[role].includes(action),
+        `${role} / ${action}`,
+      );
+});
+
+test("class access rejects unknown roles and stays disabled by default", () => {
+  assert.equal(parseClassRole("teacher"), null);
+  assert.equal(parseClassRole("moderator"), "moderator");
+  assert.equal(classFeatureEnabled(undefined), false);
+  assert.equal(classFeatureEnabled("true"), false);
+  assert.equal(classFeatureEnabled(" enabled "), true);
 });

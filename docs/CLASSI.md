@@ -2,7 +2,7 @@
 
 [Indice](../README.md) · [Piano prodotto](PRODOTTO.md) · [Sicurezza](../SECURITY.md)
 
-Specifica di prodotto e tecnica. Le funzioni descritte qui sono **pianificate e non ancora disponibili** nella versione pubblicata.
+Specifica di prodotto e tecnica. Le funzioni descritte qui sono **pianificate e non ancora disponibili** nella versione pubblicata. Le fondamenta C0 sono state avviate: schema isolato, matrice permessi riusabile e interruttore di rilascio spento per impostazione predefinita.
 
 ## Obiettivo
 
@@ -121,16 +121,22 @@ Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di event
 
 ## Consegna incrementale
 
-| Fase | Contenuto | Criterio di uscita |
-|---|---|---|
-| C0 — fondazioni | Migrazioni, autorizzazioni riusabili, feature flag e test ruoli | Nessuna rotta visibile; matrice permessi coperta dai test |
-| C1 — gruppo | Creazione classe, membri, link/codice, revoca, uscita e trasferimento | Due account possono completare il ciclo senza accessi residui |
-| C2 — agenda | Materie condivise, eventi, aggiornamenti e annullamenti | Concorrenza e autorizzazioni verificate |
-| C3 — personale | Sottoscrizione, campi personali, scollegamento e cache offline | L'evento resta utile senza rete e dopo l'uscita |
-| C4 — cura | Attività minima, segnalazioni, liste grandi, accessibilità e notifiche in-app | Prova con più classi e dataset realistico |
-| C5 — materiali | Annunci, link e poi file con storage/scansione | Politica dati e infrastruttura file approvate |
+| Fase | Stato | Contenuto | Criterio di uscita |
+|---|---|---|---|
+| C0 — fondazioni | Completata, funzione spenta | Migrazioni, autorizzazioni riusabili, feature flag e test ruoli | Nessuna rotta visibile; matrice permessi coperta dai test |
+| C1 — gruppo | Pianificata | Creazione classe, membri, link/codice, revoca, uscita e trasferimento | Due account possono completare il ciclo senza accessi residui |
+| C2 — agenda | Pianificata | Materie condivise, eventi, aggiornamenti e annullamenti | Concorrenza e autorizzazioni verificate |
+| C3 — personale | Pianificata | Sottoscrizione, campi personali, scollegamento e cache offline | L'evento resta utile senza rete e dopo l'uscita |
+| C4 — cura | Pianificata | Attività minima, segnalazioni, liste grandi, accessibilità e notifiche in-app | Prova con più classi e dataset realistico |
+| C5 — materiali | Pianificata | Annunci, link e poi file con storage/scansione | Politica dati e infrastruttura file approvate |
 
-Non iniziare C0 prima di chiudere i P0 di affidabilità applicabili nella [roadmap](PRODOTTO.md). Ogni fase ha migrazione reversibile, test API e UI, documentazione e rilascio separato.
+Le fondamenta C0 possono essere preparate dietro l'interruttore spento; non abilitare la funzione né iniziare il rilascio C1 prima di chiudere i P0 di affidabilità applicabili nella [roadmap](PRODOTTO.md). Ogni fase ha migrazione reversibile, test API e UI, documentazione e rilascio separato.
+
+### Avvio C0
+
+- Responsabile iniziale: manutentore del progetto iPagell.
+- Criterio d'accettazione: migrazione D1 ispezionata, matrice completa dei tre ruoli coperta da test automatici e nessuna rotta classi raggiungibile finché `IPAGELL_CLASSES` non vale esattamente `enabled`.
+- Rollback: mantenere l'interruttore spento; prima che esistano dati reali, le tre nuove tabelle possono essere rimosse in ordine `class_invites`, `class_members`, `classes`. Dopo l'apertura C1 si useranno solo migrazioni in avanti e procedure di conservazione dati.
 
 ## Cose volutamente escluse dal primo rilascio
 
