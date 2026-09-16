@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://ipagell.ahmed-2005-taverbe.chatgpt.site"><strong>Apri l'app</strong></a>
+  <a href="https://ipagell.website"><strong>Apri l'app</strong></a>
   ·
   <a href="docs/GUIDA-UTENTE.md">Guida utente</a>
   ·
