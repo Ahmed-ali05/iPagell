@@ -4,7 +4,7 @@
   "short_name": "iPagell",
   "description": "Voti, agenda, assenze e statistiche scolastiche, sempre disponibili offline.",
   "lang": "it-CH",
-  "start_url": "/?source=pwa",
+  "start_url": "/app?source=pwa",
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui"],
@@ -18,8 +18,8 @@
     { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Aggiungi voto", "short_name": "Nuovo voto", "url": "/?action=grade", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Apri agenda", "short_name": "Agenda", "url": "/?view=agenda", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Apri classi", "short_name": "Classi", "url": "/?view=classes", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Aggiungi voto", "short_name": "Nuovo voto", "url": "/app?action=grade", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Apri agenda", "short_name": "Agenda", "url": "/app?view=agenda", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Apri classi", "short_name": "Classi", "url": "/app?view=classes", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }

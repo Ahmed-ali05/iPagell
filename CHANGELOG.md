@@ -4,6 +4,13 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 
 ## Non rilasciato
 
+### Distribuzione indipendente e pagina pubblica
+
+- Aggiunta una landing page SEO pubblica con dati strutturati, FAQ, sitemap e regole robots; l'area account è ora separata in `/app` e i vecchi link vengono inoltrati.
+- Preparato e verificato il deploy autonomo su Cloudflare Workers con D1 europeo, osservabilità e migrazioni tracciate.
+- Aggiunti comandi ripetibili e un workflow GitHub Actions manuale per la pubblicazione.
+- Il dominio principale resta temporaneamente sul precedente ambiente fino alla migrazione verificata dei dati.
+
 ### Classi private C1
 
 - Nuova area Classi per creare un gruppo, entrare tramite link o codice e scegliere il proprio nome visibile.

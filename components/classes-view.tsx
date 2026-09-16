@@ -329,7 +329,7 @@ export function ClassesView({
   );
 
   const inviteLink = createdInvite
-    ? `https://ipagell.website/?view=classes#join=${createdInvite.code}`
+    ? `https://ipagell.website/app?view=classes#join=${createdInvite.code}`
     : "";
 
   if (loading)

@@ -88,6 +88,7 @@ Le prove API creano dati sintetici e devono essere eseguite soltanto contro un a
 | [Architettura](docs/ARCHITETTURA.md) | Componenti, persistenza, formule e sincronizzazione |
 | [Contratto API](docs/API.md) | Endpoint, richieste, risposte ed errori |
 | [Manutenzione](docs/MANUTENZIONE.md) | Ambiente locale, test, build, migrazioni e incidenti |
+| [Distribuzione](docs/DEPLOYMENT.md) | Worker indipendente, D1, CI e passaggio del dominio |
 | [Piano prodotto](docs/PRODOTTO.md) | Priorità, limiti, qualità e criteri di rilascio |
 | [Sicurezza](SECURITY.md) | Confini di fiducia e segnalazioni riservate |
 | [Changelog](CHANGELOG.md) | Evoluzione e note di rilascio |

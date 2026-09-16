@@ -3,10 +3,17 @@ import "./globals-new.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ipagell.website"),
-  title: "iPagell — Il tuo semestre, sotto controllo",
-  description: "Diario scolastico digitale offline-first per voti, agenda e assenze.",
+  title: {
+    default: "iPagell — Diario scolastico digitale per studenti",
+    template: "%s | iPagell",
+  },
+  description:
+    "Organizza voti, medie, compiti, assenze e classi in un diario scolastico digitale, privato e disponibile anche offline.",
   manifest: "/manifest.webmanifest",
   applicationName: "iPagell",
+  creator: "iPagell",
+  category: "education",
+  formatDetection: { email: false, address: false, telephone: false },
   appleWebApp: { capable: true, statusBarStyle: "default", title: "iPagell" },
   icons: {
     icon: "/favicon.svg",

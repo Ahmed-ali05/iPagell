@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "ipagell",
+  "main": "vinext/server/fetch-handler",
+  "compatibility_date": "2026-09-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "vars": {
+    "IPAGELL_CLASSES": "enabled"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ipagell-production",
+      "database_id": "a45281d4-7fea-4ba1-8f04-439aab8d1b93",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    }
+  }
+}

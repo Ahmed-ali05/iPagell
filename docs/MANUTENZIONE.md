@@ -19,7 +19,7 @@ npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-
 npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0002_loving_roland_deschain.sql
 ```
 
-Questi comandi non sono idempotenti e non registrano una cronologia Wrangler delle migrazioni: sono il bootstrap manuale dello schema attuale. Non rieseguirli su un database già inizializzato. Il percorso assoluto di persistenza evita di creare accidentalmente un database sotto `dist/server/`. Non aggiungere `--remote`: la produzione è gestita tramite Sites.
+Questi comandi non sono idempotenti e non registrano una cronologia Wrangler delle migrazioni: sono il bootstrap manuale dello schema locale iniziale. Non rieseguirli su un database già inizializzato. Il percorso assoluto di persistenza evita di creare accidentalmente un database sotto `dist/server/`. Le migrazioni remote sono gestite dal flusso descritto in [Distribuzione](DEPLOYMENT.md).
 
 Avvio sviluppo:
 
@@ -64,10 +64,10 @@ La suite accetta solo host locali, crea due account sintetici e ne tenta la canc
 2. Leggere la migrazione: soprattutto cancellazioni, vincoli e cambi di formato. Non modificare migrazioni già pubblicate.
 3. Provare su copia locale e preparare recupero dati prima di modifiche distruttive. Le future migrazioni locali vanno applicate una sola volta, in ordine; il bootstrap sopra non è un runner generale.
 4. Eseguire i controlli pertinenti e aggiornare changelog, API e guida se cambia il comportamento.
-5. Pubblicare tramite il flusso Sites del progetto esistente. `.openai/hosting.json` contiene l’identità del sito e il binding `DB`, non segreti.
-6. Il pacchetto deve includere `dist/server/index.js`, client e migrazioni in `dist/.openai/drizzle/`. Attendere l’esito terminale del deploy.
+5. Generare il pacchetto indipendente con `npm run build:cloudflare` e controllare `npx wrangler deploy --dry-run`.
+6. Pubblicare con `npm run deploy:cloudflare`, attendere l'esito terminale e provare le route pubbliche e private. Il precedente progetto Sites resta separato finché dati e dominio non sono migrati.
 
-Non mettere token Git nelle remote, nei file, negli screenshot o nella documentazione. Non pubblicare `.wrangler/`, database locali, file `.env`, cookie o backup degli utenti. Non usare una nuova identità Sites come scorciatoia per risolvere errori di deploy.
+Non mettere token Git o Cloudflare nelle remote, nei file, negli screenshot o nella documentazione. Non pubblicare `.wrangler/`, database locali, file `.env`, cookie o backup degli utenti. Non usare un nuovo database come scorciatoia per risolvere errori di deploy sul database esistente.
 
 Un rollback del codice **non annulla le migrazioni**. Prima di ripubblicare una versione precedente, verificare che sappia leggere lo schema e il payload correnti. Non ripristinare un intero database sopra dati nuovi senza piano e autorizzazione espliciti.
 
