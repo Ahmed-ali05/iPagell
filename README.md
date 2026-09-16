@@ -19,6 +19,8 @@ L’app **ha un backend**: API su Cloudflare Workers e database D1. IndexedDB co
 | Integrare o verificare gli endpoint | [Contratto API](docs/API.md) |
 | Avviare, testare, pubblicare e gestire problemi | [Manutenzione](docs/MANUTENZIONE.md) |
 | Priorità, qualità, limiti e criteri di rilascio | [Piano prodotto](docs/PRODOTTO.md) |
+| Progettare classi autogestite, inviti e agenda condivisa | [Specifica classi](docs/CLASSI.md) |
+| Capire la futura mappa AI costruita dalle dispense | [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md) |
 | Confini di sicurezza e segnalazioni riservate | [Sicurezza](SECURITY.md) |
 | Vedere cosa è cambiato | [Registro modifiche](CHANGELOG.md) |
 | Consultare la revisione precedente | [Revisione del 16 settembre](docs/REVIEW.md) |

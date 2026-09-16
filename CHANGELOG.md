@@ -10,6 +10,8 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 - Guida utente, architettura, API, manutenzione e documento di sicurezza.
 - Cinque profili d’uso, roadmap prioritaria con criteri d’accettazione, checklist di rilascio e linee guida per contribuire.
 - Controllo ripetibile dei collegamenti locali della documentazione.
+- Specifica implementabile per classi autogestite, inviti revocabili, ruoli e agenda collegata.
+- Progetto dello spazio studio AI: albero/grafo incrementale dalle dispense, fonti, versionamento, privacy, rischi ed evaluation.
 - Nessuna modifica al comportamento o ai dati dell’app in questo aggiornamento documentale.
 
 ## 2026-09-16 — Pubblicazione Sites 2

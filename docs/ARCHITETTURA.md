@@ -2,7 +2,7 @@
 
 [Indice](../README.md) · [API](API.md) · [Manutenzione](MANUTENZIONE.md)
 
-Descrizione del codice corrente, non del solo brief iniziale. Stato documentato: 16 settembre 2026.
+Descrizione del codice corrente, non del solo brief iniziale. Stato documentato: 16 settembre 2026. Le architetture future sono separate nelle specifiche [Classi](CLASSI.md) e [Spazio studio AI](SPAZIO-STUDIO-AI.md).
 
 ## Componenti e responsabilità
 
@@ -86,3 +86,9 @@ IndexedDB `ipagell-db`, versione 2: store `accounts` per ID utente e store `stat
 La build sostituisce i marker in `dist/client/sw.js` con hash e lista degli asset. Non distribuire direttamente il template `public/sw.js`. Le API, le rotte di autenticazione e le risposte RSC non sono in cache. La pagina `/` è una shell generica senza diario utente incorporato.
 
 Il service worker non forza `skipWaiting`: un aggiornamento può attendere la chiusura delle schede controllate. Eliminare le cache senza backup non è una strategia di migrazione dati. La registrazione del worker avviene solo nella build di produzione.
+
+## Confine delle estensioni future
+
+Classi, inviti ed eventi condivisi useranno tabelle normalizzate separate da `diaries.payload`: una classe non deve poter leggere o dedurre voti, assenze o preferenze private. Gli eventi importati saranno sottoscrizioni unite all'agenda dall'interfaccia, non copie nascoste nel diario.
+
+I documenti dello spazio studio AI richiederanno object storage, coda di elaborazione e indice di ricerca separati. Non inserire file, testo estratto o embedding nel payload del diario e non eseguire analisi AI nella richiesta HTTP di upload.

@@ -1,6 +1,6 @@
 # Cura del prodotto e piano di lavoro
 
-[Indice](../README.md) · [Revisione storica](REVIEW.md)
+[Indice](../README.md) · [Classi](CLASSI.md) · [Spazio studio AI](SPAZIO-STUDIO-AI.md) · [Revisione storica](REVIEW.md)
 
 ## Promessa e confini
 
@@ -42,8 +42,15 @@ Le righe seguenti sono **aperte**, non funzionalità già consegnate. P0 indica 
 | Q06 / P1 | Manutenibilità e test | Separare viste dal componente principale; runner locale migrazioni tracciato e ripetibile; controlli automatizzati in CI |
 | Q07 / P1 | Accuratezza scolastica avanzata | Definire medie per componenti e congelamento storico, con esempi approvati e test prima dell’implementazione |
 | Q08 / P2 | Estensioni d’uso | Valutare vista settimana e promemoria push reali solo con infrastruttura, consenso e costi chiariti |
+| C01 / P1 | Classi autogestite | Ruoli proprietario/moderatore/membro, inviti revocabili e isolamento dei dati coperti da test |
+| C02 / P1 | Agenda condivisa | Eventi collaborativi e sottoscrizioni personali aggiornabili senza condividere il diario |
+| C03 / P2 | Annunci e materiali | Introdurre prima link/testo; file soltanto con storage privato, scansione e policy dati |
+| A01 / ricerca | Spazio studio AI | Prototipo offline su corpus autorizzato con citazioni, albero incrementale ed evaluation documentata |
+| A02 / futuro | AI personale in produzione | Solo dopo privacy, cancellazione, quote, storage, code e soglie di qualità approvate |
 
 Prima di ogni intervento assegnare una persona responsabile e un criterio d’accettazione. Non sono ancora assegnati proprietari individuali né scadenze. Non introdurre analytics sui dati scolastici solo per misurare l’adozione: prima definire finalità e minimizzazione.
+
+Le specifiche [Classi](CLASSI.md) e [Spazio studio AI](SPAZIO-STUDIO-AI.md) descrivono l'ordine di realizzazione. La collaborazione viene prima dell'AI in produzione; la prova tecnica AI può procedere isolata soltanto con documenti sintetici o autorizzati.
 
 ## Checklist di rilascio
 

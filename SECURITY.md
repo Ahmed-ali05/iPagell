@@ -35,3 +35,12 @@ La pulizia di sessioni scadute e bucket avviene in occasione della creazione di 
 Non pubblicare exploit con dati reali, backup, password, codici di recupero, cookie o dump database. Contattare privatamente il responsabile del progetto tramite un canale già verificato. Un indirizzo dedicato e uno SLA **non sono ancora definiti**: la loro attivazione è una priorità prima della diffusione ampia.
 
 Includere versione interessata, impatto, passaggi riproducibili su account sintetici e prove minimizzate. Non accedere a dati altrui né svolgere test di carico sul sito pubblico. Chi mantiene il progetto deve confermare la ricezione, riprodurre in isolamento, classificare il rischio, concordare contenimento e rilascio, aggiornare i test e comunicare i limiti della correzione.
+
+## Funzioni future
+
+Le classi e lo spazio studio AI non fanno parte dell'attuale superficie pubblicata. Le rispettive specifiche fissano requisiti di sicurezza prima dell'implementazione:
+
+- [Classi autogestite](docs/CLASSI.md): autorizzazioni server-side, inviti conservati come digest, isolamento del diario e test contro IDOR/escalation;
+- [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md): file non fidati, prompt injection, isolamento di storage/vettori, cancellazione dei derivati, quote e trattamento da parte del fornitore.
+
+Non collegare un modello AI o accettare file reali in produzione finché informativa, provider, regione, conservazione, scansione, cancellazione e responsabilità operativa non sono stati approvati e verificati.
