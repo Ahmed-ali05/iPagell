@@ -1,5 +1,5 @@
+/* eslint-disable @next/next/no-html-link-for-pages -- Full-page navigation avoids the Vinext client-router crash between the SEO page and the diary. */
 import type { Metadata } from "next";
-import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
@@ -170,18 +170,18 @@ export default async function Home() {
       />
 
       <header className={styles.header}>
-        <Link className={styles.brand} href="/" aria-label="iPagell, pagina iniziale">
+        <a className={styles.brand} href="/" aria-label="iPagell, pagina iniziale">
           <span className={styles.logo}>iP</span>
           <span>iPagell</span>
-        </Link>
+        </a>
         <nav className={styles.nav} aria-label="Navigazione principale">
           <a href="#funzioni">Funzioni</a>
           <a href="#privacy">Privacy</a>
           <a href="#domande">Domande</a>
         </nav>
-        <Link className={styles.headerCta} href="/app">
+        <a className={styles.headerCta} href="/app">
           Apri il diario <ArrowRight size={16} aria-hidden="true" />
-        </Link>
+        </a>
       </header>
 
       <section className={styles.hero}>
@@ -195,9 +195,9 @@ export default async function Home() {
             ordinato. Tu decidi cosa resta privato e cosa condividere.
           </p>
           <div className={styles.heroActions}>
-            <Link className={styles.primaryCta} href="/app">
+            <a className={styles.primaryCta} href="/app">
               Inizia con iPagell <ArrowRight size={18} aria-hidden="true" />
-            </Link>
+            </a>
             <a className={styles.secondaryCta} href="#come-funziona">
               Scopri come funziona
             </a>
@@ -324,15 +324,15 @@ export default async function Home() {
           <h2>Metti a fuoco il tuo semestre.</h2>
           <p>Apri il diario, aggiungi la prima materia e costruisci una routine più leggera.</p>
         </div>
-        <Link className={styles.lightCta} href="/app">
+        <a className={styles.lightCta} href="/app">
           Apri iPagell <ArrowRight size={18} aria-hidden="true" />
-        </Link>
+        </a>
       </section>
 
       <footer className={styles.footer}>
         <div className={styles.brand}><span className={styles.logo}>iP</span><span>iPagell</span></div>
         <p>Il diario scolastico personale per vedere il semestre con più chiarezza.</p>
-        <Link href="/app">Accedi all’app</Link>
+        <a href="/app">Accedi all’app</a>
       </footer>
     </main>
   );
