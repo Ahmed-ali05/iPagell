@@ -4,6 +4,8 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 
 ## Non rilasciato
 
+- Password: minimo ridotto a 12 caratteri per registrazione, recupero e cambio password; interfaccia e guida allineate.
+
 ### Semplificazione e contenuti generici
 
 - Modello iniziale con materie generiche personalizzabili; diario vuoto ancora disponibile e compatibilità con i client precedenti.

@@ -284,14 +284,14 @@ export function AccountGate({
                       autoComplete={
                         mode === "login" ? "current-password" : "new-password"
                       }
-                      minLength={mode === "login" ? 1 : 15}
+                      minLength={mode === "login" ? 1 : 12}
                       maxLength={128}
                       required
                     />
                     <small>
                       {mode === "login"
                         ? "Puoi usare il gestore password del dispositivo."
-                        : "Almeno 15 caratteri. Una frase lunga è più facile da ricordare."}
+                        : "Almeno 12 caratteri. Una frase lunga è più facile da ricordare."}
                     </small>
                   </label>
                   {mode === "register" && (

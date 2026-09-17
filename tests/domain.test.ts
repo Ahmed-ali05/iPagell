@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { hashPassword, verifyPassword } from "../lib/server/password";
+import { passwordSchema, signupSchema, recoverySchema } from "../lib/auth-validation";
 import {
   diarySchema,
   parseGrade,
@@ -159,6 +160,16 @@ test("weighted averages and simulator use both type and assessment weights", () 
   assert.equal(generalAverage(d.data.subjects, grades), 14 / 3);
   assert.equal(neededGrade(s, grades, 5, 2), 5.5);
   assert.equal(subjectAverage(s, []), null);
+});
+test("new passwords accept 12 characters and retain upper and repetition limits", () => {
+  for (const length of [11, 12, 128, 129]) {
+    const password = "Ab".repeat(Math.ceil(length / 2)).slice(0, length);
+    const accepted = length >= 12 && length <= 128;
+    assert.equal(passwordSchema.safeParse(password).success, accepted);
+    assert.equal(signupSchema.safeParse({ username: "test_user", password }).success, accepted);
+    assert.equal(recoverySchema.safeParse({ username: "test_user", password, recoveryCode: "a".repeat(64) }).success, accepted);
+  }
+  assert.equal(passwordSchema.safeParse("a".repeat(12)).success, false);
 });
 test("passwords have unique salts and constant-time verification", async () => {
   const password = "A long independent test passphrase";

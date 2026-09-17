@@ -95,7 +95,7 @@ export function AccountSecurity({
                 name="newPassword"
                 type="password"
                 autoComplete="new-password"
-                minLength={15}
+                minLength={12}
                 maxLength={128}
                 required
               />

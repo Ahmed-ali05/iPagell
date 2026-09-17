@@ -11,7 +11,7 @@ export const usernameSchema = z
   );
 export const passwordSchema = z
   .string()
-  .min(15, "Usa almeno 15 caratteri, per esempio una frase lunga.")
+  .min(12, "Usa almeno 12 caratteri, per esempio una frase lunga.")
   .max(128, "Massimo 128 caratteri.")
   .refine(
     (v) => !/^(.)(\1)+$/.test(v),

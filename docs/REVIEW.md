@@ -18,7 +18,7 @@ Revisione mirata di codice, sicurezza e cinque profili d’uso. Non è una certi
 
 ## Sicurezza implementata
 
-- Password scrypt N=16384, r=8, p=5, salt casuale di 128 bit per password. Parametri versionati; confronti timing-safe. Password 15–128 caratteri. Nessuna password o token nel backup.
+- Password scrypt N=16384, r=8, p=5, salt casuale di 128 bit per password. Parametri versionati; confronti timing-safe. Password 15–128 caratteri al momento della revisione; minimo successivamente ridotto a 12. Nessuna password o token nel backup.
 - Sessioni casuali a 256 bit: nel database solo SHA-256 del token. Cookie HTTPS `__Host-`, Secure, HttpOnly, SameSite=Lax; scadenza 14 giorni. Nessun token di sessione in localStorage.
 - Recupero con codice casuale monouso a 256 bit, mostrato una sola volta e conservato come digest. Recupero e cambio password invalidano tutte le sessioni tramite versione credenziali. Nessuna dipendenza dall’accesso ChatGPT. Nessuna email raccolta o verifica email simulata.
 - Limiti persistenti ai tentativi per indirizzo edge, nome utente e budget globale. Protezione sovraccarico della funzione di hashing. Errori pubblici generici.
