@@ -13,6 +13,29 @@ export const metadata: Metadata = {
   applicationName: "iPagell",
   creator: "iPagell",
   category: "education",
+  openGraph: {
+    type: "website",
+    locale: "it_IT",
+    url: "/",
+    siteName: "iPagell",
+    title: "iPagell — Il tuo diario scolastico",
+    description:
+      "Voti, medie, agenda, assenze e classi in un unico diario scolastico digitale.",
+    images: [{
+      url: "/og.png",
+      width: 1733,
+      height: 907,
+      type: "image/png",
+      alt: "iPagell — Il tuo diario scolastico. Voti, agenda e classi, con un diario viola e simboli di calendario, statistiche e collaborazione.",
+    }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "iPagell — Il tuo diario scolastico",
+    description:
+      "Voti, medie, agenda, assenze e classi in un unico diario scolastico digitale.",
+    images: [{ url: "/og.png", alt: "iPagell — Il tuo diario scolastico. Voti, agenda e classi." }],
+  },
   formatDetection: { email: false, address: false, telephone: false },
   appleWebApp: { capable: true, statusBarStyle: "default", title: "iPagell" },
   icons: {

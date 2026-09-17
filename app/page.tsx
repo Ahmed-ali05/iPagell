@@ -34,21 +34,6 @@ export async function generateMetadata(): Promise<Metadata> {
       "app scuola",
     ],
     alternates: { canonical: "/" },
-    openGraph: {
-      type: "website",
-      locale: "it_IT",
-      url: "/",
-      siteName: "iPagell",
-      title: "iPagell — Il tuo semestre, sotto controllo",
-      description:
-        "Voti, medie, agenda, assenze e classi in un unico diario scolastico digitale.",
-    },
-    twitter: {
-      card: "summary",
-      title: "iPagell — Il tuo semestre, sotto controllo",
-      description:
-        "Voti, medie, agenda, assenze e classi in un unico diario scolastico digitale.",
-    },
     robots: canonicalHost
       ? {
           index: true,
