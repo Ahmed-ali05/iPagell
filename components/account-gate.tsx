@@ -234,8 +234,8 @@ export function AccountGate({
                       <NativeSelectOption value="empty">
                         Le aggiungo io
                       </NativeSelectOption>
-                      <NativeSelectOption value="sig">
-                        Base SIG (personalizzabile)
+                      <NativeSelectOption value="basic">
+                        Materie di base (personalizzabili)
                       </NativeSelectOption>
                     </NativeSelect>
                   </label>

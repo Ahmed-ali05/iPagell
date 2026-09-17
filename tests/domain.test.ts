@@ -6,6 +6,7 @@ import {
   parseGrade,
   backupSchema,
   daySchema,
+  registerSchema,
 } from "../lib/validation";
 import { createDiary } from "../lib/new-diary";
 import { backupWithClassAgenda } from "../lib/classes/backup";
@@ -35,7 +36,7 @@ const fixture = () =>
     schoolYear: "2026/27",
     startDate: "2026-08-01",
     endDate: "2027-01-31",
-    preset: "sig",
+    preset: "basic",
   });
 test("class agenda backups become valid private copies without altering the diary", () => {
   const diary=fixture();
@@ -64,6 +65,28 @@ test("new accounts start without any personal demo results", () => {
   assert.equal(d.data.absences.length, 0);
   assert.equal(d.preferences.studentName, "Test");
   assert.ok(diarySchema.safeParse(d).success);
+});
+test("onboarding supports generic subjects, an empty diary and cached clients", () => {
+  const input = {
+    name: "Studente",
+    school: "",
+    semester: "S1",
+    schoolYear: "2026/27",
+    startDate: "2026-08-01",
+    endDate: "2027-01-31",
+  };
+  for (const preset of ["basic", "sig", "empty"]) {
+    const parsed = registerSchema.parse({ ...input, preset });
+    assert.equal(parsed.preset, preset === "empty" ? "empty" : "basic");
+    const diary = createDiary(parsed);
+    assert.deepEqual(
+      diary.data.subjects.map((subject) => subject.name),
+      preset === "empty" ? [] : ["Matematica", "Italiano", "Inglese", "Storia", "Scienze"],
+    );
+    assert.ok(diarySchema.safeParse(diary).success);
+    assert.equal(diary.data.grades.length + diary.data.agenda.length + diary.data.absences.length, 0);
+  }
+  assert.equal(registerSchema.safeParse({ ...input, preset: "unknown" }).success, false);
 });
 test("Swiss grades accept half notation and comma, reject malformed values", () => {
   for (const [input, value] of [

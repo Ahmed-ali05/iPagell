@@ -4,12 +4,7 @@
   "description": "Diario scolastico personale per voti, agenda, assenze e statistiche.",
   "private": true,
   "license": "MIT",
-  "author": "Ahmed-ali05",
   "homepage": "https://ipagell.website",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Ahmed-ali05/iPagell.git"
-  },
   "engines": {
     "node": ">=22.13.0"
   },

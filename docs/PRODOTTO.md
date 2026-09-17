@@ -4,7 +4,7 @@
 
 ## Promessa e confini
 
-iPagell aiuta uno studente a sapere cosa scade, come sta andando e quali dati ha registrato. Non sostituisce il registro scolastico, non certifica assenze o promozioni e non è affiliato ufficialmente alla SIG/SSSE.
+iPagell aiuta uno studente a sapere cosa scade, come sta andando e quali dati ha registrato. Non sostituisce il registro scolastico, non certifica assenze o promozioni e non è affiliato a scuole o istituti.
 
 Stato: **versione iniziale pubblicata**, non “prodotto completo”. L’account è interno; l’accesso al sito è pubblico, i diari sono personali. La priorità è non perdere dati e non confondere le persone, prima di aggiungere funzioni.
 
@@ -12,7 +12,7 @@ Stato: **versione iniziale pubblicata**, non “prodotto completo”. L’accoun
 
 | Persona | Bisogno | Criterio verificabile |
 |---|---|---|
-| Nuovo studente di un’altra scuola | Partire senza dati di Ahmed o vincoli SIG | Registrazione vuota, modello facoltativo, materia e semestre rinominabili |
+| Nuovo studente | Partire con un diario personale e una configurazione libera | Registrazione vuota, modello facoltativo, materia e semestre rinominabili |
 | Studente di fretta su iPhone | Inserire un voto senza cercare comandi nascosti | Accesso a impostazioni/periodo; inserimento e conferma leggibili a 390 px |
 | Persona sensibile al movimento o con testo ingrandito | Leggere senza effetti invasivi | Nessuna sfocatura permanente; movimento ridotto; prova tastiera e testo 200% |
 | Studente analitico con anni di storico | Fidarsi di formule e confronti | Pesi espliciti, nessuna previsione inventata; storico e limiti spiegati |
@@ -29,6 +29,8 @@ Stato: **versione iniziale pubblicata**, non “prodotto completo”. L’accoun
 - Le formule configurabili non vanno presentate come regolamenti ufficiali della scuola.
 
 ## Roadmap ordinata, senza date promesse
+
+La direzione tecnica è evolvere senza riscrivere: soluzioni Web standard, nessuna nuova dipendenza senza un beneficio concreto e separazione graduale delle viste. I [criteri architetturali](ARCHITETTURA.md#semplicità-architetturale-e-priorità-di-prodotto) guidano questo lavoro. La priorità resta rendere più utile il diario per chi studia.
 
 Le righe seguenti sono **aperte**, non funzionalità già consegnate. P0 indica un requisito prima di allargare significativamente l’uso, non una vulnerabilità confermata.
 

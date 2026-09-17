@@ -148,7 +148,7 @@ try {
     schoolYear: "2026/27",
     startDate: "2026-08-24",
     endDate: "2027-01-31",
-    preset: "sig",
+    preset: "basic",
   };
   const profile = await call("/api/account", registration, a.cookie);
   check(profile.status, 201, "create own diary");

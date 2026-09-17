@@ -8,8 +8,8 @@ export function createDiary(input: Registration): {
 } {
   const semesterId = crypto.randomUUID();
   const names =
-    input.preset === "sig"
-      ? ["Matematica", "Informatica", "Economia", "Inglese", "Sistemi e reti"]
+    input.preset === "basic"
+      ? ["Matematica", "Italiano", "Inglese", "Storia", "Scienze"]
       : [];
   const colors = ["#6c5ce7", "#258ee7", "#c87a24", "#268361", "#c94460"];
   return {

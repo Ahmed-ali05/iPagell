@@ -8,7 +8,7 @@
 2. Scegli un nome utente di 3–32 caratteri: lettere, numeri, punto, trattino o underscore; il primo carattere deve essere una lettera o un numero. Maiuscole e minuscole non distinguono account diversi.
 3. Usa una password unica di 15–128 caratteri. Puoi usare il gestore password del dispositivo.
 4. Conserva il codice di recupero mostrato dopo la registrazione. È una chiave d’accesso: non inviarlo a nessuno e non inserirlo nelle segnalazioni di problemi.
-5. Indica il nome da mostrare, scuola facoltativa, anno e date del semestre. Parti senza materie oppure scegli la base SIG personalizzabile.
+5. Indica il nome da mostrare, scuola facoltativa, anno e date del semestre. Parti senza materie oppure scegli le materie di base personalizzabili.
 
 Non viene richiesta un’email. Non esiste recupero via email. Nome utente, password e codice di recupero non sono intercambiabili.
 

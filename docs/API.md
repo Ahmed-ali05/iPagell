@@ -41,7 +41,7 @@ Ogni mutazione richiede `Origin` uguale all’origine della richiesta e `Content
 }
 ```
 
-`preset`: `empty` oppure `sig`. Un secondo tentativo sullo stesso diario restituisce 409, non sostituisce i dati.
+`preset`: `empty` oppure `basic` (materie generiche personalizzabili). Il precedente identificatore resta accettato per compatibilità con client già installati. Un secondo tentativo sullo stesso diario restituisce 409, non sostituisce i dati.
 
 ### Aggiornamento diario
 

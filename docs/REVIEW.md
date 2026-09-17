@@ -10,7 +10,7 @@ Revisione mirata di codice, sicurezza e cinque profili d’uso. Non è una certi
 
 | Persona | Problema trovato | Intervento |
 |---|---|---|
-| Nuovo studente, altra scuola | Demo personale già popolata e percorso imposto | Account indipendente, profilo vuoto, materie SIG solo opzionali |
+| Nuovo studente, altra scuola | Demo personale già popolata e percorso imposto | Account indipendente, profilo vuoto, materie iniziali solo opzionali |
 | Utente iPhone, uso rapido | Sfocatura persistente e comandi nascosti | Superfici opache, eliminati i livelli animati permanenti; periodo, tema e modifica disponibili su mobile |
 | Utente sensibile al movimento / testo piccolo | Animazioni, contrasto e controlli troppo piccoli | Preferenza movimento ridotto, rispetto impostazioni di sistema, controlli da 44 px e campi da 16 px |
 | Utente analitico, molti voti | Proiezione inventata, peso prossimo voto implicito, andamento quadratico | Rimossa previsione artificiale, simulatore esplicito per tipologia/peso, andamento incrementale; limiti validati sui dati |

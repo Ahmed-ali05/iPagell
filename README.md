@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Il diario scolastico personale per voti, agenda, assenze e statistiche.</strong><br>
-  Progettato per la scala ticinese 1–6, con materie e periodi personalizzabili.
+  Progettato per la scala di voti 1–6, con materie e periodi personalizzabili.
 </p>
 
 <p align="center">
@@ -26,7 +26,7 @@
 </p>
 
 > [!IMPORTANT]
-> iPagell non è un registro ufficiale e non è affiliato a scuole o istituti. Il modello SIG è soltanto una configurazione iniziale facoltativa.
+> iPagell non è un registro ufficiale e non è affiliato a scuole o istituti. Le materie di base sono una configurazione iniziale facoltativa e personalizzabile.
 
 ## Cosa offre
 
@@ -102,9 +102,3 @@ Issue e pull request sono benvenute. Prima di proporre modifiche, leggere [CONTR
 ## Licenza
 
 Distribuito con licenza [MIT](LICENSE). Le dipendenze e i componenti vendorizzati mantengono le rispettive licenze.
-
----
-
-<p align="center">
-  Sviluppato e mantenuto da <a href="https://github.com/Ahmed-ali05">Ahmed-ali05</a>.
-</p>

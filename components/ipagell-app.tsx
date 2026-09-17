@@ -24,7 +24,6 @@ import {
   Pencil,
   Plus,
   Settings2,
-  Sparkles,
   Sun,
   Trash2,
   TrendingUp,
@@ -32,18 +31,6 @@ import {
   UserRoundCheck,
   UsersRound,
 } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Line,
-  LineChart,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import {
@@ -68,6 +55,9 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { Switch } from "@/components/ui/switch";
+import { AbsencesView } from "@/components/absences-view";
+import { StatsView } from "@/components/stats-view";
+import { EmptyState, EmptyMini } from "@/components/diary-empty-state";
 import { AccountGate } from "@/components/account-gate";
 import { AccountSecurity } from "@/components/account-security";
 import { useDiary } from "@/hooks/use-diary";
@@ -82,7 +72,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   formatGrade,
   generalAverage,
-  gradeTrend,
   neededGrade,
   subjectAverage,
 } from "@/lib/calculations";
@@ -1552,7 +1541,7 @@ function GradesView({
   return (
     <section className="module-view">
       <div className="module-toolbar">
-        <p>Scala ticinese 1–6 · sufficienza a 4.0</p>
+        <p>Scala 1–6 · sufficienza a 4.0</p>
         <button className="primary-button" onClick={onAdd}>
           <Plus size={18} /> Registra voto
         </button>
@@ -1713,384 +1702,6 @@ function GradesView({
           text="Aggiungi una materia dalle impostazioni."
         />
       )}
-    </section>
-  );
-}
-
-function AbsencesView({
-  items,
-  subjects,
-  threshold,
-  onThreshold,
-  onAdd,
-  onDelete,
-}: {
-  items: Absence[];
-  subjects: Subject[];
-  threshold: number;
-  onThreshold: (value: number) => void;
-  onAdd: () => void;
-  onDelete: (id: string) => void;
-}) {
-  const total = items.reduce((sum, item) => sum + item.durationHours, 0);
-  const unjustified = items
-    .filter((item) => !item.justified)
-    .reduce((sum, item) => sum + item.durationHours, 0);
-  const percentage = Math.min(100, (total / threshold) * 100);
-  const bySubject = subjects
-    .map((subject) => ({
-      subject,
-      hours: items
-        .filter((item) => item.subjectId === subject.id)
-        .reduce((sum, item) => sum + item.durationHours, 0),
-    }))
-    .filter((item) => item.hours > 0)
-    .sort((a, b) => b.hours - a.hours);
-  return (
-    <section className="module-view">
-      <div className="module-toolbar">
-        <p>Monitora ore, ritardi e giustificazioni.</p>
-        <button className="primary-button" onClick={onAdd}>
-          <Plus size={18} /> Registra assenza
-        </button>
-      </div>
-      <div className="absence-stats">
-        <div className="metric-card">
-          <span>
-            <Clock3 />
-          </span>
-          <small>Ore totali</small>
-          <b>{total.toFixed(1)}</b>
-        </div>
-        <div className="metric-card">
-          <span>
-            <AlertTriangle />
-          </span>
-          <small>Non giustificate</small>
-          <b>{unjustified.toFixed(1)}</b>
-        </div>
-        <div className="metric-card">
-          <span>
-            <CalendarDays />
-          </span>
-          <small>Eventi</small>
-          <b>{items.length}</b>
-        </div>
-      </div>
-      <section className={`absence-alert ${percentage >= 80 ? "warning" : ""}`}>
-        <div
-          className="circle-progress"
-          style={
-            { "--progress": `${percentage * 3.6}deg` } as React.CSSProperties
-          }
-        >
-          <span>{Math.round(percentage)}%</span>
-        </div>
-        <div>
-          <span className="eyebrow">Soglia personale</span>
-          <h3>
-            {total.toFixed(1)} di {threshold} ore
-          </h3>
-          <p>
-            {percentage >= 80
-              ? "Sei vicino alla soglia: controlla le prossime assenze."
-              : `Hai ancora ${(threshold - total).toFixed(1)} ore prima dell’avviso.`}
-          </p>
-        </div>
-        <label>
-          Soglia
-          <input
-            type="number"
-            min="1"
-            max="200"
-            defaultValue={threshold}
-            onBlur={(event) => {
-              const value = Number(event.target.value);
-              if (value >= 1 && value <= 200) onThreshold(value);
-              else event.target.value = String(threshold);
-            }}
-          />
-        </label>
-      </section>
-      <div className="absence-layout">
-        <section className="panel absence-list">
-          <div className="panel-title">
-            <div>
-              <span className="eyebrow">Registro</span>
-              <h3>Assenze recenti</h3>
-            </div>
-          </div>
-          {items.length ? (
-            [...items]
-              .sort((a, b) => b.date.localeCompare(a.date))
-              .map((item) => (
-                <article key={item.id}>
-                  <div className="date-block">
-                    <b>{new Date(item.date).getDate()}</b>
-                    <small>
-                      {new Intl.DateTimeFormat("it-CH", {
-                        month: "short",
-                      }).format(new Date(item.date))}
-                    </small>
-                  </div>
-                  <div>
-                    <b>
-                      {findSubject(subjects, item.subjectId)?.name ??
-                        "Intera giornata"}
-                    </b>
-                    <small>
-                      {item.kind === "late"
-                        ? "Ritardo"
-                        : item.kind === "early-exit"
-                          ? "Uscita anticipata"
-                          : item.justified
-                            ? "Giustificata"
-                            : "Non giustificata"}
-                      {item.note ? ` · ${item.note}` : ""}
-                    </small>
-                  </div>
-                  <strong>{item.durationHours.toFixed(1)} h</strong>
-                  <button
-                    className="icon-button subtle"
-                    onClick={() => onDelete(item.id)}
-                    aria-label="Elimina assenza"
-                  >
-                    <Trash2 size={17} />
-                  </button>
-                </article>
-              ))
-          ) : (
-            <EmptyState
-              icon={UserRoundCheck}
-              title="Nessuna assenza"
-              text="Ottimo: il registro del semestre è vuoto."
-            />
-          )}
-        </section>
-        <aside className="panel absence-subjects">
-          <div className="panel-title">
-            <div>
-              <span className="eyebrow">Distribuzione</span>
-              <h3>Per materia</h3>
-            </div>
-          </div>
-          {bySubject.map(({ subject, hours }) => (
-            <div key={subject.id}>
-              <div>
-                <span>
-                  <i style={{ background: subject.color }} />
-                  {subject.name}
-                </span>
-                <b>{hours.toFixed(1)} h</b>
-              </div>
-              <span className="mini-track">
-                <i
-                  style={{
-                    background: subject.color,
-                    width: `${(hours / Math.max(total, 1)) * 100}%`,
-                  }}
-                />
-              </span>
-            </div>
-          ))}
-        </aside>
-      </div>
-    </section>
-  );
-}
-
-function StatsView({
-  data,
-  semester,
-  grades,
-  goal,
-}: {
-  data: SchoolData;
-  semester: Semester;
-  grades: Grade[];
-  goal: number;
-}) {
-  const subjectData = data.subjects
-    .map((subject) => ({
-      name:
-        subject.name.length > 10
-          ? `${subject.name.slice(0, 9)}…`
-          : subject.name,
-      fullName: subject.name,
-      media: Number((subjectAverage(subject, grades) ?? 0).toFixed(2)),
-      fill: subject.color,
-    }))
-    .filter((item) => item.media > 0);
-  const trendData = gradeTrend(data.subjects, grades);
-  const average = generalAverage(data.subjects, grades);
-  const strongest = [...subjectData].sort((a, b) => b.media - a.media)[0];
-  const weakest = [...subjectData].sort((a, b) => a.media - b.media)[0];
-  const oldSemesters = data.semesters.filter((item) => item.id !== semester.id);
-  return (
-    <section className="module-view">
-      <div className="stats-hero">
-        <div>
-          <span className="eyebrow">Panoramica {semester.name}</span>
-          <h2>{formatGrade(average)}</h2>
-          <p>Media generale ponderata</p>
-        </div>
-        <div>
-          <Sparkles />
-          <p>Scenario senza nuovi voti</p>
-          <b>{formatGrade(average)}</b>
-          <small>È la media attuale, non una previsione.</small>
-        </div>
-      </div>
-      <div className="stats-layout">
-        <section className="panel chart-card wide">
-          <div className="panel-title">
-            <div>
-              <span className="eyebrow">Confronto</span>
-              <h3>Media per materia</h3>
-            </div>
-          </div>
-          <div className="chart-wrap">
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-              minWidth={0}
-              minHeight={270}
-              initialDimension={{ width: 640, height: 270 }}
-            >
-              <BarChart
-                data={subjectData}
-                margin={{ top: 10, right: 6, left: -22, bottom: 4 }}
-              >
-                <CartesianGrid stroke="var(--line)" vertical={false} />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fill: "var(--subtle)", fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  domain={[1, 6]}
-                  ticks={[1, 2, 3, 4, 5, 6]}
-                  tick={{ fill: "var(--subtle)", fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <ReferenceLine y={4} stroke="#e45c67" strokeDasharray="5 5" />
-                <Tooltip
-                  cursor={{ fill: "var(--accent-soft)" }}
-                  contentStyle={{
-                    borderRadius: 14,
-                    border: "1px solid var(--line)",
-                    background: "var(--surface)",
-                    color: "var(--ink)",
-                  }}
-                />
-                <Bar dataKey="media" radius={[8, 8, 3, 3]} fill="#6655e6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-        <section className="panel insight-card">
-          <span className="eyebrow">In evidenza</span>
-          <div className="insight success">
-            <TrendingUp />
-            <small>Più forte</small>
-            <b>{strongest?.fullName ?? "—"}</b>
-            <strong>{strongest?.media.toFixed(1) ?? "—"}</strong>
-          </div>
-          <div className="insight warning">
-            <AlertTriangle />
-            <small>Da rinforzare</small>
-            <b>{weakest?.fullName ?? "—"}</b>
-            <strong>{weakest?.media.toFixed(1) ?? "—"}</strong>
-          </div>
-          <div className="goal-line">
-            <span>Obiettivo semestre</span>
-            <b>{goal.toFixed(1)}</b>
-          </div>
-        </section>
-        <section className="panel chart-card wide">
-          <div className="panel-title">
-            <div>
-              <span className="eyebrow">Evoluzione</span>
-              <h3>Andamento nel tempo</h3>
-            </div>
-          </div>
-          <div className="chart-wrap">
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-              minWidth={0}
-              minHeight={270}
-              initialDimension={{ width: 640, height: 270 }}
-            >
-              <LineChart
-                data={trendData}
-                margin={{ top: 10, right: 15, left: -22, bottom: 4 }}
-              >
-                <CartesianGrid stroke="var(--line)" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fill: "var(--subtle)", fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  domain={[1, 6]}
-                  ticks={[1, 2, 3, 4, 5, 6]}
-                  tick={{ fill: "var(--subtle)", fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <ReferenceLine y={4} stroke="#e45c67" strokeDasharray="5 5" />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: 14,
-                    border: "1px solid var(--line)",
-                    background: "var(--surface)",
-                    color: "var(--ink)",
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="media"
-                  stroke="#6655e6"
-                  strokeWidth={3}
-                  dot={{
-                    r: 4,
-                    fill: "#6655e6",
-                    strokeWidth: 2,
-                    stroke: "var(--surface)",
-                  }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-        <section className="panel semester-compare">
-          <span className="eyebrow">Archivio</span>
-          <h3>Confronta semestri</h3>
-          {oldSemesters.map((item) => {
-            const oldGrades = data.grades.filter(
-              (grade) => grade.semesterId === item.id,
-            );
-            const oldAvg = generalAverage(data.subjects, oldGrades);
-            return (
-              <div key={item.id}>
-                <span>
-                  <Archive />
-                  {item.name}
-                  <small>{item.schoolYear}</small>
-                </span>
-                <b>{formatGrade(oldAvg)}</b>
-              </div>
-            );
-          })}
-          {!oldSemesters.length && (
-            <EmptyMini text="Nessun semestre archiviato." />
-          )}
-        </section>
-      </div>
     </section>
   );
 }
@@ -2365,31 +1976,5 @@ function SettingsDialog({
         </Tabs>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function EmptyState({
-  icon: Icon,
-  title,
-  text,
-}: {
-  icon: typeof CalendarDays;
-  title: string;
-  text: string;
-}) {
-  return (
-    <div className="empty-state">
-      <Icon />
-      <b>{title}</b>
-      <p>{text}</p>
-    </div>
-  );
-}
-function EmptyMini({ text }: { text: string }) {
-  return (
-    <div className="empty-mini">
-      <CheckCircle2 />
-      {text}
-    </div>
   );
 }

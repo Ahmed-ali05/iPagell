@@ -197,7 +197,10 @@ export const registerSchema = z
     schoolYear: short,
     startDate: daySchema,
     endDate: daySchema,
-    preset: z.enum(["empty", "sig"]),
+    // Accept the previous identifier for clients still using a cached app.
+    preset: z.enum(["empty", "basic", "sig"]).transform((value) =>
+      value === "sig" ? "basic" : value,
+    ),
   })
   .strict()
   .refine((s) => s.startDate <= s.endDate, "Controlla le date del semestre");

@@ -18,7 +18,8 @@ Service worker: solo shell e asset statici; nessuna API in cache
 | Percorso | Responsabilità |
 |---|---|
 | `app/page.tsx`, `app/layout.tsx` | Entrata, metadati e PWA |
-| `components/ipagell-app.tsx` | Navigazione, viste personali e impostazioni; componente ancora da scomporre |
+| `components/ipagell-app.tsx` | Coordinamento del diario, navigazione, dashboard, agenda, voti e impostazioni |
+| `components/absences-view.tsx`, `stats-view.tsx` | Viste Assenze e Statistiche; ricevono dati e azioni dal diario |
 | `components/classes-view.tsx` | Classi private, membri, ruoli, inviti e azioni amministrative C1 |
 | `components/account-gate.tsx`, `account-security.tsx`, `entry-dialog.tsx` | Accesso/onboarding, gestione credenziali, inserimento dati |
 | `hooks/use-diary.ts` | Fasi dell’app, accodamento per istanza, copia locale e server |
@@ -30,6 +31,18 @@ Service worker: solo shell e asset statici; nessuna API in cache
 | `public/`, `scripts/generate-precache.mjs` | Asset PWA e generazione allowlist del service worker |
 
 React/TypeScript, Tailwind e componenti Radix/Shadcn; grafici Recharts. Vinext/Vite produce il Worker e il client usando convenzioni compatibili con Next. Non trattare il repository come un server Next standard. Il backend usa D1 tramite binding `DB`; nessun R2 configurato e nessun servizio email.
+
+## Semplicità architetturale e priorità di prodotto
+
+La complessità deve essere proporzionata al beneficio. Account, permessi, offline, backup e conflitti risolvono problemi reali: vanno mantenuti affidabili. Nuovi framework, livelli di compatibilità e sistemi di cache richiedono invece un vantaggio concreto prima di essere introdotti.
+
+- Preferire comportamenti standard del Web: la pagina pubblica apre `/app` con normali link HTML, senza prefetch o transizioni RSC.
+- Stabilizzare la build esistente e mantenere le dipendenze che servono al prodotto; nessuna riscrittura generale.
+- Estrarre gradualmente viste complete dal componente principale. Assenze e Statistiche sono separate; stato, persistenza e sincronizzazione restano nel flusso esistente.
+- Per l'ambiente Sites e l'anteprima, sostituire i binding locali nella configurazione Vite, senza concatenarli a quelli del Worker indipendente. La data di compatibilità deve essere supportata dal runtime installato.
+- Investire prima nella comprensione dell'andamento scolastico e nel collegamento fra agenda, voti e materiali. Lo spazio studio AI resta un'evoluzione da validare, non un motivo per complicare oggi l'infrastruttura.
+
+Un intervento è utile se rende il comportamento più prevedibile, un problema più facile da localizzare o una funzione più semplice da usare e mantenere.
 
 ## Modello persistente
 

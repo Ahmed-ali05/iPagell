@@ -17,6 +17,7 @@ const managedLinux = readExecutionProfile() === "managed-linux";
 
 const localBindingConfig = {
   main: "vinext/server/fetch-handler",
+  compatibility_date: "2026-05-22",
   compatibility_flags: ["nodejs_compat"],
   d1_databases: d1
     ? [
@@ -66,11 +67,12 @@ export default defineConfig(async ({ command }) => {
         ...(independentCloudflare
           ? { configPath: "./wrangler.jsonc" }
           : {
-              config: {
-                ...localBindingConfig,
-                ...(command === "serve"
-                  ? { vars: { IPAGELL_CLASSES: "enabled" } }
-                  : {}),
+              config(config) {
+                // Replace local bindings: merging arrays duplicates flags and DB.
+                Object.assign(config, localBindingConfig);
+                if (command === "serve") {
+                  config.vars = { ...config.vars, IPAGELL_CLASSES: "enabled" };
+                }
               },
             }),
       }),

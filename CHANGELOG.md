@@ -4,6 +4,14 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 
 ## Non rilasciato
 
+### Semplificazione e contenuti generici
+
+- Modello iniziale con materie generiche personalizzabili; diario vuoto ancora disponibile e compatibilità con i client precedenti.
+- Rimossi crediti personali e riferimenti a istituti specifici dai contenuti e dai metadati del progetto.
+- Separate le viste Assenze e Statistiche dal coordinamento del diario, senza modificare calcoli o persistenza.
+- Corretta la configurazione locale per evitare flag e binding duplicati e usare una data supportata dal runtime installato.
+- Documentata la direzione tecnica: evoluzione graduale, comportamenti standard del Web e priorità al prodotto.
+
 ### Distribuzione indipendente e pagina pubblica
 
 - Aggiunta una landing page SEO pubblica con dati strutturati, FAQ, sitemap e regole robots; l'area account è ora separata in `/app` e i vecchi link vengono inoltrati.

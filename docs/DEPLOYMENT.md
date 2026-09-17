@@ -19,7 +19,7 @@ Il file `wrangler.jsonc` è la fonte di verità del Worker indipendente. `.opena
 | Ambiente | Indirizzo | Dati |
 |---|---|---|
 | Pubblicazione attuale | `https://ipagell.website` | Database della pubblicazione Sites |
-| Worker indipendente | `https://ipagell.ahmedbasto59.workers.dev` | D1 `ipagell-production`, regione WEUR |
+| Worker indipendente | URL `workers.dev` restituito dal deploy | D1 `ipagell-production`, regione WEUR |
 
 Non spostare il dominio principale sul nuovo Worker prima di aver esportato, verificato e importato i dati esistenti. Il nuovo database è separato: cambiare solo il DNS farebbe apparire vuoti gli account creati sulla pubblicazione precedente.
 
