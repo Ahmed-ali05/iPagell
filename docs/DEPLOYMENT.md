@@ -4,7 +4,7 @@
 
 ## Una produzione: ipagell.website
 
-La produzione è **https://ipagell.website**, ospitata da Sites con il database esistente. Il progetto da aggiornare è quello in `.openai/hosting.json`. `www.ipagell.website` è collegato allo stesso sito; anche l'indirizzo generato `*.chatgpt.site` è un alias della medesima pubblicazione. La navigazione da questi alias viene reindirizzata al dominio principale, conservando percorso e query.
+La produzione è **https://ipagell.website**, ospitata da Sites con il database esistente. Il progetto da aggiornare è quello in `.openai/hosting.json`. `www.ipagell.website` è collegato allo stesso sito; anche l'indirizzo generato `ipagell.produc-ch.chatgpt.site` è un alias della medesima pubblicazione. La navigazione da questi alias viene reindirizzata al dominio principale, conservando percorso, query e inviti nel frammento. Una protezione nel browser copre anche il proxy Sites quando non espone il nome originale al redirect server. L'alias tecnico resta gestito da Sites e non costituisce una seconda produzione.
 
 Il Worker indipendente configurato in `wrangler.jsonc` ha un **database separato**. Il suo nome storico `ipagell-production` non significa che contenga i dati di ipagell.website. Pubblicarlo non aggiorna il sito pubblico. Non cambiare DNS o database per un normale rilascio.
 
