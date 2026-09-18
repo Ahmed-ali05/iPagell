@@ -8,6 +8,15 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function DiaryPage() {
-  return <IPagellApp />;
+export default async function DiaryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mode?: string }>;
+}) {
+  const { mode } = await searchParams;
+  return (
+    <IPagellApp
+      initialAccountMode={mode === "register" ? "register" : "login"}
+    />
+  );
 }

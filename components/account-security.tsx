@@ -45,8 +45,8 @@ export function AccountSecurity({
     <details className="security-settings">
       <summary>Sicurezza e gestione account</summary>
       <p>
-        Il cambio password chiude tutte le sessioni. Il tuo codice di recupero
-        rimane valido.
+        Dopo il cambio password dovrai accedere di nuovo su tutti i dispositivi.
+        Il tuo codice di recupero rimane valido.
       </p>
       <div className="auth-links">
         <button
@@ -123,7 +123,7 @@ export function AccountSecurity({
             {busy
               ? "Attendi…"
               : mode === "password"
-                ? "Cambia password e chiudi le sessioni"
+                ? "Cambia password"
                 : "Elimina definitivamente il mio account"}
           </button>
         </fieldset>

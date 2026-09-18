@@ -1,21 +1,23 @@
 "use client";
 
-import { AlertTriangle, Archive, Sparkles, TrendingUp } from "lucide-react";
+import { AlertTriangle, Archive, BarChart3, GraduationCap, TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { formatGrade, generalAverage, gradeTrend, subjectAverage } from "@/lib/calculations";
 import type { Grade, SchoolData, Semester } from "@/types/domain";
-import { EmptyMini } from "@/components/diary-empty-state";
+import { EmptyMini, EmptyState } from "@/components/diary-empty-state";
 
 export function StatsView({
   data,
   semester,
   grades,
   goal,
+  onAddGrade,
 }: {
   data: SchoolData;
   semester: Semester;
   grades: Grade[];
   goal: number;
+  onAddGrade: () => void;
 }) {
   const subjectData = data.subjects
     .map((subject) => ({
@@ -33,6 +35,21 @@ export function StatsView({
   const strongest = [...subjectData].sort((a, b) => b.media - a.media)[0];
   const weakest = [...subjectData].sort((a, b) => a.media - b.media)[0];
   const oldSemesters = data.semesters.filter((item) => item.id !== semester.id);
+  if (!grades.length) {
+    return (
+      <section className="module-view">
+        <section className="panel">
+          <EmptyState
+            icon={GraduationCap}
+            title="Nessun voto registrato"
+            text="Registra il primo voto per vedere medie, confronti e andamento nel tempo."
+            actionLabel="Registra il primo voto"
+            onAction={onAddGrade}
+          />
+        </section>
+      </section>
+    );
+  }
   return (
     <section className="module-view">
       <div className="stats-hero">
@@ -42,10 +59,10 @@ export function StatsView({
           <p>Media generale ponderata</p>
         </div>
         <div>
-          <Sparkles />
-          <p>Scenario senza nuovi voti</p>
-          <b>{formatGrade(average)}</b>
-          <small>È la media attuale, non una previsione.</small>
+          <BarChart3 />
+          <p>Dati del semestre</p>
+          <b>{grades.length} {grades.length === 1 ? "voto" : "voti"}</b>
+          <small>{subjectData.length} {subjectData.length === 1 ? "materia con voti" : "materie con voti"}</small>
         </div>
       </div>
       <div className="stats-layout">
@@ -97,25 +114,37 @@ export function StatsView({
             </ResponsiveContainer>
           </div>
         </section>
-        <section className="panel insight-card">
-          <span className="eyebrow">In evidenza</span>
-          <div className="insight success">
-            <TrendingUp />
-            <small>Più forte</small>
-            <b>{strongest?.fullName ?? "—"}</b>
-            <strong>{strongest?.media.toFixed(1) ?? "—"}</strong>
-          </div>
-          <div className="insight warning">
-            <AlertTriangle />
-            <small>Da rinforzare</small>
-            <b>{weakest?.fullName ?? "—"}</b>
-            <strong>{weakest?.media.toFixed(1) ?? "—"}</strong>
-          </div>
-          <div className="goal-line">
-            <span>Obiettivo semestre</span>
-            <b>{goal.toFixed(1)}</b>
-          </div>
-        </section>
+        {subjectData.length > 1 ? (
+          <section className="panel insight-card">
+            <span className="eyebrow">In evidenza</span>
+            <div className="insight success">
+              <TrendingUp />
+              <small>Più forte</small>
+              <b>{strongest?.fullName ?? "—"}</b>
+              <strong>{strongest?.media.toFixed(1) ?? "—"}</strong>
+            </div>
+            <div className="insight warning">
+              <AlertTriangle />
+              <small>Da rinforzare</small>
+              <b>{weakest?.fullName ?? "—"}</b>
+              <strong>{weakest?.media.toFixed(1) ?? "—"}</strong>
+            </div>
+            <div className="goal-line">
+              <span>Obiettivo semestre</span>
+              <b>{goal.toFixed(1)}</b>
+            </div>
+          </section>
+        ) : (
+          <section className="panel insight-card">
+            <span className="eyebrow">Confronto tra materie</span>
+            <h3>Serve almeno un’altra materia con voti</h3>
+            <p>Aggiungi altri risultati per confrontare punti forti e materie da rinforzare.</p>
+            <div className="goal-line">
+              <span>Obiettivo semestre</span>
+              <b>{goal.toFixed(1)}</b>
+            </div>
+          </section>
+        )}
         <section className="panel chart-card wide">
           <div className="panel-title">
             <div>
@@ -201,4 +230,3 @@ export function StatsView({
     </section>
   );
 }
-

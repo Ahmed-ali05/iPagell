@@ -24,6 +24,14 @@ export function AbsencesView({
     .filter((item) => !item.justified)
     .reduce((sum, item) => sum + item.durationHours, 0);
   const percentage = Math.min(100, (total / threshold) * 100);
+  const thresholdMessage =
+    total > threshold
+      ? `Hai superato la soglia personale di ${(total - threshold).toFixed(1)} ore.`
+      : total === threshold
+        ? "Hai raggiunto la soglia personale."
+        : percentage >= 80
+          ? `Mancano ${(threshold - total).toFixed(1)} ore alla soglia personale.`
+          : `Hai registrato ${total.toFixed(1)} ore su ${threshold}.`;
   const bySubject = subjects
     .map((subject) => ({
       subject,
@@ -60,7 +68,7 @@ export function AbsencesView({
           <span>
             <CalendarDays />
           </span>
-          <small>Eventi</small>
+          <small>Assenze registrate</small>
           <b>{items.length}</b>
         </div>
       </div>
@@ -74,18 +82,14 @@ export function AbsencesView({
           <span>{Math.round(percentage)}%</span>
         </div>
         <div>
-          <span className="eyebrow">Soglia personale</span>
+          <span className="eyebrow">Soglia personale di riferimento</span>
           <h3>
             {total.toFixed(1)} di {threshold} ore
           </h3>
-          <p>
-            {percentage >= 80
-              ? "Sei vicino alla soglia: controlla le prossime assenze."
-              : `Hai ancora ${(threshold - total).toFixed(1)} ore prima dell’avviso.`}
-          </p>
+          <p>{thresholdMessage} Non è il limite ufficiale della scuola.</p>
         </div>
         <label>
-          Soglia
+          Ore di riferimento
           <input
             type="number"
             min="1"
@@ -123,7 +127,7 @@ export function AbsencesView({
                   <div>
                     <b>
                       {subjects.find((subject) => subject.id === item.subjectId)?.name ??
-                        "Intera giornata"}
+                        "Più lezioni / materia non indicata"}
                     </b>
                     <small>
                       {item.kind === "late"
@@ -149,8 +153,8 @@ export function AbsencesView({
           ) : (
             <EmptyState
               icon={UserRoundCheck}
-              title="Nessuna assenza"
-              text="Ottimo: il registro del semestre è vuoto."
+              title="Nessuna assenza registrata"
+              text="Quando aggiungi un’assenza, qui trovi ore e giustificazione."
             />
           )}
         </section>
@@ -185,4 +189,3 @@ export function AbsencesView({
     </section>
   );
 }
-

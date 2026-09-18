@@ -8,6 +8,8 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 
 - Password: minimo ridotto a 12 caratteri per registrazione, recupero e cambio password; interfaccia e guida allineate.
 
+- Avviato il passaggio UX leggero: copy più espliciti, registrazione separata dall’accesso, conferme specifiche e stati vuoti/assenze/classi più chiari; gli interventi strutturali restano pianificati nella reference UX.
+
 ### Semplificazione e contenuti generici
 
 - Modello iniziale con materie generiche personalizzabili; diario vuoto ancora disponibile e compatibilità con i client precedenti.

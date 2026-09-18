@@ -148,7 +148,11 @@ function getCountdown(value: string) {
   return { value: String(days), small: "giorni", past };
 }
 
-export function IPagellApp() {
+export function IPagellApp({
+  initialAccountMode = "login",
+}: {
+  initialAccountMode?: "login" | "register";
+}) {
   const session = useDiary();
   useEffect(() => {
     if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator)
@@ -177,6 +181,7 @@ export function IPagellApp() {
     return (
       <AccountGate
         user={session.user}
+        initialMode={initialAccountMode}
         onRegister={session.register}
         onAuthenticated={session.reload}
         onLogout={session.logout}
@@ -202,6 +207,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   );
   const [removal, setRemoval] = useState<{
     title: string;
+    description: string;
+    actionLabel: string;
     run: () => Promise<void>;
   } | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
@@ -442,7 +449,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const exportBackup = () => {
     try {
       downloadBackup(backupWithClassAgenda(data, preferences, classAgenda.items));
-      toast.success("Backup pronto. Gli eventi di classe sono inclusi come copie personali.");
+      toast.success("Backup pronto. Le attività di classe sono incluse come copie personali.");
     } catch (error) { reportError(error); }
   };
 
@@ -565,7 +572,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           <span className={`sync-status ${session.status}`} role="status">
             {
               {
-                saved: "Salvato nell’account",
+                saved: "Diario personale salvato",
                 saving: "Sincronizzazione…",
                 offline: "Copia sul dispositivo · offline",
                 conflict: "Modifiche da confrontare",
@@ -603,13 +610,15 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                   className="soft-button"
                   onClick={() =>
                     setRemoval({
-                      title:
-                        "Caricare la copia dell’account? La copia locale verrà sostituita: esportala prima.",
+                      title: "Caricare la versione dell’account?",
+                      description:
+                        "La copia su questo dispositivo verrà sostituita. Scaricala prima se vuoi conservarla.",
+                      actionLabel: "Carica versione dell’account",
                       run: session.useServer,
                     })
                   }
                 >
-                  Carica copia account
+                  Carica versione dell’account
                 </button>
               ) : (
                 <button
@@ -660,7 +669,11 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onDelete={(id) => {
                 const shared = semesterAgenda.find(item => item.id === id)?.shared;
                 setRemoval({
-                  title: shared ? "Rimuovere solo dalla tua agenda? L’evento della classe non cambia." : "Eliminare questa attività?",
+                  title: shared ? "Rimuovere dalla tua agenda?" : "Eliminare questa attività?",
+                  description: shared
+                    ? "L’attività della classe resta disponibile agli altri membri."
+                    : "L’attività verrà eliminata dal tuo diario e non potrà essere recuperata.",
+                  actionLabel: shared ? "Rimuovi dalla mia agenda" : "Elimina attività",
                   run: () =>
                     shared ? classAgenda.remove(shared) : updateData((current) => ({
                       ...current,
@@ -681,6 +694,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onDelete={(id) =>
                 setRemoval({
                   title: "Eliminare questo voto?",
+                  description:
+                    "Il voto verrà eliminato dal tuo diario e le medie saranno ricalcolate.",
+                  actionLabel: "Elimina voto",
                   run: () =>
                     updateData((current) => ({
                       ...current,
@@ -702,6 +718,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onDelete={(id) =>
                 setRemoval({
                   title: "Eliminare questa assenza?",
+                  description:
+                    "L’assenza verrà eliminata dal tuo diario e dai riepiloghi del semestre.",
+                  actionLabel: "Elimina assenza",
                   run: () =>
                     updateData((current) => ({
                       ...current,
@@ -719,6 +738,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               semester={currentSemester}
               grades={semesterGrades}
               goal={preferences.gradeGoal}
+              onAddGrade={() => setModal("grade")}
             />
           )}
           {activeTab === "classes" && (
@@ -810,8 +830,10 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         onImport={() => importRef.current?.click()}
         onLogout={() =>
           setRemoval({
-            title:
-              "Uscire dall’account? La copia su questo dispositivo verrà rimossa. Esporta prima eventuali modifiche non sincronizzate.",
+            title: "Uscire dall’account?",
+            description:
+              "La copia su questo dispositivo verrà rimossa. Esporta prima eventuali modifiche non sincronizzate.",
+            actionLabel: "Esci e rimuovi la copia locale",
             run: () => session.logout(true),
           })
         }
@@ -870,8 +892,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           <AlertDialogHeader>
             <AlertDialogTitle>{removal?.title}</AlertDialogTitle>
             <AlertDialogDescription>
-              Questa operazione modifica il tuo diario. Puoi annullare per
-              conservarlo così com’è.
+              {removal?.description}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -884,7 +905,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                   .catch(reportError)
               }
             >
-              Conferma
+              {removal?.actionLabel}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1063,10 +1084,10 @@ function Dashboard({
             <h3>{formatGrade(average)}</h3>
           </div>
           <span
-            className={`status-badge ${average !== null && average < 4 ? "danger" : "success"}`}
+            className={`status-badge ${average === null ? "" : average < 4 ? "danger" : "success"}`}
           >
             {average === null
-              ? "Nessun voto"
+              ? "Nessun voto registrato"
               : average >= goal
                 ? "Obiettivo"
                 : average !== null && average >= 4
@@ -1129,7 +1150,15 @@ function Dashboard({
             </button>
           );
         })}
-        {!upcoming.length && <EmptyMini text="Tutto completato. Bel lavoro!" />}
+        {!upcoming.length && (
+          <EmptyMini
+            text={
+              agenda.length
+                ? "Tutto completato. Bel lavoro!"
+                : "Nessuna attività registrata."
+            }
+          />
+        )}
       </section>
       <section className="panel subjects-panel">
         <div className="panel-title">
@@ -1181,7 +1210,7 @@ function Dashboard({
             <b>{totalAbsences.toFixed(1)} ore</b>
           </div>
         </button>
-        <button onClick={() => onNavigate("stats")}>
+        <button onClick={() => onNavigate("grades")}>
           <span>
             <TrendingUp size={19} />
           </span>
@@ -1199,7 +1228,13 @@ function Dashboard({
           </span>
           <div>
             <small>Da controllare</small>
-            <b>{alerts.length ? `${alerts.length} materie` : "Tutto bene"}</b>
+            <b>
+              {alerts.length
+                ? `${alerts.length} materie`
+                : grades.length
+                  ? "Nessuna sotto il 4"
+                  : "Nessun voto"}
+            </b>
           </div>
         </button>
       </section>
@@ -1248,9 +1283,9 @@ function AgendaView({
           <p>La tua agenda. Il completamento resta sempre personale.</p>
         </div>
         <div>
-          <button className="soft-button" onClick={onClasses}><UsersRound size={18} /> Dalle classi</button>
+          <button className="soft-button" onClick={onClasses}><UsersRound size={18} /> Apri le classi</button>
           <button className="soft-button" onClick={onNotifications}>
-            <Bell size={18} /> Promemoria
+            <Bell size={18} /> Avvisi ad app aperta
           </button>
           <button className="primary-button" onClick={onAdd}>
             <Plus size={18} /> Nuova attività
@@ -1621,7 +1656,7 @@ function GradesView({
             ) : (
               <EmptyState
                 icon={GraduationCap}
-                title="Nessun voto"
+                title="Nessun voto registrato"
                 text="Registra il primo voto per questa materia."
               />
             )}
@@ -1647,7 +1682,7 @@ function GradesView({
               />
             </label>
             <label>
-              Prossima tipologia
+              Prossimo tipo di prova
               <NativeSelect
                 value={type?.id ?? ""}
                 onChange={(e) => setNextType(e.target.value)}
@@ -1684,7 +1719,7 @@ function GradesView({
                   : needed <= 1
                     ? "Basta 1.0"
                     : needed > 6
-                      ? "> 6.0"
+                      ? "Una sola prova non basta per raggiungere questa media"
                       : (Math.ceil((needed - 1e-10) * 2) / 2).toFixed(1)}
               </strong>
             </div>
@@ -1772,7 +1807,7 @@ function SettingsDialog({
             <div className="settings-section-head">
               <div>
                 <h3>Materie</h3>
-                <p>Colori, docenti e ponderazioni.</p>
+                <p>Gestisci le materie e il calcolo delle medie.</p>
               </div>
               <button className="primary-button small" onClick={onAddSubject}>
                 <Plus /> Aggiungi
