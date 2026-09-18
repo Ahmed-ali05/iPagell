@@ -20,11 +20,11 @@ Principi:
 
 1. Un utente crea una classe, ne diventa proprietario e riceve un codice e un link.
 2. Condivide l'invito fuori da iPagell. Chi lo apre accede o crea un account e si unisce.
-3. I membri pubblicano eventi comuni. Ognuno può aggiungerli alla propria agenda.
-4. Titolo, descrizione, materia e data dell'evento seguono gli aggiornamenti della classe. Promemoria e stato completato rimangono personali.
+3. I membri pubblicano attività comuni. Ognuno può aggiungerle alla propria agenda.
+4. Titolo, descrizione, materia e data dell'attività seguono gli aggiornamenti della classe. Avvisi e stato completato rimangono personali.
 5. Se l'evento è annullato, importato o la persona lascia la classe, la copia non scompare: diventa annullata o non più sincronizzata.
 
-La schermata della classe privilegia “Prossimi eventi”, non chat e funzioni social. Annunci e materiali sono sezioni secondarie. Il prodotto deve funzionare bene anche con una sola classe.
+La schermata della classe privilegia “Prossime attività”, non chat e funzioni social. Annunci e materiali sono sezioni secondarie. Il prodotto deve funzionare bene anche con una sola classe.
 
 ## Ruoli e permessi
 
@@ -121,7 +121,7 @@ Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di event
 
 - Home, calendario, elenco e riepilogo WebMCP includono gli eventi scelti dall'utente. Voti, assenze e statistiche non vengono condivisi.
 - Le materie di classe sono etichette suggerite dagli eventi esistenti; non esiste ancora una tassonomia con archiviazione. L'associazione alla materia del diario è privata.
-- Completamento, promemoria e periodo personale hanno persistenza separata dal diario e sono accessibili solo al titolare. I promemoria funzionano ad app aperta, non sono notifiche push programmate.
+- Completamento, avvisi e periodo personale hanno persistenza separata dal diario e sono accessibili solo al titolare. Gli avvisi funzionano ad app aperta, non sono notifiche push programmate.
 - L'ultima agenda collegata è disponibile senza rete nella cache locale separata per account. Le modifiche condivise e delle sottoscrizioni richiedono connessione. La cache viene rimossa su logout o sessione non valida.
 - Aggiornamenti attivi ogni 30 secondi, al ritorno nell'app e alla riconnessione; nessuna promessa di aggiornamento istantaneo.
 - Trigger transazionali conservano le copie su uscita, rimozione, eliminazione evento o classe. Le copie scollegate sono modificabili dal solo titolare; un evento eliminato rimane annullato nella copia.

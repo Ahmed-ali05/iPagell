@@ -805,7 +805,7 @@ export function ClassesView({
               </label>
             </fieldset>
             <DialogFooter>
-              <button className="primary-button" disabled={busy}>Salva</button>
+              <button className="primary-button" disabled={busy}>Salva modifiche</button>
             </DialogFooter>
           </form>
         </DialogContent>

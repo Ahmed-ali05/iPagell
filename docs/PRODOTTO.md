@@ -25,7 +25,7 @@ Stato: **versione iniziale pubblicata**, non “prodotto completo”. L’accoun
 - Campi mobili leggibili, bersagli da almeno 44 px come obiettivo di progetto; focus visibile e label associate.
 - “Salvato sul dispositivo” e “Salvato nell’account” sono stati diversi. Non usare un successo generico per coprire un errore remoto.
 - Importazioni e cancellazioni devono dire cosa verrà sostituito o rimosso e quale copia si può conservare.
-- Stati vuoti senza finti risultati; metriche calcolate, non abbellimenti numerici. Terminologia coerente: materia, tipologia, peso, coefficiente, semestre.
+- Stati vuoti senza finti risultati; metriche calcolate, non abbellimenti numerici. Terminologia coerente: materia, tipo di prova, peso, coefficiente, semestre.
 - Le formule configurabili non vanno presentate come regolamenti ufficiali della scuola.
 
 ## Roadmap ordinata, senza date promesse
