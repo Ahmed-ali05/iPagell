@@ -1,6 +1,11 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
+if (!process.argv.includes("--sandbox")) {
+  console.error("Questo comando non pubblica su ipagell.website. La produzione usa Sites: vedi docs/DEPLOYMENT.md. Per il Worker sperimentale separato usa npm run deploy:sandbox.");
+  process.exit(1);
+}
+
 const root = process.cwd();
 const wrangler = resolve(root, "node_modules/wrangler/bin/wrangler.js");
 const env = {

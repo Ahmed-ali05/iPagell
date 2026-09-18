@@ -1,72 +1,37 @@
-# Distribuzione indipendente
+# Sviluppo e pubblicazione
 
-[Indice](../README.md) · [Manutenzione](MANUTENZIONE.md) · [Architettura](ARCHITETTURA.md)
+[Indice](../README.md) · [Manutenzione](MANUTENZIONE.md)
 
-## Scelta della piattaforma
+## Una produzione: ipagell.website
 
-iPagell è un'applicazione full-stack: il browser usa route API, sessioni HTTP e un database D1. GitHub Pages può ospitare soltanto l'output statico e quindi non può eseguire il backend dell'app. La distribuzione indipendente usa:
+La produzione è **https://ipagell.website**, ospitata da Sites con il database esistente. Il progetto da aggiornare è quello in `.openai/hosting.json`. `www.ipagell.website` è collegato allo stesso sito; anche l'indirizzo generato `*.chatgpt.site` è un alias della medesima pubblicazione. La navigazione da questi alias viene reindirizzata al dominio principale, conservando percorso e query.
 
-- GitHub come repository e punto di avvio della pipeline;
-- Cloudflare Workers per pagine, API e asset;
-- Cloudflare D1 per account, diari e classi;
-- Vinext/Vite come build compatibile con Workers;
-- `ipagell.website` come dominio pubblico dopo la migrazione dei dati.
+Il Worker indipendente configurato in `wrangler.jsonc` ha un **database separato**. Il suo nome storico `ipagell-production` non significa che contenga i dati di ipagell.website. Pubblicarlo non aggiorna il sito pubblico. Non cambiare DNS o database per un normale rilascio.
 
-Il file `wrangler.jsonc` è la fonte di verità del Worker indipendente. `.openai/hosting.json` rimane nel repository finché la precedente pubblicazione Sites serve da rollback e sorgente dei dati esistenti.
+## Quando modifichi tu il codice
 
-## Ambienti
+1. Crea un ramo dal `main` aggiornato e modifica il progetto.
+2. Da un clone pulito esegui `npm run install:ci`. Per l'anteprima usa `npm run dev`; inizializza il database locale come indicato in [Manutenzione](MANUTENZIONE.md).
+3. Esegui `npm run release:prepare`: controlla codice, tipi, test, documentazione e genera la build.
+4. Salva le modifiche con un commit, invia il ramo su GitHub e apri una pull request. Il workflow **Controlli iPagell** esegue gli stessi controlli; puoi avviarlo anche da GitHub → Actions → Controlli iPagell → Run workflow. Unisci quando è verde.
+5. Apri il progetto aggiornato in Codex e chiedi: **«Pubblica questo codice su ipagell.website usando il progetto Sites esistente»**.
 
-| Ambiente | Indirizzo | Dati |
-|---|---|---|
-| Pubblicazione attuale | `https://ipagell.website` | Database della pubblicazione Sites |
-| Worker indipendente | URL `workers.dev` restituito dal deploy | D1 `ipagell-production`, regione WEUR |
+GitHub verifica il codice ma non pubblica la produzione. Il deploy Sites richiede il collegamento Sites autenticato di Codex: in questo repository non è configurata un'integrazione CI per pubblicare su Sites. `release:prepare` prepara il rilascio, non lo pubblica.
 
-Non spostare il dominio principale sul nuovo Worker prima di aver esportato, verificato e importato i dati esistenti. Il nuovo database è separato: cambiare solo il DNS farebbe apparire vuoti gli account creati sulla pubblicazione precedente.
+## Procedura di pubblicazione per Codex
 
-La zona `ipagell.website` non è ancora associata all'account Cloudflare del Worker: un tentativo controllato sul solo sottodominio `beta` è stato rifiutato prima di creare la route. Occorre aggiungere prima la zona e aggiornare i nameserver presso il gestore del dominio. L'URL `workers.dev` è marcato `noindex`; l'indicizzazione si abilita soltanto sul dominio canonico.
+Usare la skill Sites hosting: verificare il progetto e i domini esistenti, compilare per Sites con `npm run build` (senza `IPAGELL_DEPLOY_TARGET=cloudflare`), salvare e inviare l'esatto sorgente al repository restituito dal connettore, preparare il pacchetto e pubblicare la versione con Sites. Attendere lo stato `succeeded` e confermare l'URL **https://ipagell.website**. Il push del sorgente Sites è distinto da GitHub.
 
-## Pubblicazione manuale
+Preservare accesso pubblico e binding esistenti. Le migrazioni incluse nel pacchetto devono essere compatibili con i dati correnti; un rollback del codice non annulla le migrazioni. Nessun token, backup, database locale o `.env` nel pacchetto o nel repository.
 
-Autenticarsi una volta con `npx wrangler login`, poi eseguire:
+## Worker sperimentale separato
 
-```bash
-npm run deploy:cloudflare
-```
-
-Lo script:
-
-1. genera il build Cloudflare con la configurazione di produzione;
-2. esegue un deploy a secco;
-3. applica soltanto le migrazioni D1 non ancora registrate;
-4. pubblica il Worker e gli asset.
-
-Per controllare soltanto il pacchetto:
+Solo per prove esplicitamente richieste, dopo `npx wrangler login`:
 
 ```bash
-npm run build:cloudflare
-npx wrangler deploy --dry-run
+npm run deploy:sandbox
 ```
 
-## GitHub Actions
+Questo compila, verifica e pubblica il Worker `workers.dev`, applicando le migrazioni al suo D1 separato. Il vecchio `npm run deploy:cloudflare` si ferma con un messaggio per evitare pubblicazioni nel posto sbagliato. Il workflow GitHub di deploy Cloudflare è stato sostituito dai controlli.
 
-Il workflow `.github/workflows/deploy-cloudflare.yml` è manuale (`workflow_dispatch`) per evitare pubblicazioni involontarie. Nell'ambiente GitHub `production` servono:
-
-- `CLOUDFLARE_API_TOKEN`, limitato al Worker, D1 e alle route necessarie;
-- `CLOUDFLARE_ACCOUNT_ID`.
-
-Dopo aver aggiunto protezioni, revisori e un backup verificato, il trigger può essere esteso ai push sul ramo `main`.
-
-## Passaggio del dominio
-
-Checklist minima per trasferire `ipagell.website` senza perdita di dati:
-
-1. sospendere temporaneamente le nuove scritture o definire una finestra di manutenzione;
-2. esportare il database Sites e conservarne una copia cifrata con accesso limitato;
-3. importare in `ipagell-production` e confrontare conteggi, relazioni e accesso di account sintetici;
-4. provare registrazione, login, diario, classi, offline e cancellazione sull'ambiente indipendente;
-5. aggiungere il dominio alla zona Cloudflare e collegarlo al Worker;
-6. aggiornare DNS e certificato, mantenendo il precedente deploy come rollback temporaneo;
-7. verificare `/`, `/app`, `/robots.txt`, `/sitemap.xml` e le route API dal dominio finale;
-8. inviare la sitemap ai motori di ricerca solo dopo il passaggio.
-
-Un rollback del codice non annulla una migrazione. Un rollback DNS non riconcilia automaticamente le scritture avvenute sui due database: durante il passaggio deve esistere una sola sorgente scrivibile.
+Un'eventuale migrazione futura fuori da Sites richiede trasferimento verificato dei dati e del dominio come attività dedicata.

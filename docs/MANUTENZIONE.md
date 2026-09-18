@@ -64,8 +64,8 @@ La suite accetta solo host locali, crea due account sintetici e ne tenta la canc
 2. Leggere la migrazione: soprattutto cancellazioni, vincoli e cambi di formato. Non modificare migrazioni già pubblicate.
 3. Provare su copia locale e preparare recupero dati prima di modifiche distruttive. Le future migrazioni locali vanno applicate una sola volta, in ordine; il bootstrap sopra non è un runner generale.
 4. Eseguire i controlli pertinenti e aggiornare changelog, API e guida se cambia il comportamento.
-5. Generare il pacchetto indipendente con `npm run build:cloudflare` e controllare `npx wrangler deploy --dry-run`.
-6. Pubblicare con `npm run deploy:cloudflare`, attendere l'esito terminale e provare le route pubbliche e private. Il precedente progetto Sites resta separato finché dati e dominio non sono migrati.
+5. Eseguire `npm run release:prepare` per verificare e compilare il codice.
+6. Pubblicare su **ipagell.website** tramite il progetto Sites esistente, seguendo [Distribuzione](DEPLOYMENT.md), e attendere l'esito terminale. Il Worker Cloudflare indipendente è un ambiente sperimentale separato.
 
 Non mettere token Git o Cloudflare nelle remote, nei file, negli screenshot o nella documentazione. Non pubblicare `.wrangler/`, database locali, file `.env`, cookie o backup degli utenti. Non usare un nuovo database come scorciatoia per risolvere errori di deploy sul database esistente.
 
