@@ -15,17 +15,19 @@ import type { AccountIdentity } from "@/types/domain";
 
 type Props = {
   user: AccountIdentity | null;
+  initialMode?: "login" | "register";
   onRegister: (input: Registration) => Promise<void>;
   onAuthenticated: () => Promise<void>;
   onLogout: () => Promise<void>;
 };
 export function AccountGate({
   user,
+  initialMode = "login",
   onRegister,
   onAuthenticated,
   onLogout,
 }: Props) {
-  const [mode, setMode] = useState<"login" | "register" | "recover">("login");
+  const [mode, setMode] = useState<"login" | "register" | "recover">(initialMode);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [recovery, setRecovery] = useState<{
@@ -122,7 +124,7 @@ export function AccountGate({
         <span className="eyebrow">Il tuo diario scolastico</span>
         <h1>
           {recovery
-            ? "Conserva la tua chiave."
+            ? "Salva il codice di recupero."
             : user
               ? "Crea il tuo profilo"
               : mode === "register"
@@ -246,7 +248,7 @@ export function AccountGate({
                     {mode === "register"
                       ? "Crea un account iPagell indipendente. Scegli un nome utente e una password unica."
                       : mode === "recover"
-                        ? "Usa il codice ricevuto alla registrazione. Tutte le sessioni verranno revocate."
+                        ? "Usa il codice ricevuto alla registrazione. Dovrai accedere di nuovo su tutti i dispositivi."
                         : "Accedi con il tuo account iPagell."}
                   </p>
                   <label className="full">

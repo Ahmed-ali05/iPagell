@@ -67,7 +67,7 @@ Questo modello evita copie divergenti e rende esplicite le responsabilità:
 - campi personali: completamento, promemoria, preferenze di visualizzazione;
 - cache offline: ultima versione visibile, origine e stato di sincronizzazione.
 
-Se un evento cambia, la nuova revisione appare automaticamente. Se viene annullato, resta visibile come annullato. Se l'accesso alla classe termina, l'ultima versione importata diventa una voce personale scollegata. L'utente può anche scegliere “Rendi personale” in anticipo.
+Se un evento cambia, la nuova revisione viene applicata automaticamente senza mostrare dettagli tecnici nell'interfaccia. Se viene annullato, resta visibile come annullato. Se l'accesso alla classe termina, l'ultima versione importata diventa una voce personale scollegata. L'utente può anche scegliere “Scollega dalla classe” in anticipo.
 
 Le materie condivise sono etichette della classe, non riferimenti diretti alle materie private. Ogni persona può associare un'etichetta condivisa a una propria materia senza rivelare il proprio piano di studi.
 

@@ -4,16 +4,25 @@ export function EmptyState({
   icon: Icon,
   title,
   text,
+  actionLabel,
+  onAction,
 }: {
   icon: typeof CalendarDays;
   title: string;
   text: string;
+  actionLabel?: string;
+  onAction?: () => void;
 }) {
   return (
     <div className="empty-state">
       <Icon />
       <b>{title}</b>
       <p>{text}</p>
+      {actionLabel && onAction && (
+        <button className="primary-button small" onClick={onAction}>
+          {actionLabel}
+        </button>
+      )}
     </div>
   );
 }

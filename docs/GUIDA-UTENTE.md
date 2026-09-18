@@ -4,7 +4,7 @@
 
 ## Primo accesso
 
-1. Apri [iPagell](https://ipagell.website) e scegli **Crea un account**.
+1. Apri [iPagell](https://ipagell.website) e scegli **Crea il tuo diario**. Se hai già un account, scegli **Accedi**.
 2. Scegli un nome utente di 3–32 caratteri: lettere, numeri, punto, trattino o underscore; il primo carattere deve essere una lettera o un numero. Maiuscole e minuscole non distinguono account diversi.
 3. Usa una password unica di 12–128 caratteri. Puoi usare il gestore password del dispositivo.
 4. Conserva il codice di recupero mostrato dopo la registrazione. È una chiave d’accesso: non inviarlo a nessuno e non inserirlo nelle segnalazioni di problemi.
@@ -40,13 +40,13 @@ Ogni voto pesa **peso del voto × peso della tipologia**. Esempio: uno scritto d
 
 Le cifre visualizzate possono essere arrotondate; non sono un voto ufficiale di pagella. Cambiare pesi o coefficienti ricalcola anche i periodi passati. Non sono implementate medie separate teoria/pratica a percentuale fissa.
 
-Nel simulatore scegli obiettivo, tipologia e peso della prossima prova. Il risultato è arrotondato al mezzo voto superiore. `> 6.0` significa che una sola prova con quel peso non basta. Lo “scenario senza nuovi voti” è la media attuale, non una previsione.
+Nel simulatore scegli obiettivo, tipo e peso della prossima prova. Il risultato è arrotondato al mezzo voto superiore. Se una sola prova con quel peso non basta, il simulatore lo indica esplicitamente.
 
-### Assenze e promemoria
+### Assenze e avvisi
 
 Registra la durata in ore; una voce senza materia può rappresentare più lezioni, non necessariamente una giornata intera. La soglia è personale e non certifica i limiti della tua scuola. Ritardi e uscite sono conteggiati in base alle ore inserite.
 
-I promemoria attuali sono avvisi ad app aperta, previo consenso. Non sono una sveglia affidabile ad app chiusa: per scadenze importanti usa anche il calendario del dispositivo.
+Gli avvisi attuali funzionano ad app aperta, previo consenso. Non sono una sveglia affidabile ad app chiusa: per scadenze importanti usa anche il calendario del dispositivo.
 
 ## Classi private
 
@@ -54,11 +54,11 @@ Apri **Classi** e scegli **Nuova classe** per creare un gruppo. Diventi propriet
 
 Il proprietario può nominare o revocare moderatori, rimuovere membri, modificare la classe, trasferire la proprietà ed eliminarla. I moderatori possono creare o revocare inviti e rimuovere membri ordinari. Un membro può cambiare il proprio nome visibile o uscire. Il proprietario deve prima trasferire la proprietà oppure eliminare la classe.
 
-Voti, assenze, medie, preferenze e diario personale non vengono mostrati alla classe. La prima versione condivisa gestisce gruppo e accessi; eventi e agenda condivisa arriveranno nella fase C2.
+Voti, assenze, medie, preferenze e completamento personale non vengono mostrati alla classe. I membri possono condividere compiti e verifiche; ciascuno sceglie quali aggiungere alla propria agenda. Titolo e data delle attività collegate seguono gli aggiornamenti della classe, mentre completamento, materia personale e avvisi restano privati. **Scollega dalla classe** conserva l’attività nell’agenda ma interrompe gli aggiornamenti.
 
 ## Salvataggio, offline e conflitti
 
-- **Salvato nell’account:** il server ha confermato la copia. Un backup indipendente resta utile.
+- **Diario personale salvato:** il server ha confermato la copia del diario. Un backup indipendente resta utile.
 - **Copia sul dispositivo / offline:** ci sono dati disponibili localmente; non è una conferma di sincronizzazione.
 - **Sincronizzazione non riuscita:** controlla connessione e messaggio; esporta prima di fare tentativi distruttivi.
 - **Accedi di nuovo:** rientra nello stesso account. Le modifiche in attesa non vanno attribuite a un altro utente.

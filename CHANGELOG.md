@@ -4,9 +4,13 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 
 ## Non rilasciato
 
+- Produzione esplicitamente su ipagell.website tramite Sites; alias www/ChatGPT reindirizzati, workflow GitHub di controlli e comando di preparazione del rilascio. Deploy del Worker separato rinominato sandbox per evitare destinazioni ambigue.
+
 - Anteprima di condivisione Open Graph e X con immagine dedicata, nome iPagell e descrizione leggibile.
 
 - Password: minimo ridotto a 12 caratteri per registrazione, recupero e cambio password; interfaccia e guida allineate.
+
+- Avviato il passaggio UX leggero: copy più espliciti, registrazione separata dall’accesso, conferme specifiche e stati vuoti/assenze/classi più chiari; gli interventi strutturali restano pianificati nella reference UX.
 
 ### Semplificazione e contenuti generici
 

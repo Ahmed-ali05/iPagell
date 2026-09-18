@@ -59,12 +59,12 @@ const features = [
   {
     icon: CalendarCheck2,
     title: "Un’agenda che unisce tutto",
-    text: "Compiti, verifiche ed eventi condivisi arrivano nella stessa vista, mantenendo personali promemoria e stato.",
+    text: "Compiti, verifiche e attività condivise arrivano nella stessa vista, mantenendo personali avvisi e completamento.",
   },
   {
     icon: UsersRound,
     title: "Classi condivise, spazio privato",
-    text: "Collabora sugli eventi della classe senza esporre voti, assenze o organizzazione personale agli altri membri.",
+    text: "Condividi le attività della classe senza esporre voti, assenze o organizzazione personale agli altri membri.",
   },
   {
     icon: CloudOff,
@@ -114,7 +114,7 @@ const structuredData = {
         "Calcolo delle medie",
         "Agenda di compiti e verifiche",
         "Gestione delle assenze",
-        "Eventi di classe condivisi",
+        "Attività di classe condivise",
         "Consultazione offline",
       ],
     },
@@ -165,7 +165,7 @@ export default async function Home() {
           <a href="#domande">Domande</a>
         </nav>
         <a className={styles.headerCta} href="/app">
-          Apri il diario <ArrowRight size={16} aria-hidden="true" />
+          Accedi <ArrowRight size={16} aria-hidden="true" />
         </a>
       </header>
 
@@ -176,15 +176,16 @@ export default async function Home() {
           </p>
           <h1>Il semestre è più semplice quando vedi tutto insieme.</h1>
           <p className={styles.lead}>
-            Voti, media, compiti, assenze e attività della classe in uno spazio
-            ordinato. Tu decidi cosa resta privato e cosa condividere.
+            Voti da 1 a 6, media, compiti e assenze in uno spazio ordinato. I
+            tuoi voti e le assenze restano privati; con la classe condividi le
+            attività.
           </p>
           <div className={styles.heroActions}>
-            <a className={styles.primaryCta} href="/app">
-              Inizia con iPagell <ArrowRight size={18} aria-hidden="true" />
+            <a className={styles.primaryCta} href="/app?mode=register">
+              Crea il tuo diario <ArrowRight size={18} aria-hidden="true" />
             </a>
-            <a className={styles.secondaryCta} href="#come-funziona">
-              Scopri come funziona
+            <a className={styles.secondaryCta} href="/app">
+              Accedi
             </a>
           </div>
           <ul className={styles.trustList} aria-label="Vantaggi principali">
@@ -269,8 +270,8 @@ export default async function Home() {
           </p>
           <ul>
             <li><LockKeyhole size={18} aria-hidden="true" /> Dati personali non visibili alla classe</li>
-            <li><UsersRound size={18} aria-hidden="true" /> Eventi comuni aggiornati per tutti</li>
-            <li><BookOpenCheck size={18} aria-hidden="true" /> Stato e promemoria restano individuali</li>
+            <li><UsersRound size={18} aria-hidden="true" /> Attività comuni aggiornate per tutti</li>
+            <li><BookOpenCheck size={18} aria-hidden="true" /> Completamento e avvisi restano individuali</li>
           </ul>
         </div>
       </section>
@@ -283,7 +284,7 @@ export default async function Home() {
         <ol className={styles.steps}>
           <li><span>01</span><div><h3>Crea il tuo semestre</h3><p>Imposta date e materie per costruire uno spazio adatto alla tua scuola.</p></div></li>
           <li><span>02</span><div><h3>Aggiungi ciò che conta</h3><p>Registra voti, compiti e assenze; iPagell aggiorna subito riepiloghi e statistiche.</p></div></li>
-          <li><span>03</span><div><h3>Condividi solo il calendario</h3><p>Entra in una classe per ricevere gli eventi comuni senza aprire il tuo diario agli altri.</p></div></li>
+          <li><span>03</span><div><h3>Condividi solo il calendario</h3><p>Entra in una classe per ricevere le attività comuni senza aprire il tuo diario agli altri.</p></div></li>
         </ol>
       </section>
 

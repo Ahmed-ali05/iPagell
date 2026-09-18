@@ -1,6 +1,6 @@
 # iPagell — Riferimento UX, UI e contenuti
 
-Aggiornato: 17 settembre 2026. Secondo passaggio UX sul commit `1436fad`.
+Aggiornato: 18 settembre 2026. Avvio delle migliorie leggere dopo il secondo passaggio UX.
 
 Questo documento conserva contesto, evidenze e proposte. Non certifica un rilascio e non autorizza automaticamente l'implementazione. Nessun codice o dato scolastico è stato modificato durante questa analisi.
 
@@ -13,6 +13,12 @@ Questo documento conserva contesto, evidenze e proposte. Non certifica un rilasc
 - **Da validare:** ipotesi sul comportamento degli studenti, non risultato di ricerca.
 
 Per ogni futura modifica annotare data, decisione, motivo, sezioni coinvolte ed esito della verifica. Non segnare come risolto un problema solo perché esiste un task. Prima di aggiornare questo documento rileggere il comportamento corrente: il prodotto evolve.
+
+## Avvio implementazione — 18 settembre 2026
+
+Applicato un primo gruppo circoscritto: CTA di registrazione distinta dall'accesso, glossario principale, verbi specifici nelle conferme, stato del diario personale, copy e stati vuoti di statistiche/assenze, distinzione tra tipo e giustificazione dell'assenza, beneficio delle classi e rimozione del numero di revisione dall'interfaccia.
+
+UX04, UX06, UX07, UX08 e UX09 sono quindi solo **avviati**, non completati. Restano rinviati i lavori più ampi: conservazione del contesto, editor degli elementi personali, simulazione non persistente, riduzione strutturale dei moduli, riordino della Home e della navigazione, accesso al dettaglio delle attività già aggiunte e recupero dei conflitti.
 
 ## Principi documentati da conservare
 

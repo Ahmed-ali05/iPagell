@@ -82,13 +82,15 @@ Le prove API creano dati sintetici e devono essere eseguite soltanto contro un a
 
 ## Documentazione
 
+Per lavorare sul codice e pubblicarlo segui [Sviluppo e pubblicazione](docs/DEPLOYMENT.md). `npm run release:prepare` esegue controlli e build; la pubblicazione su **ipagell.website** passa dal progetto Sites esistente. GitHub esegue i controlli sulle pull request e su `main`.
+
 | Documento | Contenuto |
 |---|---|
 | [Guida utente](docs/GUIDA-UTENTE.md) | Utilizzo, installazione, account, recupero e dati |
 | [Architettura](docs/ARCHITETTURA.md) | Componenti, persistenza, formule e sincronizzazione |
 | [Contratto API](docs/API.md) | Endpoint, richieste, risposte ed errori |
 | [Manutenzione](docs/MANUTENZIONE.md) | Ambiente locale, test, build, migrazioni e incidenti |
-| [Distribuzione](docs/DEPLOYMENT.md) | Worker indipendente, D1, CI e passaggio del dominio |
+| [Distribuzione](docs/DEPLOYMENT.md) | Sviluppo, controlli GitHub e pubblicazione su ipagell.website |
 | [Piano prodotto](docs/PRODOTTO.md) | Priorità, limiti, qualità e criteri di rilascio |
 | [Sicurezza](SECURITY.md) | Confini di fiducia e segnalazioni riservate |
 | [Changelog](CHANGELOG.md) | Evoluzione e note di rilascio |

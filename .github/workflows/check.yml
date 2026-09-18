@@ -1,0 +1,29 @@
+name: Controlli iPagell
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm run install:ci
+      - run: npm run release:prepare
+      - name: Riepilogo
+        run: |
+          echo 'Controlli e build superati. Per pubblicare su https://ipagell.website seguire docs/DEPLOYMENT.md. Questo workflow non effettua deploy.' >> "$GITHUB_STEP_SUMMARY"

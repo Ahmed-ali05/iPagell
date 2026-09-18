@@ -1113,6 +1113,8 @@ button {
 }
 .needed-grade.impossible strong {
   color: var(--danger);
+  font-size: 22px;
+  letter-spacing: -0.02em;
 }
 
 /* Absences */

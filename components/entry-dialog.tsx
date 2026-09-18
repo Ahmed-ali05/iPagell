@@ -132,7 +132,15 @@ function EntryForm({
           "Attività salvata sul dispositivo",
         );
       } else if (type === "absence") {
-        const kind = str("kind") as Absence["kind"];
+        const absenceType = str("absenceType");
+        const justified = str("justified") === "yes";
+        const kind = (
+          absenceType === "absence"
+            ? justified
+              ? "justified"
+              : "unjustified"
+            : absenceType
+        ) as Absence["kind"];
         const item: Absence = {
           id: uid(),
           semesterId,
@@ -140,7 +148,7 @@ function EntryForm({
           subjectId: str("subjectId") || undefined,
           kind,
           durationHours: num("durationHours"),
-          justified: kind !== "unjustified",
+          justified,
           note: str("note"),
         };
         await onSave(
@@ -199,6 +207,13 @@ function EntryForm({
     subject: editingSubject ? "Modifica materia" : "Nuova materia",
     semester: editingSemester ? "Modifica semestre" : "Nuovo semestre",
   };
+  const submitLabels = {
+    grade: "Registra voto",
+    agenda: "Aggiungi attività",
+    absence: "Registra assenza",
+    subject: editingSubject ? "Salva modifiche" : "Aggiungi materia",
+    semester: editingSemester ? "Salva modifiche" : "Aggiungi semestre",
+  };
   const needsSubject = type === "grade" || type === "agenda";
   return (
     <form onSubmit={submit}>
@@ -254,7 +269,7 @@ function EntryForm({
               <input name="date" type="date" defaultValue={today()} required />
             </label>
             <label>
-              Tipologia
+              Tipo di prova
               <NativeSelect key={selected} name="typeId" required>
                 {subject?.gradeTypes.map((t) => (
                   <NativeSelectOption key={t.id} value={t.id}>
@@ -308,7 +323,7 @@ function EntryForm({
               <textarea name="description" maxLength={4000} />
             </label>
             <label>
-              Tipologia voto
+              Tipo di prova
               <NativeSelect name="typeId" key={selected}>
                 <NativeSelectOption value="">
                   Non specificata
@@ -349,20 +364,22 @@ function EntryForm({
               <input name="date" type="date" defaultValue={today()} required />
             </label>
             <label>
-              Tipologia
-              <NativeSelect name="kind">
-                <NativeSelectOption value="justified">
-                  Giustificata
-                </NativeSelectOption>
-                <NativeSelectOption value="unjustified">
-                  Non giustificata
-                </NativeSelectOption>
+              Tipo di assenza
+              <NativeSelect name="absenceType">
+                <NativeSelectOption value="absence">Assenza</NativeSelectOption>
                 <NativeSelectOption value="late">
                   Ritardo / entrata posticipata
                 </NativeSelectOption>
                 <NativeSelectOption value="early-exit">
                   Uscita anticipata
                 </NativeSelectOption>
+              </NativeSelect>
+            </label>
+            <label>
+              Giustificazione
+              <NativeSelect name="justified" defaultValue="no">
+                <NativeSelectOption value="no">Non giustificata</NativeSelectOption>
+                <NativeSelectOption value="yes">Giustificata</NativeSelectOption>
               </NativeSelect>
             </label>
             <label>
@@ -404,7 +421,7 @@ function EntryForm({
               />
             </label>
             <label>
-              Coefficiente generale
+              Peso della materia nella media generale
               <input
                 name="coefficient"
                 type="number"
@@ -424,9 +441,9 @@ function EntryForm({
               />
             </label>
             <div className="full type-editor">
-              <h3>Tipologie e pesi</h3>
+              <h3>Tipi di prova e pesi</h3>
               <p>
-                Ogni voto pesa: peso del voto × peso della tipologia. Non
+                Ogni voto pesa: peso del voto × peso del tipo di prova. Non
                 vengono fatte medie separate tra gruppi. Modificare i pesi
                 ricalcola anche i semestri passati.
               </p>
@@ -476,7 +493,7 @@ function EntryForm({
                         ? "Usata da voti o attività: non eliminabile"
                         : undefined
                     }
-                    aria-label={`Elimina tipologia ${t.name}`}
+                    aria-label={`Elimina tipo di prova ${t.name}`}
                     onClick={() => setTypes(types.filter((x) => x.id !== t.id))}
                   >
                     <Trash2 />
@@ -492,7 +509,7 @@ function EntryForm({
                 }
               >
                 <Plus />
-                Aggiungi tipologia
+                Aggiungi tipo di prova
               </button>
             </div>
           </>
@@ -558,7 +575,7 @@ function EntryForm({
           className="primary-button"
           disabled={busy || (needsSubject && !data.subjects.length)}
         >
-          {busy ? "Salvataggio…" : "Salva"}
+          {busy ? "Salvataggio…" : submitLabels[type!]}
         </button>
       </DialogFooter>
     </form>
