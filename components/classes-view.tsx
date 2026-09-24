@@ -46,6 +46,9 @@ import type {
   ClassSummary,
   CreatedClassInvite,
 } from "@/types/classes";
+import { LanguageSelect, useI18n } from "@/components/i18n-provider";
+import { formatDate, selectPlural } from "@/lib/i18n";
+import type { MessageKey } from "@/lib/i18n";
 
 type ConfirmAction = {
   title: string;
@@ -66,22 +69,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
   const data = (await response.json()) as T & { error?: string };
   if (!response.ok)
-    throw new Error(data.error ?? "Operazione non riuscita. Riprova.");
+    throw new Error(data.error ?? "CLASS_REQUEST_FAILED");
   return data;
 }
-
-const roleLabel = {
-  owner: "Proprietario",
-  moderator: "Moderatore",
-  member: "Membro",
-} as const;
-
-const dateLabel = (value: number) =>
-  new Intl.DateTimeFormat("it-CH", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
 
 export function ClassesView({
   currentUserId,
@@ -96,6 +86,8 @@ export function ClassesView({
   semesterId: string;
   agenda: ClassAgendaController;
 }) {
+  const { t, locale } = useI18n();
+  const dateLabel = (value: number) => formatDate(locale, new Date(value), { day: "numeric", month: "short", year: "numeric" });
   const detailSequence = useRef(0);
   const [classes, setClasses] = useState<ClassSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -103,7 +95,7 @@ export function ClassesView({
   const [invites, setInvites] = useState<ClassInvite[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<MessageKey | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -136,7 +128,7 @@ export function ClassesView({
 
   const loadClasses = useCallback(
     async (preferredId?: string) => {
-      setError("");
+      setError(null);
       const result = await request<{ classes: ClassSummary[] }>("/api/classes");
       setClasses(result.classes);
       const nextId =
@@ -166,11 +158,7 @@ export function ClassesView({
     queueMicrotask(() => {
       setCheckedAt(Date.now());
       void loadClasses()
-        .catch((cause) =>
-          setError(
-            cause instanceof Error ? cause.message : "Classi non disponibili",
-          ),
-        )
+        .catch(() => setError("classes.unavailable"))
         .finally(() => setLoading(false));
     });
   }, [loadClasses]);
@@ -179,11 +167,11 @@ export function ClassesView({
     if (id === selectedId) return;
     setSelectedId(id);
     setDetail(null);
-    setError("");
+    setError(null);
     try {
       await loadDetail(id);
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Classe non disponibile");
+    } catch {
+      setError("classes.classUnavailable");
     }
   }
 
@@ -198,9 +186,9 @@ export function ClassesView({
       });
       setCreateOpen(false);
       await loadClasses(result.class.id);
-      toast.success("Classe creata");
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "Classe non creata");
+      toast.success(t("classes.created"));
+    } catch {
+      toast.error(t("classes.notCreated"));
     } finally {
       setBusy(false);
     }
@@ -218,9 +206,9 @@ export function ClassesView({
       setJoinOpen(false);
       setJoinCode("");
       await loadClasses(result.class.id);
-      toast.success(`Sei entrato in ${result.class.name}`);
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "Ingresso non riuscito");
+      toast.success(t("classes.joined", { name: result.class.name }));
+    } catch {
+      toast.error(t("classes.notJoined"));
     } finally {
       setBusy(false);
     }
@@ -244,8 +232,8 @@ export function ClassesView({
       );
       setCreatedInvite(result.invite);
       setInvites((current) => [result.invite, ...current]);
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "Invito non creato");
+    } catch {
+      toast.error(t("classes.inviteNotCreated"));
     } finally {
       setBusy(false);
     }
@@ -264,9 +252,9 @@ export function ClassesView({
       setDetail(result.class);
       setEditOpen(false);
       await loadClasses(detail.id);
-      toast.success("Classe aggiornata");
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "Modifica non salvata");
+      toast.success(t("classes.updated"));
+    } catch {
+      toast.error(t("classes.operationFailed"));
     } finally {
       setBusy(false);
     }
@@ -288,9 +276,9 @@ export function ClassesView({
       setDetail(result.class);
       setNameOpen(false);
       await loadClasses(detail.id);
-      toast.success("Nome aggiornato");
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "Modifica non salvata");
+      toast.success(t("classes.nameUpdated"));
+    } catch {
+      toast.error(t("classes.operationFailed"));
     } finally {
       setBusy(false);
     }
@@ -309,9 +297,9 @@ export function ClassesView({
       );
       setDetail(result.class);
       await loadClasses(detail.id);
-      toast.success(input.operation === "transfer" ? "Proprietà trasferita" : "Ruolo aggiornato");
-    } catch (cause) {
-      toast.error(cause instanceof Error ? cause.message : "Modifica non riuscita");
+      toast.success(input.operation === "transfer" ? t("classes.transferDone") : t("classes.roleUpdated"));
+    } catch {
+      toast.error(t("classes.operationFailed"));
     } finally {
       setBusy(false);
     }
@@ -335,7 +323,7 @@ export function ClassesView({
   if (loading)
     return (
       <section className="panel classes-loading" aria-live="polite">
-        <RefreshCw /> <span>Caricamento classi…</span>
+        <RefreshCw /> <span>{t("classes.loading")}</span>
       </section>
     );
 
@@ -343,23 +331,23 @@ export function ClassesView({
     <>
       <div className="classes-toolbar">
         <div>
-          <span className="eyebrow">Le tue classi</span>
+          <span className="section-label">{t("classes.title")}</span>
         </div>
         <div>
           <button className="soft-button" onClick={() => setJoinOpen(true)}>
-            <DoorOpen /> Inserisci codice
+            <DoorOpen /> {t("classes.enterCode")}
           </button>
           <button className="primary-button" onClick={() => setCreateOpen(true)}>
-            <Plus /> Nuova classe
+            <Plus /> {t("classes.new")}
           </button>
         </div>
       </div>
 
       {error && (
         <section className="sync-banner" role="alert">
-          <p>{error}</p>
-          <button className="soft-button" onClick={() => void loadClasses().catch(cause => setError(cause instanceof Error ? cause.message : "Classi non disponibili"))}>
-            Riprova
+          <p>{t(error)}</p>
+          <button className="soft-button" onClick={() => void loadClasses().catch(() => setError("classes.unavailable"))}>
+            {t("classes.retry")}
           </button>
         </section>
       )}
@@ -367,26 +355,25 @@ export function ClassesView({
       {!classes.length ? (
         <section className="panel class-empty">
           <UsersRound />
-          <h2>La tua prima classe</h2>
+          <h2>{t("classes.firstTitle")}</h2>
           <p>
-            Creane una e condividi l’invito, oppure inserisci il codice ricevuto
-            da un compagno.
+            {t("classes.firstHint")}
           </p>
           <div>
             <button className="primary-button" onClick={() => setCreateOpen(true)}>
-              Crea una classe
+              {t("classes.create")}
             </button>
             <button className="soft-button" onClick={() => setJoinOpen(true)}>
-              Ho un codice
+              {t("classes.haveCode")}
             </button>
           </div>
         </section>
       ) : (
         <div className="classes-layout">
-          <aside className="panel class-switcher" aria-label="Le tue classi">
+          <aside className="panel class-switcher" aria-label={t("classes.title")}>
             <div className="panel-title">
               <div>
-                <span className="eyebrow">Le tue classi</span>
+                <span className="section-label">{t("classes.title")}</span>
                 <h3>{classes.length}</h3>
               </div>
             </div>
@@ -401,7 +388,7 @@ export function ClassesView({
                   <div>
                     <b>{item.name}</b>
                     <small>
-                      {item.memberCount} {item.memberCount === 1 ? "membro" : "membri"}
+                      {item.memberCount} {t(selectPlural(locale, item.memberCount, "classes.member", "classes.members"))}
                     </small>
                   </div>
                 </button>
@@ -411,14 +398,14 @@ export function ClassesView({
 
           <div className="class-detail-stack">
             {!detail ? (
-              <section className="panel classes-loading">Caricamento…</section>
+              <section className="panel classes-loading">{t("classes.loadingDetail")}</section>
             ) : (
               <>
                 <section className="class-hero">
                   <div>
-                    <span className="class-role">{roleLabel[detail.role]}</span>
+                    <span className="class-role">{t(`classes.role.${detail.role}` as "classes.role.owner" | "classes.role.moderator" | "classes.role.member")}</span>
                     <h2>{detail.name}</h2>
-                    <p>{detail.description || "Nessuna descrizione."}</p>
+                    <p>{detail.description || t("classes.noDescription")}</p>
                   </div>
                   <div className="class-hero-actions">
                     {canManageInvites && (
@@ -429,12 +416,12 @@ export function ClassesView({
                           setInviteOpen(true);
                         }}
                       >
-                        <Link2 /> Crea invito
+                        <Link2 /> {t("classes.createInvite")}
                       </button>
                     )}
                     {detail.role === "owner" && (
                       <button className="soft-button" onClick={() => setEditOpen(true)}>
-                        <Pencil /> Modifica
+                        <Pencil /> {t("classes.edit")}
                       </button>
                     )}
                   </div>
@@ -443,15 +430,14 @@ export function ClassesView({
                 <ClassEventsPanel key={detail.id} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} />
 
                 <details className="class-administration">
-                  <summary>Membri e gestione della classe <span>{detail.memberCount} {detail.memberCount === 1 ? "membro" : "membri"}</span></summary>
+                  <summary>{t("classes.management")} <span>{detail.memberCount} {t(selectPlural(locale, detail.memberCount, "classes.member", "classes.members"))}</span></summary>
                   <div className="class-detail-stack">
                 <section className="panel members-panel">
                   <div className="panel-title">
                     <div>
-                      <span className="eyebrow">Persone</span>
-                      <h3>{detail.memberCount} membri</h3>
+                      <h3>{detail.memberCount} {t("classes.members")}</h3>
                     </div>
-                    <button onClick={() => setNameOpen(true)}>Il mio nome</button>
+                    <button onClick={() => setNameOpen(true)}>{t("classes.myName")}</button>
                   </div>
                   <div className="member-list">
                     {detail.members.map((member) => {
@@ -468,9 +454,9 @@ export function ClassesView({
                           <div>
                             <b>
                               {member.displayName}
-                              {member.isCurrentUser ? " · Tu" : ""}
+                              {member.isCurrentUser ? ` · ${t("common.you")}` : ""}
                             </b>
-                            <small>{roleLabel[member.role]}</small>
+                            <small>{t(`classes.role.${member.role}` as "classes.role.owner" | "classes.role.moderator" | "classes.role.member")}</small>
                           </div>
                           <div className="member-actions">
                             {detail.role === "owner" && member.role !== "owner" && (
@@ -489,35 +475,34 @@ export function ClassesView({
                                   }
                                 >
                                   <ShieldCheck />
-                                  {member.role === "moderator" ? "Rendi membro" : "Rendi moderatore"}
+                                  {member.role === "moderator" ? t("classes.makeMember") : t("classes.makeModerator")}
                                 </button>
                                 <button
                                   className="soft-button compact"
                                   disabled={busy}
                                   onClick={() =>
                                     setConfirm({
-                                      title: `Trasferire la classe a ${member.displayName}?`,
+                                      title: t("classes.transferConfirm", { name: member.displayName }),
                                       description:
-                                        "Diventerà proprietario e tu resterai nella classe come membro.",
-                                      label: "Trasferisci",
+                                        t("classes.transferWarning"),
+                                      label: t("classes.transfer"),
                                       run: () => updateMember(member.userId, { operation: "transfer" }),
                                     })
                                   }
                                 >
-                                  <Crown /> Trasferisci
+                                  <Crown /> {t("classes.transfer")}
                                 </button>
                               </>
                             )}
                             {canRemove && (
                               <button
                                 className="icon-button danger"
-                                aria-label={`Rimuovi ${member.displayName}`}
+                                aria-label={t("classes.removeMember", { name: member.displayName })}
                                 onClick={() =>
                                   setConfirm({
-                                    title: `Rimuovere ${member.displayName}?`,
-                                    description:
-                                      "L’accesso alla classe verrà revocato immediatamente.",
-                                    label: "Rimuovi",
+                                    title: t("classes.removeMemberConfirm", { name: member.displayName }),
+                                    description: t("classes.removeAccess"),
+                                    label: t("classes.remove"),
                                     run: async () => {
                                       await request(
                                         `/api/classes/${detail.id}/members/${member.userId}`,
@@ -542,8 +527,7 @@ export function ClassesView({
                   <section className="panel invites-panel">
                     <div className="panel-title">
                       <div>
-                        <span className="eyebrow">Accesso</span>
-                        <h3>Inviti attivi</h3>
+                        <h3>{t("classes.activeInvites")}</h3>
                       </div>
                       <button
                         onClick={() => {
@@ -551,7 +535,7 @@ export function ClassesView({
                           setInviteOpen(true);
                         }}
                       >
-                        Nuovo
+                        {t("classes.newInvite")}
                       </button>
                     </div>
                     {activeInvites.length ? (
@@ -561,20 +545,19 @@ export function ClassesView({
                             <Link2 />
                             <div>
                               <b>
-                                {invite.uses}/{invite.maxUses} ingressi
+                                {invite.uses}/{invite.maxUses} {t("classes.entries")}
                               </b>
                               <small>
-                                Scade {invite.expiresAt ? dateLabel(invite.expiresAt) : "mai"}
+                                {t("classes.expires")} {invite.expiresAt ? dateLabel(invite.expiresAt) : t("classes.never")}
                               </small>
                             </div>
                             <button
                               className="soft-button compact"
                               onClick={() =>
                                 setConfirm({
-                                  title: "Revocare questo invito?",
-                                  description:
-                                    "Il link e il codice non permetteranno più nuovi ingressi.",
-                                  label: "Revoca",
+                                  title: t("classes.revokeConfirm"),
+                                  description: t("classes.revokeWarning"),
+                                  label: t("classes.revoke"),
                                   run: async () => {
                                     await request(
                                       `/api/classes/${detail.id}/invites/${invite.id}`,
@@ -585,13 +568,13 @@ export function ClassesView({
                                 })
                               }
                             >
-                              Revoca
+                              {t("classes.revoke")}
                             </button>
                           </article>
                         ))}
                       </div>
                     ) : (
-                      <p className="class-muted">Nessun invito attivo.</p>
+                      <p className="class-muted">{t("classes.noInvites")}</p>
                     )}
                   </section>
                 )}
@@ -602,10 +585,9 @@ export function ClassesView({
                       className="soft-button danger-text"
                       onClick={() =>
                         setConfirm({
-                          title: `Eliminare “${detail.name}”?`,
-                          description:
-                            "Membri e inviti verranno rimossi. Questa azione non tocca i diari personali.",
-                          label: "Elimina classe",
+                          title: t("classes.deleteClassConfirm", { name: detail.name }),
+                          description: t("classes.deleteClassWarning"),
+                          label: t("classes.deleteClass"),
                           run: async () => {
                             await request(`/api/classes/${detail.id}`, {
                               method: "DELETE",
@@ -617,16 +599,16 @@ export function ClassesView({
                         })
                       }
                     >
-                      <Trash2 /> Elimina classe
+                      <Trash2 /> {t("classes.deleteClass")}
                     </button>
                   ) : (
                     <button
                       className="soft-button danger-text"
                       onClick={() =>
                         setConfirm({
-                          title: `Uscire da “${detail.name}”?`,
-                          description: "Per rientrare servirà un nuovo invito valido.",
-                          label: "Esci dalla classe",
+                          title: t("classes.leaveConfirm", { name: detail.name }),
+                          description: t("classes.leaveWarning"),
+                          label: t("classes.leaveClass"),
                           run: async () => {
                             await request(
                               `/api/classes/${detail.id}/members/${currentUserId}`,
@@ -638,7 +620,7 @@ export function ClassesView({
                         })
                       }
                     >
-                      <DoorOpen /> Esci dalla classe
+                      <DoorOpen /> {t("classes.leaveClass")}
                     </button>
                   )}
                 </section>
@@ -653,23 +635,24 @@ export function ClassesView({
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent className="entry-dialog">
           <DialogHeader>
-            <DialogTitle>Crea una classe</DialogTitle>
+            <DialogTitle>{t("classes.create")}</DialogTitle>
             <DialogDescription>
-              Sarai il proprietario. Potrai invitare compagni e nominare moderatori.
+              {t("classes.createOwnerHint")}
             </DialogDescription>
+            <LanguageSelect className="language-select" />
           </DialogHeader>
           <form onSubmit={submitCreate}>
             <fieldset className="form-grid" disabled={busy}>
               <label className="full">
-                Nome della classe
+                {t("classes.className")}
                 <input name="name" required minLength={2} maxLength={80} />
               </label>
               <label className="full">
-                Descrizione
+                {t("classes.description")}
                 <textarea name="description" maxLength={500} rows={3} />
               </label>
               <label className="full">
-                Il tuo nome nella classe
+                {t("classes.displayName")}
                 <input
                   name="displayName"
                   required
@@ -680,7 +663,7 @@ export function ClassesView({
             </fieldset>
             <DialogFooter>
               <button className="primary-button" disabled={busy}>
-                {busy ? "Creazione…" : "Crea classe"}
+                {busy ? t("classes.creating") : t("classes.create")}
               </button>
             </DialogFooter>
           </form>
@@ -690,15 +673,16 @@ export function ClassesView({
       <Dialog open={joinOpen} onOpenChange={setJoinOpen}>
         <DialogContent className="entry-dialog">
           <DialogHeader>
-            <DialogTitle>Unisciti a una classe</DialogTitle>
+            <DialogTitle>{t("classes.joinTitle")}</DialogTitle>
             <DialogDescription>
-              Inserisci il codice ricevuto. Nella classe non verranno condivisi voti o assenze.
+              {t("classes.joinHint")}
             </DialogDescription>
+            <LanguageSelect className="language-select" />
           </DialogHeader>
           <form onSubmit={submitJoin}>
             <fieldset className="form-grid" disabled={busy}>
               <label className="full">
-                Codice invito
+                {t("classes.inviteCode")}
                 <input
                   name="code"
                   required
@@ -707,11 +691,11 @@ export function ClassesView({
                   autoCapitalize="characters"
                   autoCorrect="off"
                   spellCheck={false}
-                  placeholder="ABCD-EFGH-JKLM"
+                  placeholder={t("classes.codePlaceholder")}
                 />
               </label>
               <label className="full">
-                Il tuo nome nella classe
+                {t("classes.displayName")}
                 <input
                   name="displayName"
                   required
@@ -722,7 +706,7 @@ export function ClassesView({
             </fieldset>
             <DialogFooter>
               <button className="primary-button" disabled={busy}>
-                {busy ? "Ingresso…" : "Entra nella classe"}
+                {busy ? t("classes.joining") : t("classes.join")}
               </button>
             </DialogFooter>
           </form>
@@ -738,49 +722,50 @@ export function ClassesView({
       >
         <DialogContent className="entry-dialog">
           <DialogHeader>
-            <DialogTitle>{createdInvite ? "Invito pronto" : "Crea un invito"}</DialogTitle>
+            <DialogTitle>{createdInvite ? t("classes.inviteReady") : t("classes.createInviteTitle")}</DialogTitle>
             <DialogDescription>
               {createdInvite
-                ? "Condividi il link o il codice fuori da iPagell. Sarà mostrato solo ora."
-                : "Scegli durata e numero massimo di ingressi."}
+                ? t("classes.inviteShareHint")
+                : t("classes.inviteOptionsHint")}
             </DialogDescription>
+            <LanguageSelect className="language-select" />
           </DialogHeader>
           {createdInvite ? (
             <div className="invite-result">
-              <span>Codice invito</span>
+              <span>{t("classes.inviteCode")}</span>
               <strong>{createdInvite.code}</strong>
               <button
                 className="primary-button"
                 onClick={() => {
-                  void navigator.clipboard.writeText(inviteLink).then(() => toast.success("Link copiato")).catch(() => toast.error("Copia non disponibile. Condividi il codice mostrato."));
+                  void navigator.clipboard.writeText(inviteLink).then(() => toast.success(t("classes.linkCopied"))).catch(() => toast.error(t("classes.copyUnavailable")));
                 }}
               >
-                <Clipboard /> Copia link
+                <Clipboard /> {t("classes.copyLink")}
               </button>
               <small>
-                Scade {createdInvite.expiresAt ? dateLabel(createdInvite.expiresAt) : "mai"} · massimo {createdInvite.maxUses} ingressi
+                {t("classes.expires")} {createdInvite.expiresAt ? dateLabel(createdInvite.expiresAt) : t("classes.never")} · {t("classes.maxEntries", { count: createdInvite.maxUses })}
               </small>
             </div>
           ) : (
             <form onSubmit={submitInvite}>
               <fieldset className="form-grid" disabled={busy}>
                 <label>
-                  Scadenza
+                  {t("classes.expiration")}
                   <NativeSelect name="expiresInDays" defaultValue="7">
-                    <NativeSelectOption value="1">1 giorno</NativeSelectOption>
-                    <NativeSelectOption value="7">7 giorni</NativeSelectOption>
-                    <NativeSelectOption value="14">14 giorni</NativeSelectOption>
-                    <NativeSelectOption value="30">30 giorni</NativeSelectOption>
+                    <NativeSelectOption value="1">{t("classes.days", { count: 1 })}</NativeSelectOption>
+                    <NativeSelectOption value="7">{t("classes.days", { count: 7 })}</NativeSelectOption>
+                    <NativeSelectOption value="14">{t("classes.days", { count: 14 })}</NativeSelectOption>
+                    <NativeSelectOption value="30">{t("classes.days", { count: 30 })}</NativeSelectOption>
                   </NativeSelect>
                 </label>
                 <label>
-                  Ingressi massimi
+                  {t("classes.maxEntriesLabel")}
                   <input name="maxUses" type="number" min={1} max={50} defaultValue={50} />
                 </label>
               </fieldset>
               <DialogFooter>
                 <button className="primary-button" disabled={busy}>
-                  {busy ? "Creazione…" : "Genera invito"}
+                  {busy ? t("classes.creating") : t("classes.generateInvite")}
                 </button>
               </DialogFooter>
             </form>
@@ -791,21 +776,22 @@ export function ClassesView({
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="entry-dialog">
           <DialogHeader>
-            <DialogTitle>Modifica classe</DialogTitle>
+            <DialogTitle>{t("classes.editTitle")}</DialogTitle>
+            <LanguageSelect className="language-select" />
           </DialogHeader>
           <form onSubmit={submitEdit} key={detail?.id}>
             <fieldset className="form-grid" disabled={busy}>
               <label className="full">
-                Nome
+                {t("classes.name")}
                 <input name="name" required maxLength={80} defaultValue={detail?.name} />
               </label>
               <label className="full">
-                Descrizione
+                {t("classes.description")}
                 <textarea name="description" maxLength={500} defaultValue={detail?.description} rows={3} />
               </label>
             </fieldset>
             <DialogFooter>
-              <button className="primary-button" disabled={busy}>Salva</button>
+              <button className="primary-button" disabled={busy}>{t("classes.saveChanges")}</button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -814,20 +800,21 @@ export function ClassesView({
       <Dialog open={nameOpen} onOpenChange={setNameOpen}>
         <DialogContent className="entry-dialog">
           <DialogHeader>
-            <DialogTitle>Il tuo nome nella classe</DialogTitle>
+            <DialogTitle>{t("classes.displayName")}</DialogTitle>
             <DialogDescription>
-              È l’unico nome mostrato agli altri membri.
+              {t("classes.onlyNameShown")}
             </DialogDescription>
+            <LanguageSelect className="language-select" />
           </DialogHeader>
           <form onSubmit={submitDisplayName} key={detail?.displayName}>
             <fieldset className="form-grid" disabled={busy}>
               <label className="full">
-                Nome visibile
+                {t("classes.visibleName")}
                 <input name="displayName" required maxLength={80} defaultValue={detail?.displayName} />
               </label>
             </fieldset>
             <DialogFooter>
-              <button className="primary-button" disabled={busy}>Salva nome</button>
+              <button className="primary-button" disabled={busy}>{t("classes.saveName")}</button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -840,7 +827,7 @@ export function ClassesView({
             <AlertDialogDescription>{confirm?.description}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogCancel>{t("classes.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               className="danger-action"
               disabled={busy}
@@ -852,10 +839,10 @@ export function ClassesView({
                   .run()
                   .then(() => {
                     setConfirm(null);
-                    toast.success("Operazione completata");
+                    toast.success(t("classes.done"));
                   })
-                  .catch((cause) =>
-                    toast.error(cause instanceof Error ? cause.message : "Operazione non riuscita"),
+                  .catch(() =>
+                    toast.error(t("classes.operationFailed")),
                   )
                   .finally(() => setBusy(false));
               }}

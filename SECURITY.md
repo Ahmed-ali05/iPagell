@@ -36,9 +36,9 @@ Non pubblicare exploit con dati reali, backup, password, codici di recupero, coo
 
 Includere versione interessata, impatto, passaggi riproducibili su account sintetici e prove minimizzate. Non accedere a dati altrui né svolgere test di carico sul sito pubblico. Chi mantiene il progetto deve confermare la ricezione, riprodurre in isolamento, classificare il rischio, concordare contenimento e rilascio, aggiornare i test e comunicare i limiti della correzione.
 
-## Funzioni future
+## Stato delle funzioni
 
-Le classi e lo spazio studio AI non fanno parte dell'attuale superficie pubblicata. Le rispettive specifiche fissano requisiti di sicurezza prima dell'implementazione:
+Classi, eventi condivisi e agenda personale collegata sono implementati nel codice: verificano autorizzazioni server-side e separano i dati condivisi dal diario. L'attivazione delle classi nell'ambiente Sites pubblicato non è verificabile dalla repository. Lo spazio studio AI resta futuro. Le specifiche fissano requisiti di sicurezza prima dell'eventuale estensione:
 
 - [Classi autogestite](docs/CLASSI.md): autorizzazioni server-side, inviti conservati come digest, isolamento del diario e test contro IDOR/escalation;
 - [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md): file non fidati, prompt injection, isolamento di storage/vettori, cancellazione dei derivati, quote e trattamento da parte del fornitore.

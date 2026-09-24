@@ -21,17 +21,17 @@ export async function PUT(request: Request) {
   try {
     const user = await identity(request);
     if (!user)
-      return json({ error: "Sessione scaduta. Accedi di nuovo." }, 401);
+      return json({ error: "Sessione scaduta. Accedi di nuovo.", code: "ACCOUNT_CHANGED" }, 401);
     checkMutation(request);
     const parsed = envelope.safeParse(await readJson(request));
     if (!parsed.success)
       return json(
-        { error: "Dati non validi: controlla valori, date e collegamenti" },
+        { error: "Dati non validi: controlla valori, date e collegamenti", code: "DIARY_INVALID_SNAPSHOT" },
         400,
       );
     if (parsed.data.expectedUserId !== user.id)
       return json(
-        { error: "L’account attivo è cambiato. Ricarica per continuare." },
+        { error: "L’account attivo è cambiato. Ricarica per continuare.", code: "ACCOUNT_CHANGED" },
         401,
       );
     const { diary, revision } = parsed.data;
@@ -41,6 +41,7 @@ export async function PUT(request: Request) {
         {
           error:
             "Il diario è stato modificato su un altro dispositivo. Nessun dato è stato sovrascritto.",
+          code: "DIARY_CONFLICT",
         },
         409,
       );

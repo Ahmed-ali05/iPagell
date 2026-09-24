@@ -25,7 +25,7 @@ Stato: **versione iniziale pubblicata**, non “prodotto completo”. L’accoun
 - Campi mobili leggibili, bersagli da almeno 44 px come obiettivo di progetto; focus visibile e label associate.
 - “Salvato sul dispositivo” e “Salvato nell’account” sono stati diversi. Non usare un successo generico per coprire un errore remoto.
 - Importazioni e cancellazioni devono dire cosa verrà sostituito o rimosso e quale copia si può conservare.
-- Stati vuoti senza finti risultati; metriche calcolate, non abbellimenti numerici. Terminologia coerente: materia, tipologia, peso, coefficiente, semestre.
+- Stati vuoti senza finti risultati; metriche calcolate, non abbellimenti numerici. Terminologia coerente: materia, tipo di prova, peso, coefficiente, semestre.
 - Le formule configurabili non vanno presentate come regolamenti ufficiali della scuola.
 
 ## Roadmap ordinata, senza date promesse
@@ -44,8 +44,8 @@ Le righe seguenti sono **aperte**, non funzionalità già consegnate. P0 indica 
 | Q06 / P1 | Manutenibilità e test | Separare viste dal componente principale; runner locale migrazioni tracciato e ripetibile; controlli automatizzati in CI |
 | Q07 / P1 | Accuratezza scolastica avanzata | Definire medie per componenti e congelamento storico, con esempi approvati e test prima dell’implementazione |
 | Q08 / P2 | Estensioni d’uso | Valutare vista settimana e promemoria push reali solo con infrastruttura, consenso e costi chiariti |
-| C01 / P1 | Classi autogestite — C1 disponibile | Ruoli proprietario/moderatore/membro, inviti revocabili e isolamento dei dati coperti da test |
-| C02 / P1 | Agenda condivisa | Eventi collaborativi e sottoscrizioni personali aggiornabili senza condividere il diario |
+| C01 / consegnato | Classi autogestite | Implementato: ruoli proprietario/moderatore/membro, inviti revocabili e dati separati dal diario; l'attivazione live del flag non è verificabile dalla repository |
+| C02 / consegnato | Agenda condivisa | Implementati eventi collaborativi e sottoscrizioni personali aggiornabili senza condividere il diario |
 | C03 / P2 | Annunci e materiali | Introdurre prima link/testo; file soltanto con storage privato, scansione e policy dati |
 | A01 / ricerca | Spazio studio AI | Prototipo offline su corpus autorizzato con citazioni, albero incrementale ed evaluation documentata |
 | A02 / futuro | AI personale in produzione | Solo dopo privacy, cancellazione, quote, storage, code e soglie di qualità approvate |

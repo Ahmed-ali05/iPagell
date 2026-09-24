@@ -12,6 +12,18 @@ export interface LocalDiary extends DiarySnapshot {
   dirty: boolean;
 }
 const ACTIVE_KEY = "ipagell-active-account-v2";
+export class LocalConflictError extends Error {
+  constructor() {
+    super("Il diario sul dispositivo è cambiato in un’altra scheda. Aggiornalo e riprova: questa modifica non è stata salvata.");
+  }
+}
+export function sameLocal(a: LocalDiary | null, b: LocalDiary | null) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+export function activateAccount(id: string | null) {
+  if (id) localStorage.setItem(ACTIVE_KEY, id);
+  else localStorage.removeItem(ACTIVE_KEY);
+}
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open("ipagell-db", 2);
@@ -39,19 +51,28 @@ async function read<T>(store: string, key: string): Promise<T | null> {
     db.close();
   }
 }
-export async function saveLocal(value: LocalDiary) {
+// Compare and write in ONE transaction: the remote revision alone cannot detect
+// two offline edits based on the same server snapshot.
+export async function saveLocal(value: LocalDiary, expected: LocalDiary | null) {
   diarySchema.parse({ data: value.data, preferences: value.preferences });
   const db = await openDb();
   try {
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction("accounts", "readwrite");
-      tx.objectStore("accounts").put(value, value.user.id);
+      const store = tx.objectStore("accounts");
+      let conflict = false;
+      const request = store.get(value.user.id);
+      request.onsuccess = () => {
+        if (!sameLocal(request.result ?? null, expected)) {
+          conflict = true;
+          tx.abort();
+        } else store.put(value, value.user.id);
+      };
       // An IndexedDB request can succeed before the transaction commits.
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
-      tx.onabort = () => reject(tx.error);
+      tx.onabort = () => reject(conflict ? new LocalConflictError() : tx.error);
     });
-    localStorage.setItem(ACTIVE_KEY, value.user.id);
   } finally {
     db.close();
   }
@@ -60,7 +81,10 @@ export async function readLocal(id: string) {
   const value = await read<LocalDiary>("accounts", id);
   if (
     !value ||
-    value.user.id !== id ||
+    value.user?.id !== id ||
+    typeof value.user.username !== "string" ||
+    typeof value.dirty !== "boolean" ||
+    !Number.isSafeInteger(value.revision) || value.revision < 1 ||
     !diarySchema.safeParse({ data: value.data, preferences: value.preferences })
       .success
   )
@@ -74,18 +98,26 @@ export function activeAccountId() {
     return null;
   }
 }
-export async function forgetLocal(id?: string) {
-  localStorage.removeItem(ACTIVE_KEY);
+export async function forgetLocal(id?: string, expected?: LocalDiary | null) {
+  if (!id || activeAccountId() === id) activateAccount(null);
   if (!id) return;
   localStorage.removeItem(`ipagell-class-agenda-v1:${id}`);
   const db = await openDb();
   try {
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction("accounts", "readwrite");
-      tx.objectStore("accounts").delete(id);
+      const store = tx.objectStore("accounts");
+      let conflict = false;
+      const request = store.get(id);
+      request.onsuccess = () => {
+        if (!sameLocal(request.result ?? null, expected ?? null)) {
+          conflict = true;
+          tx.abort();
+        } else store.delete(id);
+      };
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
-      tx.onabort = () => reject(tx.error);
+      tx.onabort = () => reject(conflict ? new LocalConflictError() : tx.error);
     });
   } finally {
     db.close();

@@ -17,7 +17,8 @@ export async function POST(request: Request) {
       return json(
         {
           error:
-            "Controlla nome utente, codice e nuova password (15–128 caratteri).",
+            "Controlla nome utente, codice e nuova password (12–128 caratteri).",
+          code: "AUTH_INVALID_RECOVERY",
         },
         400,
       );
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
       .bind(nextHash, tokenHash(nextCode), username, tokenHash(recoveryCode))
       .run();
     if (result.meta.changes !== 1)
-      return json({ error: "Nome utente o codice non validi." }, 401);
+      return json({ error: "Nome utente o codice non validi.", code: "AUTH_INVALID_RECOVERY" }, 401);
     const response = json({ recoveryCode: nextCode });
     response.headers.set("Set-Cookie", sessionCookie(request, "", 0));
     return response;

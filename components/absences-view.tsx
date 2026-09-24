@@ -1,8 +1,10 @@
 "use client";
 
-import { AlertTriangle, CalendarDays, Clock3, Plus, Trash2, UserRoundCheck } from "lucide-react";
+import { Plus, Trash2, UserRoundCheck } from "lucide-react";
 import type { Absence, Subject } from "@/types/domain";
 import { EmptyState } from "@/components/diary-empty-state";
+import { useI18n } from "@/components/i18n-provider";
+import { formatDate, formatNumber } from "@/lib/i18n";
 
 export function AbsencesView({
   items,
@@ -19,6 +21,7 @@ export function AbsencesView({
   onAdd: () => void;
   onDelete: (id: string) => void;
 }) {
+  const { t, locale } = useI18n();
   const total = items.reduce((sum, item) => sum + item.durationHours, 0);
   const unjustified = items
     .filter((item) => !item.justified)
@@ -26,12 +29,12 @@ export function AbsencesView({
   const percentage = Math.min(100, (total / threshold) * 100);
   const thresholdMessage =
     total > threshold
-      ? `Hai superato la soglia personale di ${(total - threshold).toFixed(1)} ore.`
+      ? t("absence.overThreshold", { value: formatNumber(locale, total - threshold, { maximumFractionDigits: 1 }) })
       : total === threshold
-        ? "Hai raggiunto la soglia personale."
+        ? t("absence.atThreshold")
         : percentage >= 80
-          ? `Mancano ${(threshold - total).toFixed(1)} ore alla soglia personale.`
-          : `Hai registrato ${total.toFixed(1)} ore su ${threshold}.`;
+          ? t("absence.nearThreshold", { value: formatNumber(locale, threshold - total, { maximumFractionDigits: 1 }) })
+          : t("absence.totalProgress", { total: formatNumber(locale, total, { maximumFractionDigits: 1 }), threshold: formatNumber(locale, threshold) });
   const bySubject = subjects
     .map((subject) => ({
       subject,
@@ -44,31 +47,22 @@ export function AbsencesView({
   return (
     <section className="module-view">
       <div className="module-toolbar">
-        <p>Monitora ore, ritardi e giustificazioni.</p>
+        <p>{t("absence.intro")}</p>
         <button className="primary-button" onClick={onAdd}>
-          <Plus size={18} /> Registra assenza
+          <Plus size={18} /> {t("absence.add")}
         </button>
       </div>
       <div className="absence-stats">
-        <div className="metric-card">
-          <span>
-            <Clock3 />
-          </span>
-          <small>Ore totali</small>
-          <b>{total.toFixed(1)}</b>
+        <div className="absence-stat">
+          <small>{t("absence.totalHours")}</small>
+          <b>{formatNumber(locale, total, { maximumFractionDigits: 1 })} <span>{t("common.hoursShort")}</span></b>
         </div>
-        <div className="metric-card">
-          <span>
-            <AlertTriangle />
-          </span>
-          <small>Non giustificate</small>
-          <b>{unjustified.toFixed(1)}</b>
+        <div className="absence-stat">
+          <small>{t("absence.unjustified")}</small>
+          <b>{formatNumber(locale, unjustified, { maximumFractionDigits: 1 })} <span>{t("common.hoursShort")}</span></b>
         </div>
-        <div className="metric-card">
-          <span>
-            <CalendarDays />
-          </span>
-          <small>Assenze registrate</small>
+        <div className="absence-stat">
+          <small>{t("absence.registered")}</small>
           <b>{items.length}</b>
         </div>
       </div>
@@ -82,14 +76,14 @@ export function AbsencesView({
           <span>{Math.round(percentage)}%</span>
         </div>
         <div>
-          <span className="eyebrow">Soglia personale di riferimento</span>
+          <span className="section-label">{t("absence.personalThreshold")}</span>
           <h3>
-            {total.toFixed(1)} di {threshold} ore
+            {formatNumber(locale, total, { maximumFractionDigits: 1 })} {t("common.of")} {formatNumber(locale, threshold)} {t("common.hours")}
           </h3>
-          <p>{thresholdMessage} Non è il limite ufficiale della scuola.</p>
+          <p>{thresholdMessage} {t("absence.notOfficialLimit")}</p>
         </div>
         <label>
-          Ore di riferimento
+          {t("absence.referenceHours")}
           <input
             type="number"
             min="1"
@@ -107,8 +101,7 @@ export function AbsencesView({
         <section className="panel absence-list">
           <div className="panel-title">
             <div>
-              <span className="eyebrow">Registro</span>
-              <h3>Assenze recenti</h3>
+              <h3>{t("absence.recent")}</h3>
             </div>
           </div>
           {items.length ? (
@@ -119,32 +112,30 @@ export function AbsencesView({
                   <div className="date-block">
                     <b>{new Date(item.date).getDate()}</b>
                     <small>
-                      {new Intl.DateTimeFormat("it-CH", {
-                        month: "short",
-                      }).format(new Date(item.date))}
+                      {formatDate(locale, item.date, { month: "short" })}
                     </small>
                   </div>
                   <div>
                     <b>
                       {subjects.find((subject) => subject.id === item.subjectId)?.name ??
-                        "Più lezioni / materia non indicata"}
+                        t("absence.unspecifiedSubject")}
                     </b>
                     <small>
                       {item.kind === "late"
-                        ? "Ritardo"
+                        ? t("absence.late")
                         : item.kind === "early-exit"
-                          ? "Uscita anticipata"
+                          ? t("absence.earlyExit")
                           : item.justified
-                            ? "Giustificata"
-                            : "Non giustificata"}
+                            ? t("absence.justified")
+                            : t("absence.unjustified")}
                       {item.note ? ` · ${item.note}` : ""}
                     </small>
                   </div>
-                  <strong>{item.durationHours.toFixed(1)} h</strong>
+                  <strong>{formatNumber(locale, item.durationHours, { maximumFractionDigits: 1 })} {t("common.hoursShort")}</strong>
                   <button
                     className="icon-button subtle"
                     onClick={() => onDelete(item.id)}
-                    aria-label="Elimina assenza"
+                    aria-label={t("absence.delete")}
                   >
                     <Trash2 size={17} />
                   </button>
@@ -153,16 +144,15 @@ export function AbsencesView({
           ) : (
             <EmptyState
               icon={UserRoundCheck}
-              title="Nessuna assenza registrata"
-              text="Quando aggiungi un’assenza, qui trovi ore e giustificazione."
+              title={t("absence.emptyTitle")}
+              text={t("absence.emptyText")}
             />
           )}
         </section>
         <aside className="panel absence-subjects">
           <div className="panel-title">
             <div>
-              <span className="eyebrow">Distribuzione</span>
-              <h3>Per materia</h3>
+              <h3>{t("common.bySubject")}</h3>
             </div>
           </div>
           {bySubject.map(({ subject, hours }) => (
@@ -172,7 +162,7 @@ export function AbsencesView({
                   <i style={{ background: subject.color }} />
                   {subject.name}
                 </span>
-                <b>{hours.toFixed(1)} h</b>
+                <b>{formatNumber(locale, hours, { maximumFractionDigits: 1 })} {t("common.hoursShort")}</b>
               </div>
               <span className="mini-track">
                 <i

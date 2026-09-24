@@ -35,7 +35,7 @@ async function call(path, body, cookie, extra = {}) {
     headers: response.headers,
   };
 }
-async function api(path, method, body, cookie) {
+async function api(path, method, body, cookie, extraHeaders = {}) {
   const response = await fetch(base + path, {
     method,
     headers: {
@@ -44,6 +44,7 @@ async function api(path, method, body, cookie) {
       "CF-Connecting-IP": testIp,
       "X-IPagell-Account": accounts.find(a=>a.cookie===cookie)?.id ?? "",
       ...(cookie ? { Cookie: cookie } : {}),
+      ...extraHeaders,
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -93,12 +94,9 @@ try {
     401,
     "ChatGPT/forged headers do not authenticate",
   );
-  check(
-    (await call("/api/auth/register", { username: prefix, password: "short" }))
-      .status,
-    400,
-    "short passwords rejected",
-  );
+  const badSignup = await call("/api/auth/register", { username: prefix, password: "short" });
+  check(badSignup.status, 400, "short passwords rejected");
+  check(badSignup.data.code, "AUTH_INVALID_SIGNUP", "signup error has a stable code");
   check(
     (
       await call("/api/auth/login", { username: prefix, password }, undefined, {
@@ -110,6 +108,15 @@ try {
   );
   const a = await signUp("a"),
     b = await signUp("b");
+  check(
+    (
+      await api("/api/class-agenda", "GET", undefined, b.cookie, {
+        "X-IPagell-Account": a.id,
+      })
+    ).status,
+    401,
+    "client account header cannot override session identity",
+  );
   const login = await call("/api/auth/login", {
     username: a.username,
     password,
@@ -131,16 +138,11 @@ try {
     "no-store authentication response",
   );
   check(login.cookie !== a.cookie, true, "new session token on login");
-  check(
-    (
-      await call("/api/auth/login", {
-        username: a.username,
-        password: "invalid password",
-      })
-    ).status,
-    401,
-    "wrong password denied",
-  );
+  const badLogin = await call("/api/auth/login", {
+    username: a.username, password: "invalid password",
+  });
+  check(badLogin.status, 401, "wrong password denied");
+  check(badLogin.data.code, "AUTH_INVALID_CREDENTIALS", "login error has a stable code");
   const registration = {
     name: "Synthetic tester",
     school: "QA only",
@@ -150,6 +152,12 @@ try {
     endDate: "2027-01-31",
     preset: "basic",
   };
+  check((await call("/api/account", registration, b.cookie, { "X-IPagell-Account": a.id })).status,
+    401, "onboarding cannot create a diary after account switch");
+  check((await call("/api/auth/logout", {}, b.cookie, { "X-IPagell-Account": a.id })).status,
+    401, "stale tab cannot log out another account");
+  check((await call("/api/account", undefined, b.cookie)).status,
+    200, "other account session survives stale logout");
   const profile = await call("/api/account", registration, a.cookie);
   check(profile.status, 201, "create own diary");
   check(
@@ -430,6 +438,14 @@ try {
       password: "invalid password",
     });
   check(last.status, 429, "distributed attempt limit");
+  const badSecurity = await call("/api/auth/security", {
+    operation: "password",
+    expectedUserId: a.id,
+    currentPassword: "not-the-current-password",
+    newPassword: "Another synthetic password 2026!",
+  }, a.cookie);
+  check(badSecurity.data.code, "SECURITY_INVALID_PASSWORD", "security error has a stable code");
+  check(typeof badSecurity.data.error, "string", "security error keeps a compatible message");
 } finally {
   for (const a of accounts) {
     const listed=await api("/api/classes","GET",undefined,a.cookie);

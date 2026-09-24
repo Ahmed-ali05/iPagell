@@ -18,13 +18,13 @@ Principi:
 
 ## Esperienza essenziale
 
-1. Un utente crea una classe, ne diventa proprietario e riceve un codice e un link.
+1. Un utente crea una classe e ne diventa proprietario. Poi crea separatamente un invito per ottenere il codice e il link da condividere.
 2. Condivide l'invito fuori da iPagell. Chi lo apre accede o crea un account e si unisce.
-3. I membri pubblicano eventi comuni. Ognuno può aggiungerli alla propria agenda.
-4. Titolo, descrizione, materia e data dell'evento seguono gli aggiornamenti della classe. Promemoria e stato completato rimangono personali.
+3. I membri pubblicano attività comuni. Ognuno può aggiungerle alla propria agenda.
+4. Titolo, descrizione, materia e data dell'attività seguono gli aggiornamenti della classe. Avvisi e stato completato rimangono personali.
 5. Se l'evento è annullato, importato o la persona lascia la classe, la copia non scompare: diventa annullata o non più sincronizzata.
 
-La schermata della classe privilegia “Prossimi eventi”, non chat e funzioni social. Annunci e materiali sono sezioni secondarie. Il prodotto deve funzionare bene anche con una sola classe.
+La schermata della classe privilegia “Prossime attività”, non chat e funzioni social. Annunci e materiali sono sezioni secondarie. Il prodotto deve funzionare bene anche con una sola classe.
 
 ## Ruoli e permessi
 
@@ -41,7 +41,7 @@ La schermata della classe privilegia “Prossimi eventi”, non chat e funzioni 
 
 Il proprietario può attivare la modalità opzionale “contenuti approvati”; non fa parte del primo MVP. Non sono previste votazioni, gerarchie aggiuntive o verifica dei docenti.
 
-Il proprietario deve trasferire la proprietà prima di uscire. Una rimozione invalida subito l'accesso. L'elenco membri è visibile solo alla classe; il proprietario può nasconderlo ai membri ordinari. Username, email eventuali e credenziali non vengono mai mostrati: nella classe si usa un nome visualizzato modificabile.
+Il proprietario deve trasferire la proprietà prima di uscire. Una rimozione invalida subito l'accesso. L'elenco membri è visibile ai membri della classe; l'impostazione `membersVisible` non viene attualmente applicata per nasconderlo. Username, email eventuali e credenziali non vengono mai mostrati: nella classe si usa un nome visualizzato modificabile.
 
 ## Inviti
 
@@ -53,9 +53,8 @@ Il proprietario o un moderatore può:
 
 - revocare un singolo invito senza interrompere gli altri;
 - rimuovere un membro;
-- ruotare tutti gli inviti in caso di condivisione indesiderata.
 
-Possedere un vecchio link non permette di rientrare dopo la revoca. Un membro rimosso può rientrare soltanto tramite un nuovo invito valido.
+La revoca massiva o rotazione di tutti gli inviti non è implementata. Un membro rimosso può rientrare soltanto tramite un invito valido creato dopo la sua partenza.
 
 ## Agenda collegata
 
@@ -73,7 +72,7 @@ Le materie condivise sono etichette della classe, non riferimenti diretti alle m
 
 ## Modello dati proposto
 
-Le tabelle sono nuove e normalizzate; non vanno inserite dentro `diaries.payload`.
+Questa tabella descrive il modello progettuale complessivo, non lo schema D1 corrente. `classes`, `class_members`, `class_invites`, `class_events`, `class_event_subscriptions` e `class_departures` sono implementate; `class_subjects`, `class_announcements`, `class_materials` e `class_activity` restano proposte. Nello schema attuale `class_events.subject` è testo, non un riferimento `subject_id`; verificare `db/schema.ts` per i campi effettivi. Nessuna di queste tabelle va inserita dentro `diaries.payload`.
 
 | Entità | Campi principali | Note |
 |---|---|---|
@@ -121,7 +120,7 @@ Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di event
 
 - Home, calendario, elenco e riepilogo WebMCP includono gli eventi scelti dall'utente. Voti, assenze e statistiche non vengono condivisi.
 - Le materie di classe sono etichette suggerite dagli eventi esistenti; non esiste ancora una tassonomia con archiviazione. L'associazione alla materia del diario è privata.
-- Completamento, promemoria e periodo personale hanno persistenza separata dal diario e sono accessibili solo al titolare. I promemoria funzionano ad app aperta, non sono notifiche push programmate.
+- Completamento, avvisi e periodo personale hanno persistenza separata dal diario e sono accessibili solo al titolare. Gli avvisi funzionano ad app aperta, non sono notifiche push programmate.
 - L'ultima agenda collegata è disponibile senza rete nella cache locale separata per account. Le modifiche condivise e delle sottoscrizioni richiedono connessione. La cache viene rimossa su logout o sessione non valida.
 - Aggiornamenti attivi ogni 30 secondi, al ritorno nell'app e alla riconnessione; nessuna promessa di aggiornamento istantaneo.
 - Trigger transazionali conservano le copie su uscita, rimozione, eliminazione evento o classe. Le copie scollegate sono modificabili dal solo titolare; un evento eliminato rimane annullato nella copia.
@@ -149,7 +148,7 @@ Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di event
 | C4 — cura | Pianificata | Attività minima, segnalazioni, liste grandi, accessibilità e notifiche in-app | Prova con più classi e dataset realistico |
 | C5 — materiali | Pianificata | Annunci, link e poi file con storage/scansione | Politica dati e infrastruttura file approvate |
 
-L'interruttore server permette di disattivare l'area Classi in caso di incidente. C1 è pubblicata come prima versione controllata; non ampliarne la promozione prima di chiudere i P0 di affidabilità applicabili nella [roadmap](PRODOTTO.md). Ogni fase ha test API e UI, documentazione e rilascio separato.
+L'interruttore server permette di disattivare l'area Classi in caso di incidente. C1/C2/C3 sono implementate nel codice; l'attivazione del flag nell'ambiente Sites pubblicato non è verificabile dalla repository. Non ampliare la promozione prima di chiudere i P0 di affidabilità applicabili nella [roadmap](PRODOTTO.md). Ogni fase ha test API e UI, documentazione e rilascio separato.
 
 ### Avvio C0
 

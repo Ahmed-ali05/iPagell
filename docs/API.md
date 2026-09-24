@@ -24,6 +24,11 @@ Ogni mutazione richiede `Origin` uguale all’origine della richiesta e `Content
 | `GET, POST /api/classes/:classId/invites` | POST con `expiresInDays`, `maxUses` | Metadati inviti oppure 201 con codice mostrato una volta |
 | `DELETE /api/classes/:classId/invites/:inviteId` | `{}` | Revoca immediata dell’invito |
 | `GET, PATCH, DELETE /api/classes/:classId/members/:userId` | PATCH con operazione nome, ruolo o trasferimento | Lettura, modifica ruolo/nome, uscita o rimozione |
+| `GET, POST /api/classes/:classId/events` | POST con dati evento; GET senza corpo | Elenco oppure 201: evento condiviso |
+| `PATCH, DELETE /api/classes/:classId/events/:eventId` | PATCH con revisione e campi evento; DELETE con revisione | Modifica o eliminazione con controllo concorrenza |
+| `POST /api/class-events/:eventId/subscription` | `semesterId`, facoltativo `subjectId` e `reminder` | 201: sottoscrizione dell'evento all'agenda personale |
+| `GET /api/class-agenda` | Nessuno | Sottoscrizioni personali alle attività di classe |
+| `PATCH, DELETE /api/class-agenda/:subscriptionId` | Revisione e campi personali; `detach: true` per scollegare | Modifica, scollegamento o rimozione della copia personale |
 
 `user = { id, username }`. Registrazione account e creazione diario sono due passaggi distinti: dopo la prima, `GET /api/account` può restituire `diary: null`. Un username duplicato restituisce 409; non esiste idempotency key per registrazione o recupero.
 
@@ -57,7 +62,9 @@ Schema della busta (notazione descrittiva, non un JSON da inviare):
 
 `expectedUserId` serve a rilevare cambi account nella scheda, non ad autorizzare l’accesso. Il proprietario viene sempre ricavato dal cookie. Nessun endpoint accetta un ID per leggere il diario di un altro account. Per i campi completi, vedere [tipi](../types/domain.ts) e [schemi runtime](../lib/validation.ts).
 
-Un 409 conserva il server invariato per quella richiesta. Non incrementare artificialmente la revisione per forzare una scrittura: leggere, confrontare e chiedere una decisione esplicita all’utente.
+Il client invia `X-IPagell-Account` anche su creazione del primo diario e logout: quando presente, un account diverso viene rifiutato con 401. L’header resta facoltativo su questi due endpoint per i client precedenti; non autorizza mai un account al posto del cookie.
+
+Un 409 conserva il server invariato per quella richiesta. Il client può confermare una scrittura con risposta persa solo dopo avere riletto lo stesso account e verificato che l’intero snapshot coincida; in caso contrario conserva il draft e il conflitto. Non incrementare artificialmente la revisione per forzare una scrittura: leggere, confrontare e chiedere una decisione esplicita all’utente.
 
 ### Classi e inviti
 

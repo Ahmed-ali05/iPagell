@@ -1,10 +1,13 @@
 "use client";
 
-import { AlertTriangle, Archive, BarChart3, GraduationCap, TrendingUp } from "lucide-react";
+import { Archive, GraduationCap } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { formatGrade, generalAverage, gradeTrend, subjectAverage } from "@/lib/calculations";
+import { generalAverage, gradeTrend, subjectAverage } from "@/lib/calculations";
 import type { Grade, SchoolData, Semester } from "@/types/domain";
 import { EmptyMini, EmptyState } from "@/components/diary-empty-state";
+import { ChevronLeft } from "lucide-react";
+import { useI18n } from "@/components/i18n-provider";
+import { formatDate, formatNumber, selectPlural } from "@/lib/i18n";
 
 export function StatsView({
   data,
@@ -12,13 +15,16 @@ export function StatsView({
   grades,
   goal,
   onAddGrade,
+  onBackToGrades,
 }: {
   data: SchoolData;
   semester: Semester;
   grades: Grade[];
   goal: number;
   onAddGrade: () => void;
+  onBackToGrades: () => void;
 }) {
+  const { t, locale } = useI18n();
   const subjectData = data.subjects
     .map((subject) => ({
       name:
@@ -30,7 +36,7 @@ export function StatsView({
       fill: subject.color,
     }))
     .filter((item) => item.media > 0);
-  const trendData = gradeTrend(data.subjects, grades);
+  const trendData = gradeTrend(data.subjects, grades).map((item) => ({ ...item, date: formatDate(locale, item.date, { day: "numeric", month: "short" }) }));
   const average = generalAverage(data.subjects, grades);
   const strongest = [...subjectData].sort((a, b) => b.media - a.media)[0];
   const weakest = [...subjectData].sort((a, b) => a.media - b.media)[0];
@@ -38,12 +44,13 @@ export function StatsView({
   if (!grades.length) {
     return (
       <section className="module-view">
+        <div className="module-toolbar"><button className="soft-button" onClick={onBackToGrades}><ChevronLeft size={18} /> {t("stats.backToGrades")}</button></div>
         <section className="panel">
           <EmptyState
             icon={GraduationCap}
-            title="Nessun voto registrato"
-            text="Registra il primo voto per vedere medie, confronti e andamento nel tempo."
-            actionLabel="Registra il primo voto"
+            title={t("stats.emptyTitle")}
+            text={t("stats.emptyText")}
+            actionLabel={t("stats.firstGrade")}
             onAction={onAddGrade}
           />
         </section>
@@ -52,25 +59,23 @@ export function StatsView({
   }
   return (
     <section className="module-view">
+      <div className="module-toolbar"><button className="soft-button" onClick={onBackToGrades}><ChevronLeft size={18} /> {t("stats.backToGrades")}</button></div>
       <div className="stats-hero">
         <div>
-          <span className="eyebrow">Panoramica {semester.name}</span>
-          <h2>{formatGrade(average)}</h2>
-          <p>Media generale ponderata</p>
+          <span className="section-label">{semester.name}</span>
+          <h2>{average === null ? "—" : formatNumber(locale, average, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</h2>
+          <p>{t("stats.weightedAverage")}</p>
         </div>
         <div>
-          <BarChart3 />
-          <p>Dati del semestre</p>
-          <b>{grades.length} {grades.length === 1 ? "voto" : "voti"}</b>
-          <small>{subjectData.length} {subjectData.length === 1 ? "materia con voti" : "materie con voti"}</small>
+          <b>{formatNumber(locale, grades.length)} {t(selectPlural(locale, grades.length, "stats.gradeOne", "stats.gradeMany"))}</b>
+          <small>{formatNumber(locale, subjectData.length)} {t(selectPlural(locale, subjectData.length, "stats.subjectOne", "stats.subjectMany"))}</small>
         </div>
       </div>
       <div className="stats-layout">
         <section className="panel chart-card wide">
           <div className="panel-title">
             <div>
-              <span className="eyebrow">Confronto</span>
-              <h3>Media per materia</h3>
+              <h3>{t("stats.averageBySubject")}</h3>
             </div>
           </div>
           <div className="chart-wrap">
@@ -116,40 +121,36 @@ export function StatsView({
         </section>
         {subjectData.length > 1 ? (
           <section className="panel insight-card">
-            <span className="eyebrow">In evidenza</span>
+            <h3>{t("stats.subjectsCompared")}</h3>
             <div className="insight success">
-              <TrendingUp />
-              <small>Più forte</small>
+              <small>{t("stats.strongest")}</small>
               <b>{strongest?.fullName ?? "—"}</b>
-              <strong>{strongest?.media.toFixed(1) ?? "—"}</strong>
+              <strong>{strongest ? formatNumber(locale, strongest.media, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : "—"}</strong>
             </div>
             <div className="insight warning">
-              <AlertTriangle />
-              <small>Da rinforzare</small>
+              <small>{t("stats.toImprove")}</small>
               <b>{weakest?.fullName ?? "—"}</b>
-              <strong>{weakest?.media.toFixed(1) ?? "—"}</strong>
+              <strong>{weakest ? formatNumber(locale, weakest.media, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : "—"}</strong>
             </div>
             <div className="goal-line">
-              <span>Obiettivo semestre</span>
-              <b>{goal.toFixed(1)}</b>
+              <span>{t("stats.semesterGoal")}</span>
+              <b>{formatNumber(locale, goal, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</b>
             </div>
           </section>
         ) : (
           <section className="panel insight-card">
-            <span className="eyebrow">Confronto tra materie</span>
-            <h3>Serve almeno un’altra materia con voti</h3>
-            <p>Aggiungi altri risultati per confrontare punti forti e materie da rinforzare.</p>
+            <h3>{t("stats.needSubject")}</h3>
+            <p>{t("stats.needSubjectHint")}</p>
             <div className="goal-line">
-              <span>Obiettivo semestre</span>
-              <b>{goal.toFixed(1)}</b>
+              <span>{t("stats.semesterGoal")}</span>
+              <b>{formatNumber(locale, goal, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</b>
             </div>
           </section>
         )}
         <section className="panel chart-card wide">
           <div className="panel-title">
             <div>
-              <span className="eyebrow">Evoluzione</span>
-              <h3>Andamento nel tempo</h3>
+              <h3>{t("stats.trend")}</h3>
             </div>
           </div>
           <div className="chart-wrap">
@@ -204,8 +205,7 @@ export function StatsView({
           </div>
         </section>
         <section className="panel semester-compare">
-          <span className="eyebrow">Archivio</span>
-          <h3>Confronta semestri</h3>
+          <h3>{t("stats.compareSemesters")}</h3>
           {oldSemesters.map((item) => {
             const oldGrades = data.grades.filter(
               (grade) => grade.semesterId === item.id,
@@ -218,12 +218,12 @@ export function StatsView({
                   {item.name}
                   <small>{item.schoolYear}</small>
                 </span>
-                <b>{formatGrade(oldAvg)}</b>
+                <b>{oldAvg === null ? "—" : formatNumber(locale, oldAvg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</b>
               </div>
             );
           })}
           {!oldSemesters.length && (
-            <EmptyMini text="Nessun semestre archiviato." />
+            <EmptyMini text={t("stats.noArchivedSemesters")} />
           )}
         </section>
       </div>

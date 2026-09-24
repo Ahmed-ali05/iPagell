@@ -25,7 +25,7 @@ La prima apertura online serve a preparare la copia offline. L’installazione s
 | Home | Controllare attività aperte, media e avvisi; una scadenza passata resta da completare |
 | Agenda | Creare compiti/verifiche, consultare mese o elenco, selezionare un giorno e segnare attività svolte |
 | Voti | Registrare risultati, selezionare materia e simulare il voto necessario |
-| Assenze | Registrare data, ore e tipologia; impostare una soglia personale |
+| Assenze | Registrare data, ore e tipo di assenza; impostare una soglia personale |
 | Statistiche | Confrontare materie, andamento e periodi presenti |
 | Classi | Creare o raggiungere un gruppo privato, gestire membri e inviti |
 | Impostazioni | Gestire materie e semestri, tema, movimento, backup e account |
@@ -36,7 +36,7 @@ Il selettore del periodo cambia i voti, le attività e le assenze visualizzati. 
 
 La sufficienza è 4 su 6. Puoi scrivere `4.5`, `4,5` oppure `4-5`.
 
-Ogni voto pesa **peso del voto × peso della tipologia**. Esempio: uno scritto da 4 con peso effettivo 2 e un orale da 6 con peso 1 danno `(4×2 + 6×1) / 3 = 4,67`. La media generale considera anche il coefficiente di ogni materia; le materie senza voti non contribuiscono.
+Ogni voto pesa **peso del voto × peso del tipo di prova**. Esempio: uno scritto da 4 con peso effettivo 2 e un orale da 6 con peso 1 danno `(4×2 + 6×1) / 3 = 4,67`. La media generale considera anche il peso di ogni materia; le materie senza voti non contribuiscono.
 
 Le cifre visualizzate possono essere arrotondate; non sono un voto ufficiale di pagella. Cambiare pesi o coefficienti ricalcola anche i periodi passati. Non sono implementate medie separate teoria/pratica a percentuale fissa.
 

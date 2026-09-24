@@ -4,7 +4,13 @@
 
 ## Una produzione: ipagell.website
 
-La produzione è **https://ipagell.website**, ospitata da Sites con il database esistente. Il progetto da aggiornare è quello in `.openai/hosting.json`. `www.ipagell.website` è collegato allo stesso sito; anche l'indirizzo generato `ipagell.produc-ch.chatgpt.site` è un alias della medesima pubblicazione. La navigazione da questi alias viene reindirizzata al dominio principale, conservando percorso, query e inviti nel frammento. Una protezione nel browser copre anche il proxy Sites quando non espone il nome originale al redirect server. L'alias tecnico resta gestito da Sites e non costituisce una seconda produzione.
+La produzione è **https://ipagell.website**, ospitata da Sites con il database esistente. Il progetto da aggiornare è quello in `.openai/hosting.json`. `www.ipagell.website` è collegato allo stesso sito e `ipagell.produc-ch.chatgpt.site` è l'alias generato corrente. L'alias storico `ipagell.ahmed-2005-taverbe.chatgpt.site` non risulta più instradato al progetto Sites nella verifica post-deploy della versione 17: restituisce un 404 di piattaforma prima di raggiungere l'app e va considerato dismesso. `proxy.ts` reindirizza solo gli host ancora collegati con HTTP 308 al dominio principale, conservando percorso e query. La protezione nel browser in `app/layout.tsx` copre il proxy Sites quando non espone il nome originale al redirect server e conserva anche il frammento dell'invito. Gli alias tecnici restano gestiti da Sites e non costituiscono produzioni separate. Per ripristinare l'alias storico occorre un intervento esplicito nella configurazione domini di Sites, non una modifica al proxy.
+
+## Indicizzazione e landing pubblica
+
+La sola pagina destinata all'indicizzazione è la landing `/`, con canonical, titolo, descrizione e anteprime social riferiti a `https://ipagell.website/`. La sitemap pubblica contiene solo questo URL. `robots.txt` lascia consultabili `/app` e `/offline.html`, così i motori possono leggere i rispettivi `noindex, nofollow`; le API restano escluse. La landing dichiara dati strutturati coerenti con il testo visibile: non aggiungere prezzi, valutazioni o recensioni senza un'offerta e prove reali.
+
+Prima di pubblicare modifiche alla landing, verificare i metadati nel bundle, la sitemap, `robots.txt`, i redirect degli alias con query string e la corrispondenza dei dati strutturati con i contenuti visibili. Controllare la resa desktop e mobile e assicurarsi che il link GitHub punti al repository pubblico corretto.
 
 Il Worker indipendente configurato in `wrangler.jsonc` ha un **database separato**. Il suo nome storico `ipagell-production` non significa che contenga i dati di ipagell.website. Pubblicarlo non aggiorna il sito pubblico. Non cambiare DNS o database per un normale rilascio.
 

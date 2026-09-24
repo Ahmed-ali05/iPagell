@@ -1,7 +1,8 @@
 // Build replaces these markers with a content hash and the exact static assets.
 const CACHE = "ipagell-shell-__BUILD__";
 const ASSETS = /*__ASSETS__*/ [];
-const CORE = ["/", "/app", "/offline.html", "/manifest.webmanifest", "/favicon.svg", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/apple-touch-icon-180.png"];
+const CORE = ["/", "/app", "/offline.html", "/manifest.webmanifest", "/manifest-de.webmanifest", "/manifest-fr.webmanifest", "/manifest-en.webmanifest", "/favicon.svg", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/icon-maskable-512.png", "/icons/apple-touch-icon-180.png"];
+const PUBLIC_LANDINGS = new Set(["/it", "/de", "/fr", "/en"]);
 const ALLOWED = new Set([...CORE, ...ASSETS]);
 
 self.addEventListener("install", event => {
@@ -21,10 +22,13 @@ self.addEventListener("fetch", event => {
   // are network-only. Cache API does not enforce HTTP no-store on our behalf.
   if(event.request.headers.has("RSC")||event.request.headers.has("Next-Router-State-Tree"))return;
   if(event.request.mode==="navigate"){
-    if(url.pathname!=="/"&&url.pathname!=="/app")return;
+    if(url.pathname!=="/"&&url.pathname!=="/app"&&!PUBLIC_LANDINGS.has(url.pathname))return;
     event.respondWith(fetch(event.request).catch(async()=> {
       const cache=await caches.open(CACHE);
-      return (await cache.match(url.pathname))||(await cache.match("/offline.html"))||Response.error();
+      const cached=(await cache.match(url.pathname))||(await cache.match("/offline.html"));
+      // Sites serves /offline.html through /offline. A redirected cached response
+      // cannot satisfy a navigation request with redirect mode "manual".
+      return cached?new Response(cached.body,cached):Response.error();
     }));
     return;
   }

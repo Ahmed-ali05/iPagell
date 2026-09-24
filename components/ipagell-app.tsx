@@ -2,18 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  AlertTriangle,
   Archive,
   BarChart3,
   Bell,
   BookOpen,
   CalendarDays,
   Check,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   CircleGauge,
-  Clock3,
   Download,
   FileJson,
   GraduationCap,
@@ -26,7 +23,6 @@ import {
   Settings2,
   Sun,
   Trash2,
-  TrendingUp,
   Upload,
   UserRoundCheck,
   UsersRound,
@@ -57,10 +53,13 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { AbsencesView } from "@/components/absences-view";
 import { StatsView } from "@/components/stats-view";
-import { EmptyState, EmptyMini } from "@/components/diary-empty-state";
+import { EmptyState } from "@/components/diary-empty-state";
 import { AccountGate } from "@/components/account-gate";
+import { LanguageSelect, useI18n } from "@/components/i18n-provider";
+import { formatDate as intlDate, formatNumber as intlNumber, selectPlural, type Locale } from "@/lib/i18n";
 import { AccountSecurity } from "@/components/account-security";
 import { useDiary } from "@/hooks/use-diary";
+import { InstallAppOffer } from "@/components/install-app";
 import { gradeSchema } from "@/lib/validation";
 import { EntryDialog, type ModalType } from "@/components/entry-dialog";
 import { ClassesView } from "@/components/classes-view";
@@ -70,7 +69,6 @@ import { subscriptionAgenda, type AgendaDisplayItem, type ClassSubscription } fr
 import { backupWithClassAgenda } from "@/lib/classes/backup";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  formatGrade,
   generalAverage,
   neededGrade,
   subjectAverage,
@@ -81,7 +79,6 @@ import {
   legacyBackup,
 } from "@/lib/account-storage";
 import type {
-  Absence,
   BackupPayload,
   Grade,
   Preferences,
@@ -104,28 +101,25 @@ declare global {
 }
 
 const nav = [
-  { id: "home", label: "Home", icon: Home },
-  { id: "agenda", label: "Agenda", icon: CalendarDays },
-  { id: "grades", label: "Voti", icon: GraduationCap },
-  { id: "absences", label: "Assenze", icon: UserRoundCheck },
-  { id: "stats", label: "Statistiche", icon: BarChart3 },
-  { id: "classes", label: "Classi", icon: UsersRound },
+  { id: "home", icon: Home },
+  { id: "agenda", icon: CalendarDays },
+  { id: "grades", icon: GraduationCap },
+  { id: "absences", icon: UserRoundCheck },
+  { id: "classes", icon: UsersRound },
 ] as const;
+const navKeys = { home: "common.home", agenda: "nav.agenda", grades: "nav.grades", absences: "nav.absences", classes: "nav.classes", stats: "nav.stats" } as const;
 
 const uid = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
-const formatDate = (date: string, options?: Intl.DateTimeFormatOptions) =>
-  new Intl.DateTimeFormat(
-    "it-CH",
-    options ?? { weekday: "short", day: "numeric", month: "short" },
-  ).format(new Date(date));
-const formatLongDate = (date: Date) =>
-  new Intl.DateTimeFormat("it-CH", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  }).format(date);
+const formatDate = (locale: Locale, date: string, options?: Intl.DateTimeFormatOptions) =>
+  intlDate(locale, date, options ?? { weekday: "short", day: "numeric", month: "short" });
+const formatLongDate = (locale: Locale, date: Date) =>
+  intlDate(locale, date, { weekday: "long", day: "numeric", month: "long" });
+const gradeText = (locale: Locale, value: number | null) =>
+  value === null ? "—" : intlNumber(locale, value, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const titleCase = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1);
+const localDayKey = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
 function findSubject(subjects: Subject[], id?: string) {
   return subjects.find((subject) => subject.id === id);
@@ -143,9 +137,7 @@ function getCountdown(value: string) {
         86_400_000,
     ),
   );
-  if (days === 0) return { value: "Oggi", small: "", past };
-  if (days === 1) return { value: "1", small: "giorno", past };
-  return { value: String(days), small: "giorni", past };
+  return { days, past };
 }
 
 export function IPagellApp({
@@ -153,26 +145,20 @@ export function IPagellApp({
 }: {
   initialAccountMode?: "login" | "register";
 }) {
+  const { t } = useI18n();
   const session = useDiary();
-  useEffect(() => {
-    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator)
-      void navigator.serviceWorker
-        .register("/sw.js", { updateViaCache: "none" })
-        .then((r) => r.update())
-        .catch(() => undefined);
-  }, []);
   if (session.phase === "loading") return <LoadingScreen />;
   if (session.phase === "error")
     return (
       <main className="account-page">
         <section className="account-card">
-          <h1>Il diario non è disponibile</h1>
-          <p role="alert">{session.error}</p>
+          <h1>{t("error.diaryUnavailable")}</h1>
+          <p role="alert">{t("error.diaryLoad")}</p>
           <button
             className="primary-button"
             onClick={() => void session.reload()}
           >
-            Riprova
+            {t("common.retry")}
           </button>
         </section>
       </main>
@@ -191,11 +177,14 @@ export function IPagellApp({
 }
 
 function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
+  const { t, locale } = useI18n();
   const { data, preferences } = session.diary!;
   const classAgenda = useClassAgenda(session.user!.id);
   const allAgenda = useMemo(() => [...data.agenda, ...subscriptionAgenda(classAgenda.items.filter(s => !data.agenda.some(a => a.id === `class-snapshot-${s.id}`)))], [data.agenda, classAgenda.items]);
   const [personalEvent, setPersonalEvent] = useState<ClassSubscription | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
+  const [agendaFocusId, setAgendaFocusId] = useState<string | null>(null);
+  const [selectedGradeSubjectId, setSelectedGradeSubjectId] = useState("");
   const [modal, setModal] = useState<ModalType>(null);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [editingSemester, setEditingSemester] = useState<Semester | null>(null);
@@ -254,7 +243,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       navigator.serviceWorker.ready
         .then((registration) =>
           registration.showNotification(item.title, {
-            body: `Scade ${formatDate(item.dueAt, { hour: "2-digit", minute: "2-digit" })}`,
+            body: t("agenda.notificationDue", { time: formatDate(locale, item.dueAt, { hour: "2-digit", minute: "2-digit" }) }),
             icon: "/icons/icon-192.png",
             badge: "/icons/icon-192.png",
             tag: item.id,
@@ -263,7 +252,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         .then(() => localStorage.setItem(key, "1"))
         .catch(() => undefined);
     });
-  }, [data, preferences, allAgenda, classAgenda.status, session.user]);
+  }, [data, preferences, allAgenda, classAgenda.status, session.user, locale, t]);
 
   useEffect(() => {
     if (!preferences) return;
@@ -286,9 +275,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const commitDiary = session.commit;
   const updateData = useCallback((recipe: (current: SchoolData) => SchoolData) =>
     commitDiary(recipe), [commitDiary]);
-  const reportError = (error: unknown) =>
+  const reportError = () =>
     toast.error(
-      error instanceof Error ? error.message : "Salvataggio non riuscito",
+      t("entry.saveFailed"),
     );
   const saveAction = (recipe: (current: SchoolData) => SchoolData) =>
     void updateData(recipe).catch(reportError);
@@ -308,9 +297,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     };
     register({
       name: "read_school_summary",
-      title: "Leggi riepilogo scolastico",
-      description:
-        "Restituisce media generale, attività aperte e ore di assenza del semestre selezionato.",
+      title: t("webmcp.readTitle"),
+      description: t("webmcp.readDescription"),
       inputSchema: {
         type: "object",
         properties: {},
@@ -336,9 +324,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     });
     register({
       name: "create_grade",
-      title: "Registra voto",
-      description:
-        "Registra un nuovo voto in iPagell usando gli stessi dati del modulo Voti.",
+      title: t("webmcp.createGrade"),
+      description: t("webmcp.createGradeDescription"),
       inputSchema: {
         type: "object",
         properties: {
@@ -367,7 +354,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           value.value > 6 ||
           !/^\d{4}-\d{2}-\d{2}$/.test(value.date)
         )
-          throw new Error("Dati del voto non validi");
+          throw new Error(t("error.gradeInvalid"));
         const grade = gradeSchema.parse({
           id: uid("grade"),
           subjectId: subject.id,
@@ -386,7 +373,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       },
     });
     return () => lifecycle.abort();
-  }, [data, preferences, allAgenda, updateData]);
+  }, [data, preferences, allAgenda, updateData, t]);
 
   const currentSemester =
     data.semesters.find(
@@ -395,13 +382,17 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const semesterGrades = data.grades.filter(
     (grade) => grade.semesterId === currentSemester.id,
   );
-  const semesterAgenda: AgendaDisplayItem[] = allAgenda.filter(
+  const semesterAgenda: AgendaDisplayItem[] = useMemo(() => allAgenda.filter(
     (item) => item.semesterId === currentSemester.id || ((item as AgendaDisplayItem).shared && !data.semesters.some(s => s.id === item.semesterId)),
-  );
+  ), [allAgenda, currentSemester.id, data.semesters]);
   const semesterAbsences = data.absences.filter(
     (absence) => absence.semesterId === currentSemester.id,
   );
   const average = generalAverage(data.subjects, semesterGrades);
+  const navigate = (tab: TabId, agendaItemId?: string) => {
+    setAgendaFocusId(tab === "agenda" ? agendaItemId ?? null : null);
+    setActiveTab(tab);
+  };
   const toggleTheme = () =>
     savePreference({
       theme:
@@ -435,7 +426,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const removeSemester = (id: string) => {
     const remaining = data.semesters.filter((semester) => semester.id !== id);
     if (!remaining.length)
-      return toast.error("Deve rimanere almeno un semestre.");
+      return toast.error(t("error.lastSemester"));
     saveAction((current) => ({
       ...current,
       semesters: current.semesters.filter((semester) => semester.id !== id),
@@ -449,19 +440,19 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const exportBackup = () => {
     try {
       downloadBackup(backupWithClassAgenda(data, preferences, classAgenda.items));
-      toast.success("Backup pronto. Le attività di classe sono incluse come copie personali.");
-    } catch (error) { reportError(error); }
+      toast.success(t("backup.ready"));
+    } catch { reportError(); }
   };
 
   const importBackup = async (file?: File) => {
     if (!file) return;
     try {
       if (file.size > 1_500_000)
-        throw new Error("Il backup supera il limite di 1,5 MB.");
+        throw new Error(t("error.backupTooLarge"));
       const parsed: unknown = JSON.parse(await file.text());
       setPendingBackup(parseBackup(parsed));
     } catch {
-      toast.error("Il file non è un backup iPagell valido.");
+      toast.error(t("error.backupInvalid"));
     }
     if (importRef.current) importRef.current.value = "";
   };
@@ -469,14 +460,14 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const requestNotifications = async () => {
     if (!("Notification" in window))
       return toast.error(
-        "Le notifiche non sono supportate su questo dispositivo.",
+        t("agenda.notificationUnsupported"),
       );
     const result = await Notification.requestPermission();
     if (result === "granted")
       toast.success(
-        "Avvisi disponibili mentre l’app è aperta. A app chiusa non sono programmati.",
+        t("agenda.notificationGranted"),
       );
-    else toast.info("Puoi riattivarli dalle impostazioni di Safari.");
+    else toast.info(t("agenda.notificationDenied"));
   };
 
   return (
@@ -484,25 +475,25 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       <aside className="desktop-nav">
         <button
           className="brand-mark"
-          onClick={() => setActiveTab("home")}
-          aria-label="Vai alla Home"
+          onClick={() => navigate("home")}
+          aria-label={t("common.home")}
         >
           <span>iP</span>
         </button>
-        <nav aria-label="Navigazione principale">
-          {nav.map(({ id, label, icon: Icon }) => (
+        <nav aria-label={t("landing.navFeatures")}>
+          {nav.map(({ id, icon: Icon }) => (
             <button
               className={activeTab === id ? "nav-item active" : "nav-item"}
               key={id}
-              onClick={() => setActiveTab(id)}
+              onClick={() => navigate(id)}
             >
               <Icon size={20} strokeWidth={2.1} />
-              <span>{label}</span>
+              <span>{t(navKeys[id])}</span>
             </button>
           ))}
         </nav>
         <button className="settings-nav" onClick={() => setSettingsOpen(true)}>
-          <Settings2 size={19} /> Impostazioni
+          <Settings2 size={19} /> {t("common.settings")}
         </button>
         <div className="profile-chip">
           <span>{preferences.studentName.slice(0, 2).toUpperCase()}</span>
@@ -516,18 +507,21 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       <section className="workspace">
         <header className="topbar">
           <div>
-            <p>{titleCase(formatLongDate(new Date()))}</p>
+            <p>{titleCase(formatLongDate(locale, new Date()))}</p>
             <h1>
               {activeTab === "home"
-                ? `Buongiorno, ${preferences.studentName}`
-                : nav.find((item) => item.id === activeTab)?.label}
+                ? t("workspace.greeting", { name: preferences.studentName })
+                : activeTab === "stats"
+                  ? t("nav.stats")
+                  : t(navKeys[activeTab])}
             </h1>
-            <span className="space-context">{activeTab === "classes" ? "Condiviso · solo con i membri" : activeTab === "agenda" || activeTab === "home" ? "Il tuo spazio · attività personali e classi scelte da te" : "Privato · visibile solo a te"}</span>
+            <span className="space-context">{activeTab === "classes" ? t("workspace.shared") : activeTab === "agenda" || activeTab === "home" ? t("workspace.personal") : t("workspace.private")}</span>
           </div>
           <div className="top-actions">
+            <LanguageSelect className="language-select" />
             {activeTab !== "classes" && (
               <NativeSelect
-                aria-label="Semestre corrente"
+                aria-label={t("workspace.currentSemester")}
                 value={currentSemester.id}
                 onChange={(event) =>
                   savePreference({ currentSemesterId: event.target.value })
@@ -541,11 +535,11 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                 ))}
               </NativeSelect>
             )}
-            <button aria-label="Cambia tema" onClick={toggleTheme}>
+            <button aria-label={t("workspace.theme")} onClick={toggleTheme}>
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             <button
-              aria-label="Impostazioni"
+              aria-label={t("common.settings")}
               onClick={() => setSettingsOpen(true)}
             >
               <Settings2 size={20} />
@@ -556,7 +550,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         <div className="account-toolbar">
           {activeTab !== "classes" && (
             <NativeSelect
-              aria-label="Periodo del diario"
+              aria-label={t("workspace.diaryPeriod")}
               value={currentSemester.id}
               onChange={(event) =>
                 savePreference({ currentSemesterId: event.target.value })
@@ -570,89 +564,82 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             </NativeSelect>
           )}
           <span className={`sync-status ${session.status}`} role="status">
-            {
-              {
-                saved: "Diario personale salvato",
-                saving: "Sincronizzazione…",
-                offline: "Copia sul dispositivo · offline",
-                conflict: "Modifiche da confrontare",
-                error: "Sincronizzazione non riuscita",
-                expired: "Accedi di nuovo",
-              }[session.status]
-            }
+            {t(({ saved: "sync.saved", saving: "sync.saving", offline: "sync.offline", conflict: "sync.conflict", "device-conflict": "sync.deviceConflict", error: "sync.error", expired: "sync.expired" } as const)[session.status])}
           </span>
         </div>
-        {(["offline", "error", "expired", "conflict"] as string[]).includes(
+        {(["offline", "error", "expired", "conflict", "device-conflict"] as string[]).includes(
           session.status,
         ) && (
-          <section className="sync-banner" aria-label="Stato del diario">
+          <section className="sync-banner" aria-label={t("sync.statusLabel")}>
             <p>
-              {session.status === "conflict"
-                ? "Il diario è cambiato su un altro dispositivo. Esporta la copia locale prima di caricare quella dell’account."
-                : session.status === "expired"
-                  ? "La sessione è cambiata o è scaduta. Le modifiche locali sono conservate."
-                  : "Le modifiche restano sul dispositivo e verranno sincronizzate alla riconnessione."}
+              {t(({ offline: "sync.offlineDetail", error: "sync.errorDetail", expired: "sync.expiredDetail", conflict: "sync.conflictDetail", "device-conflict": "sync.deviceConflictDetail", saved: "sync.saved", saving: "sync.saving" } as const)[session.status])}
             </p>
             <div>
               <button className="soft-button" onClick={exportBackup}>
-                Esporta copia locale
+                {t("sync.export")}
               </button>
-              {session.status === "expired" ? (
+              {session.status === "device-conflict" ? (
+                <button className="soft-button" onClick={() => void session.reload().catch(reportError)}>
+                  {t("sync.refreshDevice")}
+                </button>
+              ) : session.status === "expired" ? (
                 <a
                   className="primary-button"
                   onClick={session.reauthenticate}
                   target="_top"
                 >
-                  Accedi
+                  {t("common.login")}
                 </a>
               ) : session.status === "conflict" ? (
                 <button
                   className="soft-button"
                   onClick={() =>
                     setRemoval({
-                      title: "Caricare la versione dell’account?",
+                      title: t("sync.loadAccountTitle"),
                       description:
-                        "La copia su questo dispositivo verrà sostituita. Scaricala prima se vuoi conservarla.",
-                      actionLabel: "Carica versione dell’account",
+                        t("sync.loadAccountWarning"),
+                      actionLabel: t("sync.loadAccount"),
                       run: session.useServer,
                     })
                   }
                 >
-                  Carica versione dell’account
+                  {t("sync.loadAccount")}
                 </button>
               ) : (
                 <button
                   className="soft-button"
                   onClick={() => void session.retry().catch(reportError)}
                 >
-                  Riprova
+                  {t("common.retry")}
                 </button>
               )}
             </div>
           </section>
         )}
 
-        {["home","agenda","classes"].includes(activeTab) && classAgenda.status && <div className="class-sync-status" role="status"><span>{classAgenda.status}</span><button onClick={() => void classAgenda.refresh()}>Aggiorna</button></div>}
+        {["home","agenda","classes"].includes(activeTab) && classAgenda.status && <div className="class-sync-status" role="status"><span>{t(classAgenda.status === "loading" ? "classEvents.agendaLoading" : classAgenda.status === "expired" ? "classEvents.sessionExpired" : "classEvents.agendaStale")}</span><button onClick={() => void classAgenda.refresh()}>{t("common.refresh")}</button></div>}
         <div className="view-stage" key={activeTab}>
           {activeTab === "home" && (
-            <Dashboard
-              data={data}
-              grades={semesterGrades}
-              agenda={semesterAgenda}
-              absences={semesterAbsences}
-              average={average}
-              goal={preferences.gradeGoal}
-              onNavigate={setActiveTab}
-              onAdd={setModal}
-              onManageSubjects={() => setSettingsOpen(true)}
-            />
+            <>
+              <Dashboard
+                data={data}
+                grades={semesterGrades}
+                agenda={semesterAgenda}
+                average={average}
+                onNavigate={navigate}
+                onAdd={setModal}
+                onManageSubjects={() => setSettingsOpen(true)}
+              />
+              <InstallAppOffer placement="home" hasRealContent={data.grades.length + data.agenda.length + data.absences.length > 0} />
+            </>
           )}
           {activeTab === "agenda" && (
             <AgendaView
               items={semesterAgenda}
+              focusItemId={agendaFocusId}
               subjects={data.subjects}
               onAdd={() => setModal("agenda")}
-              onClasses={() => setActiveTab("classes")}
+              onClasses={() => navigate("classes")}
               onPersonal={setPersonalEvent}
               onToggle={(id) => {
                 const shared = semesterAgenda.find(item => item.id === id)?.shared;
@@ -669,11 +656,11 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onDelete={(id) => {
                 const shared = semesterAgenda.find(item => item.id === id)?.shared;
                 setRemoval({
-                  title: shared ? "Rimuovere dalla tua agenda?" : "Eliminare questa attività?",
+                  title: shared ? t("agenda.removeSharedConfirm") : t("agenda.deleteConfirm"),
                   description: shared
-                    ? "L’attività della classe resta disponibile agli altri membri."
-                    : "L’attività verrà eliminata dal tuo diario e non potrà essere recuperata.",
-                  actionLabel: shared ? "Rimuovi dalla mia agenda" : "Elimina attività",
+                    ? t("agenda.removeSharedWarning")
+                    : t("agenda.deleteWarning"),
+                  actionLabel: shared ? t("agenda.removeShared") : t("agenda.deleteActivity"),
                   run: () =>
                     shared ? classAgenda.remove(shared) : updateData((current) => ({
                       ...current,
@@ -693,10 +680,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onAdd={() => setModal("grade")}
               onDelete={(id) =>
                 setRemoval({
-                  title: "Eliminare questo voto?",
-                  description:
-                    "Il voto verrà eliminato dal tuo diario e le medie saranno ricalcolate.",
-                  actionLabel: "Elimina voto",
+                  title: t("grades.deletedTitle"),
+                  description: t("grades.deletedDetail"),
+                  actionLabel: t("grades.delete"),
                   run: () =>
                     updateData((current) => ({
                       ...current,
@@ -704,6 +690,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                     })),
                 })
               }
+              selectedId={selectedGradeSubjectId}
+              onSelectSubject={setSelectedGradeSubjectId}
+              onOpenStats={() => navigate("stats")}
             />
           )}
           {activeTab === "absences" && (
@@ -717,10 +706,10 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onAdd={() => setModal("absence")}
               onDelete={(id) =>
                 setRemoval({
-                  title: "Eliminare questa assenza?",
+                  title: t("absence.deleteConfirm"),
                   description:
-                    "L’assenza verrà eliminata dal tuo diario e dai riepiloghi del semestre.",
-                  actionLabel: "Elimina assenza",
+                    t("absence.deleteWarning"),
+                  actionLabel: t("absence.delete"),
                   run: () =>
                     updateData((current) => ({
                       ...current,
@@ -739,6 +728,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               grades={semesterGrades}
               goal={preferences.gradeGoal}
               onAddGrade={() => setModal("grade")}
+              onBackToGrades={() => navigate("grades")}
             />
           )}
           {activeTab === "classes" && (
@@ -756,19 +746,19 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       <button
         className="mobile-avatar"
         onClick={() => setSettingsOpen(true)}
-        aria-label="Apri impostazioni"
+        aria-label={t("workspace.openSettings")}
       >
         <span>{preferences.studentName.slice(0, 2).toUpperCase()}</span>
       </button>
-      <nav className="mobile-tabs" aria-label="Navigazione principale">
-        {nav.map(({ id, label, icon: Icon }) => (
+      <nav className="mobile-tabs" aria-label={t("landing.navFeatures")}>
+        {nav.map(({ id, icon: Icon }) => (
           <button
             className={activeTab === id ? "active" : ""}
             key={id}
-            onClick={() => setActiveTab(id)}
+            onClick={() => navigate(id)}
           >
             <Icon size={21} />
-            <span>{label}</span>
+            <span>{t(navKeys[id])}</span>
           </button>
         ))}
       </nav>
@@ -784,6 +774,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         semesterId={currentSemester.id}
         editingSubject={editingSubject}
         editingSemester={editingSemester}
+        onRefresh={session.status === "device-conflict" ? async () => {
+          await session.reload();
+          const refreshed = session.getState();
+          if (["device-conflict", "error", "expired"].includes(refreshed.status))
+            throw new Error(t("entry.refreshFailed"));
+        } : undefined}
         onSave={async (next, message) => {
           await updateData(next);
           setModal(null);
@@ -830,10 +826,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         onImport={() => importRef.current?.click()}
         onLogout={() =>
           setRemoval({
-            title: "Uscire dall’account?",
-            description:
-              "La copia su questo dispositivo verrà rimossa. Esporta prima eventuali modifiche non sincronizzate.",
-            actionLabel: "Esci e rimuovi la copia locale",
+            title: t("account.logoutConfirm"),
+            description: t("account.logoutWarning"),
+            actionLabel: t("settings.logoutRemoveCopy"),
             run: () => session.logout(true),
           })
         }
@@ -855,18 +850,16 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       >
         <AlertDialogContent className="confirm-dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Importare il backup?</AlertDialogTitle>
+            <AlertDialogTitle>{t("backup.confirmTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Il backup contiene {pendingBackup?.data.subjects.length} materie e{" "}
-              {pendingBackup?.data.grades.length} voti. Sostituirà il diario di
-              questo account.
+              {pendingBackup && t("backup.confirmDescription", { subjects: intlNumber(locale, pendingBackup.data.subjects.length), grades: intlNumber(locale, pendingBackup.data.grades.length) })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <button className="soft-button" onClick={exportBackup}>
-            Esporta il diario attuale
+            {t("backup.exportCurrent")}
           </button>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (pendingBackup)
@@ -874,12 +867,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                     .commit(() => pendingBackup.data, pendingBackup.preferences)
                     .then(() => {
                       setPendingBackup(null);
-                      toast.success("Backup importato");
+                      toast.success(t("backup.imported"));
                     })
                     .catch(reportError);
               }}
             >
-              Importa e sostituisci
+            {t("backup.importReplace")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -896,7 +889,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() =>
                 void removal
@@ -916,19 +909,18 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       >
         <AlertDialogContent className="confirm-dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Eliminare la materia?</AlertDialogTitle>
+            <AlertDialogTitle>{t("settings.deleteSubjectConfirm")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Verranno eliminati anche voti, attività e assenze collegati.
-              Questa azione non può essere annullata.
+              {t("settings.deleteSubjectWarning")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={() => deleteSubjectId && removeSubject(deleteSubjectId)}
             >
-              Elimina
+              {t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -939,21 +931,20 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       >
         <AlertDialogContent className="confirm-dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Eliminare il semestre?</AlertDialogTitle>
+            <AlertDialogTitle>{t("settings.deleteSemesterConfirm")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Verranno eliminati tutti i voti, le attività e le assenze del
-              periodo. Questa azione non può essere annullata.
+              {t("settings.deleteSemesterWarning")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={() =>
                 deleteSemesterId && removeSemester(deleteSemesterId)
               }
             >
-              Elimina
+              {t("common.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -965,12 +956,13 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
 }
 
 function LoadingScreen() {
+  const { t } = useI18n();
   return (
     <main className="loading-screen">
       <div className="brand-mark">
         <span>iP</span>
       </div>
-      <p>Preparo il tuo diario…</p>
+      <p>{t("app.loading")}</p>
     </main>
   );
 }
@@ -979,9 +971,7 @@ function Dashboard({
   data,
   grades,
   agenda,
-  absences,
   average,
-  goal,
   onNavigate,
   onAdd,
   onManageSubjects,
@@ -989,261 +979,79 @@ function Dashboard({
   data: SchoolData;
   grades: Grade[];
   agenda: AgendaDisplayItem[];
-  absences: Absence[];
   average: number | null;
-  goal: number;
-  onNavigate: (tab: TabId) => void;
+  onNavigate: (tab: TabId, agendaItemId?: string) => void;
   onAdd: (type: ModalType) => void;
   onManageSubjects: () => void;
 }) {
-  const upcoming = agenda
+  const { t, locale } = useI18n();
+  const openItems = agenda
     .filter((item) => !item.completed && item.shared?.event.status !== "cancelled")
     .sort((a, b) => a.dueAt.localeCompare(b.dueAt));
-  const nextTest = upcoming[0];
+  const overdue = openItems.filter((item) => getCountdown(item.dueAt).past);
+  const future = openItems.filter((item) => !getCountdown(item.dueAt).past);
+  const nextTest = future[0];
   const countdown = nextTest ? getCountdown(nextTest.dueAt) : null;
   const subject = findSubject(data.subjects, nextTest?.subjectId);
-  const totalAbsences = absences.reduce(
-    (sum, item) => sum + item.durationHours,
-    0,
-  );
-  const alerts = data.subjects
-    .map((item) => ({ subject: item, average: subjectAverage(item, grades) }))
-    .filter((item) => item.average !== null && item.average < 4);
+  const gradedSubjects = data.subjects.filter((item) => subjectAverage(item, grades) !== null).length;
+  const emptyDiary = !agenda.length && !grades.length;
+
   return (
-    <div className="dashboard-grid">
-      <section className="hero-card">
+    <div className={`dashboard-grid ${emptyDiary ? "empty-dashboard" : ""}`}>
+      <section className="hero-card" style={subject ? { borderLeftColor: subject.color } : undefined}>
         <div className="hero-top">
-          <span className="eyebrow">
-            {nextTest?.kind === "test"
-              ? "Prossima verifica"
-              : "Prossima consegna"}
-          </span>
-          {nextTest && (
-            <span className="date-pill">
-              {countdown?.past
-                ? "Scaduta · da completare"
-                : countdown?.value === "Oggi"
-                  ? "Oggi"
-                  : `Tra ${countdown?.value} ${countdown?.small}`}
-            </span>
-          )}
+          <span className="hero-label">{nextTest ? nextTest.kind === "test" ? t("home.nextTest") : t("home.nextTask") : t("home.agenda")}</span>
+          {nextTest && <span className="date-pill">{countdown?.days === 0 ? t("home.today") : selectPlural(locale, countdown?.days ?? 0, t("home.inOneDay"), t("home.inDays", { days: countdown?.days ?? 0 }))}</span>}
         </div>
         {nextTest ? (
           <>
-            <div className="subject-kicker">
-              <span style={{ background: subject?.color }} />{" "}
-              {subject?.name ?? nextTest.shared?.event.subject ?? "Materia"}
-            </div>
+            <div className="subject-kicker"><span style={{ background: subject?.color }} /> {subject?.name ?? nextTest.shared?.event.subject ?? t("common.subject")}</div>
             <h2>{nextTest.title}</h2>
-            {nextTest.shared && <span className="agenda-origin">{nextTest.shared.detachedAt ? "Personale · da " : "Classe · "}{nextTest.shared.event.className}</span>}
-            <p>
-              {titleCase(
-                formatDate(nextTest.dueAt, {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }),
-              )}
-            </p>
-            <button onClick={() => onNavigate("agenda")}>
-              <BookOpen size={18} /> Apri l’agenda
-            </button>
-            {countdown && (
-              <div className="hero-orb">
-                {countdown.value}
-                <small>{countdown.small}</small>
-              </div>
-            )}
+            {nextTest.shared && <span className="agenda-origin">{nextTest.shared.detachedAt ? t("home.personalOrigin", { className: nextTest.shared.event.className }) : t("home.classOrigin", { className: nextTest.shared.event.className })}</span>}
+            <p>{titleCase(formatDate(locale, nextTest.dueAt, { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }))}</p>
+            <button onClick={() => onNavigate("agenda", nextTest.id)}><BookOpen size={18} /> {t("home.openActivity")}</button>
           </>
+        ) : overdue.length ? (
+          <div className="empty-hero">
+            <h2>{t("home.noUpcoming")}</h2>
+            <p>{selectPlural(locale, overdue.length, t("home.overdueHintOne"), t("home.overdueHintMany", { count: overdue.length }))}</p>
+          </div>
         ) : (
           <div className="empty-hero">
-            <CheckCircle2 />
-            <h2>Nessuna scadenza</h2>
-            <p>
-              {data.subjects.length
-                ? "Non ci sono attività aperte in questo semestre."
-                : "Inizia aggiungendo le tue materie."}
-            </p>
-            <button
-              onClick={() =>
-                data.subjects.length ? onAdd("agenda") : onManageSubjects()
-              }
-            >
-              <Plus size={18} />{" "}
-              {data.subjects.length ? "Aggiungi attività" : "Aggiungi materie"}
-            </button>
+            <h2>{emptyDiary ? t("home.start") : t("home.noUpcoming")}</h2>
+            <p>{emptyDiary ? t("home.startHint") : t("home.noMore")}</p>
+            <button onClick={() => data.subjects.length ? onAdd("agenda") : onManageSubjects()}><Plus size={18} /> {data.subjects.length ? t("home.addActivity") : t("home.addSubjects")}</button>
+            {emptyDiary && data.subjects.length > 0 && <button className="secondary-action" onClick={() => onAdd("grade")}>{t("home.firstGrade")}</button>}
           </div>
         )}
       </section>
-      <section className="average-card">
-        <div className="card-heading">
-          <div>
-            <span className="eyebrow">Media generale</span>
-            <h3>{formatGrade(average)}</h3>
-          </div>
-          <span
-            className={`status-badge ${average === null ? "" : average < 4 ? "danger" : "success"}`}
-          >
-            {average === null
-              ? "Nessun voto registrato"
-              : average >= goal
-                ? "Obiettivo"
-                : average !== null && average >= 4
-                  ? "In corsa"
-                  : "Attenzione"}
-          </span>
-        </div>
-        <div className="average-track">
-          <span
-            style={{
-              width: `${average ? Math.max(4, ((average - 1) / 5) * 100) : 0}%`,
-            }}
-          />
-        </div>
-        <div className="scale">
-          <span>1.0</span>
-          <span>Obiettivo {goal.toFixed(1)}</span>
-          <span>6.0</span>
-        </div>
-        <p>
-          {average === null
-            ? "Aggiungi il primo voto per iniziare."
-            : average >= goal
-              ? "Stai centrando l’obiettivo del semestre. Continua così."
-              : `Ti mancano ${(goal - average).toFixed(1)} punti per raggiungere il tuo obiettivo.`}
-        </p>
-      </section>
-      <section className="panel today-panel">
-        <div className="panel-title">
-          <div>
-            <span className="eyebrow">In agenda</span>
-            <h3>{upcoming.length} attività aperte</h3>
-          </div>
-          <button
-            aria-label="Aggiungi attività"
-            onClick={() => onAdd("agenda")}
-          >
-            <Plus size={20} />
-          </button>
-        </div>
-        {upcoming.slice(0, 3).map((item) => {
+
+      {!!overdue.length && !emptyDiary && <section className="dashboard-overdue" aria-label={t("home.overdue")}>
+        <div className="dashboard-section-heading"><h3>{t("home.overdue")}</h3><span>{selectPlural(locale, overdue.length, t("home.overdueOne"), t("home.overdueMany", { count: overdue.length }))}</span></div>
+        {overdue.slice(0, 2).map((item) => {
           const itemSubject = findSubject(data.subjects, item.subjectId);
-          return (
-            <button
-              className="activity-row"
-              key={item.id}
-              onClick={() => onNavigate("agenda")}
-            >
-              <span
-                className="subject-dot"
-                style={{ background: itemSubject?.color }}
-              />
-              <div>
-                <b>{item.title}</b>
-                <small>
-                  {itemSubject?.name ?? item.shared?.event.subject} · {formatDate(item.dueAt)}{item.shared ? ` · ${item.shared.detachedAt ? "Copia personale" : item.shared.event.className}` : ""}
-                </small>
-              </div>
-              <ChevronRight size={18} />
-            </button>
-          );
+          return <button className="activity-row overdue-row" key={item.id} onClick={() => onNavigate("agenda", item.id)}><span className="subject-dot" style={{ background: itemSubject?.color ?? "var(--accent)" }} /><div><b>{item.title}</b><small>{itemSubject?.name ?? item.shared?.event.subject} · {formatDate(locale, item.dueAt)}</small></div><ChevronRight size={18} /></button>;
         })}
-        {!upcoming.length && (
-          <EmptyMini
-            text={
-              agenda.length
-                ? "Tutto completato. Bel lavoro!"
-                : "Nessuna attività registrata."
-            }
-          />
-        )}
-      </section>
-      <section className="panel subjects-panel">
-        <div className="panel-title">
-          <div>
-            <span className="eyebrow">Materie</span>
-            <h3>Il tuo andamento</h3>
-          </div>
-          <button onClick={onManageSubjects}>Gestisci</button>
-        </div>
-        {data.subjects.slice(0, 5).map((item) => {
-          const value = subjectAverage(item, grades);
-          return (
-            <button
-              className="subject-row"
-              key={item.id}
-              onClick={() => onNavigate("grades")}
-            >
-              <span
-                className="subject-dot"
-                style={{ background: item.color }}
-              />
-              <div>
-                <b>{item.name}</b>
-                <span className="mini-track">
-                  <i
-                    style={{
-                      width: `${value ? Math.max(5, ((value - 1) / 5) * 100) : 0}%`,
-                      background: item.color,
-                    }}
-                  />
-                </span>
-              </div>
-              <strong
-                className={value !== null && value < 4 ? "low-grade" : ""}
-              >
-                {formatGrade(value)}
-              </strong>
-            </button>
-          );
+        {overdue.length > 2 && <button className="text-link" onClick={() => onNavigate("agenda")}>{t("home.openAgenda")}</button>}
+      </section>}
+
+      {!!future.length && <section className="panel today-panel dashboard-upcoming">
+        <div className="panel-title"><div><h3>{t("home.upcoming")}</h3><p>{selectPlural(locale, future.length, t("home.openActivityOne"), t("home.openActivityMany", { count: future.length }))}</p></div><button aria-label={t("home.addActivity")} onClick={() => onAdd("agenda")}><Plus size={20} /></button></div>
+        {future.slice(1, 4).map((item) => {
+          const itemSubject = findSubject(data.subjects, item.subjectId);
+          return <button className="activity-row" key={item.id} onClick={() => onNavigate("agenda", item.id)}><span className="subject-dot" style={{ background: itemSubject?.color ?? "var(--accent)" }} /><div><b>{item.title}</b><small>{itemSubject?.name ?? item.shared?.event.subject} · {formatDate(locale, item.dueAt)}</small></div><ChevronRight size={18} /></button>;
         })}
-      </section>
-      <section className="dashboard-strip">
-        <button onClick={() => onNavigate("absences")}>
-          <span>
-            <Clock3 size={19} />
-          </span>
-          <div>
-            <small>Assenze</small>
-            <b>{totalAbsences.toFixed(1)} ore</b>
-          </div>
-        </button>
-        <button onClick={() => onNavigate("grades")}>
-          <span>
-            <TrendingUp size={19} />
-          </span>
-          <div>
-            <small>Voti registrati</small>
-            <b>{grades.length}</b>
-          </div>
-        </button>
-        <button
-          className={alerts.length ? "alert-tile" : ""}
-          onClick={() => onNavigate("grades")}
-        >
-          <span>
-            <AlertTriangle size={19} />
-          </span>
-          <div>
-            <small>Da controllare</small>
-            <b>
-              {alerts.length
-                ? `${alerts.length} materie`
-                : grades.length
-                  ? "Nessuna sotto il 4"
-                  : "Nessun voto"}
-            </b>
-          </div>
-        </button>
-      </section>
+        {future.length === 1 && <button className="text-link" onClick={() => onNavigate("agenda")}>{t("home.openAgenda")} <ChevronRight size={16} /></button>}
+      </section>}
+
+      {grades.length > 0 ? <button className="grade-summary" onClick={() => onNavigate("grades")}><span>{t("home.gradeSituation")}</span><strong>{t("home.average", { value: gradeText(locale, average) })}</strong><small>{selectPlural(locale, grades.length, t("home.gradeCountOne"), t("home.gradeCount", { count: grades.length }))} · {selectPlural(locale, gradedSubjects, t("home.subjectCountOne"), t("home.subjectCount", { count: gradedSubjects }))}</small><ChevronRight size={18} /></button> : !emptyDiary && <section className="grade-prompt"><div><b>{t("home.noGrades")}</b><span>{t("home.noGradesHint")}</span></div><button onClick={() => data.subjects.length ? onAdd("grade") : onManageSubjects()}>{data.subjects.length ? t("grades.add") : t("home.addSubject")}</button></section>}
     </div>
   );
 }
 
 function AgendaView({
   items: allItems,
+  focusItemId,
   subjects,
   onAdd,
   onToggle,
@@ -1253,6 +1061,7 @@ function AgendaView({
   onPersonal,
 }: {
   items: AgendaDisplayItem[];
+  focusItemId?: string | null;
   subjects: Subject[];
   onAdd: () => void;
   onToggle: (id: string) => void;
@@ -1261,14 +1070,15 @@ function AgendaView({
   onClasses: () => void;
   onPersonal: (item: ClassSubscription) => void;
 }) {
+  const { locale, t } = useI18n();
   const [scope, setScope] = useState("all");
-  const items = allItems.filter(item => scope === "all" || (scope === "private" ? !item.shared || !!item.shared.detachedAt : !!item.shared && !item.shared.detachedAt));
+  const items = useMemo(() => allItems.filter(item => scope === "all" || (scope === "private" ? !item.shared || !!item.shared.detachedAt : !!item.shared && !item.shared.detachedAt)), [allItems, scope]);
+  const focusedItem = focusItemId ? allItems.find((item) => item.id === focusItemId) : undefined;
+  const focusedDate = focusedItem ? new Date(focusedItem.dueAt) : null;
   const [month, setMonth] = useState(
-    () => new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+    () => focusedDate ? new Date(focusedDate.getFullYear(), focusedDate.getMonth(), 1) : new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   );
-  const [selectedDay, setSelectedDay] = useState<string | null>(null);
-  const localDay = (date: Date) =>
-    `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  const [selectedDay, setSelectedDay] = useState<string | null>(() => focusedDate ? localDayKey(focusedDate) : null);
   const sorted = [...items].sort((a, b) => a.dueAt.localeCompare(b.dueAt));
   const firstOffset =
     (new Date(month.getFullYear(), month.getMonth(), 1).getDay() + 6) % 7;
@@ -1276,30 +1086,34 @@ function AgendaView({
   const grid = Array.from({ length: firstOffset + days }, (_, index) =>
     index < firstOffset ? null : index - firstOffset + 1,
   );
+  const intlLocale = locale === "it" ? "it-CH" : locale === "de" ? "de-CH" : locale === "fr" ? "fr-CH" : "en-GB";
+  const weekdays = Array.from({ length: 7 }, (_, index) =>
+    new Intl.DateTimeFormat(intlLocale, { weekday: "short" }).format(new Date(Date.UTC(2024, 0, 1 + index))).replace(/[.]$/, ""),
+  );
   return (
     <section className="module-view">
       <div className="module-toolbar">
         <div>
-          <p>La tua agenda. Il completamento resta sempre personale.</p>
+          <p>{t("agenda.intro")}</p>
         </div>
         <div>
-          <button className="soft-button" onClick={onClasses}><UsersRound size={18} /> Apri le classi</button>
+          <button className="soft-button" onClick={onClasses}><UsersRound size={18} /> {t("agenda.openClasses")}</button>
           <button className="soft-button" onClick={onNotifications}>
-            <Bell size={18} /> Avvisi ad app aperta
+            <Bell size={18} /> {t("agenda.reminders")}
           </button>
           <button className="primary-button" onClick={onAdd}>
-            <Plus size={18} /> Nuova attività
+            <Plus size={18} /> {t("entry.newActivity")}
           </button>
         </div>
       </div>
-      <div className="agenda-scope" aria-label="Origine delle attività">{[["all","Tutte"],["private","Personali"],["class","Dalle classi"]].map(([id,label]) => <button key={id} aria-pressed={scope === id} onClick={() => setScope(id)}>{label}</button>)}</div>
+      <div className="agenda-scope" aria-label={t("agenda.activitySource")}>{[["all",t("agenda.all")],["private",t("agenda.personal")],["class",t("agenda.fromClasses")]].map(([id,label]) => <button key={id} aria-pressed={scope === id} onClick={() => setScope(id)}>{label}</button>)}</div>
       <Tabs defaultValue="calendar" className="agenda-tabs">
         <TabsList className="segmented">
           <TabsTrigger value="calendar">
-            <CalendarDays /> Calendario
+            <CalendarDays /> {t("agenda.calendar")}
           </TabsTrigger>
           <TabsTrigger value="list">
-            <ListFilter /> Elenco
+            <ListFilter /> {t("agenda.list")}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="calendar">
@@ -1307,7 +1121,7 @@ function AgendaView({
             <section className="panel calendar-card">
               <div className="calendar-head">
                 <button
-                  aria-label="Mese precedente"
+                  aria-label={t("agenda.previousMonth")}
                   onClick={() =>
                     setMonth(
                       new Date(month.getFullYear(), month.getMonth() - 1, 1),
@@ -1318,14 +1132,11 @@ function AgendaView({
                 </button>
                 <h2>
                   {titleCase(
-                    new Intl.DateTimeFormat("it-CH", {
-                      month: "long",
-                      year: "numeric",
-                    }).format(month),
+                    intlDate(locale, month, { month: "long", year: "numeric" }),
                   )}
                 </h2>
                 <button
-                  aria-label="Mese successivo"
+                  aria-label={t("agenda.nextMonth")}
                   onClick={() =>
                     setMonth(
                       new Date(month.getFullYear(), month.getMonth() + 1, 1),
@@ -1336,7 +1147,7 @@ function AgendaView({
                 </button>
               </div>
               <div className="weekdays">
-                {["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"].map(
+                {weekdays.map(
                   (day) => (
                     <span key={day}>{day}</span>
                   ),
@@ -1365,13 +1176,13 @@ function AgendaView({
                       disabled={!day}
                       aria-label={
                         day
-                          ? `${day} ${new Intl.DateTimeFormat("it-CH", { month: "long", year: "numeric" }).format(month)}: ${events.length} attività`
+                          ? t("agenda.dayActivities", { day, date: intlDate(locale, month, { month: "long", year: "numeric" }), count: intlNumber(locale, events.length) })
                           : undefined
                       }
                       aria-pressed={
                         !!day &&
                         selectedDay ===
-                          localDay(
+                          localDayKey(
                             new Date(
                               month.getFullYear(),
                               month.getMonth(),
@@ -1382,7 +1193,7 @@ function AgendaView({
                       onClick={() =>
                         day &&
                         setSelectedDay(
-                          localDay(
+                            localDayKey(
                             new Date(
                               month.getFullYear(),
                               month.getMonth(),
@@ -1416,7 +1227,7 @@ function AgendaView({
                   className="soft-button"
                   onClick={() => setSelectedDay(null)}
                 >
-                  {formatDate(selectedDay)} · Mostra prossime
+                  {formatDate(locale, selectedDay)} · {t("agenda.showUpcoming")}
                 </button>
               )}
               <AgendaList
@@ -1424,7 +1235,7 @@ function AgendaView({
                   selectedDay
                     ? sorted.filter(
                         (item) =>
-                          localDay(new Date(item.dueAt)) === selectedDay,
+                          localDayKey(new Date(item.dueAt)) === selectedDay,
                       )
                     : sorted.filter((item) => !item.completed).slice(0, 6)
                 }
@@ -1432,6 +1243,7 @@ function AgendaView({
                 onToggle={onToggle}
                 onDelete={onDelete}
                 onPersonal={onPersonal}
+                focusItemId={focusItemId}
                 compact
               />
             </div>
@@ -1444,6 +1256,7 @@ function AgendaView({
             onToggle={onToggle}
             onDelete={onDelete}
             onPersonal={onPersonal}
+            focusItemId={focusItemId}
           />
         </TabsContent>
       </Tabs>
@@ -1457,6 +1270,7 @@ function AgendaList({
   onToggle,
   onDelete,
   onPersonal,
+  focusItemId,
   compact = false,
 }: {
   items: AgendaDisplayItem[];
@@ -1464,14 +1278,16 @@ function AgendaList({
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onPersonal: (item: ClassSubscription) => void;
+  focusItemId?: string | null;
   compact?: boolean;
 }) {
+  const { locale, t } = useI18n();
   return (
     <section className={`panel agenda-list ${compact ? "compact" : ""}`}>
       <div className="panel-title">
         <div>
-          <span className="eyebrow">Scadenze</span>
-          <h3>{compact ? "Prossime attività" : `${items.length} attività`}</h3>
+          <span className="eyebrow">{t("agenda.deadlines")}</span>
+          <h3>{compact ? t("agenda.upcoming") : `${intlNumber(locale, items.length)} ${t(selectPlural(locale, items.length, "agenda.itemOne", "agenda.itemMany"))}`}</h3>
         </div>
       </div>
       {items.length ? (
@@ -1479,15 +1295,17 @@ function AgendaList({
           const subject = findSubject(subjects, item.subjectId);
           return (
             <article
-              className={`${item.completed ? "completed" : ""} ${item.shared?.event.status === "cancelled" ? "cancelled" : ""}`}
+              className={`${item.completed ? "completed" : ""} ${item.shared?.event.status === "cancelled" ? "cancelled" : ""} ${item.id === focusItemId ? "home-focus" : ""}`}
+              id={item.id === focusItemId ? "home-focused-agenda-item" : undefined}
+              aria-current={item.id === focusItemId ? "location" : undefined}
               key={item.id}
             >
               <button
                 className="round-check"
                 aria-label={
                   item.completed
-                    ? "Segna come da fare"
-                    : "Segna come completata"
+                    ? t("agenda.markTodo")
+                    : t("agenda.markDone")
                 }
                 onClick={() => onToggle(item.id)}
               >
@@ -1496,9 +1314,7 @@ function AgendaList({
               <div className="date-block">
                 <b>{new Date(item.dueAt).getDate()}</b>
                 <small>
-                  {new Intl.DateTimeFormat("it-CH", { month: "short" }).format(
-                    new Date(item.dueAt),
-                  )}
+                  {intlDate(locale, item.dueAt, { month: "short" })}
                 </small>
               </div>
               <div className="agenda-copy">
@@ -1510,20 +1326,17 @@ function AgendaList({
                   {subject?.name ?? item.shared?.event.subject}
                 </div>
                 <h4>{item.title}</h4>
-                {item.shared && <button className="agenda-origin" onClick={() => onPersonal(item.shared!)}>{item.shared.event.status === "cancelled" ? "Annullato · " : ""}{item.shared.detachedAt ? "Personale · da " : "Classe · "}{item.shared.event.className} <Settings2 size={12} /></button>}
+                {item.shared && <button className="agenda-origin" onClick={() => onPersonal(item.shared!)}>{item.shared.event.status === "cancelled" ? `${t("classEvents.cancelled")} · ` : ""}{item.shared.detachedAt ? `${t("agenda.personalOrigin")} · ` : `${t("agenda.classOrigin")} · `}{item.shared.event.className} <Settings2 size={12} /></button>}
                 {item.description && <p className="agenda-description">{item.description}</p>}
                 <small>
-                  {item.kind === "test" ? "Verifica" : "Compito"} ·{" "}
-                  {new Intl.DateTimeFormat("it-CH", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(new Date(item.dueAt))}
-                  {item.reminder ? " · Avviso ad app aperta" : ""}
+                  {item.kind === "test" ? t("entry.test") : t("entry.task")} ·{" "}
+                  {intlDate(locale, item.dueAt, { hour: "2-digit", minute: "2-digit" })}
+                  {item.reminder ? ` · ${t("agenda.reminderOpen")}` : ""}
                 </small>
               </div>
               <button
                 className="icon-button subtle"
-                aria-label="Elimina"
+                aria-label={t("common.delete")}
                 onClick={() => onDelete(item.id)}
               >
                 <Trash2 size={17} />
@@ -1534,8 +1347,8 @@ function AgendaList({
       ) : (
         <EmptyState
           icon={CalendarDays}
-          title="Agenda vuota"
-          text="Aggiungi un compito o una verifica per iniziare."
+          title={t("agenda.emptyTitle")}
+          text={t("agenda.emptyText")}
         />
       )}
     </section>
@@ -1546,18 +1359,24 @@ function GradesView({
   subjects,
   grades,
   goal,
+  selectedId,
+  onSelectSubject,
   onGoal,
   onAdd,
   onDelete,
+  onOpenStats,
 }: {
   subjects: Subject[];
   grades: Grade[];
   goal: number;
+  selectedId: string;
+  onSelectSubject: (id: string) => void;
   onGoal: (value: number) => void;
   onAdd: () => void;
   onDelete: (id: string) => void;
+  onOpenStats: () => void;
 }) {
-  const [selectedId, setSelectedId] = useState(subjects[0]?.id ?? "");
+  const { t, locale } = useI18n();
   const subject =
     subjects.find((item) => item.id === selectedId) ?? subjects[0];
   const subjectGrades = grades
@@ -1576,10 +1395,11 @@ function GradesView({
   return (
     <section className="module-view">
       <div className="module-toolbar">
-        <p>Scala 1–6 · sufficienza a 4.0</p>
-        <button className="primary-button" onClick={onAdd}>
-          <Plus size={18} /> Registra voto
-        </button>
+        <p>{t("grades.scale")}</p>
+        <div className="grades-actions">
+          <button className="grades-stats-link" onClick={onOpenStats}><BarChart3 size={17} /> {t("grades.stats")}</button>
+          <button className="primary-button" onClick={onAdd}><Plus size={18} /> {t("grades.add")}</button>
+        </div>
       </div>
       <div className="grade-overview">
         {subjects.map((item) => {
@@ -1588,14 +1408,14 @@ function GradesView({
             <button
               className={item.id === subject?.id ? "selected" : ""}
               key={item.id}
-              onClick={() => setSelectedId(item.id)}
+              onClick={() => onSelectSubject(item.id)}
             >
               <span style={{ background: item.color }}>
                 <BookOpen size={18} />
               </span>
               <small>{item.name}</small>
               <b className={value !== null && value < 4 ? "low-grade" : ""}>
-                {formatGrade(value)}
+                {gradeText(locale, value)}
               </b>
               <i
                 style={{
@@ -1613,17 +1433,17 @@ function GradesView({
             <div className="panel-title">
               <div>
                 <span className="eyebrow">{subject.name}</span>
-                <h3>Registro voti</h3>
+                <h3>{t("grades.register")}</h3>
               </div>
               <div className="big-average" style={{ color: subject.color }}>
-                {formatGrade(average)}
+                {gradeText(locale, average)}
               </div>
             </div>
             {subjectGrades.length ? (
               subjectGrades.map((grade) => (
                 <article key={grade.id}>
                   <div className={`grade-pill ${grade.value < 4 ? "low" : ""}`}>
-                    {grade.value.toFixed(1)}
+                    {gradeText(locale, grade.value)}
                   </div>
                   <div>
                     <b>
@@ -1631,10 +1451,10 @@ function GradesView({
                         subject.gradeTypes.find(
                           (type) => type.id === grade.typeId,
                         )?.name ||
-                        "Voto"}
+                        t("common.grade")}
                     </b>
                     <small>
-                      {formatDate(grade.date)} · peso {grade.weight.toFixed(1)}×
+                      {formatDate(locale, grade.date)} · {t("grades.weight", { value: gradeText(locale, grade.weight) })}
                     </small>
                   </div>
                   <span>
@@ -1647,7 +1467,7 @@ function GradesView({
                   <button
                     className="icon-button subtle"
                     onClick={() => onDelete(grade.id)}
-                    aria-label="Elimina voto"
+                    aria-label={t("grades.delete")}
                   >
                     <Trash2 size={17} />
                   </button>
@@ -1656,19 +1476,19 @@ function GradesView({
             ) : (
               <EmptyState
                 icon={GraduationCap}
-                title="Nessun voto registrato"
-                text="Registra il primo voto per questa materia."
+                title={t("home.noGrades")}
+                text={t("grades.emptyHint")}
               />
             )}
           </section>
           <aside className="panel simulator-card">
-            <span className="eyebrow">Simulatore</span>
-            <h3>Che voto mi serve?</h3>
+            <span className="eyebrow">{t("grades.simulator")}</span>
+            <h3>{t("grades.needed")}</h3>
             <p>
-              Imposta la media che vuoi raggiungere con la prossima valutazione.
+              {t("grades.neededHint")}
             </p>
             <label>
-              Obiettivo <b>{target.toFixed(1)}</b>
+              {t("grades.target")} <b>{gradeText(locale, target)}</b>
               <input
                 type="range"
                 min="4"
@@ -1682,7 +1502,7 @@ function GradesView({
               />
             </label>
             <label>
-              Prossimo tipo di prova
+              {t("grades.nextType")}
               <NativeSelect
                 value={type?.id ?? ""}
                 onChange={(e) => setNextType(e.target.value)}
@@ -1695,7 +1515,7 @@ function GradesView({
               </NativeSelect>
             </label>
             <label>
-              Peso prossima verifica
+              {t("grades.nextWeight")}
               <input
                 type="number"
                 min=".1"
@@ -1712,29 +1532,27 @@ function GradesView({
             <div
               className={`needed-grade ${needed !== null && needed > 6 ? "impossible" : ""}`}
             >
-              <small>Voto necessario</small>
+              <small>{t("grades.required")}</small>
               <strong>
                 {needed === null
                   ? "—"
                   : needed <= 1
-                    ? "Basta 1.0"
+                    ? t("grades.enoughOne")
                     : needed > 6
-                      ? "Una sola prova non basta per raggiungere questa media"
-                      : (Math.ceil((needed - 1e-10) * 2) / 2).toFixed(1)}
+                      ? t("grades.notEnough")
+                      : gradeText(locale, Math.ceil((needed - 1e-10) * 2) / 2)}
               </strong>
             </div>
             <small className="sim-note">
-              Il risultato è arrotondato al mezzo voto superiore per raggiungere
-              l’obiettivo. Peso effettivo della prossima prova:{" "}
-              {(nextWeight * (type?.weight ?? 1)).toFixed(2)}×.
+              {t("grades.simNote", { weight: intlNumber(locale, nextWeight * (type?.weight ?? 1), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })}
             </small>
           </aside>
         </div>
       ) : (
         <EmptyState
           icon={BookOpen}
-          title="Nessuna materia"
-          text="Aggiungi una materia dalle impostazioni."
+          title={t("grades.noSubject")}
+          text={t("grades.noSubjectHint")}
         />
       )}
     </section>
@@ -1782,35 +1600,37 @@ function SettingsDialog({
   securityDisabled: boolean;
   onSecurityChanged: () => Promise<void>;
 }) {
+  const { t, locale } = useI18n();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="settings-dialog">
         <DialogHeader>
-          <DialogTitle>Impostazioni</DialogTitle>
+          <DialogTitle>{t("common.settings")}</DialogTitle>
           <DialogDescription>
-            Personalizza il diario e gestisci il tuo account.
+            {t("settings.description")}
           </DialogDescription>
+          <LanguageSelect className="language-select" />
         </DialogHeader>
         <Tabs defaultValue="subjects" className="settings-tabs">
           <TabsList className="settings-tablist">
             <TabsTrigger value="subjects">
-              <Layers3 /> Materie
+              <Layers3 /> {t("settings.subjects")}
             </TabsTrigger>
             <TabsTrigger value="periods">
-              <CalendarDays /> Semestri
+              <CalendarDays /> {t("settings.periods")}
             </TabsTrigger>
             <TabsTrigger value="preferences">
-              <Settings2 /> Preferenze
+              <Settings2 /> {t("settings.preferences")}
             </TabsTrigger>
           </TabsList>
           <TabsContent value="subjects" className="settings-section">
             <div className="settings-section-head">
               <div>
-                <h3>Materie</h3>
-                <p>Gestisci le materie e il calcolo delle medie.</p>
+                <h3>{t("settings.subjects")}</h3>
+                <p>{t("settings.manageSubjects")}</p>
               </div>
               <button className="primary-button small" onClick={onAddSubject}>
-                <Plus /> Aggiungi
+                <Plus /> {t("settings.add")}
               </button>
             </div>
             <div className="settings-list">
@@ -1828,21 +1648,20 @@ function SettingsDialog({
                   <div>
                     <b>{subject.name}</b>
                     <small>
-                      {subject.teacher || "Nessun docente"} · coeff.{" "}
-                      {subject.coefficient}×
+                      {subject.teacher || t("settings.noTeacher")} · {t("settings.coefficient", { value: intlNumber(locale, subject.coefficient) })}
                     </small>
                   </div>
                   <button
                     className="icon-button"
                     onClick={() => onEditSubject(subject)}
-                    aria-label={`Modifica ${subject.name}`}
+                    aria-label={t("settings.editSubject", { name: subject.name })}
                   >
                     <Pencil />
                   </button>
                   <button
                     className="icon-button danger"
                     onClick={() => onDeleteSubject(subject.id)}
-                    aria-label={`Elimina ${subject.name}`}
+                    aria-label={t("settings.deleteSubject", { name: subject.name })}
                   >
                     <Trash2 />
                   </button>
@@ -1853,11 +1672,11 @@ function SettingsDialog({
           <TabsContent value="periods" className="settings-section">
             <div className="settings-section-head">
               <div>
-                <h3>Semestri</h3>
-                <p>Archivia e confronta i periodi scolastici.</p>
+                <h3>{t("settings.periods")}</h3>
+                <p>{t("settings.periodsHint")}</p>
               </div>
               <button className="primary-button small" onClick={onAddSemester}>
-                <Plus /> Nuovo
+                <Plus /> {t("entry.newSemester")}
               </button>
             </div>
             <div className="settings-list">
@@ -1868,17 +1687,17 @@ function SettingsDialog({
                   </span>
                   <div>
                     <b>
-                      {semester.name} {semester.archived && <em>Archiviato</em>}
+                      {semester.name} {semester.archived && <em>{t("settings.archived")}</em>}
                     </b>
                     <small>
-                      {semester.schoolYear} · {formatDate(semester.startDate)} –{" "}
-                      {formatDate(semester.endDate)}
+                      {semester.schoolYear} · {formatDate(locale, semester.startDate)} –{" "}
+                      {formatDate(locale, semester.endDate)}
                     </small>
                   </div>
                   <button
                     className="icon-button"
                     onClick={() => onEditSemester(semester)}
-                    aria-label={`Modifica ${semester.name}`}
+                    aria-label={t("settings.editSemester", { name: semester.name })}
                   >
                     <Pencil />
                   </button>
@@ -1887,8 +1706,8 @@ function SettingsDialog({
                     onClick={() => onArchiveSemester(semester.id)}
                     aria-label={
                       semester.archived
-                        ? "Ripristina semestre"
-                        : "Archivia semestre"
+                        ? t("settings.restoreSemester")
+                        : t("settings.archiveSemester")
                     }
                   >
                     <Archive />
@@ -1896,7 +1715,7 @@ function SettingsDialog({
                   <button
                     className="icon-button danger"
                     onClick={() => onDeleteSemester(semester.id)}
-                    aria-label={`Elimina ${semester.name}`}
+                    aria-label={t("settings.deleteSemester", { name: semester.name })}
                   >
                     <Trash2 />
                   </button>
@@ -1905,13 +1724,14 @@ function SettingsDialog({
             </div>
           </TabsContent>
           <TabsContent value="preferences" className="settings-section">
+            <InstallAppOffer placement="settings" />
             <div className="preference-row">
               <div>
-                <b>Il tuo nome</b>
-                <small>Usato nel saluto della Home.</small>
+                <b>{t("settings.yourName")}</b>
+                <small>{t("settings.yourNameHint")}</small>
               </div>
               <input
-                aria-label="Il tuo nome"
+                aria-label={t("settings.yourName")}
                 defaultValue={preferences.studentName}
                 maxLength={120}
                 onBlur={(event) => {
@@ -1923,11 +1743,11 @@ function SettingsDialog({
             </div>
             <div className="preference-row">
               <div>
-                <b>Tema</b>
-                <small>Segue il dispositivo oppure scegli manualmente.</small>
+                <b>{t("settings.theme")}</b>
+                <small>{t("settings.themeHint")}</small>
               </div>
               <NativeSelect
-                aria-label="Tema"
+                aria-label={t("settings.theme")}
                 value={preferences.theme}
                 onChange={(event) =>
                   onPreferences({
@@ -1936,19 +1756,19 @@ function SettingsDialog({
                 }
               >
                 <NativeSelectOption value="system">
-                  Automatico
+                  {t("settings.automatic")}
                 </NativeSelectOption>
-                <NativeSelectOption value="light">Chiaro</NativeSelectOption>
-                <NativeSelectOption value="dark">Scuro</NativeSelectOption>
+                <NativeSelectOption value="light">{t("settings.light")}</NativeSelectOption>
+                <NativeSelectOption value="dark">{t("settings.dark")}</NativeSelectOption>
               </NativeSelect>
             </div>
             <div className="preference-row">
               <div>
-                <b>Riduci movimento</b>
-                <small>Disattiva transizioni e animazioni.</small>
+                <b>{t("settings.reduceMotion")}</b>
+                <small>{t("settings.reduceMotionHint")}</small>
               </div>
               <Switch
-                aria-label="Riduci movimento"
+                aria-label={t("settings.reduceMotion")}
                 checked={!!preferences.reduceMotion}
                 onCheckedChange={(reduceMotion) =>
                   onPreferences({ reduceMotion })
@@ -1958,17 +1778,16 @@ function SettingsDialog({
             <div className="backup-card">
               <FileJson />
               <div>
-                <b>Backup locale</b>
+                <b>{t("settings.localBackup")}</b>
                 <p>
-                  Esporta tutto in JSON o importa un backup da un altro
-                  dispositivo.
+                  {t("settings.backupHint")}
                 </p>
                 <div>
                   <button className="soft-button" onClick={onExport}>
-                    <Download /> Esporta
+                    <Download /> {t("settings.export")}
                   </button>
                   <button className="soft-button" onClick={onImport}>
-                    <Upload /> Importa
+                    <Upload /> {t("settings.import")}
                   </button>
                   <button
                     className="soft-button"
@@ -1978,28 +1797,25 @@ function SettingsDialog({
                         if (old) downloadBackup(old, "ipagell-vecchio-diario");
                         else
                           toast.info(
-                            "Nessun diario della versione precedente trovato su questo dispositivo.",
+                            t("settings.noLegacyBackup"),
                           );
                       } catch {
                         toast.error(
-                          "Il vecchio archivio non è leggibile. Nessun dato è stato modificato.",
+                          t("settings.legacyUnreadable"),
                         );
                       }
                     }}
                   >
-                    Recupera vecchio diario
+                    {t("settings.recoverLegacy")}
                   </button>
                 </div>
               </div>
             </div>
             <div className="privacy-note">
-              <CircleGauge /> Account @{accountEmail}. I dati sono sincronizzati
-              nell’account; una copia offline resta su questo dispositivo. Il
-              backup JSON non contiene password o sessioni, ma include i tuoi
-              dati scolastici: conservalo al sicuro.
+              <CircleGauge /> {t("settings.privacyNote", { account: accountEmail })}
             </div>
             <button className="soft-button" onClick={onLogout}>
-              Esci e rimuovi la copia locale
+              {t("settings.logoutRemoveCopy")}
             </button>
             <AccountSecurity
               id={accountId}

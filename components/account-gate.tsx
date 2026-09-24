@@ -1,5 +1,9 @@
 "use client";
 import { useState, type FormEvent } from "react";
+import { LanguageSelect, useI18n } from "@/components/i18n-provider";
+import { apiErrorKey } from "@/lib/i18n/errors";
+import { RequestError } from "@/lib/client-http";
+import type { MessageKey } from "@/lib/i18n";
 import { BookOpen, Cloud, ShieldCheck, WifiOff } from "lucide-react";
 import {
   NativeSelect,
@@ -27,8 +31,9 @@ export function AccountGate({
   onAuthenticated,
   onLogout,
 }: Props) {
+  const { t } = useI18n();
   const [mode, setMode] = useState<"login" | "register" | "recover">(initialMode);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
   const [recovery, setRecovery] = useState<{
     code: string;
@@ -40,7 +45,7 @@ export function AccountGate({
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
-    setError("");
+    setError(null);
     const fields = Object.fromEntries(new FormData(event.currentTarget));
     const parsed = (
       user
@@ -52,7 +57,7 @@ export function AccountGate({
             : credentialsSchema
     ).safeParse(fields);
     if (!parsed.success) {
-      setError(parsed.error.issues[0]?.message ?? "Controlla i campi.");
+      setError(user ? "auth.invalidDiary" : mode === "recover" ? "auth.invalidRecovery" : mode === "register" ? "auth.invalidSignup" : "auth.invalidCredentials");
       return;
     }
     setBusy(true);
@@ -70,9 +75,10 @@ export function AccountGate({
       });
       const result = (await response.json()) as {
         error?: string;
+        code?: string;
         recoveryCode?: string;
       };
-      if (!response.ok) throw new Error(result.error ?? "Accesso non riuscito");
+      if (!response.ok) throw new RequestError(response.status, result.error ?? "Accesso non riuscito", result.code);
       if (result.recoveryCode) {
         setRecovery({
           code: result.recoveryCode,
@@ -82,28 +88,20 @@ export function AccountGate({
         setSaved(false);
       } else await onAuthenticated();
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : "Connessione non disponibile. Riprova online.",
-      );
+      setError(e instanceof RequestError ? apiErrorKey(e.code, "error.generic") : e instanceof TypeError ? "auth.network" : "error.generic");
     } finally {
       setBusy(false);
     }
   }
   const changeMode = (next: typeof mode) => {
     setMode(next);
-    setError("");
+    setError(null);
   };
   function downloadRecovery() {
     if (!recovery) return;
     const blob = new Blob(
       [
-        "iPagell — Codice di recupero\nUtente: " +
-          recovery.username +
-          "\nCodice: " +
-          recovery.code +
-          "\n\nConservalo in un posto sicuro e non condividerlo. Permette di cambiare la password. È monouso.\n",
+        `${t("auth.recoveryFileTitle")}\n${t("auth.user")}: ${recovery.username}\n${t("auth.code")}: ${recovery.code}\n\n${t("auth.recoveryFileWarning")}\n`,
       ],
       { type: "text/plain" },
     );
@@ -121,31 +119,30 @@ export function AccountGate({
           <span className="brand-mark">iP</span>
           <b>iPagell</b>
         </div>
-        <span className="eyebrow">Il tuo diario scolastico</span>
+        <LanguageSelect className="language-select" />
+        <span className="eyebrow">{t("auth.tagline")}</span>
         <h1>
           {recovery
-            ? "Salva il codice di recupero."
+            ? t("auth.recoveryTitle")
             : user
-              ? "Crea il tuo profilo"
+              ? t("auth.onboardingTitle")
               : mode === "register"
-                ? "Il tuo nuovo diario."
+                ? t("auth.registerTitle")
                 : mode === "recover"
-                  ? "Recupera l’account."
-                  : "Bentornato."}
+                  ? t("auth.recoverTitle")
+                  : t("auth.loginTitle")}
         </h1>
         {recovery ? (
           <div className="recovery-panel">
             <p>
-              Questo codice permette di reimpostare la password. Verrà mostrato
-              solo ora: conservalo in un gestore di password o in un posto
-              sicuro.
+              {t("auth.recoveryInfo")}
             </p>
             <label>
-              Codice di recupero
+              {t("auth.recoveryCode")}
               <textarea readOnly value={recovery.code} rows={3} />
             </label>
             <button className="soft-button" onClick={downloadRecovery}>
-              Scarica il codice
+              {t("auth.downloadCode")}
             </button>
             <label className="switch-row">
               <input
@@ -153,7 +150,7 @@ export function AccountGate({
                 checked={saved}
                 onChange={(e) => setSaved(e.target.checked)}
               />
-              Ho conservato il codice in un posto sicuro
+              {t("auth.savedCode")}
             </label>
             <button
               className="primary-button"
@@ -165,7 +162,7 @@ export function AccountGate({
                 else await onAuthenticated();
               }}
             >
-              Continua
+              {t("common.continue")}
             </button>
           </div>
         ) : (
@@ -174,37 +171,37 @@ export function AccountGate({
               {user ? (
                 <>
                   <p className="account-email full">
-                    Account: @{user.username}
+                    {t("auth.account", { username: user.username })}
                   </p>
                   <label>
-                    Come ti chiami?
+                    {t("auth.name")}
                     <input
                       name="name"
                       autoComplete="given-name"
                       maxLength={120}
                       required
-                      placeholder="Il tuo nome"
+                      placeholder={t("auth.namePlaceholder")}
                     />
                   </label>
                   <label>
-                    Scuola o percorso
+                    {t("auth.school")}
                     <input
                       name="school"
                       maxLength={150}
-                      placeholder="Facoltativo"
+                      placeholder={t("common.optional")}
                     />
                   </label>
                   <label>
-                    Primo periodo
+                    {t("auth.firstTerm")}
                     <input
                       name="semester"
-                      defaultValue="Semestre 1"
+                      defaultValue={`${t("common.semester")} 1`}
                       maxLength={120}
                       required
                     />
                   </label>
                   <label>
-                    Anno scolastico
+                    {t("auth.schoolYear")}
                     <input
                       name="schoolYear"
                       defaultValue={year + "/" + String(year + 1).slice(-2)}
@@ -213,7 +210,7 @@ export function AccountGate({
                     />
                   </label>
                   <label>
-                    Inizio
+                    {t("auth.start")}
                     <input
                       name="startDate"
                       type="date"
@@ -222,7 +219,7 @@ export function AccountGate({
                     />
                   </label>
                   <label>
-                    Fine
+                    {t("auth.end")}
                     <input
                       name="endDate"
                       type="date"
@@ -231,13 +228,13 @@ export function AccountGate({
                     />
                   </label>
                   <label className="full">
-                    Materie iniziali
+                    {t("auth.initialSubjects")}
                     <NativeSelect name="preset">
                       <NativeSelectOption value="empty">
-                        Le aggiungo io
+                        {t("auth.addSubjectsMyself")}
                       </NativeSelectOption>
                       <NativeSelectOption value="basic">
-                        Materie di base (personalizzabili)
+                        {t("auth.basicSubjects")}
                       </NativeSelectOption>
                     </NativeSelect>
                   </label>
@@ -246,13 +243,13 @@ export function AccountGate({
                 <>
                   <p className="account-note full">
                     {mode === "register"
-                      ? "Crea un account iPagell indipendente. Scegli un nome utente e una password unica."
+                      ? t("auth.registerInfo")
                       : mode === "recover"
-                        ? "Usa il codice ricevuto alla registrazione. Dovrai accedere di nuovo su tutti i dispositivi."
-                        : "Accedi con il tuo account iPagell."}
+                        ? t("auth.recoverInfo")
+                        : t("auth.loginInfo")}
                   </p>
                   <label className="full">
-                    Nome utente
+                    {t("auth.username")}
                     <input
                       name="username"
                       autoComplete="username"
@@ -262,12 +259,12 @@ export function AccountGate({
                       minLength={3}
                       maxLength={32}
                       required
-                      placeholder="es. studente_26"
+                      placeholder={t("auth.usernameExample")}
                     />
                   </label>
                   {mode === "recover" && (
                     <label className="full">
-                      Codice di recupero
+                      {t("auth.recoveryCode")}
                       <input
                         name="recoveryCode"
                         autoComplete="off"
@@ -279,7 +276,7 @@ export function AccountGate({
                     </label>
                   )}
                   <label className="full">
-                    {mode === "recover" ? "Nuova password" : "Password"}
+                    {mode === "recover" ? t("auth.newPassword") : t("auth.password")}
                     <input
                       name="password"
                       type="password"
@@ -292,15 +289,13 @@ export function AccountGate({
                     />
                     <small>
                       {mode === "login"
-                        ? "Puoi usare il gestore password del dispositivo."
-                        : "Almeno 12 caratteri. Una frase lunga è più facile da ricordare."}
+                        ? t("auth.passwordManager")
+                        : t("auth.passwordHint")}
                     </small>
                   </label>
                   {mode === "register" && (
                     <p className="account-note full">
-                      Non raccogliamo un’email: il recupero avviene tramite un
-                      codice personale. Senza password e codice non potremo
-                      ripristinare l’accesso.
+                      {t("auth.noEmail")}
                     </p>
                   )}
                 </>
@@ -308,25 +303,24 @@ export function AccountGate({
             </fieldset>
             {user && (
               <p className="account-note">
-                Il diario viene salvato nell’account e su questo dispositivo per
-                l’uso offline. Su dispositivi condivisi, esci quando hai finito.
+                {t("auth.storageInfo")}
               </p>
             )}
             {error && (
               <p className="form-error" role="alert">
-                {error}
+                {t(error)}
               </p>
             )}
             <button className="primary-button signin-button" disabled={busy}>
               {busy
-                ? "Attendi…"
+                ? t("common.wait")
                 : user
-                  ? "Crea il mio diario"
+                  ? t("auth.createDiary")
                   : mode === "register"
-                    ? "Crea account"
+                    ? t("common.register")
                     : mode === "recover"
-                      ? "Reimposta password"
-                      : "Accedi"}
+                      ? t("auth.resetPassword")
+                      : t("common.login")}
             </button>
             {user ? (
               <button
@@ -334,10 +328,10 @@ export function AccountGate({
                 className="text-link"
                 disabled={busy}
                 onClick={() =>
-                  void onLogout().catch((e) => setError(e.message))
+                  void onLogout().catch((e) => setError(e instanceof RequestError ? apiErrorKey(e.code) : "error.generic"))
                 }
               >
-                Usa un altro account
+                {t("auth.useOther")}
               </button>
             ) : (
               <div className="auth-links">
@@ -350,8 +344,8 @@ export function AccountGate({
                   }
                 >
                   {mode === "register"
-                    ? "Ho già un account"
-                    : "Crea un account"}
+                    ? t("auth.haveAccount")
+                    : t("common.register")}
                 </button>
                 <button
                   type="button"
@@ -362,8 +356,8 @@ export function AccountGate({
                   }
                 >
                   {mode === "recover"
-                    ? "Torna all’accesso"
-                    : "Password dimenticata?"}
+                    ? t("auth.backLogin")
+                    : t("auth.forgot")}
                 </button>
               </div>
             )}
@@ -373,19 +367,19 @@ export function AccountGate({
           <div className="account-features">
             <span>
               <BookOpen />
-              Il tuo percorso
+              {t("auth.path")}
             </span>
             <span>
               <ShieldCheck />
-              Account personale
+              {t("auth.personalAccount")}
             </span>
             <span>
               <Cloud />
-              Tra dispositivi
+              {t("auth.devices")}
             </span>
             <span>
               <WifiOff />
-              Copia offline
+              {t("auth.offlineCopy")}
             </span>
           </div>
         )}

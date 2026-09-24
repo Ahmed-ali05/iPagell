@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import { Plus, Trash2 } from "lucide-react";
 import {
   Dialog,
@@ -15,6 +16,7 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { parseGrade } from "@/lib/validation";
+import type { MessageKey } from "@/lib/i18n";
 import type {
   Absence,
   AgendaItem,
@@ -39,6 +41,7 @@ type Props = {
   semesterId: string;
   editingSubject: Subject | null;
   editingSemester: Semester | null;
+  onRefresh?: () => Promise<void>;
   onSave: (
     recipe: (data: SchoolData) => SchoolData,
     message: string,
@@ -71,16 +74,18 @@ function EntryForm({
   editingSubject,
   editingSemester,
   onSave,
+  onRefresh,
 }: Props) {
+  const { t } = useI18n();
   const [selected, setSelected] = useState(data.subjects[0]?.id ?? "");
   const [types, setTypes] = useState(
     editingSubject?.gradeTypes ?? [
-      { id: uid(), name: "Scritto", weight: 1 },
-      { id: uid(), name: "Orale", weight: 1 },
+      { id: uid(), name: t("entry.written"), weight: 1 },
+      { id: uid(), name: t("entry.oral"), weight: 1 },
     ],
   );
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<MessageKey | null>(null);
   const subject = data.subjects.find((s) => s.id === selected);
   const usedType = (id: string) =>
     data.grades.some(
@@ -93,25 +98,28 @@ function EntryForm({
     event.preventDefault();
     if (busy) return;
     setBusy(true);
-    setError("");
+    setError(null);
     const f = new FormData(event.currentTarget);
     const str = (name: string) => String(f.get(name) ?? "").trim();
     const num = (name: string) => Number(f.get(name));
     try {
       if (type === "grade") {
+        let value: number;
+        try { value = parseGrade(str("value")); }
+        catch { setError("error.grade"); return; }
         const grade: Grade = {
           id: uid(),
           subjectId: str("subjectId"),
           semesterId,
           typeId: str("typeId"),
-          value: parseGrade(str("value")),
+          value,
           weight: num("weight"),
           date: str("date"),
           note: str("note"),
         };
         await onSave(
           (d) => ({ ...d, grades: [grade, ...d.grades] }),
-          "Voto salvato sul dispositivo",
+          t("entry.saveDevice"),
         );
       } else if (type === "agenda") {
         const item: AgendaItem = {
@@ -129,7 +137,7 @@ function EntryForm({
         };
         await onSave(
           (d) => ({ ...d, agenda: [item, ...d.agenda] }),
-          "Attività salvata sul dispositivo",
+          t("entry.agendaSaved"),
         );
       } else if (type === "absence") {
         const absenceType = str("absenceType");
@@ -153,7 +161,7 @@ function EntryForm({
         };
         await onSave(
           (d) => ({ ...d, absences: [item, ...d.absences] }),
-          "Assenza salvata sul dispositivo",
+          t("entry.absenceSaved"),
         );
       } else if (type === "subject") {
         const item: Subject = {
@@ -171,7 +179,7 @@ function EntryForm({
               ? d.subjects.map((s) => (s.id === item.id ? item : s))
               : [...d.subjects, item],
           }),
-          "Materia salvata sul dispositivo",
+          t("entry.subjectSaved"),
         );
       } else if (type === "semester") {
         const item: Semester = {
@@ -182,8 +190,10 @@ function EntryForm({
           endDate: str("endDate"),
           archived: editingSemester?.archived,
         };
-        if (item.endDate < item.startDate)
-          throw new Error("La data finale deve seguire quella iniziale.");
+        if (item.endDate < item.startDate) {
+          setError("entry.invalidSemesterDates");
+          return;
+        }
         await onSave(
           (d) => ({
             ...d,
@@ -191,28 +201,28 @@ function EntryForm({
               ? d.semesters.map((s) => (s.id === item.id ? item : s))
               : [item, ...d.semesters],
           }),
-          "Semestre salvato sul dispositivo",
+          t("entry.semesterSaved"),
         );
       }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Salvataggio non riuscito");
+    } catch {
+      setError("entry.saveFailed");
     } finally {
       setBusy(false);
     }
   }
   const titles = {
-    grade: "Registra un voto",
-    agenda: "Nuova attività",
-    absence: "Registra assenza",
-    subject: editingSubject ? "Modifica materia" : "Nuova materia",
-    semester: editingSemester ? "Modifica semestre" : "Nuovo semestre",
+    grade: t("entry.gradeTitle"),
+    agenda: t("entry.newActivity"),
+    absence: t("absence.add"),
+    subject: editingSubject ? t("entry.editSubjectTitle") : t("entry.subjectTitle"),
+    semester: editingSemester ? t("entry.editSemester") : t("entry.newSemester"),
   };
   const submitLabels = {
-    grade: "Registra voto",
-    agenda: "Aggiungi attività",
-    absence: "Registra assenza",
-    subject: editingSubject ? "Salva modifiche" : "Aggiungi materia",
-    semester: editingSemester ? "Salva modifiche" : "Aggiungi semestre",
+    grade: t("grades.add"),
+    agenda: t("entry.addActivity"),
+    absence: t("absence.add"),
+    subject: editingSubject ? t("entry.saveChanges") : t("entry.addSubject"),
+    semester: editingSemester ? t("entry.saveChanges") : t("entry.addSemester"),
   };
   const needsSubject = type === "grade" || type === "agenda";
   return (
@@ -220,14 +230,14 @@ function EntryForm({
       <DialogHeader>
         <DialogTitle>{titles[type!]}</DialogTitle>
         <DialogDescription>
-          Compila i campi. I dati vengono salvati prima sul dispositivo, poi
-          nell’account.
+          {t("entry.description")}
         </DialogDescription>
+        <LanguageSelect className="language-select" />
       </DialogHeader>
       <fieldset disabled={busy} className="form-grid">
         {(needsSubject || type === "absence") && (
           <label className="full">
-            Materia
+            {t("common.subject")}
             <NativeSelect
               name="subjectId"
               value={selected}
@@ -236,8 +246,8 @@ function EntryForm({
             >
               <NativeSelectOption value="">
                 {needsSubject
-                  ? "Scegli materia"
-                  : "Nessuna materia / più lezioni"}
+                  ? t("entry.selectSubject")
+                  : t("entry.noSubjectOptional")}
               </NativeSelectOption>
               {data.subjects.map((s) => (
                 <NativeSelectOption key={s.id} value={s.id}>
@@ -249,27 +259,27 @@ function EntryForm({
         )}
         {needsSubject && !data.subjects.length && (
           <p className="full form-error">
-            Aggiungi prima una materia dalle impostazioni.
+            {t("entry.noSubject")}
           </p>
         )}
         {type === "grade" && (
           <>
             <label>
-              Voto
+              {t("common.grade")}
               <input
                 name="value"
                 inputMode="decimal"
-                placeholder="4.5 oppure 4-5"
+                placeholder={t("entry.gradePlaceholder")}
                 maxLength={12}
                 required
               />
             </label>
             <label>
-              Data
+              {t("common.date")}
               <input name="date" type="date" defaultValue={today()} required />
             </label>
             <label>
-              Tipo di prova
+              {t("entry.type")}
               <NativeSelect key={selected} name="typeId" required>
                 {subject?.gradeTypes.map((t) => (
                   <NativeSelectOption key={t.id} value={t.id}>
@@ -279,7 +289,7 @@ function EntryForm({
               </NativeSelect>
             </label>
             <label>
-              Peso del voto
+              {t("entry.weight")}
               <input
                 name="weight"
                 type="number"
@@ -291,22 +301,22 @@ function EntryForm({
               />
             </label>
             <label className="full">
-              Nota
-              <input name="note" maxLength={4000} placeholder="Facoltativa" />
+              {t("common.note")}
+              <input name="note" maxLength={4000} placeholder={t("entry.noteOptional")} />
             </label>
           </>
         )}
         {type === "agenda" && (
           <>
             <label>
-              Tipo
+              {t("entry.kind")}
               <NativeSelect name="kind">
-                <NativeSelectOption value="task">Compito</NativeSelectOption>
-                <NativeSelectOption value="test">Verifica</NativeSelectOption>
+                <NativeSelectOption value="task">{t("entry.task")}</NativeSelectOption>
+                <NativeSelectOption value="test">{t("entry.test")}</NativeSelectOption>
               </NativeSelect>
             </label>
             <label>
-              Scadenza
+              {t("entry.dueDate")}
               <input
                 name="dueAt"
                 type="datetime-local"
@@ -315,18 +325,18 @@ function EntryForm({
               />
             </label>
             <label className="full">
-              Titolo
+              {t("entry.title")}
               <input name="title" maxLength={200} required />
             </label>
             <label className="full">
-              Dettagli
+              {t("entry.details")}
               <textarea name="description" maxLength={4000} />
             </label>
             <label>
-              Tipo di prova
+              {t("entry.assessmentType")}
               <NativeSelect name="typeId" key={selected}>
                 <NativeSelectOption value="">
-                  Non specificata
+                  {t("entry.unspecified")}
                 </NativeSelectOption>
                 {subject?.gradeTypes.map((t) => (
                   <NativeSelectOption key={t.id} value={t.id}>
@@ -336,7 +346,7 @@ function EntryForm({
               </NativeSelect>
             </label>
             <label>
-              Peso previsto
+              {t("entry.expectedWeight")}
               <input
                 name="weight"
                 type="number"
@@ -349,41 +359,40 @@ function EntryForm({
             </label>
             <label className="switch-row full">
               <input type="checkbox" name="reminder" />
-              Avviso mentre l’app è aperta
+              {t("entry.reminderWhileOpen")}
             </label>
             <small className="full">
-              Non è una notifica programmata ad app chiusa. Richiede il consenso
-              nelle impostazioni dell’agenda.
+              {t("entry.reminderHint")}
             </small>
           </>
         )}
         {type === "absence" && (
           <>
             <label>
-              Data
+              {t("entry.date")}
               <input name="date" type="date" defaultValue={today()} required />
             </label>
             <label>
-              Tipo di assenza
+              {t("entry.absenceType")}
               <NativeSelect name="absenceType">
-                <NativeSelectOption value="absence">Assenza</NativeSelectOption>
+                <NativeSelectOption value="absence">{t("entry.absence")}</NativeSelectOption>
                 <NativeSelectOption value="late">
-                  Ritardo / entrata posticipata
+                  {t("entry.lateArrival")}
                 </NativeSelectOption>
                 <NativeSelectOption value="early-exit">
-                  Uscita anticipata
+                  {t("absence.earlyExit")}
                 </NativeSelectOption>
               </NativeSelect>
             </label>
             <label>
-              Giustificazione
+              {t("entry.justification")}
               <NativeSelect name="justified" defaultValue="no">
-                <NativeSelectOption value="no">Non giustificata</NativeSelectOption>
-                <NativeSelectOption value="yes">Giustificata</NativeSelectOption>
+                <NativeSelectOption value="no">{t("entry.notExcused")}</NativeSelectOption>
+                <NativeSelectOption value="yes">{t("entry.excused")}</NativeSelectOption>
               </NativeSelect>
             </label>
             <label>
-              Durata in ore
+              {t("entry.durationHours")}
               <input
                 name="durationHours"
                 type="number"
@@ -395,7 +404,7 @@ function EntryForm({
               />
             </label>
             <label>
-              Nota
+              {t("entry.note")}
               <input name="note" maxLength={4000} />
             </label>
           </>
@@ -403,7 +412,7 @@ function EntryForm({
         {type === "subject" && (
           <>
             <label className="full">
-              Nome
+              {t("entry.subjectName")}
               <input
                 name="name"
                 maxLength={120}
@@ -412,7 +421,7 @@ function EntryForm({
               />
             </label>
             <label>
-              Colore
+              {t("entry.subjectColor")}
               <input
                 name="color"
                 className="color-input"
@@ -421,7 +430,7 @@ function EntryForm({
               />
             </label>
             <label>
-              Peso della materia nella media generale
+              {t("entry.subjectCoefficient")}
               <input
                 name="coefficient"
                 type="number"
@@ -433,7 +442,7 @@ function EntryForm({
               />
             </label>
             <label className="full">
-              Docente
+              {t("entry.teacher")}
               <input
                 name="teacher"
                 defaultValue={editingSubject?.teacher}
@@ -441,42 +450,38 @@ function EntryForm({
               />
             </label>
             <div className="full type-editor">
-              <h3>Tipi di prova e pesi</h3>
-              <p>
-                Ogni voto pesa: peso del voto × peso del tipo di prova. Non
-                vengono fatte medie separate tra gruppi. Modificare i pesi
-                ricalcola anche i semestri passati.
-              </p>
-              {types.map((t, index) => (
-                <div className="type-row" key={t.id}>
+              <h3>{t("entry.typeWeights")}</h3>
+              <p>{t("entry.typeWeightsInfo")}</p>
+              {types.map((gradeType, index) => (
+                <div className="type-row" key={gradeType.id}>
                   <label>
-                    Nome {index + 1}
+                    {t("entry.nameNumber", { number: index + 1 })}
                     <input
-                      value={t.name}
+                      value={gradeType.name}
                       maxLength={120}
                       required
                       onChange={(e) =>
                         setTypes(
                           types.map((x) =>
-                            x.id === t.id ? { ...x, name: e.target.value } : x,
+                            x.id === gradeType.id ? { ...x, name: e.target.value } : x,
                           ),
                         )
                       }
                     />
                   </label>
                   <label>
-                    Peso
+                    {t("entry.weightShort")}
                     <input
                       type="number"
                       min=".1"
                       max="100"
                       step=".1"
                       required
-                      value={t.weight || ""}
+                      value={gradeType.weight || ""}
                       onChange={(e) =>
                         setTypes(
                           types.map((x) =>
-                            x.id === t.id
+                            x.id === gradeType.id
                               ? { ...x, weight: Number(e.target.value) }
                               : x,
                           ),
@@ -487,14 +492,14 @@ function EntryForm({
                   <button
                     type="button"
                     className="icon-button danger"
-                    disabled={types.length === 1 || usedType(t.id)}
+                    disabled={types.length === 1 || usedType(gradeType.id)}
                     title={
-                      usedType(t.id)
-                        ? "Usata da voti o attività: non eliminabile"
+                      usedType(gradeType.id)
+                        ? t("entry.subjectNoDelete")
                         : undefined
                     }
-                    aria-label={`Elimina tipo di prova ${t.name}`}
-                    onClick={() => setTypes(types.filter((x) => x.id !== t.id))}
+                    aria-label={t("entry.deleteType", { name: gradeType.name })}
+                    onClick={() => setTypes(types.filter((x) => x.id !== gradeType.id))}
                   >
                     <Trash2 />
                   </button>
@@ -509,7 +514,7 @@ function EntryForm({
                 }
               >
                 <Plus />
-                Aggiungi tipo di prova
+                {t("entry.addType")}
               </button>
             </div>
           </>
@@ -517,7 +522,7 @@ function EntryForm({
         {type === "semester" && (
           <>
             <label className="full">
-              Nome
+              {t("entry.name")}
               <input
                 name="name"
                 maxLength={120}
@@ -526,7 +531,7 @@ function EntryForm({
               />
             </label>
             <label>
-              Anno scolastico
+              {t("entry.schoolYear")}
               <input
                 name="schoolYear"
                 maxLength={120}
@@ -536,7 +541,7 @@ function EntryForm({
               />
             </label>
             <label>
-              Data inizio
+              {t("entry.startDate")}
               <input
                 name="startDate"
                 type="date"
@@ -545,7 +550,7 @@ function EntryForm({
               />
             </label>
             <label>
-              Data fine
+              {t("entry.endDate")}
               <input
                 name="endDate"
                 type="date"
@@ -558,8 +563,19 @@ function EntryForm({
       </fieldset>
       {error && (
         <p className="form-error" role="alert">
-          {error}
+          {t(error)}
         </p>
+      )}
+      {onRefresh && (
+        <button type="button" className="soft-button" disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            try { await onRefresh(); setError(null); }
+            catch { setError("entry.refreshFailed"); }
+            finally { setBusy(false); }
+          }}>
+          {t("entry.refresh")}
+        </button>
       )}
       <DialogFooter>
         <button
@@ -568,14 +584,14 @@ function EntryForm({
           disabled={busy}
           onClick={onClose}
         >
-          Annulla
+          {t("common.cancel")}
         </button>
         <button
           type="submit"
           className="primary-button"
           disabled={busy || (needsSubject && !data.subjects.length)}
         >
-          {busy ? "Salvataggio…" : submitLabels[type!]}
+          {busy ? t("entry.saving") : submitLabels[type!]}
         </button>
       </DialogFooter>
     </form>

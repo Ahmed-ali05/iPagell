@@ -11,7 +11,7 @@ const cacheSchema = z.array(z.object({
 })).max(500);
 export function useClassAgenda(userId: string) {
   const [items, setItems] = useState<ClassSubscription[]>([]);
-  const [status, setStatus] = useState("Caricamento agenda di classe…");
+  const [status, setStatus] = useState<"loading" | "expired" | "stale" | "">("loading");
   const sequence = useRef(0);
   const alive = useRef(true);
   const save = useCallback((next: ClassSubscription[]) => {
@@ -30,7 +30,7 @@ export function useClassAgenda(userId: string) {
         setItems([]);
         try { localStorage.removeItem(classCacheKey(userId)); } catch { /* No cache. */ }
       }
-      setStatus(e instanceof ClassRequestError && e.status===401 ? "Sessione scaduta: accedi di nuovo." : "Agenda di classe non aggiornata · ultima copia disponibile. Le modifiche richiedono una connessione.");
+      setStatus(e instanceof ClassRequestError && e.status===401 ? "expired" : "stale");
     }
   }, [save,userId]);
   useEffect(() => {
@@ -44,7 +44,7 @@ export function useClassAgenda(userId: string) {
       void refresh();
     });
     const tick=()=> { if(document.visibilityState==="visible") void refresh(); };
-    const invalidate=(e:Event)=> { if((e as CustomEvent).detail===userId) { ++sequence.current; setItems([]); setStatus("Sessione scaduta: accedi di nuovo."); } };
+    const invalidate=(e:Event)=> { if((e as CustomEvent).detail===userId) { ++sequence.current; setItems([]); setStatus("expired"); } };
     const timer=setInterval(tick,30000);
     window.addEventListener("online",tick); document.addEventListener("visibilitychange",tick);
     window.addEventListener("ipagell-class-session-ended",invalidate);

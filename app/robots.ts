@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/app", "/api/"],
+      disallow: ["/api/"],
     },
     sitemap: "https://ipagell.website/sitemap.xml",
     host: "https://ipagell.website",

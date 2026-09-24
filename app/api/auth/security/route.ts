@@ -32,19 +32,20 @@ export async function POST(request: Request) {
   try {
     checkMutation(request);
     const user = await identity(request);
-    if (!user) return json({ error: "Accedi di nuovo." }, 401);
+    if (!user) return json({ error: "Accedi di nuovo.", code: "SECURITY_SESSION_REQUIRED" }, 401);
     const parsed = schema.safeParse(await readJson(request, 4096));
     if (!parsed.success)
       return json(
         {
           error:
-            "Controlla i campi. La nuova password deve avere 15–128 caratteri.",
+            "Controlla i campi. La nuova password deve avere 12–128 caratteri.",
+          code: "SECURITY_INVALID_INPUT",
         },
         400,
       );
     const input = parsed.data;
     if (input.expectedUserId !== user.id)
-      return json({ error: "Account cambiato. Ricarica la pagina." }, 401);
+      return json({ error: "Account cambiato. Ricarica la pagina.", code: "ACCOUNT_CHANGED" }, 401);
     await rateLimit(request, user.username, "security");
     const db = database();
     const account = await db
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
       !account ||
       !(await verifyPassword(input.currentPassword, account.password_hash))
     )
-      return json({ error: "Password non valida." }, 401);
+      return json({ error: "Password non valida.", code: "SECURITY_INVALID_PASSWORD" }, 401);
     if (input.operation === "password") {
       const hash = await hashPassword(input.newPassword);
       const result = await db
@@ -66,13 +67,13 @@ export async function POST(request: Request) {
         .run();
       if (result.meta.changes !== 1)
         return json(
-          { error: "Credenziali già cambiate. Accedi di nuovo." },
+          { error: "Credenziali già cambiate. Accedi di nuovo.", code: "SECURITY_CREDENTIALS_CHANGED" },
           409,
         );
     } else {
       if (input.confirmation !== user.username)
         return json(
-          { error: "Scrivi esattamente il tuo nome utente per confermare." },
+          { error: "Scrivi esattamente il tuo nome utente per confermare.", code: "SECURITY_CONFIRMATION_MISMATCH" },
           400,
         );
       const ownedClass = await db
@@ -83,6 +84,7 @@ export async function POST(request: Request) {
         return json(
           {
             error: `Prima trasferisci o elimina la classe “${ownedClass.name}”.`,
+            code: "SECURITY_OWNED_CLASS_BLOCKS_DELETE",
           },
           409,
         );
@@ -102,7 +104,7 @@ export async function POST(request: Request) {
       ]);
       // D1 changes may include cascading session deletions.
       if (results[2].meta.changes < 1)
-        return json({ error: "Account cambiato. Accedi di nuovo." }, 409);
+        return json({ error: "Account cambiato. Accedi di nuovo.", code: "ACCOUNT_CHANGED" }, 409);
     }
     const response = json({ ok: true });
     response.headers.set("Set-Cookie", sessionCookie(request, "", 0));

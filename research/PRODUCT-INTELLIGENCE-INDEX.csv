@@ -1,0 +1,10 @@
+id,product,category,primary_problem,core_pattern,tradeoff,observed_on,primary_url,secondary_url,dossier_anchor
+C1,MyPlusPoints,direct_swiss_grades,understand_grade_position,grade_dashboard_and_pluspoints,local_rules_may_not_generalize,2026-09-23,https://www.mypluspoints.ch/de/,,PRODUCT-INTELLIGENCE-2026-09-23.md#c1--mypluspoints
+C2,School Companion,direct_swiss_planner,know_next_school_event,today_first_mobile_home,social_data_boundary,2026-09-23,https://schoolcompanion.ch/,https://schoolcompanion.ch/privacy/,PRODUCT-INTELLIGENCE-2026-09-23.md#c2--school-companion
+C3,Power Planner,direct_planner_grades,combine_assignments_and_grades,academic_all_in_one,setup_density,2026-09-23,https://powerplanner.net/,https://powerplanner.net/privacy,PRODUCT-INTELLIGENCE-2026-09-23.md#c3--power-planner
+C4,MyStudyLife,direct_student_planner,reduce_planner_setup,scan_timetable_with_review,complexity_and_free_task_cap,2026-09-23,https://mystudylife.com/,https://mystudylife.com/msl-plus/,PRODUCT-INTELLIGENCE-2026-09-23.md#c4--mystudylife
+A1,Todoist,productivity,capture_and_act_fast,quick_add_and_today,habit_metrics_may_misfit_school,2026-09-23,https://www.todoist.com/,https://www.todoist.com/pricing/,PRODUCT-INTELLIGENCE-2026-09-23.md#a1--todoist
+A2,StudySmarter,learning,practice_and_recall,study_session_with_feedback,learning_vs_grade_tracking,2026-09-23,https://www.studysmarter.co.uk/,https://www.studysmarter.co.uk/features/study-plan/,PRODUCT-INTELLIGENCE-2026-09-23.md#a2--studysmarter
+A3,Forest,consumer_focus,avoid_distraction,visible_growth_from_focus,loss_aversion_pressure,2026-09-23,https://www.forestapp.cc/,,PRODUCT-INTELLIGENCE-2026-09-23.md#a3--forest
+A4,Finch,consumer_wellbeing,start_small_and_return,gentle_pet_progress,rewards_can_add_noise,2026-09-23,https://finchcare.com/about-finch,https://help.finchcare.com/hc/en-us/articles/42149821015693-New-User-Guide,PRODUCT-INTELLIGENCE-2026-09-23.md#a4--finch
+E1,Goblin Tools,emerging_microtools,overcome_task_overwhelm,one_problem_one_tool,ai_uncertainty_and_fragmentation,2026-09-23,https://www.goblin.tools/,https://goblin.tools/Privacy,PRODUCT-INTELLIGENCE-2026-09-23.md#e1--goblin-tools
