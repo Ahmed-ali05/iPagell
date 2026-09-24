@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { publicLandingMetadata, publicLandingStructuredData, serializeStructuredData } from "../lib/i18n/public-page";
+import { publicLandingMetadata, publicWebsiteStructuredData, serializeStructuredData } from "../lib/i18n/public-page";
 import { defaultLocale, locales } from "../lib/i18n/locale";
 import { defaultMessages, loadMessages } from "../lib/i18n";
 
@@ -19,16 +19,10 @@ test("public landing metadata shares all four message catalogs and language URLs
     assert.equal(metadata.alternates?.canonical, locale === "it" ? "/" : `/${locale}`);
     assert.equal(metadata.manifest, locale === "it" ? "/manifest.webmanifest" : `/manifest-${locale}.webmanifest`);
 
-    const structured = await publicLandingStructuredData(locale);
-    const graph = structured["@graph"] as Array<Record<string, unknown>>;
-    const app = graph[0];
-    const faq = graph[1];
-    assert.equal(app.description, messages["landing.lead"]);
-    assert.equal(app.inLanguage, locale === "en" ? "en-GB" : `${locale}-CH`);
-    assert.equal(faq.inLanguage, app.inLanguage);
-    const questions = faq.mainEntity as Array<Record<string, unknown>>;
-    assert.equal(questions[0]?.name, messages["landing.faq1Q"]);
-    assert.equal((questions[0]?.acceptedAnswer as Record<string, unknown>).text, messages["landing.faq1A"]);
+    assert.equal(metadata.openGraph?.url, `https://ipagell.website${locale === "it" ? "/" : `/${locale}`}`);
+    const socialImage = locale === "it" ? "/og.png" : `/og-${locale}.png`;
+    assert.equal((metadata.openGraph?.images as Array<Record<string, unknown>>)[0]?.url, socialImage);
+    assert.deepEqual(metadata.twitter?.images, [socialImage]);
   }
 });
 
@@ -46,4 +40,16 @@ test("the root landing stays Italian and localized pages omit duplicate /it cano
   assert.equal(root.openGraph?.title, `${defaultMessages["landing.title"]} | iPagell`);
   assert.equal(root.alternates?.canonical, "/");
   assert.equal((await publicLandingMetadata("de")).alternates?.canonical, "/de");
+});
+
+test("homepage structured data only identifies the canonical website", () => {
+  const website = publicWebsiteStructuredData();
+  assert.deepEqual(website, {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "iPagell",
+    url: "https://ipagell.website/",
+  });
+  assert.equal("offers" in website, false);
+  assert.equal("aggregateRating" in website, false);
 });

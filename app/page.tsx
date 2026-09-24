@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { LandingContent } from "@/components/landing-content";
-import { publicLandingMetadata, publicLandingStructuredData, serializeStructuredData } from "@/lib/i18n/public-page";
+import { publicLandingMetadata, publicWebsiteStructuredData, serializeStructuredData } from "@/lib/i18n/public-page";
 import { defaultLocale } from "@/lib/i18n/locale";
 import { identity } from "@/lib/server/auth";
 
@@ -33,7 +33,7 @@ export default async function Home() {
   );
   if (user) redirect("/app");
 
-  const structuredData = await publicLandingStructuredData(defaultLocale);
+  const structuredData = publicWebsiteStructuredData();
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeStructuredData(structuredData) }} />
     <LandingContent />

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { intlLocales, locales, type Locale } from "./locale";
+import { locales, type Locale } from "./locale";
 import { getServerMessages } from "./server";
-import { translate } from "./index";
+import { publicAveragePaths, publicLandingPaths } from "./public-routes";
 
-const publicPaths: Record<Locale, string> = { it: "/", de: "/de", fr: "/fr", en: "/en" };
+export { publicLandingPaths, publicAveragePaths } from "./public-routes";
 const ogLocales: Record<Locale, string> = { it: "it_CH", de: "de_CH", fr: "fr_CH", en: "en_GB" };
 
 export async function publicLandingMetadata(locale: Locale, indexable = true): Promise<Metadata> {
@@ -11,14 +11,15 @@ export async function publicLandingMetadata(locale: Locale, indexable = true): P
   const title = messages["landing.title"];
   const socialTitle = `${title} | iPagell`;
   const description = messages["landing.lead"];
+  const socialImage = `/og${locale === "it" ? "" : `-${locale}`}.png`;
   return {
     title,
     description,
     manifest: locale === "it" ? "/manifest.webmanifest" : `/manifest-${locale}.webmanifest`,
     alternates: {
-      canonical: publicPaths[locale],
+      canonical: publicLandingPaths[locale],
       languages: {
-        ...Object.fromEntries(locales.map((supported) => [supported, `https://ipagell.website${publicPaths[supported]}`])),
+        ...Object.fromEntries(locales.map((supported) => [supported, `https://ipagell.website${publicLandingPaths[supported]}`])),
         "x-default": "https://ipagell.website/",
       },
     },
@@ -28,13 +29,13 @@ export async function publicLandingMetadata(locale: Locale, indexable = true): P
       siteName: "iPagell",
       title: socialTitle,
       description,
-      url: `https://ipagell.website${publicPaths[locale]}`,
+      url: `https://ipagell.website${publicLandingPaths[locale]}`,
       images: [{
-        url: "/og.png", width: 1733, height: 907, type: "image/png",
+        url: socialImage, width: 1200, height: 630, type: "image/png",
         alt: `${messages["landing.title"]} ${messages["landing.lead"]}`,
       }],
     },
-    twitter: { card: "summary_large_image", title: socialTitle, description, images: ["/og.png"] },
+    twitter: { card: "summary_large_image", title: socialTitle, description, images: [socialImage] },
     robots: indexable ? {
       index: true, follow: true,
       googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
@@ -42,37 +43,39 @@ export async function publicLandingMetadata(locale: Locale, indexable = true): P
   };
 }
 
-export async function publicLandingStructuredData(locale: Locale) {
+export async function publicAverageMetadata(locale: Locale, indexable = true): Promise<Metadata> {
   const messages = await getServerMessages(locale);
-  const t = (key: keyof typeof messages) => translate(messages, key);
-  const questions = [1, 2, 3, 4].map((index) => ({
-    question: t(`landing.faq${index}Q` as keyof typeof messages),
-    answer: t(`landing.faq${index}A` as keyof typeof messages),
-  }));
-  const features = [1, 2, 3, 4].map((index) => t(`landing.feature${index}Title` as keyof typeof messages));
+  const title = messages["average.title"];
+  const description = messages["average.description"];
+  const url = `https://ipagell.website${publicAveragePaths[locale]}`;
+  const socialTitle = `${title} | iPagell`;
+  const socialImage = `/og${locale === "it" ? "" : `-${locale}`}.png`;
+  return {
+    title, description,
+    manifest: locale === "it" ? "/manifest.webmanifest" : `/manifest-${locale}.webmanifest`,
+    alternates: {
+      canonical: publicAveragePaths[locale],
+      languages: {
+        ...Object.fromEntries(locales.map((supported) => [supported, `https://ipagell.website${publicAveragePaths[supported]}`])),
+        "x-default": `https://ipagell.website${publicAveragePaths.it}`,
+      },
+    },
+    openGraph: {
+      type: "website", locale: ogLocales[locale], siteName: "iPagell",
+      title: socialTitle, description, url,
+      images: [{ url: socialImage, width: 1200, height: 630, type: "image/png", alt: socialTitle }],
+    },
+    twitter: { card: "summary_large_image", title: socialTitle, description, images: [socialImage] },
+    robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
+  };
+}
+
+export function publicWebsiteStructuredData() {
   return {
     "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "SoftwareApplication",
-        name: "iPagell",
-        url: `https://ipagell.website${publicPaths[locale]}`,
-        applicationCategory: "EducationalApplication",
-        applicationSubCategory: t("landing.eyebrow"),
-        operatingSystem: "Web",
-        inLanguage: intlLocales[locale],
-        description: t("landing.lead"),
-        featureList: features,
-      },
-      {
-        "@type": "FAQPage",
-        inLanguage: intlLocales[locale],
-        mainEntity: questions.map((item) => ({
-          "@type": "Question", name: item.question,
-          acceptedAnswer: { "@type": "Answer", text: item.answer },
-        })),
-      },
-    ],
+    "@type": "WebSite",
+    name: "iPagell",
+    url: "https://ipagell.website/",
   };
 }
 

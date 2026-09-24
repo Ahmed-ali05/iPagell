@@ -10,38 +10,14 @@ import "./globals-new.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://ipagell.website"),
   title: {
-    default: "iPagell — Diario scolastico digitale per studenti",
+    default: "iPagell",
     template: "%s | iPagell",
   },
-  description:
-    "Organizza voti, medie, compiti, assenze e classi in un diario scolastico digitale, privato e disponibile anche offline.",
+  description: "Uno spazio personale per orientarsi nel semestre.",
   manifest: "/manifest.webmanifest",
   applicationName: "iPagell",
   creator: "iPagell",
   category: "education",
-  openGraph: {
-    type: "website",
-    locale: "it_IT",
-    url: "/",
-    siteName: "iPagell",
-    title: "iPagell — Il tuo diario scolastico",
-    description:
-      "Voti, medie, agenda, assenze e classi in un unico diario scolastico digitale.",
-    images: [{
-      url: "/og.png",
-      width: 1733,
-      height: 907,
-      type: "image/png",
-      alt: "iPagell — Il tuo diario scolastico. Voti, agenda e classi, con un diario viola e simboli di calendario, statistiche e collaborazione.",
-    }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "iPagell — Il tuo diario scolastico",
-    description:
-      "Voti, medie, agenda, assenze e classi in un unico diario scolastico digitale.",
-    images: [{ url: "/og.png", alt: "iPagell — Il tuo diario scolastico. Voti, agenda e classi." }],
-  },
   formatDetection: { email: false, address: false, telephone: false },
   appleWebApp: { capable: true, statusBarStyle: "default", title: "iPagell" },
   icons: {

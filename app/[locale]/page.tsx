@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { LandingContent } from "@/components/landing-content";
 import { locales, type Locale } from "@/lib/i18n/locale";
-import { publicLandingMetadata, publicLandingStructuredData, serializeStructuredData } from "@/lib/i18n/public-page";
+import { publicLandingMetadata } from "@/lib/i18n/public-page";
 import { identity } from "@/lib/server/auth";
 
 export function generateStaticParams() {
@@ -20,8 +20,9 @@ function getLocale(value: string): Locale {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale: value } = await params;
+  const locale = getLocale(value);
   const hostname = (await headers()).get("host")?.split(":")[0];
-  return publicLandingMetadata(getLocale(value), hostname === "ipagell.website");
+  return publicLandingMetadata(locale, hostname === "ipagell.website" && locale !== "it");
 }
 
 export default async function LocalizedLanding({ params }: PageProps) {
@@ -36,9 +37,5 @@ export default async function LocalizedLanding({ params }: PageProps) {
   const user = await identity(new Request(`${protocol}://${hostname}/`, {
     headers: { cookie: requestHeaders.get("cookie") ?? "" },
   }));
-  const structuredData = await publicLandingStructuredData(locale);
-  return <>
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeStructuredData(structuredData) }} />
-    <LandingContent localePath={locale} authenticated={!!user} />
-  </>;
+  return <LandingContent localePath={locale} authenticated={!!user} />;
 }
