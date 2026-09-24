@@ -166,12 +166,30 @@ try {
     "another account cannot read diary A",
   );
   const { revision, ...diary } = profile.data.diary;
+  const testSubject = diary.data.subjects[0];
+  const testGrade = {
+    id: "synthetic-grade",
+    subjectId: testSubject.id,
+    semesterId: diary.data.semesters[0].id,
+    typeId: testSubject.gradeTypes[0].id,
+    value: 4.5,
+    weight: 1,
+    date: "2026-09-01",
+  };
+  diary.data.grades.push(testGrade);
   check(
     (await put(b, diary, revision, a.id)).status,
     401,
     "foreign expected identity blocked",
   );
   check((await put(a, diary, revision)).status, 200, "own update accepted");
+  const savedGradeDiary = await call("/api/account", undefined, a.cookie);
+  check(savedGradeDiary.data.diary.data.grades[0], testGrade, "numeric grade survives API persistence roundtrip");
+  const editedGradeDiary = structuredClone(diary);
+  editedGradeDiary.data.grades[0].value = 5;
+  check((await put(a, editedGradeDiary, revision + 1)).status, 200, "grade value update accepted");
+  const readEditedGradeDiary = await call("/api/account", undefined, a.cookie);
+  check(readEditedGradeDiary.data.diary.data.grades[0].value, 5, "updated grade survives API persistence roundtrip");
   check(
     (await put(a, diary, revision)).status,
     409,
@@ -180,9 +198,16 @@ try {
   const corrupt = structuredClone(diary);
   corrupt.data.subjects[0].coefficient = -5;
   check(
-    (await put(a, corrupt, revision + 1)).status,
+    (await put(a, corrupt, revision + 2)).status,
     400,
     "invalid weight cannot reach storage",
+  );
+  const invalidGrade = structuredClone(diary);
+  invalidGrade.data.grades[0].value = 6.1;
+  check(
+    (await put(a, invalidGrade, revision + 2)).status,
+    400,
+    "grade outside current scale cannot reach storage",
   );
   const tooBig = await fetch(base + "/api/auth/login", {
     method: "POST",

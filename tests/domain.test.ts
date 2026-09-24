@@ -89,7 +89,7 @@ test("onboarding supports generic subjects, an empty diary and cached clients", 
   }
   assert.equal(registerSchema.safeParse({ ...input, preset: "unknown" }).success, false);
 });
-test("Swiss grades accept half notation and comma, reject malformed values", () => {
+test("current 1–6 grades accept half notation and comma, reject malformed values", () => {
   for (const [input, value] of [
     ["4-5", 4.5],
     ["5,5", 5.5],

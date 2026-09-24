@@ -6,7 +6,7 @@
 
 <p align="center">
   <strong>Il diario scolastico personale per voti, agenda, assenze e statistiche.</strong><br>
-  Progettato per la scala di voti 1–6, con materie e periodi personalizzabili.
+  La scala attuale è 1–6; materie e periodi sono personalizzabili.
 </p>
 
 <p align="center">
@@ -35,7 +35,7 @@
 - **Assenze e statistiche:** riepiloghi per periodo e materia in un'unica interfaccia.
 - **Account e sincronizzazione:** sessioni protette, diario personale su D1 e controllo dei conflitti tramite revisione.
 - **Uso offline:** copia locale in IndexedDB, shell PWA installabile e backup JSON esportabile.
-- **Configurazione flessibile:** semestri, materie, colori, tipologie e scala 1–6 personalizzabili.
+- **Configurazione flessibile:** semestri, materie, colori e tipologie personalizzabili; i voti usano la scala attuale 1–6.
 - **Classi private:** gruppi su invito con ruoli, membri e codici revocabili, senza condividere voti o assenze.
 
 ## Stato del progetto

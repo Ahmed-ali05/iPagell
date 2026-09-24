@@ -61,6 +61,13 @@ import { AccountSecurity } from "@/components/account-security";
 import { useDiary } from "@/hooks/use-diary";
 import { InstallAppOffer } from "@/components/install-app";
 import { gradeSchema } from "@/lib/validation";
+import {
+  CURRENT_GRADING_SYSTEM,
+  gradeProgressPercent,
+  isPassingGrade,
+  isValidGradeValue,
+  roundRequiredGrade,
+} from "@/lib/grading";
 import { EntryDialog, type ModalType } from "@/components/entry-dialog";
 import { ClassesView } from "@/components/classes-view";
 import { PersonalEventDialog } from "@/components/class-events-panel";
@@ -115,7 +122,10 @@ const formatDate = (locale: Locale, date: string, options?: Intl.DateTimeFormatO
 const formatLongDate = (locale: Locale, date: Date) =>
   intlDate(locale, date, { weekday: "long", day: "numeric", month: "long" });
 const gradeText = (locale: Locale, value: number | null) =>
-  value === null ? "—" : intlNumber(locale, value, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  value === null ? "—" : intlNumber(locale, value, {
+    minimumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits,
+    maximumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits,
+  });
 const titleCase = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1);
 const localDayKey = (date: Date) =>
@@ -330,7 +340,11 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         type: "object",
         properties: {
           subjectId: { type: "string" },
-          value: { type: "number", minimum: 1, maximum: 6 },
+          value: {
+            type: "number",
+            minimum: CURRENT_GRADING_SYSTEM.values.minimum,
+            maximum: CURRENT_GRADING_SYSTEM.values.maximum,
+          },
           date: { type: "string" },
           note: { type: "string" },
         },
@@ -350,8 +364,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         );
         if (
           !subject ||
-          value.value < 1 ||
-          value.value > 6 ||
+          !isValidGradeValue(value.value) ||
           !/^\d{4}-\d{2}-\d{2}$/.test(value.date)
         )
           throw new Error(t("error.gradeInvalid"));
@@ -1414,13 +1427,13 @@ function GradesView({
                 <BookOpen size={18} />
               </span>
               <small>{item.name}</small>
-              <b className={value !== null && value < 4 ? "low-grade" : ""}>
+              <b className={value !== null && !isPassingGrade(value) ? "low-grade" : ""}>
                 {gradeText(locale, value)}
               </b>
               <i
                 style={{
                   background: item.color,
-                  width: `${value ? ((value - 1) / 5) * 100 : 0}%`,
+                  width: `${gradeProgressPercent(value)}%`,
                 }}
               />
             </button>
@@ -1442,7 +1455,7 @@ function GradesView({
             {subjectGrades.length ? (
               subjectGrades.map((grade) => (
                 <article key={grade.id}>
-                  <div className={`grade-pill ${grade.value < 4 ? "low" : ""}`}>
+                  <div className={`grade-pill ${!isPassingGrade(grade.value) ? "low" : ""}`}>
                     {gradeText(locale, grade.value)}
                   </div>
                   <div>
@@ -1491,8 +1504,8 @@ function GradesView({
               {t("grades.target")} <b>{gradeText(locale, target)}</b>
               <input
                 type="range"
-                min="4"
-                max="6"
+                min={CURRENT_GRADING_SYSTEM.passingValue}
+                max={CURRENT_GRADING_SYSTEM.values.maximum}
                 step=".1"
                 value={target}
                 onChange={(event) => setTarget(Number(event.target.value))}
@@ -1530,17 +1543,17 @@ function GradesView({
               />
             </label>
             <div
-              className={`needed-grade ${needed !== null && needed > 6 ? "impossible" : ""}`}
+              className={`needed-grade ${needed !== null && needed > CURRENT_GRADING_SYSTEM.values.maximum ? "impossible" : ""}`}
             >
               <small>{t("grades.required")}</small>
               <strong>
                 {needed === null
                   ? "—"
-                  : needed <= 1
+                  : needed <= CURRENT_GRADING_SYSTEM.values.minimum
                     ? t("grades.enoughOne")
-                    : needed > 6
+                    : needed > CURRENT_GRADING_SYSTEM.values.maximum
                       ? t("grades.notEnough")
-                      : gradeText(locale, Math.ceil((needed - 1e-10) * 2) / 2)}
+                      : gradeText(locale, roundRequiredGrade(needed))}
               </strong>
             </div>
             <small className="sim-note">

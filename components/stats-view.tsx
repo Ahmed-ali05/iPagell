@@ -3,6 +3,7 @@
 import { Archive, GraduationCap } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { generalAverage, gradeTrend, subjectAverage } from "@/lib/calculations";
+import { CURRENT_GRADING_SYSTEM, CURRENT_GRADING_TICKS, compareGradeValues } from "@/lib/grading";
 import type { Grade, SchoolData, Semester } from "@/types/domain";
 import { EmptyMini, EmptyState } from "@/components/diary-empty-state";
 import { ChevronLeft } from "lucide-react";
@@ -38,8 +39,8 @@ export function StatsView({
     .filter((item) => item.media > 0);
   const trendData = gradeTrend(data.subjects, grades).map((item) => ({ ...item, date: formatDate(locale, item.date, { day: "numeric", month: "short" }) }));
   const average = generalAverage(data.subjects, grades);
-  const strongest = [...subjectData].sort((a, b) => b.media - a.media)[0];
-  const weakest = [...subjectData].sort((a, b) => a.media - b.media)[0];
+  const strongest = [...subjectData].sort((a, b) => compareGradeValues(b.media, a.media))[0];
+  const weakest = [...subjectData].sort((a, b) => compareGradeValues(a.media, b.media))[0];
   const oldSemesters = data.semesters.filter((item) => item.id !== semester.id);
   if (!grades.length) {
     return (
@@ -63,7 +64,7 @@ export function StatsView({
       <div className="stats-hero">
         <div>
           <span className="section-label">{semester.name}</span>
-          <h2>{average === null ? "—" : formatNumber(locale, average, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</h2>
+          <h2>{average === null ? "—" : formatNumber(locale, average, { minimumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits, maximumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits })}</h2>
           <p>{t("stats.weightedAverage")}</p>
         </div>
         <div>
@@ -98,13 +99,13 @@ export function StatsView({
                   tickLine={false}
                 />
                 <YAxis
-                  domain={[1, 6]}
-                  ticks={[1, 2, 3, 4, 5, 6]}
+                  domain={[CURRENT_GRADING_SYSTEM.values.minimum, CURRENT_GRADING_SYSTEM.values.maximum]}
+                  ticks={CURRENT_GRADING_TICKS}
                   tick={{ fill: "var(--subtle)", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
-                <ReferenceLine y={4} stroke="#e45c67" strokeDasharray="5 5" />
+                <ReferenceLine y={CURRENT_GRADING_SYSTEM.passingValue} stroke="#e45c67" strokeDasharray="5 5" />
                 <Tooltip
                   cursor={{ fill: "var(--accent-soft)" }}
                   contentStyle={{
@@ -125,16 +126,16 @@ export function StatsView({
             <div className="insight success">
               <small>{t("stats.strongest")}</small>
               <b>{strongest?.fullName ?? "—"}</b>
-              <strong>{strongest ? formatNumber(locale, strongest.media, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : "—"}</strong>
+              <strong>{strongest ? formatNumber(locale, strongest.media, { minimumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits, maximumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits }) : "—"}</strong>
             </div>
             <div className="insight warning">
               <small>{t("stats.toImprove")}</small>
               <b>{weakest?.fullName ?? "—"}</b>
-              <strong>{weakest ? formatNumber(locale, weakest.media, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : "—"}</strong>
+              <strong>{weakest ? formatNumber(locale, weakest.media, { minimumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits, maximumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits }) : "—"}</strong>
             </div>
             <div className="goal-line">
               <span>{t("stats.semesterGoal")}</span>
-              <b>{formatNumber(locale, goal, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</b>
+              <b>{formatNumber(locale, goal, { minimumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits, maximumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits })}</b>
             </div>
           </section>
         ) : (
@@ -143,7 +144,7 @@ export function StatsView({
             <p>{t("stats.needSubjectHint")}</p>
             <div className="goal-line">
               <span>{t("stats.semesterGoal")}</span>
-              <b>{formatNumber(locale, goal, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</b>
+              <b>{formatNumber(locale, goal, { minimumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits, maximumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits })}</b>
             </div>
           </section>
         )}
@@ -173,13 +174,13 @@ export function StatsView({
                   tickLine={false}
                 />
                 <YAxis
-                  domain={[1, 6]}
-                  ticks={[1, 2, 3, 4, 5, 6]}
+                  domain={[CURRENT_GRADING_SYSTEM.values.minimum, CURRENT_GRADING_SYSTEM.values.maximum]}
+                  ticks={CURRENT_GRADING_TICKS}
                   tick={{ fill: "var(--subtle)", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
-                <ReferenceLine y={4} stroke="#e45c67" strokeDasharray="5 5" />
+                <ReferenceLine y={CURRENT_GRADING_SYSTEM.passingValue} stroke="#e45c67" strokeDasharray="5 5" />
                 <Tooltip
                   contentStyle={{
                     borderRadius: 14,
@@ -218,7 +219,7 @@ export function StatsView({
                   {item.name}
                   <small>{item.schoolYear}</small>
                 </span>
-                <b>{oldAvg === null ? "—" : formatNumber(locale, oldAvg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</b>
+                <b>{oldAvg === null ? "—" : formatNumber(locale, oldAvg, { minimumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits, maximumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits })}</b>
               </div>
             );
           })}

@@ -1,4 +1,24 @@
 import type { Grade, Subject } from "@/types/domain";
+import { formatNumericGrade } from "@/lib/grading";
+
+/** Arithmetic mean of explicit, positive weights. Empty or zero-weight data has no mean. */
+export function weightedArithmeticMean(items: readonly { value: number; weight: number }[]): number | null {
+  if (!items.length) return null;
+  if (items.some(({ value, weight }) => !Number.isFinite(value) || !Number.isFinite(weight) || weight < 0)) return null;
+  const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+  if (totalWeight <= 0) return null;
+  const points = items.reduce((sum, item) => sum + item.value * item.weight, 0);
+  // Keep the existing calculation for ordinary diary data. Rescaling weights
+  // preserves the same mean when an extreme input would overflow or underflow.
+  if (Number.isFinite(totalWeight) && Number.isFinite(points) && totalWeight >= Number.MIN_VALUE / Number.EPSILON) {
+    return points / totalWeight;
+  }
+  const largestWeight = items.reduce((largest, item) => Math.max(largest, item.weight), 0);
+  const scaledWeight = items.reduce((sum, item) => sum + item.weight / largestWeight, 0);
+  const scaledPoints = items.reduce((sum, item) => sum + item.value * (item.weight / largestWeight), 0);
+  const result = scaledPoints / scaledWeight;
+  return Number.isFinite(result) ? result : null;
+}
 
 export function gradeWeight(grade: Grade, subject?: Subject) {
   const typeWeight =
@@ -9,16 +29,9 @@ export function gradeWeight(grade: Grade, subject?: Subject) {
 export function subjectAverage(subject: Subject, grades: Grade[]) {
   const relevant = grades.filter((grade) => grade.subjectId === subject.id);
   if (!relevant.length) return null;
-  const totalWeight = relevant.reduce(
-    (sum, grade) => sum + gradeWeight(grade, subject),
-    0,
-  );
-  return (
-    relevant.reduce(
-      (sum, grade) => sum + grade.value * gradeWeight(grade, subject),
-      0,
-    ) / totalWeight
-  );
+  return weightedArithmeticMean(relevant.map((grade) => ({
+    value: grade.value, weight: gradeWeight(grade, subject),
+  })));
 }
 
 export function generalAverage(subjects: Subject[], grades: Grade[]) {
@@ -32,10 +45,7 @@ export function generalAverage(subjects: Subject[], grades: Grade[]) {
         entry.value !== null,
     );
   if (!values.length) return null;
-  const total = values.reduce((sum, item) => sum + item.coefficient, 0);
-  return (
-    values.reduce((sum, item) => sum + item.value * item.coefficient, 0) / total
-  );
+  return weightedArithmeticMean(values.map((item) => ({ value: item.value, weight: item.coefficient })));
 }
 
 export function neededGrade(
@@ -60,8 +70,7 @@ export function neededGrade(
   );
 }
 
-export const formatGrade = (value: number | null, digits = 1) =>
-  value === null ? "—" : value.toFixed(digits);
+export const formatGrade = formatNumericGrade;
 
 // Incremental weighted averages avoid rescanning all previous grades for every
 // chart point (quadratic work on a large imported diary).

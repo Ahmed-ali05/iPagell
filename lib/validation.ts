@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CURRENT_GRADING_SYSTEM, parseNumericGrade } from "@/lib/grading";
 
 const id = z
   .string()
@@ -24,7 +25,7 @@ export const gradeSchema = z
     subjectId: id,
     semesterId: id,
     typeId: id,
-    value: z.number().finite().min(1).max(6),
+    value: z.number().finite().min(CURRENT_GRADING_SYSTEM.values.minimum).max(CURRENT_GRADING_SYSTEM.values.maximum),
     weight,
     date: daySchema,
     note,
@@ -36,7 +37,7 @@ export const preferencesSchema = z
     theme: z.enum(["system", "light", "dark"]),
     absenceThresholdHours: z.number().finite().min(1).max(1000),
     currentSemesterId: id,
-    gradeGoal: z.number().finite().min(1).max(6),
+    gradeGoal: z.number().finite().min(CURRENT_GRADING_SYSTEM.values.minimum).max(CURRENT_GRADING_SYSTEM.values.maximum),
     reduceMotion: z.boolean().optional(),
     school: z.string().max(150).optional(),
   })
@@ -207,13 +208,5 @@ export const registerSchema = z
 export type Registration = z.infer<typeof registerSchema>;
 
 export function parseGrade(input: string): number {
-  const text = input.trim().replace(",", ".");
-  const range = /^(\d)\s*[-–]\s*(\d)$/.exec(text);
-  const value =
-    range && Number(range[2]) === Number(range[1]) + 1
-      ? (Number(range[1]) + Number(range[2])) / 2
-      : Number(text);
-  if (!text || !Number.isFinite(value) || value < 1 || value > 6)
-    throw new Error("Usa un voto da 1 a 6, per esempio 4.5 oppure 4-5.");
-  return value;
+  return parseNumericGrade(input);
 }
