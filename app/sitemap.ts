@@ -1,15 +1,23 @@
 import type { MetadataRoute } from "next";
 import { locales } from "@/lib/i18n/locale";
+import { publicAveragePaths, publicLandingPaths } from "@/lib/i18n/public-routes";
 
-const localePaths = { it: "/", de: "/de", fr: "/fr", en: "/en" } as const;
 const languages = Object.fromEntries(
-  locales.map((locale) => [locale, `https://ipagell.website${localePaths[locale]}`]),
+  locales.map((locale) => [locale, `https://ipagell.website${publicLandingPaths[locale]}`]),
 );
 languages["x-default"] = "https://ipagell.website/";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return locales.map((locale) => ({
-    url: `https://ipagell.website${localePaths[locale]}`,
+  const landing = locales.map((locale) => ({
+    url: `https://ipagell.website${publicLandingPaths[locale]}`,
     alternates: { languages },
   }));
+  const averageLanguages = Object.fromEntries(
+    locales.map((locale) => [locale, `https://ipagell.website${publicAveragePaths[locale]}`]),
+  );
+  averageLanguages["x-default"] = `https://ipagell.website${publicAveragePaths.it}`;
+  return [...landing, ...locales.map((locale) => ({
+    url: `https://ipagell.website${publicAveragePaths[locale]}`,
+    alternates: { languages: averageLanguages },
+  }))];
 }

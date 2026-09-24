@@ -9,7 +9,21 @@ import {
   isDismissed,
   isStandalone,
   shouldShowHomeOffer,
+  shouldRegisterAppWorker,
 } from "../lib/install-app";
+import { publicAveragePaths, publicLandingPaths } from "../lib/i18n/public-routes";
+
+test("calculator visits do not install the diary precache; app and landing still do", () => {
+  for (const path of Object.values(publicAveragePaths)) {
+    assert.equal(shouldRegisterAppWorker(path), false);
+    assert.equal(shouldRegisterAppWorker(`${path}/`), false);
+  }
+  for (const path of [...Object.values(publicLandingPaths), "/app"]) {
+    assert.equal(shouldRegisterAppWorker(path), true);
+  }
+  assert.equal(shouldRegisterAppWorker("/de/unknown-tool"), false);
+  assert.equal(shouldRegisterAppWorker("/missing"), false);
+});
 
 const androidChrome = "Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/130.0 Mobile Safari/537.36";
 const samsung = "Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36 SamsungBrowser/28.0 Chrome/130.0 Mobile Safari/537.36";

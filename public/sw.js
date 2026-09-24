@@ -3,10 +3,16 @@ const CACHE = "ipagell-shell-__BUILD__";
 const ASSETS = /*__ASSETS__*/ [];
 const CORE = ["/", "/app", "/offline.html", "/manifest.webmanifest", "/manifest-de.webmanifest", "/manifest-fr.webmanifest", "/manifest-en.webmanifest", "/favicon.svg", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/icon-maskable-512.png", "/icons/apple-touch-icon-180.png"];
 const PUBLIC_LANDINGS = new Set(["/it", "/de", "/fr", "/en"]);
+const APP_ENTRIES = new Set(["/", "/app", ...PUBLIC_LANDINGS]);
 const ALLOWED = new Set([...CORE, ...ASSETS]);
 
 self.addEventListener("install", event => {
-  event.waitUntil(caches.open(CACHE).then(async cache => {
+  event.waitUntil(self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async clients => {
+    // An old registration can update during a calculator visit without a new
+    // register() call. Keep the old offline shell until an app entry is open.
+    if (!clients.some(client => APP_ENTRIES.has(new URL(client.url).pathname.replace(/\/$/, "") || "/")))
+      throw new Error("Defer diary shell update until an app entry opens");
+    const cache = await caches.open(CACHE);
     // Public landing and app shell never contain an account snapshot.
     await cache.addAll([...new Set([...CORE, ...ASSETS])].map(path=>new Request(path,{credentials:"omit",cache:"reload"})));
     // Activate on next app launch to avoid replacing assets under an open editor.

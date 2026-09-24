@@ -10,6 +10,7 @@ import {
   isDismissed,
   isStandalone,
   shouldShowHomeOffer,
+  shouldRegisterAppWorker,
   type InstallExperience,
 } from "@/lib/install-app";
 
@@ -57,7 +58,7 @@ export function InstallAppProvider({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     startedAt.current = Date.now();
-    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator)
+    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator && shouldRegisterAppWorker(window.location.pathname))
       void navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" })
         .then((registration) => registration.update()).catch(() => undefined);
     const updateDisplayMode = () => setInstalled(isStandalone(

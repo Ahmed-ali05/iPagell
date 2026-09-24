@@ -8,6 +8,44 @@ type FetchEvent = {
   respondWith: (result: Promise<Response>) => void;
 };
 
+test("an existing worker defers full precache on calculator visits and keeps it for app entry", async () => {
+  const source = await readFile(new URL("../public/sw.js", import.meta.url), "utf8");
+  for (const [path, shouldCache] of [["/calcolo-media-voti", false], ["/de/notendurchschnitt", false], ["/app", true], ["/de", true]] as const) {
+    let install: ((event: { waitUntil: (task: Promise<unknown>) => void }) => void) | undefined;
+    let opened = 0;
+    let assets: Request[] = [];
+    runInNewContext(source, {
+      self: {
+        clients: { matchAll: async () => [{ url: `https://ipagell.website${path}` }] },
+        addEventListener(name: string, handler: typeof install) {
+          if (name === "install") install = handler;
+        },
+      },
+      caches: { open: async () => {
+        opened++;
+        return { addAll: async (requests: Request[]) => { assets = requests; } };
+      } },
+      Request: class extends Request {
+        constructor(path: string, init?: RequestInit) {
+          super(new URL(path, "https://ipagell.website"), init);
+        }
+      },
+      URL,
+    });
+    let task: Promise<unknown> | undefined;
+    install!({ waitUntil(promise) { task = promise; } });
+    assert.ok(task);
+    if (shouldCache) {
+      await task;
+      assert.equal(opened, 1);
+      assert.ok(assets.some((request) => new URL(request.url).pathname === "/app"));
+    } else {
+      await assert.rejects(task, /Defer diary shell update/);
+      assert.equal(opened, 0);
+    }
+  }
+});
+
 test("offline navigation uses a fresh response when Sites redirects the shared shell", async () => {
   const handlers = new Map<string, (event: FetchEvent) => void>();
   const cache = {
@@ -40,7 +78,7 @@ test("offline navigation uses a fresh response when Sites redirects the shared s
     URL,
   });
 
-  for (const path of ["/it", "/de", "/fr", "/en"]) {
+  for (const path of ["/", "/app", "/it", "/de", "/fr", "/en"]) {
     let response: Promise<Response> | undefined;
     handlers.get("fetch")!({
       request: {
@@ -59,15 +97,17 @@ test("offline navigation uses a fresh response when Sites redirects the shared s
     assert.equal(await result.text(), "<html>offline shell</html>");
   }
 
-  let apiIntercepted = false;
-  handlers.get("fetch")!({
-    request: {
-      url: "https://ipagell.website/api/account",
-      method: "GET",
-      mode: "navigate",
-      headers: new Headers(),
-    },
-    respondWith() { apiIntercepted = true; },
-  });
-  assert.equal(apiIntercepted, false);
+  for (const path of ["/api/account", "/calcolo-media-voti", "/de/notendurchschnitt", "/fr/calcul-moyenne-notes", "/en/grade-average-calculator"]) {
+    let intercepted = false;
+    handlers.get("fetch")!({
+      request: {
+        url: `https://ipagell.website${path}`,
+        method: "GET",
+        mode: "navigate",
+        headers: new Headers(),
+      },
+      respondWith() { intercepted = true; },
+    });
+    assert.equal(intercepted, false, `${path} must bypass an existing worker`);
+  }
 });

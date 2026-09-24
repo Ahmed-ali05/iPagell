@@ -8,6 +8,7 @@ import { InstallAppOffer } from "@/components/install-app";
 import { formatNumber } from "@/lib/i18n";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import type { Locale } from "@/lib/i18n/locale";
+import { publicAveragePaths } from "@/lib/i18n/public-routes";
 import styles from "@/app/marketing-page.module.css";
 
 export function LandingContent({ localePath, authenticated = false }: { localePath?: Locale; authenticated?: boolean }) {
@@ -83,7 +84,7 @@ export function LandingContent({ localePath, authenticated = false }: { localePa
       </section>
       <section className={styles.featureSection} id="funzioni"><div className={styles.sectionHeading}><h2>{t("landing.featuresTitle")}</h2><p>{t("landing.featuresLead")}</p></div><div className={styles.featureGrid}>
         {features.map(({ title, text }, index) => <article className={styles.featureCard} key={title}><span className={styles.featureNumber}>0{index + 1}</span><h3>{title}</h3><p>{text}</p></article>)}
-      </div></section>
+      </div><a className={styles.toolLink} href={publicAveragePaths[locale]}>{t("landing.averageToolLink")} <ArrowRight size={16} aria-hidden="true" /></a></section>
       <section className={styles.privacySection} id="privacy">
         <div className={styles.privacyVisual} aria-hidden="true"><div className={styles.privateCard}><span><LockKeyhole size={17} /> {t("workspace.private")}</span><b>{t("landing.personalData")}</b></div><div className={styles.separator}><span /></div><div className={styles.sharedCard}><span><UsersRound size={17} /> {t("workspace.shared")}</span><b>{t("landing.sharedActivity")}</b></div></div>
         <div className={styles.privacyCopy}><h2>{t("landing.privacyTitle")}</h2><p>{t("landing.privacyText")}</p><ul>

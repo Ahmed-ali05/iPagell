@@ -1,3 +1,11 @@
+import { publicLandingPaths } from "@/lib/i18n/public-routes";
+
+/** Public calculator visits should not trigger the full diary asset precache. */
+export function shouldRegisterAppWorker(pathname: string): boolean {
+  const path = pathname.replace(/\/$/, "") || "/";
+  return path === "/app" || Object.values(publicLandingPaths).includes(path);
+}
+
 export type InstallExperience =
   | "prompt"
   | "ios-safari"

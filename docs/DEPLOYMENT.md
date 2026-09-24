@@ -8,7 +8,7 @@ La produzione è **https://ipagell.website**, ospitata da Sites con il database 
 
 ## Indicizzazione e landing pubblica
 
-La sola pagina destinata all'indicizzazione è la landing `/`, con canonical, titolo, descrizione e anteprime social riferiti a `https://ipagell.website/`. La sitemap pubblica contiene solo questo URL. `robots.txt` lascia consultabili `/app` e `/offline.html`, così i motori possono leggere i rispettivi `noindex, nofollow`; le API restano escluse. La landing dichiara dati strutturati coerenti con il testo visibile: non aggiungere prezzi, valutazioni o recensioni senza un'offerta e prove reali.
+Le landing `/`, `/de`, `/fr`, `/en` e le rispettive utility pubbliche per il calcolo della media sono destinate all'indicizzazione, ciascuna con canonical, titolo, descrizione e anteprime social localizzati. La sitemap pubblica contiene questi otto URL. `robots.txt` lascia consultabili `/app` e `/offline.html`, così i motori possono leggere i rispettivi `noindex, nofollow`; le API restano escluse. Le landing dichiarano dati strutturati coerenti con il testo visibile: non aggiungere prezzi, valutazioni o recensioni senza un'offerta e prove reali.
 
 Prima di pubblicare modifiche alla landing, verificare i metadati nel bundle, la sitemap, `robots.txt`, i redirect degli alias con query string e la corrispondenza dei dati strutturati con i contenuti visibili. Controllare la resa desktop e mobile e assicurarsi che il link GitHub punti al repository pubblico corretto.
 
