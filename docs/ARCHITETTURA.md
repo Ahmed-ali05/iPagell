@@ -2,13 +2,13 @@
 
 [Indice](../README.md) · [API](API.md) · [Manutenzione](MANUTENZIONE.md)
 
-Descrizione del codice corrente, non del solo brief iniziale. Stato documentato: 16 settembre 2026. Le architetture future sono separate nelle specifiche [Classi](CLASSI.md) e [Spazio studio AI](SPAZIO-STUDIO-AI.md).
+Descrizione del codice corrente, non del solo brief iniziale. Sincronizzazione aggiornata: 23 settembre 2026; evidenze in [Affidabilità](RELIABILITY.md). Le architetture future sono separate nelle specifiche [Classi](CLASSI.md) e [Spazio studio AI](SPAZIO-STUDIO-AI.md).
 
 ## Componenti e responsabilità
 
 ```text
 Interfaccia React
-  └─ useDiary: stato, coda mutazioni, sincronizzazione
+  └─ useDiary → diary-session: stato, coda unica, sincronizzazione
        ├─ IndexedDB: snapshot per account + modifiche in attesa
        └─ API same-origin: sessione, validazione, proprietà, revisione
             └─ D1: account, sessioni, limiti, snapshot diario
@@ -20,14 +20,15 @@ Service worker: solo shell e asset statici; nessuna API in cache
 | `app/page.tsx`, `app/layout.tsx` | Entrata, metadati e PWA |
 | `components/ipagell-app.tsx` | Coordinamento del diario, navigazione, dashboard, agenda, voti e impostazioni |
 | `components/absences-view.tsx`, `stats-view.tsx` | Viste Assenze e Statistiche; ricevono dati e azioni dal diario |
-| `components/classes-view.tsx` | Classi private, membri, ruoli, inviti e azioni amministrative C1 |
+| `components/classes-view.tsx`, `class-events-panel.tsx` | Classi private, membri, ruoli, inviti (C1), eventi condivisi e agenda personale collegata (C2/C3) |
 | `components/account-gate.tsx`, `account-security.tsx`, `entry-dialog.tsx` | Accesso/onboarding, gestione credenziali, inserimento dati |
-| `hooks/use-diary.ts` | Fasi dell’app, accodamento per istanza, copia locale e server |
+| `hooks/use-diary.ts`, `lib/diary-session.ts` | Sottoscrizione React e controller testabile: coda unica per letture/scritture, fasi e sincronizzazione |
+| `lib/client-http.ts` | Trasporto JSON diario/classi con timeout e distinzione errori HTTP/rete |
 | `lib/validation.ts`, `auth-validation.ts` | Schemi runtime e limiti; riferimento per dati accettati |
 | `lib/calculations.ts` | Medie, simulatore e andamento incrementale |
 | `lib/account-storage.ts` | IndexedDB, backup e recupero legacy |
 | `lib/server/` | Sessioni, hashing, controlli HTTP e query parametrizzate |
-| `db/schema.ts`, `drizzle/` | Schema D1 e migrazioni versionate, incluse le fondamenta isolate delle classi |
+| `db/schema.ts`, `drizzle/` | Schema D1 e migrazioni versionate per diario, account, classi, eventi condivisi, agenda collegata e partenze |
 | `public/`, `scripts/generate-precache.mjs` | Asset PWA e generazione allowlist del service worker |
 
 React/TypeScript, Tailwind e componenti Radix/Shadcn; grafici Recharts. Vinext/Vite produce il Worker e il client usando convenzioni compatibili con Next. Non trattare il repository come un server Next standard. Il backend usa D1 tramite binding `DB`; nessun R2 configurato e nessun servizio email.
@@ -54,7 +55,9 @@ Un intervento è utile se rende il comportamento più prevedibile, un problema p
 | `diaries` | Un payload JSON per `user_id`, revisione, creazione e aggiornamento |
 | `classes` | Identità, proprietario e impostazioni del gruppo; nessun dato del diario personale |
 | `class_members` | Appartenenza, nome visualizzato e ruolo proprietario/moderatore/membro |
-| `class_invites` | Solo digest dell'invito, limiti, scadenza, utilizzi e revoca |
+| `class_invites` | Solo digest dell’invito, limiti, scadenza, utilizzi e revoca |
+| `class_events`, `class_event_subscriptions` | Eventi condivisi e copie personali sottoscritte, con snapshot e campi privati |
+| `class_departures` | Partenze/rimozioni, per limitare il rientro con inviti precedenti |
 
 `diaries.user_id` è una chiave primaria, ma **non ha una FK SQL verso accounts**: l’integrità è attualmente mantenuta dalle API e dalla cancellazione transazionale. Non inserire snapshot tramite SQL operativo senza verificarne il proprietario.
 
@@ -90,11 +93,11 @@ Una materia senza voti restituisce `null` ed è esclusa dalla generale. Il simul
 2. Attesa del commit della transazione locale; aggiornamento UI.
 3. `PUT /api/diary` con revisione attesa e ID atteso dell’account.
 4. Il server verifica sessione/proprietà e aggiorna solo se la revisione coincide.
-5. Successo: incremento revisione e copia locale pulita; `409`: conflitto da risolvere manualmente.
+5. Successo: incremento revisione e copia locale pulita solo dopo commit IndexedDB; `409`: confronto con il server, conferma se tutti i dati coincidono, altrimenti conflitto esplicito.
 
-La coda serializza le operazioni nella singola istanza React, **non coordina più schede**. Non esistono merge automatico, CRDT o cronologia completa degli snapshot. Un timeout dopo un commit remoto può apparire come conflitto al tentativo successivo: esportare prima di sostituire.
+La coda serializza caricamento, modifiche, sync e logout della sessione. Tra schede, IndexedDB confronta e scrive atomicamente lo snapshot atteso; una scheda obsoleta non può sovrascrivere né cancellare un draft successivo. Il cambio sessione invalida i risultati pendenti. Non esistono merge automatico, CRDT o cronologia completa degli snapshot. Una conferma persa può essere riconciliata soltanto se il server contiene esattamente il draft corrente; altrimenti esportare prima di sostituire.
 
-All’avvio una copia offline viene aperta solo dopo un fallimento non classificato come errore API e se esiste l’account locale attivo. Un `401` rimuove il puntatore attivo, non automaticamente tutti i draft in IndexedDB; l’account successivo non li eredita. `503` del server non è un’autenticazione offline alternativa.
+All’avvio una copia offline viene aperta solo dopo un fallimento di rete della richiesta di identità e se esiste l’account locale attivo. Un errore di storage successivo a una risposta autenticata non può attivare questo fallback. Il puntatore viene aggiornato all’apertura dell’account, mai da salvataggi tardivi. Un `401` rimuove il puntatore attivo, non automaticamente tutti i draft in IndexedDB; l’account successivo non li eredita. `503` del server non è un’autenticazione offline alternativa.
 
 ## Storage locale e PWA
 
@@ -106,6 +109,6 @@ Il service worker non forza `skipWaiting`: un aggiornamento può attendere la ch
 
 ## Confine delle estensioni future
 
-Classi, appartenenze e inviti usano tabelle normalizzate separate da `diaries.payload`: una classe non può leggere o dedurre voti, assenze o preferenze private. Ogni endpoint verifica sessione, appartenenza e ruolo; i segreti degli inviti sono conservati soltanto come digest e i link usano il frammento URL, che non viene inviato al server. Gli eventi C2 saranno sottoscrizioni unite all'agenda dall'interfaccia, non copie nascoste nel diario.
+Classi, appartenenze, inviti, eventi e sottoscrizioni usano tabelle normalizzate separate da `diaries.payload`: una classe non può leggere o dedurre voti, assenze o preferenze private. Ogni endpoint verifica sessione, appartenenza e ruolo; i segreti degli inviti sono conservati soltanto come digest e i link usano il frammento URL, che non viene inviato al server. C1 (classi e inviti), C2 (eventi condivisi) e C3 (agenda personale collegata) sono implementati nel codice; l'attivazione del flag nell'ambiente Sites live non è verificabile dalla repository. Annunci, materiali e spazio studio AI restano futuri.
 
 I documenti dello spazio studio AI richiederanno object storage, coda di elaborazione e indice di ricerca separati. Non inserire file, testo estratto o embedding nel payload del diario e non eseguire analisi AI nella richiesta HTTP di upload.

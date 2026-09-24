@@ -1,4 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
+import { InstallAppProvider } from "@/components/install-app";
+import { I18nProvider } from "@/components/i18n-provider";
+import { defaultMessages, type Messages } from "@/lib/i18n";
+import { defaultLocale, locales, type Locale } from "@/lib/i18n/locale";
+import { getServerMessages } from "@/lib/i18n/server";
 import "./globals-new.css";
 
 export const metadata: Metadata = {
@@ -55,17 +61,29 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const requestHeaders = await headers();
+  const requestedLocale = requestHeaders.get("x-ipagell-explicit-locale");
+  const explicitLocale = locales.find((locale) => locale === requestedLocale);
+  const publicLocaleHeader = requestHeaders.get("x-ipagell-public-locale");
+  const publicLocale = locales.find((locale) => locale === publicLocaleHeader);
+  const locale: Locale = explicitLocale ?? publicLocale ?? defaultLocale;
+  const messages: Messages = explicitLocale || publicLocale ? await getServerMessages(locale) : defaultMessages;
   return (
-    <html lang="it" suppressHydrationWarning>
+    <html lang={locale} data-explicit-locale={explicitLocale ? "true" : undefined} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `if (["www.ipagell.website", "ipagell.produc-ch.chatgpt.site"].includes(window.location.hostname)) { window.location.replace("https://ipagell.website" + window.location.pathname + window.location.search + window.location.hash); }`,
+            __html: `window.addEventListener("beforeinstallprompt", function (event) { event.preventDefault(); window.__ipagellInstallPrompt = event; }); window.addEventListener("appinstalled", function () { window.__ipagellAppInstalled = true; window.__ipagellInstallPrompt = null; });`,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `const host = window.location.hostname; if (["www.ipagell.website", "ipagell.produc-ch.chatgpt.site"].includes(host)) { window.location.replace("https://ipagell.website" + window.location.pathname + window.location.search + window.location.hash); }`,
           }}
         />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -77,7 +95,7 @@ export default function RootLayout({
         <link rel="apple-touch-startup-image" href="/splash/iphone-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3)" />
         <link rel="apple-touch-startup-image" href="/splash/iphone-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)" />
       </head>
-      <body>{children}</body>
+      <body><I18nProvider initialLocale={locale} initialMessages={messages} explicitLocale={!!explicitLocale} fixedLocale={!!publicLocale}><InstallAppProvider>{children}</InstallAppProvider></I18nProvider></body>
     </html>
   );
 }

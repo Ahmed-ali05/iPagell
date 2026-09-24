@@ -1,8 +1,11 @@
 {
   "id": "/",
+  "related_applications": [
+    { "platform": "webapp", "url": "/manifest.webmanifest", "id": "https://ipagell.website/" }
+  ],
   "name": "iPagell — Diario scolastico",
   "short_name": "iPagell",
-  "description": "Voti, agenda, assenze e statistiche scolastiche, sempre disponibili offline.",
+  "description": "Voti, agenda, assenze e statistiche scolastiche, con l’ultima copia del diario disponibile offline sul dispositivo.",
   "lang": "it-CH",
   "start_url": "/app?source=pwa",
   "scope": "/",

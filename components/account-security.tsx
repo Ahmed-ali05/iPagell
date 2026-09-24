@@ -1,5 +1,8 @@
 "use client";
 import { useState, type FormEvent } from "react";
+import { useI18n } from "@/components/i18n-provider";
+import { apiErrorKey } from "@/lib/i18n/errors";
+import type { MessageKey } from "@/lib/i18n";
 export function AccountSecurity({
   id,
   username,
@@ -11,13 +14,14 @@ export function AccountSecurity({
   disabled: boolean;
   onChanged: () => Promise<void>;
 }) {
+  const { t } = useI18n();
   const [mode, setMode] = useState<"password" | "delete">("password"),
     [busy, setBusy] = useState(false),
-    [error, setError] = useState("");
+    [error, setError] = useState<MessageKey | null>(null);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy || disabled) return;
-    setError("");
+    setError(null);
     setBusy(true);
     try {
       const fields = Object.fromEntries(new FormData(event.currentTarget));
@@ -32,21 +36,23 @@ export function AccountSecurity({
           expectedUserId: id,
         }),
       });
-      const body = (await result.json()) as { error?: string };
-      if (!result.ok) throw new Error(body.error ?? "Operazione non riuscita");
+      const body = (await result.json()) as { error?: string; code?: string };
+      if (!result.ok) {
+        setError(apiErrorKey(body.code, "error.operationFailed"));
+        return;
+      }
       await onChanged();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Connessione non disponibile");
+    } catch {
+      setError("error.connectionUnavailable");
     } finally {
       setBusy(false);
     }
   }
   return (
     <details className="security-settings">
-      <summary>Sicurezza e gestione account</summary>
+      <summary>{t("security.title")}</summary>
       <p>
-        Dopo il cambio password dovrai accedere di nuovo su tutti i dispositivi.
-        Il tuo codice di recupero rimane valido.
+        {t("security.passwordHint")}
       </p>
       <div className="auth-links">
         <button
@@ -54,32 +60,31 @@ export function AccountSecurity({
           className="soft-button"
           onClick={() => {
             setMode("password");
-            setError("");
+            setError(null);
           }}
         >
-          Cambia password
+          {t("security.changePassword")}
         </button>
         <button
           type="button"
           className="soft-button danger"
           onClick={() => {
             setMode("delete");
-            setError("");
+            setError(null);
           }}
         >
-          Elimina account
+          {t("security.deleteAccount")}
         </button>
       </div>
       {disabled && (
         <p>
-          Sincronizza o esporta e risolvi le modifiche in attesa prima di
-          gestire l’account.
+          {t("security.pendingChanges")}
         </p>
       )}
       <form onSubmit={submit} key={mode}>
         <fieldset disabled={disabled || busy} className="form-grid">
           <label className="full">
-            Password attuale
+            {t("security.currentPassword")}
             <input
               name="currentPassword"
               type="password"
@@ -90,7 +95,7 @@ export function AccountSecurity({
           </label>
           {mode === "password" ? (
             <label className="full">
-              Nuova password
+              {t("security.newPassword")}
               <input
                 name="newPassword"
                 type="password"
@@ -103,13 +108,10 @@ export function AccountSecurity({
           ) : (
             <>
               <p className="full form-error">
-                L’eliminazione rimuove definitivamente l’account e il diario dal
-                server. Le copie esportate e quelle offline su altri dispositivi
-                non possono essere cancellate a distanza. Esporta prima un
-                backup.
+                {t("security.deleteWarning")}
               </p>
               <label className="full">
-                Scrivi {username} per confermare
+                {t("security.confirmUsername", { username })}
                 <input
                   name="confirmation"
                   autoComplete="off"
@@ -121,15 +123,15 @@ export function AccountSecurity({
           )}
           <button className="primary-button full" type="submit">
             {busy
-              ? "Attendi…"
+              ? t("common.pleaseWait")
               : mode === "password"
-                ? "Cambia password"
-                : "Elimina definitivamente il mio account"}
+                ? t("security.changePassword")
+                : t("security.confirmDelete")}
           </button>
         </fieldset>
         {error && (
           <p role="alert" className="form-error">
-            {error}
+            {t(error)}
           </p>
         )}
       </form>

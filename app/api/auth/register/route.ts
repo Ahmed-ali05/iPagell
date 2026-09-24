@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     checkMutation(request);
     const parsed = signupSchema.safeParse(await readJson(request, 4096));
     if (!parsed.success)
-      return json({ error: parsed.error.issues[0].message }, 400);
+      return json({ error: parsed.error.issues[0].message, code: "AUTH_INVALID_SIGNUP" }, 400);
     const { username, password } = parsed.data;
     await rateLimit(request, username, "register");
     const passwordHash = await hashPassword(password),
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       .run();
     if (result.meta.changes !== 1)
       return json(
-        { error: "Nome utente non disponibile. Scegline un altro." },
+        { error: "Nome utente non disponibile. Scegline un altro.", code: "AUTH_USERNAME_TAKEN" },
         409,
       );
     const cookie = await issueSession(request, id, 1);

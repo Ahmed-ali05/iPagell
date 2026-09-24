@@ -6,6 +6,8 @@ const N = 16384,
   r = 8,
   p = 5,
   SIZE = 32;
+const toHex = (bytes: Uint8Array) =>
+  Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 let hashing = false;
 export class HashBusyError extends Error {}
 async function derive(password: string, salt: Buffer): Promise<Buffer> {
@@ -29,7 +31,7 @@ async function derive(password: string, salt: Buffer): Promise<Buffer> {
 export async function hashPassword(password: string) {
   const salt = randomBytes(16);
   const hash = await derive(password, salt);
-  return `scrypt$${N}$${r}$${p}$${salt.toString("hex")}$${hash.toString("hex")}`;
+  return `scrypt$${N}$${r}$${p}$${toHex(salt)}$${toHex(hash)}`;
 }
 export async function verifyPassword(password: string, encoded: string) {
   const parts = encoded.split("$");
@@ -48,6 +50,6 @@ export async function verifyPassword(password: string, encoded: string) {
 }
 // Fixed public dummy record equalizes the KDF cost of unknown usernames.
 export const DUMMY_HASH = `scrypt$${N}$${r}$${p}$${"0".repeat(32)}$${"0".repeat(64)}`;
-export const randomToken = () => randomBytes(32).toString("hex");
+export const randomToken = () => toHex(randomBytes(32));
 export const tokenHash = (value: string) =>
   createHash("sha256").update(value).digest("hex");

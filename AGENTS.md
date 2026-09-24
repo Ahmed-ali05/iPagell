@@ -1,3 +1,24 @@
+## Contesto della repository
+
+Prima di iniziare task non banali, leggere:
+
+- `docs/REPO-SNAPSHOT.md`
+- `docs/ARCHITECTURE-CURRENT.md`
+
+Consultare anche `docs/VERIFICATION-MATRIX.md` quando il task coinvolge comportamento critico, parti poco chiare della repository o affermazioni che devono essere verificate con precisione.
+
+Questi documenti servono come mappa iniziale della repository, ma non sostituiscono la verifica del codice.
+
+Prima di modificare una funzionalità:
+
+1. individuare i file realmente coinvolti;
+2. leggere l'implementazione corrente;
+3. verificare che il comportamento descritto nei documenti sia ancora valido.
+
+In caso di conflitto tra documentazione e codice, il codice corrente è la fonte primaria di verità.
+
+Se una modifica rende obsoleta una parte della documentazione tecnica, aggiornare i documenti pertinenti nello stesso task, senza riscrivere sezioni non coinvolte.
+
 # Produzione e pubblicazione
 
 - La produzione richiesta con «deploy» o «pubblica» è **https://ipagell.website**.

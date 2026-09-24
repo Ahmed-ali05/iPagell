@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     checkMutation(request);
     const parsed = credentialsSchema.safeParse(await readJson(request, 4096));
     if (!parsed.success)
-      return json({ error: "Nome utente o password non validi." }, 400);
+      return json({ error: "Nome utente o password non validi.", code: "AUTH_INVALID_CREDENTIALS" }, 400);
     const { username, password } = parsed.data;
     await rateLimit(request, username, "login");
     const account = await database()
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
       account?.password_hash ?? DUMMY_HASH,
     );
     if (!valid || !account)
-      return json({ error: "Nome utente o password non validi." }, 401);
+      return json({ error: "Nome utente o password non validi.", code: "AUTH_INVALID_CREDENTIALS" }, 401);
     const cookie = await issueSession(
       request,
       account.id,

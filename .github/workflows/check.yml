@@ -23,6 +23,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm run install:ci
+      - name: Audit dipendenze
+        run: npm audit --audit-level=low
       - run: npm run release:prepare
       - name: Riepilogo
         run: |

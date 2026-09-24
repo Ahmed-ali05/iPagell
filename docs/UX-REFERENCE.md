@@ -1,6 +1,6 @@
 # iPagell — Riferimento UX, UI e contenuti
 
-Aggiornato: 18 settembre 2026. Avvio delle migliorie leggere dopo il secondo passaggio UX.
+Aggiornato: 24 settembre 2026. Avvio delle migliorie leggere e primo passaggio visivo.
 
 Questo documento conserva contesto, evidenze e proposte. Non certifica un rilascio e non autorizza automaticamente l'implementazione. Nessun codice o dato scolastico è stato modificato durante questa analisi.
 
@@ -14,11 +14,55 @@ Questo documento conserva contesto, evidenze e proposte. Non certifica un rilasc
 
 Per ogni futura modifica annotare data, decisione, motivo, sezioni coinvolte ed esito della verifica. Non segnare come risolto un problema solo perché esiste un task. Prima di aggiornare questo documento rileggere il comportamento corrente: il prodotto evolve.
 
+## Landing e posizionamento — 24 settembre 2026
+
+La promessa pubblica ora mette insieme scadenze, andamento dei voti e attività di classe in uno spazio personale per orientarsi nel semestre. Non lega il prodotto a un paese o a una sola scala. La scala 1–6 appare soltanto nell’esempio d’interfaccia e viene dichiarata come quella attualmente supportata.
+
+L’anteprima usa dati sintetici dichiarati: una prossima verifica, un riepilogo con numero di voti e materie, un’attività personale e una condivisa. La privacy spiega chi vede ogni categoria e che l’ingresso delle attività condivise nell’agenda è una scelta. Offline è descritto per un diario già salvato sul dispositivo; le attività condivise richiedono rete.
+
+La gerarchia mantiene l’identità visiva esistente, con meno effetti decorativi e una spaziatura più leggibile. Il CTA primario apre la registrazione, quello secondario l’accesso. Il footer chiarisce che iPagell è un progetto indipendente e non un registro ufficiale. Non è stato pubblicato nulla.
+
+**Verificato nel working tree:** `npm run check` (lint, TypeScript, 49 test, controllo i18n e link documentali) e `npm run build` superati. Il runtime compilato è stato controllato a 320, 390, 820 e 1280 px; nessun overflow orizzontale dopo l’intervento sul header mobile. Metadata e JSON-LD riusano title/description/FAQ tradotti dai cataloghi. Controlli di sitemap, robots e markup SSR sono annotati in `research/SEO-FOLLOW-UP-2026-09-24.md`; l’aggiornamento SEO completo resta separato.
+
 ## Avvio implementazione — 18 settembre 2026
 
 Applicato un primo gruppo circoscritto: CTA di registrazione distinta dall'accesso, glossario principale, verbi specifici nelle conferme, stato del diario personale, copy e stati vuoti di statistiche/assenze, distinzione tra tipo e giustificazione dell'assenza, beneficio delle classi e rimozione del numero di revisione dall'interfaccia.
 
 UX04, UX06, UX07, UX08 e UX09 sono quindi solo **avviati**, non completati. Restano rinviati i lavori più ampi: conservazione del contesto, editor degli elementi personali, simulazione non persistente, riduzione strutturale dei moduli, riordino della Home e della navigazione, accesso al dettaglio delle attività già aggiunte e recupero dei conflitti.
+
+## Passaggio visivo — 23 settembre 2026
+
+**Obiettivo:** ridurre il linguaggio da dashboard generica, facendo emergere scadenze, materie, voti e semestre senza cambiare le funzioni del diario.
+
+La landing ora usa una preview piatta, benefici separati da linee e meno icone, ombre, gradienti ed etichette uppercase. Nell'app le superfici ordinarie hanno radius e ombre più contenuti; la Home mette l'attività utile prima del riepilogo voti, segnala gli arretrati e usa il colore della materia sul bordo della scadenza. I riepiloghi di Assenze e Statistiche sono più leggeri; la testata Classi non ripete il blocco scuro e lo stato vuoto spiega il beneficio della condivisione prima delle operazioni.
+
+Sono rimasti invariati scala dei voti, copy sugli stati senza dati, scelta esplicita delle attività di classe, distinzione dei dati privati, navigazione a sei voci, API, modello dati e sincronizzazione. Il passaggio successivo dovrebbe valutare la gerarchia definitiva della Home, il ruolo di Statistiche nella navigazione, un uso più esteso dei colori delle materie, la struttura di Agenda e Classi, la continuità del contesto e gli editor degli elementi personali. Nessun task UX esistente viene considerato completato da questo intervento visivo.
+
+**Verifica eseguita:** `npm run release:prepare` (lint, TypeScript, 13 test, documentazione e build) superato. Anteprima locale aperta in tema chiaro e scuro: Home, Assenze, stato senza voti di Statistiche e Classi su viewport mobile di 390 px; Home a 820 px e desktop; landing a 1280, 820 e 390 px. Nessun overflow orizzontale osservato alle tre larghezze. Dialog «Nuova attività» aperto a 390 px: campi leggibili e focus sul primo controllo; nessun dato salvato. Restano da verificare con dati sintetici non vuoti i grafici, i dialoghi complessi, testo ingrandito e dispositivi fisici. La barra mobile resta densa, con sei pulsanti da circa 60 px a 390 px.
+
+## Ciclo 2 — Gerarchia Home e navigazione — 23 settembre 2026
+
+La Home mette in primo piano la prossima attività futura; gli arretrati sono in un elenco separato e breve. Il riepilogo voti compare solo quando esistono voti e dichiara conteggio e materie coinvolte. Se non ci sono attività aperte né voti, un unico avvio propone di aggiungere un’attività o registrare un voto; senza materie apre la gestione materie. Non vengono ricreate nella Home la lista completa delle materie, i contatori a zero o i grafici.
+
+Statistiche resta una vista distinta, perché contiene confronti tra materie e andamento nel tempo, ma non occupa più un posto nella navigazione primaria. È raggiungibile da «Andamento e statistiche» in Voti e torna a Voti con un’azione esplicita. La navigazione primaria è Home, Agenda, Voti, Assenze e Classi sia su desktop sia su mobile; non è stato introdotto «Altro». L’accesso alle statistiche non dipende dalla quantità di voti e mantiene lo stato vuoto già presente.
+
+I collegamenti dalle attività della Home aprono il giorno corretto in Agenda e evidenziano l’attività selezionata. I collegamenti generici della Home e il riepilogo voti aprono rispettivamente Agenda e Voti. La materia selezionata in Voti sopravvive al passaggio a Statistiche e ritorno. Non esisteva un deep-link dedicato a Statistiche: il passaggio avviene con lo stato interno già usato dalle altre viste.
+
+**Verificato nell’anteprima locale:** diario demo con un’attività di classe scaduta e nessun voto; arretrato separato, selezione del giorno e attività evidenziata in Agenda; Voti → Statistiche → Voti; cinque destinazioni visibili nella barra a 390 px; Home in tema chiaro e scuro; lista arretrati leggibile a 390 px. Il diario demo non contiene un’attività futura né voti: non sono stati modificati dati scolastici per costruire scenari sintetici. Non è stato possibile provare 820 e 1280 px nell’anteprima autenticata durante questo ciclo. Restano quindi da verificare a queste larghezze, oltre agli stati sintetici con attività futura, soli voti e attività più voti, la vista Grafici con voti reali e dispositivi fisici.
+
+Il prossimo ciclo dovrebbe concentrarsi sulla struttura di Agenda e Classi, come richiesto, senza riaprire una rifinitura estetica generale.
+
+## Affidabilità — 23 settembre 2026
+
+Distinti il conflitto remoto e l'aggiornamento da un'altra scheda del dispositivo. Quest'ultimo blocca la scrittura obsoleta e propone «Aggiorna copia del dispositivo», conservando i valori del modulo. I problemi di storage non vengono più descritti automaticamente come offline; un refresh fallito mantiene consultabile il diario aperto. Una conferma remota persa viene riconosciuta quando tutti i dati coincidono. Il recupero dei conflitti reali resta esplicito, senza merge automatico. Evidenze e limiti in [Affidabilità](RELIABILITY.md); UX10 non è dichiarato completato.
+
+## Installazione dalla Home — 23 settembre 2026
+
+Invito discreto sotto i vantaggi della landing. Nell'app mobile compare una card nella Home solo dopo un primo voto, un'attività o un'assenza reali e 20 secondi di utilizzo; è chiudibile per 90 giorni. Nelle Preferenze la guida rimane accessibile. Sul desktop non si mostra la card nella Home. Nessun invito viene mostrato in modalità standalone o quando l'installazione è riconosciuta.
+
+La CTA «Installa» usa `beforeinstallprompt` soltanto se emesso dal browser. Safari su iPhone/iPad riceve una breve guida visiva Condividi → Aggiungi alla schermata Home; Chrome e Samsung Internet su Android ricevono istruzioni del loro browser quando il prompt non è disponibile; Edge e Firefox Android sono descritti come possibili collegamenti rapidi. Browser non riconosciuti non ricevono inviti. Il beneficio viene prima dei passaggi tecnici e l'offline è limitato al diario personale già salvato su quel dispositivo.
+
+**Verificato nel codice:** matrice di piattaforme, standalone, attesa, dismissal, manifest e dimensioni icone con `tests/install-app.test.ts`. La compatibilità dei menu, il ciclo reale di `beforeinstallprompt`/`appinstalled`, l'installazione, lo storage iOS separato e l'apertura offline vanno ancora provati su dispositivi fisici.
 
 ## Principi documentati da conservare
 
@@ -211,7 +255,7 @@ Ridurre descrizioni tecniche ripetute nei moduli: lo stato di salvataggio ha una
 
 Mantenere sidebar, palette, card, icone con etichette e distinzione personale/classe. Sul mobile la densità verticale viene prima di un nuovo menu: compattare selettore materie, intestazioni e toolbar. Sei voci inferiori sono affollate, ma spostare subito Assenze o Statistiche sotto «Altro» ne ridurrebbe la reperibilità: prima verificare dimensioni, testi ingranditi e uso effettivo.
 
-Le sezioni cambiano tramite stato interno: la cronologia del browser non registra ogni navigazione. Valutare continuità di Indietro e ricaricamento insieme alla conservazione del contesto, senza introdurre un secondo schema di navigazione.
+Le sezioni cambiano tramite stato interno: la cronologia del browser non registra ogni navigazione. Valutare continuità di Indietro e ricaricamento insieme alla conservazione del contesto, senza introdurre un secondo schema di navigazione. Dopo il ciclo 2 la navigazione primaria contiene cinque voci; Statistiche è un approfondimento raggiungibile da Voti.
 
 La guida utente descrive ancora eventi condivisi come futuri; `CLASSI.md` e il prodotto li indicano già implementati. Aggiornare la guida e il piano prodotto con lo stato reale. Non usare tale disallineamento come motivo per rimuovere capacità già presenti.
 
