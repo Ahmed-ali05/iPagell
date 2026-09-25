@@ -599,6 +599,8 @@ Refresh:
 - evento `online`;
 - `visibilitychange`.
 
+Le mutazioni hanno una guardia pending sincrona per sottoscrizione o evento. `ClassAgendaCoordinator` applica dalla risposta soltanto l'entità modificata e, concluse le scritture in volo, legge uno snapshot finale prima di rilasciare i pending. Una lettura precedente non può sovrascrivere lo stato riconciliato o la cache.
+
 ### 9.3 Modalità offline
 
 Se la rete fallisce, gli elementi cache restano consultabili e lo stato segnala che l'agenda non è aggiornata.

@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import { apiErrorKey } from "@/lib/i18n/errors";
 import { RequestError } from "@/lib/client-http";
@@ -35,6 +35,7 @@ export function AccountGate({
   const [mode, setMode] = useState<"login" | "register" | "recover">(initialMode);
   const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
   const [recovery, setRecovery] = useState<{
     code: string;
     username: string;
@@ -44,7 +45,7 @@ export function AccountGate({
   const year = new Date().getFullYear() - (new Date().getMonth() < 7 ? 1 : 0);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
+    if (busyRef.current) return;
     setError(null);
     const fields = Object.fromEntries(new FormData(event.currentTarget));
     const parsed = (
@@ -60,6 +61,7 @@ export function AccountGate({
       setError(user ? "auth.invalidDiary" : mode === "recover" ? "auth.invalidRecovery" : mode === "register" ? "auth.invalidSignup" : "auth.invalidCredentials");
       return;
     }
+    busyRef.current = true;
     setBusy(true);
     try {
       if (user) {
@@ -90,6 +92,7 @@ export function AccountGate({
     } catch (e) {
       setError(e instanceof RequestError ? apiErrorKey(e.code, "error.generic") : e instanceof TypeError ? "auth.network" : "error.generic");
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   }

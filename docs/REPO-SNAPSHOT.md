@@ -286,6 +286,7 @@ Gestisce l'agenda derivata dalle sottoscrizioni di classe:
 - refresh su `online` e `visibilitychange`;
 - su errore mantiene l'ultima copia cache, salvo sessione invalidata/non trovata;
 - mutazioni solo online, tramite API;
+- pending per sottoscrizione/evento e lettura finale ordinata dopo scritture concorrenti, tramite `lib/classes/agenda-coordinator.ts`;
 - nessuna outbox offline per le scritture condivise.
 
 ### Moduli dominio
