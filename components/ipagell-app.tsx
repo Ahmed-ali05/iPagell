@@ -72,6 +72,8 @@ import { EntryDialog, type ModalType } from "@/components/entry-dialog";
 import { ClassesView } from "@/components/classes-view";
 import { PersonalEventDialog } from "@/components/class-events-panel";
 import { useClassAgenda } from "@/hooks/use-class-agenda";
+import { usePendingActions } from "@/hooks/use-pending-actions";
+import { Spinner } from "@/components/ui/spinner";
 import { subscriptionAgenda, type AgendaDisplayItem, type ClassSubscription } from "@/lib/classes/events";
 import { backupWithClassAgenda } from "@/lib/classes/backup";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -190,6 +192,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const { t, locale } = useI18n();
   const { data, preferences } = session.diary!;
   const classAgenda = useClassAgenda(session.user!.id);
+  const classActions = usePendingActions();
   const allAgenda = useMemo(() => [...data.agenda, ...subscriptionAgenda(classAgenda.items.filter(s => !data.agenda.some(a => a.id === `class-snapshot-${s.id}`)))], [data.agenda, classAgenda.items]);
   const [personalEvent, setPersonalEvent] = useState<ClassSubscription | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
@@ -208,7 +211,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     title: string;
     description: string;
     actionLabel: string;
-    run: () => Promise<void>;
+    run: () => Promise<void | boolean>;
+    subscriptionId?: string;
   } | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
 
@@ -674,6 +678,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                     ? t("agenda.removeSharedWarning")
                     : t("agenda.deleteWarning"),
                   actionLabel: shared ? t("agenda.removeShared") : t("agenda.deleteActivity"),
+                  subscriptionId: shared?.id,
                   run: () =>
                     shared ? classAgenda.remove(shared) : updateData((current) => ({
                       ...current,
@@ -682,6 +687,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                 });
               }}
               onNotifications={requestNotifications}
+              pendingShared={classAgenda.pendingSubscription}
+              blockedShared={classAgenda.blockedSubscription}
             />
           )}
           {activeTab === "grades" && (
@@ -751,6 +758,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               data={data}
               semesterId={currentSemester.id}
               agenda={classAgenda}
+              actions={classActions}
             />
           )}
         </div>
@@ -892,7 +900,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       </AlertDialog>
       <AlertDialog
         open={!!removal}
-        onOpenChange={(open) => !open && setRemoval(null)}
+        onOpenChange={(open) => !open && !classActions.has("removal") && setRemoval(null)}
       >
         <AlertDialogContent className="confirm-dialog">
           <AlertDialogHeader>
@@ -902,16 +910,19 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+            <AlertDialogCancel disabled={classActions.has("removal")}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() =>
-                void removal
-                  ?.run()
-                  .then(() => setRemoval(null))
-                  .catch(reportError)
-              }
+              disabled={classActions.has("removal") || !!(removal?.subscriptionId && (classAgenda.pendingSubscription(removal.subscriptionId) || classAgenda.blockedSubscription(removal.subscriptionId)))}
+              aria-busy={classActions.has("removal")}
+              onClick={(event) => {
+                event.preventDefault();
+                if (!removal) return;
+                void classActions.run("removal", removal.run).then((result) => {
+                  if (result.started && result.value !== false) setRemoval(null);
+                }).catch(reportError);
+              }}
             >
-              {removal?.actionLabel}
+              {classActions.has("removal") ? t("common.saving") : removal?.actionLabel}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1072,6 +1083,8 @@ function AgendaView({
   onNotifications,
   onClasses,
   onPersonal,
+  pendingShared,
+  blockedShared,
 }: {
   items: AgendaDisplayItem[];
   focusItemId?: string | null;
@@ -1082,6 +1095,8 @@ function AgendaView({
   onNotifications: () => void;
   onClasses: () => void;
   onPersonal: (item: ClassSubscription) => void;
+  pendingShared: (id: string) => boolean;
+  blockedShared: (id: string) => boolean;
 }) {
   const { locale, t } = useI18n();
   const [scope, setScope] = useState("all");
@@ -1256,6 +1271,8 @@ function AgendaView({
                 onToggle={onToggle}
                 onDelete={onDelete}
                 onPersonal={onPersonal}
+                pendingShared={pendingShared}
+                blockedShared={blockedShared}
                 focusItemId={focusItemId}
                 compact
               />
@@ -1269,6 +1286,8 @@ function AgendaView({
             onToggle={onToggle}
             onDelete={onDelete}
             onPersonal={onPersonal}
+            pendingShared={pendingShared}
+            blockedShared={blockedShared}
             focusItemId={focusItemId}
           />
         </TabsContent>
@@ -1283,6 +1302,8 @@ function AgendaList({
   onToggle,
   onDelete,
   onPersonal,
+  pendingShared,
+  blockedShared,
   focusItemId,
   compact = false,
 }: {
@@ -1291,6 +1312,8 @@ function AgendaList({
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onPersonal: (item: ClassSubscription) => void;
+  pendingShared: (id: string) => boolean;
+  blockedShared: (id: string) => boolean;
   focusItemId?: string | null;
   compact?: boolean;
 }) {
@@ -1315,14 +1338,18 @@ function AgendaList({
             >
               <button
                 className="round-check"
+                disabled={!!item.shared && (pendingShared(item.shared.id) || blockedShared(item.shared.id))}
+                aria-busy={!!item.shared && pendingShared(item.shared.id)}
                 aria-label={
-                  item.completed
+                  item.shared && pendingShared(item.shared.id)
+                    ? t("common.saving")
+                    : item.completed
                     ? t("agenda.markTodo")
                     : t("agenda.markDone")
                 }
                 onClick={() => onToggle(item.id)}
               >
-                {item.completed && <Check size={15} />}
+                {item.shared && pendingShared(item.shared.id) ? <Spinner aria-label={t("common.saving")} /> : item.completed && <Check size={15} />}
               </button>
               <div className="date-block">
                 <b>{new Date(item.dueAt).getDate()}</b>
@@ -1349,6 +1376,7 @@ function AgendaList({
               </div>
               <button
                 className="icon-button subtle"
+                disabled={!!item.shared && (pendingShared(item.shared.id) || blockedShared(item.shared.id))}
                 aria-label={t("common.delete")}
                 onClick={() => onDelete(item.id)}
               >

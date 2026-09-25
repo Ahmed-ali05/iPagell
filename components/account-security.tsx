@@ -1,5 +1,5 @@
 "use client";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useI18n } from "@/components/i18n-provider";
 import { apiErrorKey } from "@/lib/i18n/errors";
 import type { MessageKey } from "@/lib/i18n";
@@ -18,10 +18,12 @@ export function AccountSecurity({
   const [mode, setMode] = useState<"password" | "delete">("password"),
     [busy, setBusy] = useState(false),
     [error, setError] = useState<MessageKey | null>(null);
+  const busyRef = useRef(false);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy || disabled) return;
+    if (busyRef.current || disabled) return;
     setError(null);
+    busyRef.current = true;
     setBusy(true);
     try {
       const fields = Object.fromEntries(new FormData(event.currentTarget));
@@ -45,6 +47,7 @@ export function AccountSecurity({
     } catch {
       setError("error.connectionUnavailable");
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   }

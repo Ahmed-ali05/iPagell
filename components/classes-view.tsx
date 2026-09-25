@@ -17,6 +17,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import { ClassEventsPanel } from "@/components/class-events-panel";
 import type { SchoolData } from "@/types/domain";
 import type { ClassAgendaController } from "@/hooks/use-class-agenda";
+import type { PendingActionController } from "@/hooks/use-pending-actions";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -49,12 +50,18 @@ import type {
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import { formatDate, selectPlural } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n";
+import { refreshAfterConfirmedMutation } from "@/lib/classes/confirmed-refresh";
 
 type ConfirmAction = {
+  key: string;
+  classId?: string;
+  exclusive?: boolean;
   title: string;
   description: string;
   label: string;
   run: () => Promise<void>;
+  after?: () => Promise<void>;
+  successMessage?: MessageKey;
 };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -79,22 +86,26 @@ export function ClassesView({
   data,
   semesterId,
   agenda,
+  actions,
 }: {
   currentUserId: string;
   defaultDisplayName: string;
   data: SchoolData;
   semesterId: string;
   agenda: ClassAgendaController;
+  actions: PendingActionController;
 }) {
   const { t, locale } = useI18n();
   const dateLabel = (value: number) => formatDate(locale, new Date(value), { day: "numeric", month: "short", year: "numeric" });
   const detailSequence = useRef(0);
+  const classesSequence = useRef(0);
+  const selectedIdRef = useRef<string | null>(null);
+  const alive = useRef(true);
   const [classes, setClasses] = useState<ClassSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ClassDetail | null>(null);
   const [invites, setInvites] = useState<ClassInvite[]>([]);
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<MessageKey | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
@@ -109,18 +120,27 @@ export function ClassesView({
 
   const canManageInvites =
     detail?.role === "owner" || detail?.role === "moderator";
+  const classKey = (classId: string, action: string) => `class:${classId}:${action}`;
+  const classConflicts = (classId: string, exclusive = false) =>
+    (active: string) => exclusive ? active.startsWith(`class:${classId}:`) : active === classKey(classId, "exclusive");
+  const createBusy = actions.has("class:create");
+  const joinBusy = actions.has("class:join");
+  const inviteBusy = !!detail && actions.has(classKey(detail.id, "invite:create"));
+  const editBusy = !!detail && actions.has(classKey(detail.id, "edit"));
+  const nameBusy = !!detail && actions.has(classKey(detail.id, `member:${currentUserId}`));
+  const confirmBusy = !!confirm && actions.has(confirm.key);
 
   const loadDetail = useCallback(async (id: string) => {
     const ticket = ++detailSequence.current;
     const result = await request<{ class: ClassDetail }>(`/api/classes/${id}`);
-    if (ticket !== detailSequence.current) return;
+    if (!alive.current || ticket !== detailSequence.current || selectedIdRef.current !== id) return;
     setDetail(result.class);
     setInvites([]);
     if (result.class.role === "owner" || result.class.role === "moderator") {
       const inviteResult = await request<{ invites: ClassInvite[] }>(
         `/api/classes/${id}/invites`,
       );
-      if (ticket !== detailSequence.current) return;
+      if (!alive.current || ticket !== detailSequence.current || selectedIdRef.current !== id) return;
       setCheckedAt(Date.now());
       setInvites(inviteResult.invites);
     } else setInvites([]);
@@ -128,13 +148,16 @@ export function ClassesView({
 
   const loadClasses = useCallback(
     async (preferredId?: string) => {
-      setError(null);
+      const ticket = ++classesSequence.current;
       const result = await request<{ classes: ClassSummary[] }>("/api/classes");
+      if (!alive.current || ticket !== classesSequence.current) return;
+      setError(null);
       setClasses(result.classes);
       const nextId =
-        preferredId && result.classes.some((item) => item.id === preferredId)
-          ? preferredId
+        (preferredId ?? selectedIdRef.current) && result.classes.some((item) => item.id === (preferredId ?? selectedIdRef.current))
+          ? (preferredId ?? selectedIdRef.current)
           : (result.classes[0]?.id ?? null);
+      selectedIdRef.current = nextId;
       setSelectedId(nextId);
       if (nextId) await loadDetail(nextId);
       else {
@@ -146,6 +169,7 @@ export function ClassesView({
   );
 
   useEffect(() => {
+    alive.current = true;
     const hash = new URLSearchParams(window.location.hash.slice(1));
     const code = hash.get("join");
     if (code) {
@@ -161,10 +185,20 @@ export function ClassesView({
         .catch(() => setError("classes.unavailable"))
         .finally(() => setLoading(false));
     });
+    return () => { alive.current = false; };
   }, [loadClasses]);
+
+  async function refreshAfterWrite(preferredId?: string) {
+    if (!alive.current) return;
+    await refreshAfterConfirmedMutation(
+      () => loadClasses(preferredId),
+      () => { if (alive.current) { setError("classes.unavailable"); toast.error(t("classes.unavailable")); } },
+    );
+  }
 
   async function selectClass(id: string) {
     if (id === selectedId) return;
+    selectedIdRef.current = id;
     setSelectedId(id);
     setDetail(null);
     setError(null);
@@ -177,50 +211,47 @@ export function ClassesView({
 
   async function submitCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setBusy(true);
     try {
       const fields = Object.fromEntries(new FormData(event.currentTarget));
-      const result = await request<{ class: ClassDetail }>("/api/classes", {
-        method: "POST",
-        body: JSON.stringify(fields),
+      const previousSelection = selectedIdRef.current;
+      await actions.run("class:create", async () => {
+        const result = await request<{ class: ClassDetail }>("/api/classes", {
+          method: "POST", body: JSON.stringify(fields),
+        });
+        if (alive.current) setCreateOpen(false);
+        toast.success(t("classes.created"));
+        await refreshAfterWrite(selectedIdRef.current === previousSelection ? result.class.id : undefined);
       });
-      setCreateOpen(false);
-      await loadClasses(result.class.id);
-      toast.success(t("classes.created"));
     } catch {
       toast.error(t("classes.notCreated"));
-    } finally {
-      setBusy(false);
     }
   }
 
   async function submitJoin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setBusy(true);
     try {
       const fields = Object.fromEntries(new FormData(event.currentTarget));
-      const result = await request<{ class: ClassDetail }>("/api/classes/join", {
-        method: "POST",
-        body: JSON.stringify(fields),
+      const previousSelection = selectedIdRef.current;
+      await actions.run("class:join", async () => {
+        const result = await request<{ class: ClassDetail }>("/api/classes/join", {
+          method: "POST", body: JSON.stringify(fields),
+        });
+        if (alive.current) { setJoinOpen(false); setJoinCode(""); }
+        toast.success(t("classes.joined", { name: result.class.name }));
+        await refreshAfterWrite(selectedIdRef.current === previousSelection ? result.class.id : undefined);
       });
-      setJoinOpen(false);
-      setJoinCode("");
-      await loadClasses(result.class.id);
-      toast.success(t("classes.joined", { name: result.class.name }));
     } catch {
       toast.error(t("classes.notJoined"));
-    } finally {
-      setBusy(false);
     }
   }
 
   async function submitInvite(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!detail) return;
-    setBusy(true);
     try {
       const fields = new FormData(event.currentTarget);
-      const result = await request<{ invite: CreatedClassInvite }>(
+      const classId = detail.id;
+      const result = await actions.run(classKey(classId, "invite:create"), () => request<{ invite: CreatedClassInvite }>(
         `/api/classes/${detail.id}/invites`,
         {
           method: "POST",
@@ -229,80 +260,66 @@ export function ClassesView({
             maxUses: Number(fields.get("maxUses")),
           }),
         },
-      );
-      setCreatedInvite(result.invite);
-      setInvites((current) => [result.invite, ...current]);
+      ), classConflicts(classId));
+      if (!result.started) return;
+      if (alive.current && selectedIdRef.current === classId) {
+        setCreatedInvite(result.value.invite);
+        setInvites((current) => [result.value.invite, ...current]);
+      }
     } catch {
       toast.error(t("classes.inviteNotCreated"));
-    } finally {
-      setBusy(false);
     }
   }
 
   async function submitEdit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!detail) return;
-    setBusy(true);
     try {
       const fields = Object.fromEntries(new FormData(event.currentTarget));
-      const result = await request<{ class: ClassDetail }>(
-        `/api/classes/${detail.id}`,
-        { method: "PATCH", body: JSON.stringify(fields) },
-      );
-      setDetail(result.class);
-      setEditOpen(false);
-      await loadClasses(detail.id);
-      toast.success(t("classes.updated"));
+      const classId = detail.id;
+      await actions.run(classKey(classId, "edit"), async () => {
+        await request(`/api/classes/${classId}`, { method: "PATCH", body: JSON.stringify(fields) });
+        if (alive.current) setEditOpen(false);
+        toast.success(t("classes.updated"));
+        await refreshAfterWrite();
+      }, classConflicts(classId));
     } catch {
       toast.error(t("classes.operationFailed"));
-    } finally {
-      setBusy(false);
     }
   }
 
   async function submitDisplayName(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!detail) return;
-    setBusy(true);
     try {
       const displayName = String(new FormData(event.currentTarget).get("displayName"));
-      const result = await request<{ class: ClassDetail }>(
-        `/api/classes/${detail.id}/members/${currentUserId}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify({ operation: "display-name", displayName }),
-        },
-      );
-      setDetail(result.class);
-      setNameOpen(false);
-      await loadClasses(detail.id);
-      toast.success(t("classes.nameUpdated"));
+      const classId = detail.id;
+      await actions.run(classKey(classId, `member:${currentUserId}`), async () => {
+        await request(`/api/classes/${classId}/members/${currentUserId}`, {
+          method: "PATCH", body: JSON.stringify({ operation: "display-name", displayName }),
+        });
+        if (alive.current) setNameOpen(false);
+        toast.success(t("classes.nameUpdated"));
+        await refreshAfterWrite();
+      }, classConflicts(classId));
     } catch {
       toast.error(t("classes.operationFailed"));
-    } finally {
-      setBusy(false);
     }
   }
 
   async function updateMember(
     userId: string,
-    input: { operation: "role"; role: "moderator" | "member" } | { operation: "transfer" },
+    input: { operation: "role"; role: "moderator" | "member" },
   ) {
-    if (!detail) return;
-    setBusy(true);
-    try {
-      const result = await request<{ class: ClassDetail }>(
-        `/api/classes/${detail.id}/members/${userId}`,
-        { method: "PATCH", body: JSON.stringify(input) },
-      );
-      setDetail(result.class);
-      await loadClasses(detail.id);
-      toast.success(input.operation === "transfer" ? t("classes.transferDone") : t("classes.roleUpdated"));
-    } catch {
-      toast.error(t("classes.operationFailed"));
-    } finally {
-      setBusy(false);
-    }
+    if (!detail) return false;
+    const classId = detail.id;
+    const result = await actions.run(classKey(classId, `member:${userId}`), async () => {
+      await request(`/api/classes/${classId}/members/${userId}`, { method: "PATCH", body: JSON.stringify(input) });
+      toast.success(t("classes.roleUpdated"));
+      await refreshAfterWrite();
+    }, classConflicts(classId));
+    if (!result.started) return false;
+    return true;
   }
 
   const activeInvites = useMemo(
@@ -427,7 +444,7 @@ export function ClassesView({
                   </div>
                 </section>
 
-                <ClassEventsPanel key={detail.id} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} />
+                <ClassEventsPanel key={detail.id} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} actions={actions} />
 
                 <details className="class-administration">
                   <summary>{t("classes.management")} <span>{detail.memberCount} {t(selectPlural(locale, detail.memberCount, "classes.member", "classes.members"))}</span></summary>
@@ -463,7 +480,8 @@ export function ClassesView({
                               <>
                                 <button
                                   className="soft-button compact"
-                                  disabled={busy}
+                                  disabled={actions.has(classKey(detail.id, `member:${member.userId}`)) || actions.has(classKey(detail.id, "exclusive"))}
+                                  aria-busy={actions.has(classKey(detail.id, `member:${member.userId}`))}
                                   onClick={() =>
                                     void updateMember(member.userId, {
                                       operation: "role",
@@ -471,7 +489,7 @@ export function ClassesView({
                                         member.role === "moderator"
                                           ? "member"
                                           : "moderator",
-                                    })
+                                    }).catch(() => toast.error(t("classes.operationFailed")))
                                   }
                                 >
                                   <ShieldCheck />
@@ -479,14 +497,19 @@ export function ClassesView({
                                 </button>
                                 <button
                                   className="soft-button compact"
-                                  disabled={busy}
+                                  disabled={actions.has(classKey(detail.id, `member:${member.userId}`)) || actions.has(classKey(detail.id, "exclusive"))}
                                   onClick={() =>
                                     setConfirm({
+                                      key: classKey(detail.id, "exclusive"),
+                                      classId: detail.id,
+                                      exclusive: true,
                                       title: t("classes.transferConfirm", { name: member.displayName }),
                                       description:
                                         t("classes.transferWarning"),
                                       label: t("classes.transfer"),
-                                      run: () => updateMember(member.userId, { operation: "transfer" }),
+                                      run: async () => { await request(`/api/classes/${detail.id}/members/${member.userId}`, { method: "PATCH", body: JSON.stringify({ operation: "transfer" }) }); },
+                                      after: () => refreshAfterWrite(),
+                                      successMessage: "classes.transferDone",
                                     })
                                   }
                                 >
@@ -497,9 +520,12 @@ export function ClassesView({
                             {canRemove && (
                               <button
                                 className="icon-button danger"
+                                disabled={actions.has(classKey(detail.id, `member:${member.userId}`)) || actions.has(classKey(detail.id, "exclusive"))}
                                 aria-label={t("classes.removeMember", { name: member.displayName })}
                                 onClick={() =>
                                   setConfirm({
+                                    key: classKey(detail.id, `member:${member.userId}`),
+                                    classId: detail.id,
                                     title: t("classes.removeMemberConfirm", { name: member.displayName }),
                                     description: t("classes.removeAccess"),
                                     label: t("classes.remove"),
@@ -508,8 +534,8 @@ export function ClassesView({
                                         `/api/classes/${detail.id}/members/${member.userId}`,
                                         { method: "DELETE", body: "{}" },
                                       );
-                                      await loadClasses(detail.id);
                                     },
+                                    after: () => refreshAfterWrite(),
                                   })
                                 }
                               >
@@ -553,8 +579,12 @@ export function ClassesView({
                             </div>
                             <button
                               className="soft-button compact"
+                              disabled={actions.has(classKey(detail.id, `invite:${invite.id}`)) || actions.has(classKey(detail.id, "exclusive"))}
+                              aria-busy={actions.has(classKey(detail.id, `invite:${invite.id}`))}
                               onClick={() =>
                                 setConfirm({
+                                  key: classKey(detail.id, `invite:${invite.id}`),
+                                  classId: detail.id,
                                   title: t("classes.revokeConfirm"),
                                   description: t("classes.revokeWarning"),
                                   label: t("classes.revoke"),
@@ -563,8 +593,8 @@ export function ClassesView({
                                       `/api/classes/${detail.id}/invites/${invite.id}`,
                                       { method: "DELETE", body: "{}" },
                                     );
-                                    await loadDetail(detail.id);
                                   },
+                                  after: async () => { try { await loadDetail(detail.id); } catch { if(alive.current){setError("classes.unavailable");toast.error(t("classes.unavailable"));} } },
                                 })
                               }
                             >
@@ -583,8 +613,12 @@ export function ClassesView({
                   {detail.role === "owner" ? (
                     <button
                       className="soft-button danger-text"
+                      disabled={actions.has(classKey(detail.id, "exclusive"))}
                       onClick={() =>
                         setConfirm({
+                          key: classKey(detail.id, "exclusive"),
+                          classId: detail.id,
+                          exclusive: true,
                           title: t("classes.deleteClassConfirm", { name: detail.name }),
                           description: t("classes.deleteClassWarning"),
                           label: t("classes.deleteClass"),
@@ -593,9 +627,8 @@ export function ClassesView({
                               method: "DELETE",
                               body: "{}",
                             });
-                            await loadClasses();
-                            await agenda.refresh();
                           },
+                          after: async () => { await refreshAfterWrite(); await agenda.refresh(); },
                         })
                       }
                     >
@@ -604,8 +637,12 @@ export function ClassesView({
                   ) : (
                     <button
                       className="soft-button danger-text"
+                      disabled={actions.has(classKey(detail.id, "exclusive"))}
                       onClick={() =>
                         setConfirm({
+                          key: classKey(detail.id, "exclusive"),
+                          classId: detail.id,
+                          exclusive: true,
                           title: t("classes.leaveConfirm", { name: detail.name }),
                           description: t("classes.leaveWarning"),
                           label: t("classes.leaveClass"),
@@ -614,9 +651,8 @@ export function ClassesView({
                               `/api/classes/${detail.id}/members/${currentUserId}`,
                               { method: "DELETE", body: "{}" },
                             );
-                            await loadClasses();
-                            await agenda.refresh();
                           },
+                          after: async () => { await refreshAfterWrite(); await agenda.refresh(); },
                         })
                       }
                     >
@@ -632,7 +668,7 @@ export function ClassesView({
         </div>
       )}
 
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <Dialog open={createOpen} onOpenChange={open => { if (!createBusy) setCreateOpen(open); }}>
         <DialogContent className="entry-dialog">
           <DialogHeader>
             <DialogTitle>{t("classes.create")}</DialogTitle>
@@ -642,7 +678,7 @@ export function ClassesView({
             <LanguageSelect className="language-select" />
           </DialogHeader>
           <form onSubmit={submitCreate}>
-            <fieldset className="form-grid" disabled={busy}>
+            <fieldset className="form-grid" disabled={createBusy}>
               <label className="full">
                 {t("classes.className")}
                 <input name="name" required minLength={2} maxLength={80} />
@@ -662,15 +698,15 @@ export function ClassesView({
               </label>
             </fieldset>
             <DialogFooter>
-              <button className="primary-button" disabled={busy}>
-                {busy ? t("classes.creating") : t("classes.create")}
+              <button className="primary-button" disabled={createBusy} aria-busy={createBusy}>
+                {createBusy ? t("classes.creating") : t("classes.create")}
               </button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={joinOpen} onOpenChange={setJoinOpen}>
+      <Dialog open={joinOpen} onOpenChange={open => { if (!joinBusy) setJoinOpen(open); }}>
         <DialogContent className="entry-dialog">
           <DialogHeader>
             <DialogTitle>{t("classes.joinTitle")}</DialogTitle>
@@ -680,7 +716,7 @@ export function ClassesView({
             <LanguageSelect className="language-select" />
           </DialogHeader>
           <form onSubmit={submitJoin}>
-            <fieldset className="form-grid" disabled={busy}>
+            <fieldset className="form-grid" disabled={joinBusy}>
               <label className="full">
                 {t("classes.inviteCode")}
                 <input
@@ -705,8 +741,8 @@ export function ClassesView({
               </label>
             </fieldset>
             <DialogFooter>
-              <button className="primary-button" disabled={busy}>
-                {busy ? t("classes.joining") : t("classes.join")}
+              <button className="primary-button" disabled={joinBusy} aria-busy={joinBusy}>
+                {joinBusy ? t("classes.joining") : t("classes.join")}
               </button>
             </DialogFooter>
           </form>
@@ -716,6 +752,7 @@ export function ClassesView({
       <Dialog
         open={inviteOpen}
         onOpenChange={(open) => {
+          if (inviteBusy) return;
           setInviteOpen(open);
           if (!open) setCreatedInvite(null);
         }}
@@ -748,7 +785,7 @@ export function ClassesView({
             </div>
           ) : (
             <form onSubmit={submitInvite}>
-              <fieldset className="form-grid" disabled={busy}>
+              <fieldset className="form-grid" disabled={inviteBusy}>
                 <label>
                   {t("classes.expiration")}
                   <NativeSelect name="expiresInDays" defaultValue="7">
@@ -764,8 +801,8 @@ export function ClassesView({
                 </label>
               </fieldset>
               <DialogFooter>
-                <button className="primary-button" disabled={busy}>
-                  {busy ? t("classes.creating") : t("classes.generateInvite")}
+                <button className="primary-button" disabled={inviteBusy} aria-busy={inviteBusy}>
+                  {inviteBusy ? t("classes.creating") : t("classes.generateInvite")}
                 </button>
               </DialogFooter>
             </form>
@@ -773,14 +810,14 @@ export function ClassesView({
         </DialogContent>
       </Dialog>
 
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+      <Dialog open={editOpen} onOpenChange={open => { if (!editBusy) setEditOpen(open); }}>
         <DialogContent className="entry-dialog">
           <DialogHeader>
             <DialogTitle>{t("classes.editTitle")}</DialogTitle>
             <LanguageSelect className="language-select" />
           </DialogHeader>
           <form onSubmit={submitEdit} key={detail?.id}>
-            <fieldset className="form-grid" disabled={busy}>
+            <fieldset className="form-grid" disabled={editBusy}>
               <label className="full">
                 {t("classes.name")}
                 <input name="name" required maxLength={80} defaultValue={detail?.name} />
@@ -791,13 +828,13 @@ export function ClassesView({
               </label>
             </fieldset>
             <DialogFooter>
-              <button className="primary-button" disabled={busy}>{t("classes.saveChanges")}</button>
+              <button className="primary-button" disabled={editBusy} aria-busy={editBusy}>{editBusy?t("common.saving"):t("classes.saveChanges")}</button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={nameOpen} onOpenChange={setNameOpen}>
+      <Dialog open={nameOpen} onOpenChange={open => { if (!nameBusy) setNameOpen(open); }}>
         <DialogContent className="entry-dialog">
           <DialogHeader>
             <DialogTitle>{t("classes.displayName")}</DialogTitle>
@@ -807,47 +844,45 @@ export function ClassesView({
             <LanguageSelect className="language-select" />
           </DialogHeader>
           <form onSubmit={submitDisplayName} key={detail?.displayName}>
-            <fieldset className="form-grid" disabled={busy}>
+            <fieldset className="form-grid" disabled={nameBusy}>
               <label className="full">
                 {t("classes.visibleName")}
                 <input name="displayName" required maxLength={80} defaultValue={detail?.displayName} />
               </label>
             </fieldset>
             <DialogFooter>
-              <button className="primary-button" disabled={busy}>{t("classes.saveName")}</button>
+              <button className="primary-button" disabled={nameBusy} aria-busy={nameBusy}>{nameBusy?t("common.saving"):t("classes.saveName")}</button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!confirm} onOpenChange={(open) => !open && setConfirm(null)}>
+      <AlertDialog open={!!confirm} onOpenChange={(open) => !open && !confirmBusy && setConfirm(null)}>
         <AlertDialogContent className="confirm-dialog">
           <AlertDialogHeader>
             <AlertDialogTitle>{confirm?.title}</AlertDialogTitle>
             <AlertDialogDescription>{confirm?.description}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("classes.cancel")}</AlertDialogCancel>
+            <AlertDialogCancel disabled={confirmBusy}>{t("classes.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               className="danger-action"
-              disabled={busy}
+              disabled={confirmBusy}
+              aria-busy={confirmBusy}
               onClick={(event) => {
                 event.preventDefault();
                 if (!confirm) return;
-                setBusy(true);
-                void confirm
-                  .run()
-                  .then(() => {
-                    setConfirm(null);
-                    toast.success(t("classes.done"));
-                  })
-                  .catch(() =>
-                    toast.error(t("classes.operationFailed")),
-                  )
-                  .finally(() => setBusy(false));
+                const action = confirm;
+                void actions.run(action.key, async () => {
+                  await action.run();
+                  if (alive.current) setConfirm(null);
+                  toast.success(t(action.successMessage ?? "classes.done"));
+                  await action.after?.();
+                }, action.classId ? classConflicts(action.classId, action.exclusive) : undefined)
+                  .catch(() => toast.error(t("classes.operationFailed")));
               }}
             >
-              {confirm?.label}
+              {confirmBusy ? t("common.saving") : confirm?.label}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

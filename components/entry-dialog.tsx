@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import { Plus, Trash2 } from "lucide-react";
 import {
@@ -85,6 +85,7 @@ function EntryForm({
     ],
   );
   const [busy, setBusy] = useState(false);
+  const busyRef = useRef(false);
   const [error, setError] = useState<MessageKey | null>(null);
   const subject = data.subjects.find((s) => s.id === selected);
   const usedType = (id: string) =>
@@ -96,13 +97,14 @@ function EntryForm({
     );
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (busy) return;
+    if (busyRef.current) return;
+    busyRef.current = true;
     setBusy(true);
     setError(null);
-    const f = new FormData(event.currentTarget);
-    const str = (name: string) => String(f.get(name) ?? "").trim();
-    const num = (name: string) => Number(f.get(name));
     try {
+      const f = new FormData(event.currentTarget);
+      const str = (name: string) => String(f.get(name) ?? "").trim();
+      const num = (name: string) => Number(f.get(name));
       if (type === "grade") {
         let value: number;
         try { value = parseGrade(str("value")); }
@@ -207,6 +209,7 @@ function EntryForm({
     } catch {
       setError("entry.saveFailed");
     } finally {
+      busyRef.current = false;
       setBusy(false);
     }
   }
