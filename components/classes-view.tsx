@@ -47,6 +47,8 @@ import type {
   ClassSummary,
   CreatedClassInvite,
 } from "@/types/classes";
+import type { ClassEvent } from "@/lib/classes/events";
+import { classRequest } from "@/lib/classes/client";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import { formatDate, selectPlural } from "@/lib/i18n";
 import type { MessageKey } from "@/lib/i18n";
@@ -64,23 +66,8 @@ type ConfirmAction = {
   successMessage?: MessageKey;
 };
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
-    credentials: "same-origin",
-    cache: "no-store",
-    ...init,
-    headers: {
-      ...(init?.body ? { "Content-Type": "application/json" } : {}),
-      ...init?.headers,
-    },
-  });
-  const data = (await response.json()) as T & { error?: string };
-  if (!response.ok)
-    throw new Error(data.error ?? "CLASS_REQUEST_FAILED");
-  return data;
-}
-
 export function ClassesView({
+  active,
   currentUserId,
   defaultDisplayName,
   data,
@@ -88,6 +75,7 @@ export function ClassesView({
   agenda,
   actions,
 }: {
+  active: boolean;
   currentUserId: string;
   defaultDisplayName: string;
   data: SchoolData;
@@ -96,15 +84,23 @@ export function ClassesView({
   actions: PendingActionController;
 }) {
   const { t, locale } = useI18n();
+  const request = useCallback(<T,>(path: string, init?: RequestInit) => classRequest<T>(currentUserId, path, init), [currentUserId]);
   const dateLabel = (value: number) => formatDate(locale, new Date(value), { day: "numeric", month: "short", year: "numeric" });
   const detailSequence = useRef(0);
+  const invitesSequence = useRef(0);
   const classesSequence = useRef(0);
   const selectedIdRef = useRef<string | null>(null);
+  const knownClassIds = useRef(new Set<string>());
+  const detailCache = useRef(new Map<string, ClassDetail>());
+  const [eventsCache, setEventsCache] = useState(() => new Map<string, { events: ClassEvent[]; loadedAt: number }>());
+  const lastListLoad = useRef(0);
+  const listInFlight = useRef(false);
   const alive = useRef(true);
   const [classes, setClasses] = useState<ClassSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ClassDetail | null>(null);
   const [invites, setInvites] = useState<ClassInvite[]>([]);
+  const [invitesLoadedFor, setInvitesLoadedFor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<MessageKey | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -134,42 +130,86 @@ export function ClassesView({
     const ticket = ++detailSequence.current;
     const result = await request<{ class: ClassDetail }>(`/api/classes/${id}`);
     if (!alive.current || ticket !== detailSequence.current || selectedIdRef.current !== id) return;
+    detailCache.current.set(id, result.class);
     setDetail(result.class);
-    setInvites([]);
-    if (result.class.role === "owner" || result.class.role === "moderator") {
-      const inviteResult = await request<{ invites: ClassInvite[] }>(
-        `/api/classes/${id}/invites`,
-      );
-      if (!alive.current || ticket !== detailSequence.current || selectedIdRef.current !== id) return;
-      setCheckedAt(Date.now());
-      setInvites(inviteResult.invites);
-    } else setInvites([]);
+    if (result.class.role === "member") { invitesSequence.current++; setInvites([]); setInvitesLoadedFor(null); }
+  }, [request]);
+
+  const loadInvites = useCallback(async (id: string) => {
+    const ticket = ++invitesSequence.current;
+    const result = await request<{ invites: ClassInvite[] }>(`/api/classes/${id}/invites`);
+    if (!alive.current || ticket !== invitesSequence.current || selectedIdRef.current !== id) return;
+    setCheckedAt(Date.now());
+    setInvites(result.invites);
+    setInvitesLoadedFor(id);
+  }, [request]);
+  const cacheEvents = useCallback((classId: string, events: ClassEvent[], loadedAt: number) => {
+    if (!knownClassIds.current.has(classId)) return;
+    setEventsCache(current => new Map(current).set(classId, { events, loadedAt }));
+  }, []);
+  const invalidateEvents = useCallback((classId: string) => {
+    setEventsCache(current => { const next = new Map(current); next.delete(classId); return next; });
   }, []);
 
   const loadClasses = useCallback(
     async (preferredId?: string) => {
+      listInFlight.current = true;
       const ticket = ++classesSequence.current;
-      const result = await request<{ classes: ClassSummary[] }>("/api/classes");
+      let result: { classes: ClassSummary[] };
+      try { result = await request<{ classes: ClassSummary[] }>("/api/classes"); }
+      finally { listInFlight.current = false; }
       if (!alive.current || ticket !== classesSequence.current) return;
+      lastListLoad.current = Date.now();
       setError(null);
       setClasses(result.classes);
+      setLoading(false);
+      const ids = new Set(result.classes.map(item => item.id));
+      knownClassIds.current = ids;
+      for (const id of detailCache.current.keys()) if (!ids.has(id)) detailCache.current.delete(id);
+      setEventsCache(current => new Map([...current].filter(([id]) => ids.has(id))));
       const nextId =
         (preferredId ?? selectedIdRef.current) && result.classes.some((item) => item.id === (preferredId ?? selectedIdRef.current))
           ? (preferredId ?? selectedIdRef.current)
           : (result.classes[0]?.id ?? null);
+      const previousId = selectedIdRef.current;
+      if (selectedIdRef.current !== nextId) { invitesSequence.current++; setInvites([]); setInvitesLoadedFor(null); }
       selectedIdRef.current = nextId;
       setSelectedId(nextId);
-      if (nextId) await loadDetail(nextId);
+      if (nextId) {
+        const cached = detailCache.current.get(nextId);
+        if (cached) setDetail(cached);
+        else if (previousId !== nextId) setDetail(null);
+        await loadDetail(nextId);
+      }
       else {
         setDetail(null);
         setInvites([]);
+        setInvitesLoadedFor(null);
       }
     },
-    [loadDetail],
+    [loadDetail, request],
   );
 
   useEffect(() => {
     alive.current = true;
+    const sessionEnded = (event: Event) => {
+      if ((event as CustomEvent<string>).detail !== currentUserId) return;
+      classesSequence.current++;
+      detailSequence.current++;
+      invitesSequence.current++;
+      knownClassIds.current.clear();
+      detailCache.current.clear();
+      setEventsCache(new Map());
+      selectedIdRef.current = null;
+      lastListLoad.current = 0;
+      setClasses([]);
+      setSelectedId(null);
+      setDetail(null);
+      setInvites([]);
+      setInvitesLoadedFor(null);
+      setError("classes.unavailable");
+    };
+    window.addEventListener("ipagell-class-session-ended", sessionEnded);
     const hash = new URLSearchParams(window.location.hash.slice(1));
     const code = hash.get("join");
     if (code) {
@@ -185,23 +225,75 @@ export function ClassesView({
         .catch(() => setError("classes.unavailable"))
         .finally(() => setLoading(false));
     });
-    return () => { alive.current = false; };
-  }, [loadClasses]);
+    return () => { alive.current = false; window.removeEventListener("ipagell-class-session-ended", sessionEnded); };
+  }, [currentUserId, loadClasses]);
 
-  async function refreshAfterWrite(preferredId?: string) {
+  useEffect(() => {
+    if (!active || listInFlight.current || !lastListLoad.current || Date.now() - lastListLoad.current < 30_000) return;
+    let current = true;
+    queueMicrotask(() => { if (current && alive.current) void loadClasses().catch(() => setError("classes.unavailable")); });
+    return () => { current = false; };
+  }, [active, loadClasses]);
+
+  async function refreshAfterWrite(preferredId?: string, invalidateId: string | null = selectedIdRef.current) {
     if (!alive.current) return;
+    if (invalidateId) detailCache.current.delete(invalidateId);
+    lastListLoad.current = 1;
     await refreshAfterConfirmedMutation(
       () => loadClasses(preferredId),
       () => { if (alive.current) { setError("classes.unavailable"); toast.error(t("classes.unavailable")); } },
     );
   }
 
+  function addLocalClass(value: ClassDetail, select: boolean) {
+    knownClassIds.current.add(value.id);
+    detailCache.current.set(value.id, value);
+    setClasses(current => [value, ...current.filter(item => item.id !== value.id)]);
+    if (select) {
+      selectedIdRef.current = value.id;
+      setSelectedId(value.id);
+      setDetail(value);
+      setInvites([]);
+      setInvitesLoadedFor(null);
+    }
+  }
+
+  function applyLocalDetail(value: ClassDetail) {
+    detailCache.current.set(value.id, value);
+    setClasses(current => current.map(item => item.id === value.id ? value : item));
+    if (selectedIdRef.current === value.id) {
+      setDetail(value);
+      if (value.role === "member") { invitesSequence.current++; setInvites([]); setInvitesLoadedFor(null); }
+    }
+  }
+
+  function removeLocalClass(id: string) {
+    const remaining = classes.filter(item => item.id !== id);
+    knownClassIds.current.delete(id);
+    detailCache.current.delete(id);
+    invalidateEvents(id);
+    setClasses(remaining);
+    if (selectedIdRef.current === id) {
+      const nextId = remaining[0]?.id ?? null;
+      selectedIdRef.current = nextId;
+      setSelectedId(nextId);
+      setDetail(nextId ? detailCache.current.get(nextId) ?? null : null);
+      setInvites([]);
+      setInvitesLoadedFor(null);
+      invitesSequence.current++;
+    }
+  }
+
   async function selectClass(id: string) {
     if (id === selectedId) return;
     selectedIdRef.current = id;
+    invitesSequence.current++;
     setSelectedId(id);
-    setDetail(null);
+    setDetail(detailCache.current.get(id) ?? null);
+    setInvites([]);
+    setInvitesLoadedFor(null);
     setError(null);
+    if (detailCache.current.has(id)) return;
     try {
       await loadDetail(id);
     } catch {
@@ -219,8 +311,10 @@ export function ClassesView({
           method: "POST", body: JSON.stringify(fields),
         });
         if (alive.current) setCreateOpen(false);
+        const shouldSelect = selectedIdRef.current === previousSelection;
+        if (alive.current) addLocalClass(result.class, shouldSelect);
         toast.success(t("classes.created"));
-        await refreshAfterWrite(selectedIdRef.current === previousSelection ? result.class.id : undefined);
+        await refreshAfterWrite(shouldSelect ? result.class.id : undefined, null);
       });
     } catch {
       toast.error(t("classes.notCreated"));
@@ -237,8 +331,10 @@ export function ClassesView({
           method: "POST", body: JSON.stringify(fields),
         });
         if (alive.current) { setJoinOpen(false); setJoinCode(""); }
+        const shouldSelect = selectedIdRef.current === previousSelection;
+        if (alive.current) addLocalClass(result.class, shouldSelect);
         toast.success(t("classes.joined", { name: result.class.name }));
-        await refreshAfterWrite(selectedIdRef.current === previousSelection ? result.class.id : undefined);
+        await refreshAfterWrite(shouldSelect ? result.class.id : undefined, null);
       });
     } catch {
       toast.error(t("classes.notJoined"));
@@ -263,8 +359,11 @@ export function ClassesView({
       ), classConflicts(classId));
       if (!result.started) return;
       if (alive.current && selectedIdRef.current === classId) {
+        invitesSequence.current++;
         setCreatedInvite(result.value.invite);
         setInvites((current) => [result.value.invite, ...current]);
+        setInvitesLoadedFor(classId);
+        void loadInvites(classId).catch(() => setError("classes.unavailable"));
       }
     } catch {
       toast.error(t("classes.inviteNotCreated"));
@@ -278,10 +377,11 @@ export function ClassesView({
       const fields = Object.fromEntries(new FormData(event.currentTarget));
       const classId = detail.id;
       await actions.run(classKey(classId, "edit"), async () => {
-        await request(`/api/classes/${classId}`, { method: "PATCH", body: JSON.stringify(fields) });
+        const result = await request<{ class: ClassDetail }>(`/api/classes/${classId}`, { method: "PATCH", body: JSON.stringify(fields) });
+        if (alive.current) applyLocalDetail(result.class);
         if (alive.current) setEditOpen(false);
         toast.success(t("classes.updated"));
-        await refreshAfterWrite();
+        await refreshAfterWrite(undefined, null);
       }, classConflicts(classId));
     } catch {
       toast.error(t("classes.operationFailed"));
@@ -295,12 +395,13 @@ export function ClassesView({
       const displayName = String(new FormData(event.currentTarget).get("displayName"));
       const classId = detail.id;
       await actions.run(classKey(classId, `member:${currentUserId}`), async () => {
-        await request(`/api/classes/${classId}/members/${currentUserId}`, {
+        const result = await request<{ class: ClassDetail }>(`/api/classes/${classId}/members/${currentUserId}`, {
           method: "PATCH", body: JSON.stringify({ operation: "display-name", displayName }),
         });
+        if (alive.current) applyLocalDetail(result.class);
         if (alive.current) setNameOpen(false);
         toast.success(t("classes.nameUpdated"));
-        await refreshAfterWrite();
+        await refreshAfterWrite(undefined, null);
       }, classConflicts(classId));
     } catch {
       toast.error(t("classes.operationFailed"));
@@ -314,9 +415,10 @@ export function ClassesView({
     if (!detail) return false;
     const classId = detail.id;
     const result = await actions.run(classKey(classId, `member:${userId}`), async () => {
-      await request(`/api/classes/${classId}/members/${userId}`, { method: "PATCH", body: JSON.stringify(input) });
+      const response = await request<{ class: ClassDetail }>(`/api/classes/${classId}/members/${userId}`, { method: "PATCH", body: JSON.stringify(input) });
+      if (alive.current) applyLocalDetail(response.class);
       toast.success(t("classes.roleUpdated"));
-      await refreshAfterWrite();
+      await refreshAfterWrite(undefined, null);
     }, classConflicts(classId));
     if (!result.started) return false;
     return true;
@@ -413,7 +515,7 @@ export function ClassesView({
             </div>
           </aside>
 
-          <div className="class-detail-stack">
+          <div className="class-detail-stack" key={selectedId}>
             {!detail ? (
               <section className="panel classes-loading">{t("classes.loadingDetail")}</section>
             ) : (
@@ -444,9 +546,9 @@ export function ClassesView({
                   </div>
                 </section>
 
-                <ClassEventsPanel key={detail.id} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} actions={actions} />
+                <ClassEventsPanel active={active} cached={eventsCache.get(detail.id)} onLoaded={cacheEvents} onInvalidate={invalidateEvents} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} actions={actions} />
 
-                <details className="class-administration">
+                <details className="class-administration" onToggle={event => { if (event.currentTarget.open && canManageInvites && invitesLoadedFor !== detail.id) void loadInvites(detail.id).catch(() => setError("classes.unavailable")); }}>
                   <summary>{t("classes.management")} <span>{detail.memberCount} {t(selectPlural(locale, detail.memberCount, "classes.member", "classes.members"))}</span></summary>
                   <div className="class-detail-stack">
                 <section className="panel members-panel">
@@ -507,8 +609,8 @@ export function ClassesView({
                                       description:
                                         t("classes.transferWarning"),
                                       label: t("classes.transfer"),
-                                      run: async () => { await request(`/api/classes/${detail.id}/members/${member.userId}`, { method: "PATCH", body: JSON.stringify({ operation: "transfer" }) }); },
-                                      after: () => refreshAfterWrite(),
+                                      run: async () => { const response = await request<{ class: ClassDetail }>(`/api/classes/${detail.id}/members/${member.userId}`, { method: "PATCH", body: JSON.stringify({ operation: "transfer" }) }); if (alive.current) applyLocalDetail(response.class); },
+                                      after: () => refreshAfterWrite(undefined, null),
                                       successMessage: "classes.transferDone",
                                     })
                                   }
@@ -564,7 +666,9 @@ export function ClassesView({
                         {t("classes.newInvite")}
                       </button>
                     </div>
-                    {activeInvites.length ? (
+                    {invitesLoadedFor !== detail.id ? (
+                      <p className="class-muted">{t("classes.loading")}</p>
+                    ) : activeInvites.length ? (
                       <div className="invite-list">
                         {activeInvites.map((invite) => (
                           <article key={invite.id}>
@@ -593,8 +697,11 @@ export function ClassesView({
                                       `/api/classes/${detail.id}/invites/${invite.id}`,
                                       { method: "DELETE", body: "{}" },
                                     );
+                                    if (alive.current && selectedIdRef.current === detail.id) {
+                                      setInvites(current => current.map(item => item.id === invite.id ? { ...item, revokedAt: Date.now() } : item));
+                                    }
                                   },
-                                  after: async () => { try { await loadDetail(detail.id); } catch { if(alive.current){setError("classes.unavailable");toast.error(t("classes.unavailable"));} } },
+                                  after: async () => { try { await loadInvites(detail.id); } catch { if(alive.current){setError("classes.unavailable");toast.error(t("classes.unavailable"));} } },
                                 })
                               }
                             >
@@ -627,6 +734,7 @@ export function ClassesView({
                               method: "DELETE",
                               body: "{}",
                             });
+                            if (alive.current) removeLocalClass(detail.id);
                           },
                           after: async () => { await refreshAfterWrite(); await agenda.refresh(); },
                         })
@@ -651,6 +759,7 @@ export function ClassesView({
                               `/api/classes/${detail.id}/members/${currentUserId}`,
                               { method: "DELETE", body: "{}" },
                             );
+                            if (alive.current) removeLocalClass(detail.id);
                           },
                           after: async () => { await refreshAfterWrite(); await agenda.refresh(); },
                         })

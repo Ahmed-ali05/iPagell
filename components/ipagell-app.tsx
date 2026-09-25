@@ -196,6 +196,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const allAgenda = useMemo(() => [...data.agenda, ...subscriptionAgenda(classAgenda.items.filter(s => !data.agenda.some(a => a.id === `class-snapshot-${s.id}`)))], [data.agenda, classAgenda.items]);
   const [personalEvent, setPersonalEvent] = useState<ClassSubscription | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
+  const [classesVisited, setClassesVisited] = useState(false);
   const [agendaFocusId, setAgendaFocusId] = useState<string | null>(null);
   const [selectedGradeSubjectId, setSelectedGradeSubjectId] = useState("");
   const [modal, setModal] = useState<ModalType>(null);
@@ -223,8 +224,10 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       if (
         query.get("view") === "classes" ||
         window.location.hash.includes("join=")
-      )
+      ) {
+        setClassesVisited(true);
         setActiveTab("classes");
+      }
       if (query.get("action") === "grade") {
         setActiveTab("grades");
         setModal("grade");
@@ -408,6 +411,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const average = generalAverage(data.subjects, semesterGrades);
   const navigate = (tab: TabId, agendaItemId?: string) => {
     setAgendaFocusId(tab === "agenda" ? agendaItemId ?? null : null);
+    if (tab === "classes") setClassesVisited(true);
     setActiveTab(tab);
   };
   const toggleTheme = () =>
@@ -751,8 +755,11 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onBackToGrades={() => navigate("grades")}
             />
           )}
-          {activeTab === "classes" && (
+        </div>
+        {classesVisited && (
+          <div className="view-stage" style={activeTab === "classes" ? undefined : { display: "none" }}>
             <ClassesView
+              active={activeTab === "classes"}
               currentUserId={session.user!.id}
               defaultDisplayName={preferences.studentName}
               data={data}
@@ -760,8 +767,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               agenda={classAgenda}
               actions={classActions}
             />
-          )}
-        </div>
+          </div>
+        )}
       </section>
 
       <button

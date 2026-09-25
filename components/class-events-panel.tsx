@@ -65,10 +65,10 @@ export function PersonalEventDialog({item,data,controller,onClose}: {item:ClassS
   </DialogContent></Dialog>;
 }
 
-export function ClassEventsPanel({detail,userId,data,semesterId,controller,actions}: {detail:ClassDetail;userId:string;data:SchoolData;semesterId:string;controller:ClassAgendaController;actions:PendingActionController}) {
+export function ClassEventsPanel({detail,userId,data,semesterId,controller,actions,active,cached,onLoaded,onInvalidate}: {detail:ClassDetail;userId:string;data:SchoolData;semesterId:string;controller:ClassAgendaController;actions:PendingActionController;active:boolean;cached?:{events:ClassEvent[];loadedAt:number};onLoaded:(classId:string,events:ClassEvent[],loadedAt:number)=>void;onInvalidate:(classId:string)=>void}) {
   const {t,locale}=useI18n();
-  const [events,setEvents]=useState<ClassEvent[]>([]);
-  const [loading,setLoading]=useState(true);
+  const [events,setEvents]=useState<ClassEvent[]>(()=>cached?.events??[]);
+  const [loading,setLoading]=useState(!cached);
   const [error,setError]=useState<MessageKey|null>(null);
   const [editor,setEditor]=useState<ClassEvent|"new"|null>(null);
   const [adding,setAdding]=useState<ClassEvent|null>(null);
@@ -77,6 +77,7 @@ export function ClassEventsPanel({detail,userId,data,semesterId,controller,actio
   const [search,setSearch]=useState("");
   const seq=useRef(0);
   const alive=useRef(true);
+  const lastLoaded=useRef(cached?.loadedAt??0);
   const editorKey=editor ? `class:${detail.id}:event:${editor==="new"?"create":editor.id}` : "";
   const addingKey=adding ? `class:${detail.id}:event:${adding.id}` : "";
   const deletingKey=deleting ? `class:${detail.id}:event:${deleting.id}` : "";
@@ -85,11 +86,12 @@ export function ClassEventsPanel({detail,userId,data,semesterId,controller,actio
   const deletingBusy=!!deleting && actions.has(deletingKey);
   const load=useCallback(async()=>{
     const ticket=++seq.current;
-    try { const r=await classRequest<{events:ClassEvent[]}>(userId,`/api/classes/${detail.id}/events`); if(alive.current && ticket===seq.current) {setEvents(r.events);setError(null);} }
-    catch {if(alive.current && ticket===seq.current) { setEvents([]);setError("classEvents.unavailable"); }}
+    try { const r=await classRequest<{events:ClassEvent[]}>(userId,`/api/classes/${detail.id}/events`); if(ticket===seq.current) {const loadedAt=Date.now();onLoaded(detail.id,r.events,loadedAt);if(alive.current) {lastLoaded.current=loadedAt;setEvents(r.events);setError(null);}} }
+    catch {if(alive.current && ticket===seq.current) setError("classEvents.unavailable");}
     finally {if(alive.current && ticket===seq.current) setLoading(false);}
-  },[detail.id,userId]);
-  useEffect(()=>{alive.current=true;queueMicrotask(()=>{if(alive.current)void load();}); const timer=setInterval(()=>{if(document.visibilityState==="visible") void load();},30000);return()=>{alive.current=false;clearInterval(timer);};},[load]);
+  },[detail.id,userId,onLoaded]);
+  useEffect(()=>{alive.current=true;return()=>{alive.current=false;};},[]);
+  useEffect(()=>{if(!active)return;let subscribed=true;queueMicrotask(()=>{if(subscribed && alive.current && Date.now()-lastLoaded.current>=30000)void load();});const timer=setInterval(()=>{if(document.visibilityState==="visible")void load();},30000);return()=>{subscribed=false;clearInterval(timer);};},[active,load]);
   async function save(e:FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const editing=editor!=="new"?editor:null;
@@ -98,6 +100,7 @@ export function ClassEventsPanel({detail,userId,data,semesterId,controller,actio
       const fields=eventFromForm(e.currentTarget);
       await actions.run(key,async()=>{
         await classRequest(userId,`/api/classes/${detail.id}/events${editing?`/${editing.id}`:""}`,{method:editing?"PATCH":"POST",body:JSON.stringify({...fields,...(editing?{revision:editing.revision}:{})})});
+        onInvalidate(detail.id);
         if(alive.current) setEditor(null);
         toast.success(t("classEvents.saved"));
         await load(); await controller.refresh();
@@ -133,6 +136,6 @@ export function ClassEventsPanel({detail,userId,data,semesterId,controller,actio
     })}</div>
     <Dialog open={!!editor} onOpenChange={open=>{if(!open&&!editorBusy)setEditor(null);}}><DialogContent className="entry-dialog shared-event-dialog"><DialogHeader><LanguageSelect className="language-select"/><DialogTitle>{editor==="new"?t("classEvents.newTitle"):t("classEvents.editTitle")}</DialogTitle><DialogDescription>{t("classEvents.visibleTo",{name:detail.name})}</DialogDescription></DialogHeader><form onSubmit={save}><fieldset disabled={editorBusy} className="form-grid"><EventInputs key={editor==="new"?"new":editor?.id} event={editor&&editor!=="new"?editor:undefined} subjects={[...new Set(events.map(e=>e.subject))]}/></fieldset><DialogFooter><button className="primary-button" disabled={editorBusy} aria-busy={editorBusy}>{editorBusy?t("common.saving"):t("classEvents.saveToClass")}</button></DialogFooter></form></DialogContent></Dialog>
     <Dialog open={!!adding} onOpenChange={open=>{if(!open&&!addingBusy)setAdding(null);}}><DialogContent className="entry-dialog"><DialogHeader><LanguageSelect className="language-select"/><DialogTitle>{t("classEvents.addToAgenda")}</DialogTitle><DialogDescription>{adding?.title} · {detail.name}. {t("classEvents.classUpdates")}</DialogDescription></DialogHeader><form onSubmit={subscribe}><fieldset className="form-grid" disabled={addingBusy}><PersonalInputs data={data} semesterId={semesterId}/></fieldset><DialogFooter><button className="primary-button" disabled={addingBusy} aria-busy={addingBusy}>{addingBusy?t("classEvents.adding"):t("classEvents.addToAgenda")}</button></DialogFooter></form></DialogContent></Dialog>
-    <AlertDialog open={!!deleting} onOpenChange={open=>{if(!open&&!deletingBusy)setDeleting(null);}}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{t("classEvents.deleteConfirm")}</AlertDialogTitle><AlertDialogDescription>{t("classEvents.deleteWarning")}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={deletingBusy}>{t("classes.cancel")}</AlertDialogCancel><AlertDialogAction disabled={deletingBusy} aria-busy={deletingBusy} variant="destructive" onClick={e=>{e.preventDefault();if(!deleting)return;const target=deleting;void actions.run(`class:${detail.id}:event:${target.id}`,async()=>{await classRequest(userId,`/api/classes/${detail.id}/events/${target.id}`,{method:"DELETE",body:JSON.stringify({revision:target.revision})});if(alive.current)setDeleting(null);toast.success(t("classEvents.deleted"));await load();await controller.refresh();},active=>active===`class:${detail.id}:exclusive`).catch(error=>{toast.error(t("classes.operationFailed"));if(error instanceof ClassRequestError && error.status===409 && alive.current){setDeleting(null);void load();}});}}>{deletingBusy?t("common.saving"):t("classEvents.delete")}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+    <AlertDialog open={!!deleting} onOpenChange={open=>{if(!open&&!deletingBusy)setDeleting(null);}}><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>{t("classEvents.deleteConfirm")}</AlertDialogTitle><AlertDialogDescription>{t("classEvents.deleteWarning")}</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel disabled={deletingBusy}>{t("classes.cancel")}</AlertDialogCancel><AlertDialogAction disabled={deletingBusy} aria-busy={deletingBusy} variant="destructive" onClick={e=>{e.preventDefault();if(!deleting)return;const target=deleting;void actions.run(`class:${detail.id}:event:${target.id}`,async()=>{await classRequest(userId,`/api/classes/${detail.id}/events/${target.id}`,{method:"DELETE",body:JSON.stringify({revision:target.revision})});onInvalidate(detail.id);if(alive.current)setDeleting(null);toast.success(t("classEvents.deleted"));await load();await controller.refresh();},active=>active===`class:${detail.id}:exclusive`).catch(error=>{toast.error(t("classes.operationFailed"));if(error instanceof ClassRequestError && error.status===409 && alive.current){setDeleting(null);void load();}});}}>{deletingBusy?t("common.saving"):t("classEvents.delete")}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </section>;
 }

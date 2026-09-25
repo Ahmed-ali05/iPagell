@@ -393,6 +393,8 @@ Se diverso, la route restituisce 404.
 - `components/class-events-panel.tsx`: attività condivise dentro una classe.
 - `components/ipagell-app.tsx`: tab Classi e integrazione agenda.
 
+La vista Classi viene montata al primo accesso e resta montata finché resta attivo lo stesso `DiaryWorkspace` (identificato da `user.id`). Conserva in memoria elenco, selezione e dettagli per `classId`; il pannello conserva anche gli eventi per `classId`. Tornando al tab, i dati sono subito visibili e una lettura non bloccante parte se l'elenco o gli eventi hanno più di 30 secondi. L'elenco sblocca la UI senza attendere il dettaglio. Gli inviti si caricano aprendo la sezione di gestione. Le scritture confermate aggiornano o invalidano i dati coinvolti. Questa cache di vista non è persistente e non sostituisce i controlli di accesso server. [Misurazione e limiti](CLASSI-PERFORMANCE.md).
+
 ### 6.3 Client HTTP
 
 `lib/classes/client.ts` fornisce `classRequest()`:
@@ -587,6 +589,8 @@ UI: `PersonalEventDialog` in `components/class-events-panel.tsx`.
 ```text
 localStorage key = ipagell-class-agenda-v1:<userId>
 ```
+
+La cache dell'agenda sottoscritta è distinta dalla cache in memoria della vista Classi descritta in §6.2.
 
 La cache è validata da uno schema Zod e accettata solo se `activeAccountId() === userId`.
 
