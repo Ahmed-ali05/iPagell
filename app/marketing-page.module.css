@@ -401,7 +401,7 @@
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0 48px;
 }
 
@@ -411,14 +411,8 @@
   border-top: 1px solid var(--marketing-line);
 }
 
-.featureNumber {
-  color: var(--marketing-purple);
-  font-size: 13px;
-  font-weight: 750;
-}
-
 .featureCard h3 {
-  margin: 18px 0 12px;
+  margin: 0 0 12px;
   font-size: 19px;
   line-height: 1.25;
   letter-spacing: -0.025em;
@@ -636,11 +630,11 @@
 }
 
 .finalCta {
-  min-height: 300px;
-  padding: 58px 65px;
+  min-height: 150px;
+  padding: 36px 65px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 44px;
   overflow: hidden;
   border-radius: 16px;
@@ -732,7 +726,7 @@
 
   .heroCopy { max-width: 720px; min-width: 0; }
   .productPreview { width: min(680px, 94%); min-width: 0; margin-inline: auto; }
-  .featureGrid { grid-template-columns: repeat(2, 1fr); }
+  .featureGrid { grid-template-columns: repeat(3, 1fr); gap: 0 24px; }
   .privacySection { grid-template-columns: 1fr 1fr; gap: 55px; }
   .faqSection { grid-template-columns: 1fr; gap: 50px; }
 }
@@ -789,19 +783,18 @@
   .averageCard strong { margin: 31px 0 35px; font-size: 38px; }
   .agendaCard { padding: 17px; }
 
-  .featureSection,
-  .stepsSection { padding-block: 88px; }
+  .featureSection { padding-block: 64px; }
   .featureSection { padding-inline: 15px; }
   .featureGrid { grid-template-columns: 1fr; }
-  .featureCard { min-height: 230px; }
+  .featureCard { min-height: 0; padding: 28px 0; }
 
   .privacySection {
-    padding-block: 95px;
+    padding-block: 64px;
     grid-template-columns: 1fr;
-    gap: 58px;
+    gap: 28px;
   }
 
-  .privacyVisual { min-height: 355px; order: 2; }
+  .privacyVisual { min-height: 280px; order: 2; }
   .privateCard,
   .sharedCard { width: 80%; }
 
@@ -810,15 +803,9 @@
   .steps li + li { padding-left: 0; border-left: 0; border-top: 1px solid var(--marketing-line); }
   .steps h3 { margin-top: 35px; }
 
-  .faqSection { padding-block: 88px; }
+  .faqSection { padding-block: 64px; }
 
-  .finalCta {
-    min-height: 390px;
-    padding: 42px 29px;
-    align-items: flex-start;
-    flex-direction: column;
-    justify-content: center;
-  }
+  .finalCta { min-height: 145px; padding: 32px 29px; }
 
   .lightCta { width: 100%; }
   .githubSection { align-items: flex-start; flex-direction: column; gap: 18px; }

@@ -4,7 +4,6 @@ import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import { apiErrorKey } from "@/lib/i18n/errors";
 import { RequestError } from "@/lib/client-http";
 import type { MessageKey } from "@/lib/i18n";
-import { BookOpen, Cloud, ShieldCheck, WifiOff } from "lucide-react";
 import {
   NativeSelect,
   NativeSelectOption,
@@ -123,7 +122,6 @@ export function AccountGate({
           <b>iPagell</b>
         </div>
         <LanguageSelect className="language-select" />
-        <span className="eyebrow">{t("auth.tagline")}</span>
         <h1>
           {recovery
             ? t("auth.recoveryTitle")
@@ -187,14 +185,6 @@ export function AccountGate({
                     />
                   </label>
                   <label>
-                    {t("auth.school")}
-                    <input
-                      name="school"
-                      maxLength={150}
-                      placeholder={t("common.optional")}
-                    />
-                  </label>
-                  <label>
                     {t("auth.firstTerm")}
                     <input
                       name="semester"
@@ -241,16 +231,17 @@ export function AccountGate({
                       </NativeSelectOption>
                     </NativeSelect>
                   </label>
+                  <details className="full onboarding-optional">
+                    <summary>{t("auth.schoolOptional")}</summary>
+                    <label>
+                      {t("auth.school")}
+                      <input name="school" maxLength={150} />
+                    </label>
+                  </details>
                 </>
               ) : (
                 <>
-                  <p className="account-note full">
-                    {mode === "register"
-                      ? t("auth.registerInfo")
-                      : mode === "recover"
-                        ? t("auth.recoverInfo")
-                        : t("auth.loginInfo")}
-                  </p>
+                  {mode === "recover" && <p className="account-note full">{t("auth.recoverInfo")}</p>}
                   <label className="full">
                     {t("auth.username")}
                     <input
@@ -290,11 +281,7 @@ export function AccountGate({
                       maxLength={128}
                       required
                     />
-                    <small>
-                      {mode === "login"
-                        ? t("auth.passwordManager")
-                        : t("auth.passwordHint")}
-                    </small>
+                    {mode !== "login" && <small>{t("auth.passwordHint")}</small>}
                   </label>
                   {mode === "register" && (
                     <p className="account-note full">
@@ -350,41 +337,17 @@ export function AccountGate({
                     ? t("auth.haveAccount")
                     : t("common.register")}
                 </button>
-                <button
+                {mode !== "register" && <button
                   type="button"
                   className="text-link"
                   disabled={busy}
-                  onClick={() =>
-                    changeMode(mode === "recover" ? "login" : "recover")
-                  }
+                  onClick={() => changeMode(mode === "recover" ? "login" : "recover")}
                 >
-                  {mode === "recover"
-                    ? t("auth.backLogin")
-                    : t("auth.forgot")}
-                </button>
+                  {mode === "recover" ? t("auth.backLogin") : t("auth.forgot")}
+                </button>}
               </div>
             )}
           </form>
-        )}
-        {!user && !recovery && (
-          <div className="account-features">
-            <span>
-              <BookOpen />
-              {t("auth.path")}
-            </span>
-            <span>
-              <ShieldCheck />
-              {t("auth.personalAccount")}
-            </span>
-            <span>
-              <Cloud />
-              {t("auth.devices")}
-            </span>
-            <span>
-              <WifiOff />
-              {t("auth.offlineCopy")}
-            </span>
-          </div>
         )}
       </section>
     </main>

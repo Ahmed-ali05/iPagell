@@ -50,7 +50,6 @@ export function StatsView({
           <EmptyState
             icon={GraduationCap}
             title={t("stats.emptyTitle")}
-            text={t("stats.emptyText")}
             actionLabel={t("stats.firstGrade")}
             onAction={onAddGrade}
           />
@@ -141,7 +140,6 @@ export function StatsView({
         ) : (
           <section className="panel insight-card">
             <h3>{t("stats.needSubject")}</h3>
-            <p>{t("stats.needSubjectHint")}</p>
             <div className="goal-line">
               <span>{t("stats.semesterGoal")}</span>
               <b>{formatNumber(locale, goal, { minimumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits, maximumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits })}</b>

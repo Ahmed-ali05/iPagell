@@ -490,12 +490,6 @@ export function ClassesView({
       ) : (
         <div className="classes-layout">
           <aside className="panel class-switcher" aria-label={t("classes.title")}>
-            <div className="panel-title">
-              <div>
-                <span className="section-label">{t("classes.title")}</span>
-                <h3>{classes.length}</h3>
-              </div>
-            </div>
             <div className="class-switcher-list">
               {classes.map((item) => (
                 <button
@@ -524,7 +518,7 @@ export function ClassesView({
                   <div>
                     <span className="class-role">{t(`classes.role.${detail.role}` as "classes.role.owner" | "classes.role.moderator" | "classes.role.member")}</span>
                     <h2>{detail.name}</h2>
-                    <p>{detail.description || t("classes.noDescription")}</p>
+                    {detail.description && <p>{detail.description}</p>}
                   </div>
                   <div className="class-hero-actions">
                     {canManageInvites && (

@@ -32,7 +32,6 @@ import { Toaster } from "@/components/ui/sonner";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -536,7 +535,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                   ? t("nav.stats")
                   : t(navKeys[activeTab])}
             </h1>
-            <span className="space-context">{activeTab === "classes" ? t("workspace.shared") : activeTab === "agenda" || activeTab === "home" ? t("workspace.personal") : t("workspace.private")}</span>
+            {activeTab !== "home" && activeTab !== "agenda" && <span className="space-context">{activeTab === "classes" ? t("workspace.shared") : t("workspace.private")}</span>}
           </div>
           <div className="top-actions">
             <LanguageSelect className="language-select" />
@@ -659,7 +658,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               items={semesterAgenda}
               focusItemId={agendaFocusId}
               subjects={data.subjects}
-              onAdd={() => setModal("agenda")}
+              onAdd={() => data.subjects.length ? setModal("agenda") : openSubjectEditor()}
               onClasses={() => navigate("classes")}
               onPersonal={setPersonalEvent}
               onToggle={(id) => {
@@ -701,7 +700,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               grades={semesterGrades}
               goal={preferences.gradeGoal}
               onGoal={(gradeGoal) => savePreference({ gradeGoal })}
-              onAdd={() => setModal("grade")}
+              onAdd={() => data.subjects.length ? setModal("grade") : openSubjectEditor()}
               onDelete={(id) =>
                 setRemoval({
                   title: t("grades.deletedTitle"),
@@ -1045,12 +1044,10 @@ function Dashboard({
         ) : overdue.length ? (
           <div className="empty-hero">
             <h2>{t("home.noUpcoming")}</h2>
-            <p>{selectPlural(locale, overdue.length, t("home.overdueHintOne"), t("home.overdueHintMany", { count: overdue.length }))}</p>
           </div>
         ) : (
           <div className="empty-hero">
             <h2>{emptyDiary ? t("home.start") : t("home.noUpcoming")}</h2>
-            <p>{emptyDiary ? t("home.startHint") : t("home.noMore")}</p>
             <button onClick={() => data.subjects.length ? onAdd("agenda") : onManageSubjects()}><Plus size={18} /> {data.subjects.length ? t("home.addActivity") : t("home.addSubjects")}</button>
             {emptyDiary && data.subjects.length > 0 && <button className="secondary-action" onClick={() => onAdd("grade")}>{t("home.firstGrade")}</button>}
           </div>
@@ -1066,16 +1063,15 @@ function Dashboard({
         {overdue.length > 2 && <button className="text-link" onClick={() => onNavigate("agenda")}>{t("home.openAgenda")}</button>}
       </section>}
 
-      {!!future.length && <section className="panel today-panel dashboard-upcoming">
-        <div className="panel-title"><div><h3>{t("home.upcoming")}</h3><p>{selectPlural(locale, future.length, t("home.openActivityOne"), t("home.openActivityMany", { count: future.length }))}</p></div><button aria-label={t("home.addActivity")} onClick={() => onAdd("agenda")}><Plus size={20} /></button></div>
+      {future.length > 1 && <section className="panel today-panel dashboard-upcoming">
+        <div className="panel-title"><div><h3>{t("home.upcoming")}</h3></div><button aria-label={t("home.addActivity")} onClick={() => onAdd("agenda")}><Plus size={20} /></button></div>
         {future.slice(1, 4).map((item) => {
           const itemSubject = findSubject(data.subjects, item.subjectId);
           return <button className="activity-row" key={item.id} onClick={() => onNavigate("agenda", item.id)}><span className="subject-dot" style={{ background: itemSubject?.color ?? "var(--accent)" }} /><div><b>{item.title}</b><small>{itemSubject?.name ?? item.shared?.event.subject} · {formatDate(locale, item.dueAt)}</small></div><ChevronRight size={18} /></button>;
         })}
-        {future.length === 1 && <button className="text-link" onClick={() => onNavigate("agenda")}>{t("home.openAgenda")} <ChevronRight size={16} /></button>}
       </section>}
 
-      {grades.length > 0 ? <button className="grade-summary" onClick={() => onNavigate("grades")}><span>{t("home.gradeSituation")}</span><strong>{t("home.average", { value: gradeText(locale, average) })}</strong><small>{selectPlural(locale, grades.length, t("home.gradeCountOne"), t("home.gradeCount", { count: grades.length }))} · {selectPlural(locale, gradedSubjects, t("home.subjectCountOne"), t("home.subjectCount", { count: gradedSubjects }))}</small><ChevronRight size={18} /></button> : !emptyDiary && <section className="grade-prompt"><div><b>{t("home.noGrades")}</b><span>{t("home.noGradesHint")}</span></div><button onClick={() => data.subjects.length ? onAdd("grade") : onManageSubjects()}>{data.subjects.length ? t("grades.add") : t("home.addSubject")}</button></section>}
+      {grades.length > 0 ? <button className="grade-summary" onClick={() => onNavigate("grades")}><span>{t("home.gradeSituation")}</span><strong>{t("home.average", { value: gradeText(locale, average) })}</strong><small>{selectPlural(locale, grades.length, t("home.gradeCountOne"), t("home.gradeCount", { count: grades.length }))} · {selectPlural(locale, gradedSubjects, t("home.subjectCountOne"), t("home.subjectCount", { count: gradedSubjects }))}</small><ChevronRight size={18} /></button> : !emptyDiary && <section className="grade-prompt"><div><b>{t("home.noGrades")}</b></div><button onClick={() => data.subjects.length ? onAdd("grade") : onManageSubjects()}>{data.subjects.length ? t("grades.add") : t("home.addSubject")}</button></section>}
     </div>
   );
 }
@@ -1129,15 +1125,12 @@ function AgendaView({
     <section className="module-view">
       <div className="module-toolbar">
         <div>
-          <p>{t("agenda.intro")}</p>
-        </div>
-        <div>
           <button className="soft-button" onClick={onClasses}><UsersRound size={18} /> {t("agenda.openClasses")}</button>
           <button className="soft-button" onClick={onNotifications}>
             <Bell size={18} /> {t("agenda.reminders")}
           </button>
           <button className="primary-button" onClick={onAdd}>
-            <Plus size={18} /> {t("entry.newActivity")}
+            <Plus size={18} /> {subjects.length ? t("entry.newActivity") : t("home.addSubject")}
           </button>
         </div>
       </div>
@@ -1282,6 +1275,7 @@ function AgendaView({
                 blockedShared={blockedShared}
                 focusItemId={focusItemId}
                 compact
+                emptyTitle={selectedDay ? t("agenda.emptyDay") : !allItems.length ? t("agenda.emptyTitle") : scope !== "all" && !items.length ? t("agenda.emptyFilter") : t("agenda.noOpen")}
               />
             </div>
           </div>
@@ -1296,6 +1290,7 @@ function AgendaView({
             pendingShared={pendingShared}
             blockedShared={blockedShared}
             focusItemId={focusItemId}
+            emptyTitle={scope === "all" ? t("agenda.emptyTitle") : t("agenda.emptyFilter")}
           />
         </TabsContent>
       </Tabs>
@@ -1313,6 +1308,7 @@ function AgendaList({
   blockedShared,
   focusItemId,
   compact = false,
+  emptyTitle,
 }: {
   items: AgendaDisplayItem[];
   subjects: Subject[];
@@ -1323,6 +1319,7 @@ function AgendaList({
   blockedShared: (id: string) => boolean;
   focusItemId?: string | null;
   compact?: boolean;
+  emptyTitle: string;
 }) {
   const { locale, t } = useI18n();
   return (
@@ -1395,8 +1392,7 @@ function AgendaList({
       ) : (
         <EmptyState
           icon={CalendarDays}
-          title={t("agenda.emptyTitle")}
-          text={t("agenda.emptyText")}
+          title={emptyTitle}
         />
       )}
     </section>
@@ -1445,8 +1441,8 @@ function GradesView({
       <div className="module-toolbar">
         <p>{t("grades.scale")}</p>
         <div className="grades-actions">
-          <button className="grades-stats-link" onClick={onOpenStats}><BarChart3 size={17} /> {t("grades.stats")}</button>
-          <button className="primary-button" onClick={onAdd}><Plus size={18} /> {t("grades.add")}</button>
+          {!!subjects.length && <button className="grades-stats-link" onClick={onOpenStats}><BarChart3 size={17} /> {t("grades.stats")}</button>}
+          <button className="primary-button" onClick={onAdd}><Plus size={18} /> {subjects.length ? t("grades.add") : t("home.addSubject")}</button>
         </div>
       </div>
       <div className="grade-overview">
@@ -1525,16 +1521,11 @@ function GradesView({
               <EmptyState
                 icon={GraduationCap}
                 title={t("home.noGrades")}
-                text={t("grades.emptyHint")}
               />
             )}
           </section>
           <aside className="panel simulator-card">
-            <span className="eyebrow">{t("grades.simulator")}</span>
             <h3>{t("grades.needed")}</h3>
-            <p>
-              {t("grades.neededHint")}
-            </p>
             <label>
               {t("grades.target")} <b>{gradeText(locale, target)}</b>
               <input
@@ -1600,7 +1591,6 @@ function GradesView({
         <EmptyState
           icon={BookOpen}
           title={t("grades.noSubject")}
-          text={t("grades.noSubjectHint")}
         />
       )}
     </section>
@@ -1651,12 +1641,9 @@ function SettingsDialog({
   const { t, locale } = useI18n();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="settings-dialog">
+      <DialogContent className="settings-dialog" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>{t("common.settings")}</DialogTitle>
-          <DialogDescription>
-            {t("settings.description")}
-          </DialogDescription>
           <LanguageSelect className="language-select" />
         </DialogHeader>
         <Tabs defaultValue="subjects" className="settings-tabs">
@@ -1673,10 +1660,6 @@ function SettingsDialog({
           </TabsList>
           <TabsContent value="subjects" className="settings-section">
             <div className="settings-section-head">
-              <div>
-                <h3>{t("settings.subjects")}</h3>
-                <p>{t("settings.manageSubjects")}</p>
-              </div>
               <button className="primary-button small" onClick={onAddSubject}>
                 <Plus /> {t("settings.add")}
               </button>
@@ -1695,9 +1678,9 @@ function SettingsDialog({
                   </span>
                   <div>
                     <b>{subject.name}</b>
-                    <small>
-                      {subject.teacher || t("settings.noTeacher")} · {t("settings.coefficient", { value: intlNumber(locale, subject.coefficient) })}
-                    </small>
+                    {(subject.teacher || subject.coefficient !== 1) && <small>
+                      {[subject.teacher, subject.coefficient !== 1 ? t("settings.coefficient", { value: intlNumber(locale, subject.coefficient) }) : null].filter(Boolean).join(" · ")}
+                    </small>}
                   </div>
                   <button
                     className="icon-button"
@@ -1719,10 +1702,6 @@ function SettingsDialog({
           </TabsContent>
           <TabsContent value="periods" className="settings-section">
             <div className="settings-section-head">
-              <div>
-                <h3>{t("settings.periods")}</h3>
-                <p>{t("settings.periodsHint")}</p>
-              </div>
               <button className="primary-button small" onClick={onAddSemester}>
                 <Plus /> {t("entry.newSemester")}
               </button>
@@ -1776,7 +1755,6 @@ function SettingsDialog({
             <div className="preference-row">
               <div>
                 <b>{t("settings.yourName")}</b>
-                <small>{t("settings.yourNameHint")}</small>
               </div>
               <input
                 aria-label={t("settings.yourName")}
@@ -1792,7 +1770,6 @@ function SettingsDialog({
             <div className="preference-row">
               <div>
                 <b>{t("settings.theme")}</b>
-                <small>{t("settings.themeHint")}</small>
               </div>
               <NativeSelect
                 aria-label={t("settings.theme")}
@@ -1813,7 +1790,6 @@ function SettingsDialog({
             <div className="preference-row">
               <div>
                 <b>{t("settings.reduceMotion")}</b>
-                <small>{t("settings.reduceMotionHint")}</small>
               </div>
               <Switch
                 aria-label={t("settings.reduceMotion")}
@@ -1827,9 +1803,6 @@ function SettingsDialog({
               <FileJson />
               <div>
                 <b>{t("settings.localBackup")}</b>
-                <p>
-                  {t("settings.backupHint")}
-                </p>
                 <div>
                   <button className="soft-button" onClick={onExport}>
                     <Download /> {t("settings.export")}
@@ -1837,6 +1810,9 @@ function SettingsDialog({
                   <button className="soft-button" onClick={onImport}>
                     <Upload /> {t("settings.import")}
                   </button>
+                </div>
+                <details className="legacy-backup">
+                  <summary>{t("settings.oldVersion")}</summary>
                   <button
                     className="soft-button"
                     onClick={async () => {
@@ -1854,9 +1830,9 @@ function SettingsDialog({
                       }
                     }}
                   >
-                    {t("settings.recoverLegacy")}
+                    {t("settings.exportLegacy")}
                   </button>
-                </div>
+                </details>
               </div>
             </div>
             <div className="privacy-note">

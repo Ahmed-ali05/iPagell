@@ -1,8 +1,12 @@
 # iPagell — Riferimento UX, UI e contenuti
 
-Aggiornato: 24 settembre 2026. Avvio delle migliorie leggere e primo passaggio visivo.
+Aggiornato: 27 settembre 2026. Pulizia mirata di copy e gerarchia informativa.
 
-Questo documento conserva contesto, evidenze e proposte. Non certifica un rilascio e non autorizza automaticamente l'implementazione. Nessun codice o dato scolastico è stato modificato durante questa analisi.
+## Pulizia UX e copy — 27 settembre 2026
+
+Il [report P0/P1/P2](UX-COPY-AUDIT-2026-09-27.md) registra il passaggio su landing, ingresso, viste del diario e moduli. Sono stati tolti i blocchi ripetuti della landing, helper ovvi e metriche a zero nell'assenza di dati; la nuova materia parte dal solo nome e lascia colore, docente e pesi in un dettaglio espandibile. È stato corretto il lessico del backup precedente e precisato il comportamento delle attività di classe collegate. Le date del semestre, il recupero account, gli stati di sincronizzazione e le conseguenze delle azioni distruttive restano esposti nel contesto pertinente. Le sezioni cronologiche sottostanti descrivono gli interventi precedenti.
+
+Questo documento conserva contesto, evidenze e proposte. Non certifica un rilascio e non autorizza automaticamente interventi futuri.
 
 ## Come mantenere questo riferimento
 

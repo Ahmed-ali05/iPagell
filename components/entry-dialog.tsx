@@ -6,7 +6,6 @@ import { Plus, Trash2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -54,7 +53,7 @@ export function EntryDialog(props: Props) {
       open={!!props.type}
       onOpenChange={(open) => !open && props.onClose()}
     >
-      <DialogContent className="entry-dialog">
+      <DialogContent className="entry-dialog" aria-describedby={undefined}>
         {props.type && (
           <EntryForm
             key={`${props.type}-${props.editingSubject?.id ?? props.editingSemester?.id ?? "new"}`}
@@ -85,6 +84,7 @@ function EntryForm({
     ],
   );
   const [busy, setBusy] = useState(false);
+  const [subjectOptionsOpen, setSubjectOptionsOpen] = useState(!!editingSubject);
   const busyRef = useRef(false);
   const [error, setError] = useState<MessageKey | null>(null);
   const subject = data.subjects.find((s) => s.id === selected);
@@ -232,9 +232,6 @@ function EntryForm({
     <form onSubmit={submit}>
       <DialogHeader>
         <DialogTitle>{titles[type!]}</DialogTitle>
-        <DialogDescription>
-          {t("entry.description")}
-        </DialogDescription>
         <LanguageSelect className="language-select" />
       </DialogHeader>
       <fieldset disabled={busy} className="form-grid">
@@ -423,103 +420,118 @@ function EntryForm({
                 required
               />
             </label>
-            <label>
-              {t("entry.subjectColor")}
-              <input
-                name="color"
-                className="color-input"
-                type="color"
-                defaultValue={editingSubject?.color ?? "#6655e6"}
-              />
-            </label>
-            <label>
-              {t("entry.subjectCoefficient")}
-              <input
-                name="coefficient"
-                type="number"
-                min=".1"
-                max="100"
-                step=".1"
-                defaultValue={editingSubject?.coefficient ?? 1}
-                required
-              />
-            </label>
-            <label className="full">
-              {t("entry.teacher")}
-              <input
-                name="teacher"
-                defaultValue={editingSubject?.teacher}
-                maxLength={120}
-              />
-            </label>
-            <div className="full type-editor">
-              <h3>{t("entry.typeWeights")}</h3>
-              <p>{t("entry.typeWeightsInfo")}</p>
-              {types.map((gradeType, index) => (
-                <div className="type-row" key={gradeType.id}>
-                  <label>
-                    {t("entry.nameNumber", { number: index + 1 })}
-                    <input
-                      value={gradeType.name}
-                      maxLength={120}
-                      required
-                      onChange={(e) =>
-                        setTypes(
-                          types.map((x) =>
-                            x.id === gradeType.id ? { ...x, name: e.target.value } : x,
-                          ),
-                        )
-                      }
-                    />
-                  </label>
-                  <label>
-                    {t("entry.weightShort")}
-                    <input
-                      type="number"
-                      min=".1"
-                      max="100"
-                      step=".1"
-                      required
-                      value={gradeType.weight || ""}
-                      onChange={(e) =>
-                        setTypes(
-                          types.map((x) =>
-                            x.id === gradeType.id
-                              ? { ...x, weight: Number(e.target.value) }
-                              : x,
-                          ),
-                        )
-                      }
-                    />
-                  </label>
+            <details
+              className="subject-options"
+              open={subjectOptionsOpen}
+              onToggle={(event) => setSubjectOptionsOpen(event.currentTarget.open)}
+              onInvalidCapture={() => setSubjectOptionsOpen(true)}
+            >
+              <summary>{t("entry.subjectOptions")}</summary>
+              <div className="subject-options-grid">
+                <label>
+                  {t("entry.subjectColor")}
+                  <input
+                    name="color"
+                    className="color-input"
+                    type="color"
+                    defaultValue={editingSubject?.color ?? "#6655e6"}
+                  />
+                </label>
+                <label>
+                  {t("entry.subjectCoefficient")}
+                  <input
+                    name="coefficient"
+                    type="number"
+                    min=".1"
+                    max="100"
+                    step=".1"
+                    defaultValue={editingSubject?.coefficient ?? 1}
+                    required
+                  />
+                </label>
+                <label className="full">
+                  {t("entry.teacher")}
+                  <input
+                    name="teacher"
+                    defaultValue={editingSubject?.teacher}
+                    maxLength={120}
+                  />
+                </label>
+                <div className="full type-editor">
+                  <h3>{t("entry.typeWeights")}</h3>
+                  {editingSubject && data.grades.some((grade) => grade.subjectId === editingSubject.id) &&
+                    <p className="weight-history-warning">{t("entry.historicalWeightsWarning")}</p>}
+                  <details className="weight-help">
+                    <summary>{t("entry.typeWeightsHelp")}</summary>
+                    <p>{t("entry.typeWeightsInfo")}</p>
+                  </details>
+                  {types.map((gradeType, index) => (
+                    <div className="type-row" key={gradeType.id}>
+                      <label>
+                        {t("entry.nameNumber", { number: index + 1 })}
+                        <input
+                          value={gradeType.name}
+                          maxLength={120}
+                          required
+                          onChange={(e) =>
+                            setTypes(
+                              types.map((x) =>
+                                x.id === gradeType.id ? { ...x, name: e.target.value } : x,
+                              ),
+                            )
+                          }
+                        />
+                      </label>
+                      <label>
+                        {t("entry.weightShort")}
+                        <input
+                          type="number"
+                          min=".1"
+                          max="100"
+                          step=".1"
+                          required
+                          value={gradeType.weight || ""}
+                          onChange={(e) =>
+                            setTypes(
+                              types.map((x) =>
+                                x.id === gradeType.id
+                                  ? { ...x, weight: Number(e.target.value) }
+                                  : x,
+                              ),
+                            )
+                          }
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="icon-button danger"
+                        disabled={types.length === 1 || usedType(gradeType.id)}
+                        title={
+                          usedType(gradeType.id)
+                            ? t("entry.subjectNoDelete")
+                            : undefined
+                        }
+                        aria-label={t("entry.deleteType", { name: gradeType.name })}
+                        onClick={() => setTypes(types.filter((x) => x.id !== gradeType.id))}
+                      >
+                        <Trash2 />
+                      </button>
+                    </div>
+                  ))}
                   <button
                     type="button"
-                    className="icon-button danger"
-                    disabled={types.length === 1 || usedType(gradeType.id)}
-                    title={
-                      usedType(gradeType.id)
-                        ? t("entry.subjectNoDelete")
-                        : undefined
+                    className="soft-button"
+                    disabled={types.length >= 30}
+                    onClick={() =>
+                      setTypes([...types, { id: uid(), name: "", weight: 1 }])
                     }
-                    aria-label={t("entry.deleteType", { name: gradeType.name })}
-                    onClick={() => setTypes(types.filter((x) => x.id !== gradeType.id))}
                   >
-                    <Trash2 />
+                    <Plus />
+                    {t("entry.addType")}
                   </button>
                 </div>
-              ))}
-              <button
-                type="button"
-                className="soft-button"
-                disabled={types.length >= 30}
-                onClick={() =>
-                  setTypes([...types, { id: uid(), name: "", weight: 1 }])
-                }
-              >
-                <Plus />
-                {t("entry.addType")}
-              </button>
-            </div>
+              </div>
+            </details>
           </>
         )}
         {type === "semester" && (
