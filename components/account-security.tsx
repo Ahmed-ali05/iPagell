@@ -12,7 +12,7 @@ export function AccountSecurity({
   id: string;
   username: string;
   disabled: boolean;
-  onChanged: () => Promise<void>;
+  onChanged: (operation:"password"|"delete") => Promise<void>;
 }) {
   const { t } = useI18n();
   const [mode, setMode] = useState<"password" | "delete">("password"),
@@ -43,7 +43,7 @@ export function AccountSecurity({
         setError(apiErrorKey(body.code, "error.operationFailed"));
         return;
       }
-      await onChanged();
+      await onChanged(mode);
     } catch {
       setError("error.connectionUnavailable");
     } finally {

@@ -168,7 +168,7 @@ export function createDiarySession(io: Dependencies = browser) {
       const userId = state.user?.id;
       return enqueue(async (ticket) => {
         const local = state.diary;
-        if (!local || local.user.id !== userId) throw new Error("Apri prima lo stesso diario.");
+        if (!local || local.user.id !== userId) throw new Error("Accedi allo stesso account prima di modificare il diario.");
         if (state.status === "expired" || io.active() !== userId) throw new Error("Accedi di nuovo prima di modificare il diario.");
         if (state.status === "device-conflict") throw new LocalConflictError();
         const data = { ...recipe(structuredClone(local.data)), updatedAt: new Date().toISOString() };
@@ -208,6 +208,8 @@ export function createDiarySession(io: Dependencies = browser) {
       publish(next, "saved");
     }),
     logout: (discard = false) => enqueue(async (ticket) => {
+      if (state.status === "expired" && !state.user)
+        throw new RequestError(401, "L’account attivo è cambiato. Accedi di nuovo.");
       const local = state.diary;
       const persisted = local ? await io.read(local.user.id) : null;
       check(ticket);
@@ -227,7 +229,7 @@ export function createDiarySession(io: Dependencies = browser) {
     accountChanged() {
       if (state.user && io.active() !== state.user.id) {
         ++generation;
-        fail(new RequestError(401, "L’account attivo è cambiato. Accedi di nuovo."));
+        update({ ...initial, phase: "anonymous", error: "L’account attivo è cambiato. Accedi di nuovo.", status: "expired" });
       }
     },
     cancelPending() { ++generation; },

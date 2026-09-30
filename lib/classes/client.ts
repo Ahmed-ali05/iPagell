@@ -8,7 +8,7 @@ export async function classRequest<T>(userId: string, path: string, init?: Reque
   try {
     return await requestJson<T>(path, {
       ...init,
-      headers: { ...init?.headers, "X-IPagell-Account": userId },
+      headers: { ...init?.headers, "X-IPagell-Account": userId, "X-IPagell-Notes-Contract": "2" },
     });
   } catch (error) {
     if (!(error instanceof RequestError)) throw error;

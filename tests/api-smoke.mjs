@@ -43,6 +43,7 @@ async function api(path, method, body, cookie, extraHeaders = {}) {
       "Content-Type": "application/json",
       "CF-Connecting-IP": testIp,
       "X-IPagell-Account": accounts.find(a=>a.cookie===cookie)?.id ?? "",
+      ...(path.includes("/notes") || path.includes("my-class-notes") ? {"X-IPagell-Notes-Contract":"2"} : {}),
       ...(cookie ? { Cookie: cookie } : {}),
       ...extraHeaders,
     },
@@ -261,6 +262,49 @@ try {
   check(joined.data.class.members.length, 2, "joined class lists two members");
   const diaryB=await call("/api/account", registration, b.cookie);
   check(diaryB.status,201,"member has separate private diary");
+  const personalNoteId=randomUUID(),personalMutation=randomUUID();
+  const personalInput={id:personalNoteId,expectedUserId:a.id,mutationId:personalMutation,baseRevision:0,subjectId:testSubject.id,subjectName:testSubject.name,title:"Private lesson",content:"<script>alert(1)</script> stays text",contentFormat:"plain",pinned:false};
+  const personalCreated=await api("/api/notes","POST",personalInput,a.cookie);
+  check(personalCreated.status,201,"create private note separately from diary");
+  check((await api("/api/notes","GET",undefined,a.cookie,{"X-IPagell-Notes-Contract":"1"})).data.code,"NOTES_CLIENT_UPGRADE_REQUIRED","old note client receives typed upgrade error");
+  check((await api("/api/notes","POST",personalInput,a.cookie)).data.note.id,personalNoteId,"lost private create response retries by mutation ID");
+  check((await api(`/api/notes/${personalNoteId}`,"GET",undefined,b.cookie)).status,404,"other account cannot read private note by ID");
+  check((await api("/api/notes","GET",undefined,b.cookie)).data.notes.length,0,"private changes isolated by account");
+  check((await api(`/api/notes/${personalNoteId}`,"PATCH",{expectedUserId:a.id,baseRevision:1,mutationId:randomUUID(),subjectId:testSubject.id,subjectName:testSubject.name,title:"Foreign",content:"",contentFormat:"plain",expectedContentFormat:"plain",pinned:false},b.cookie)).status,401,"account switch cannot edit private note");
+  const editedPersonal=await api(`/api/notes/${personalNoteId}`,"PATCH",{expectedUserId:a.id,mutationId:randomUUID(),baseRevision:1,subjectId:testSubject.id,subjectName:testSubject.name,title:"Revised",content:"Still private",contentFormat:"plain",expectedContentFormat:"plain",pinned:true},a.cookie);
+  check(editedPersonal.status,200,"private note edit uses own revision");
+  check((await api(`/api/notes/${personalNoteId}`,"PATCH",{expectedUserId:a.id,mutationId:randomUUID(),baseRevision:1,subjectId:testSubject.id,subjectName:testSubject.name,title:"Stale",content:"",contentFormat:"plain",expectedContentFormat:"plain",pinned:false},a.cookie)).status,409,"stale private edit cannot overwrite another version");
+  check((await api("/api/notes?after=0","GET",undefined,a.cookie)).data.notes[0].content,"Still private","incremental private sync returns current content");
+  const formattedPersonal=await api(`/api/notes/${personalNoteId}`,"PATCH",{expectedUserId:a.id,mutationId:randomUUID(),baseRevision:2,subjectId:testSubject.id,subjectName:testSubject.name,title:"Revised",content:"**Still private**",contentFormat:"md-lite-v1",expectedContentFormat:"plain",pinned:true},a.cookie);
+  check(formattedPersonal.data.note.contentFormat,"md-lite-v1","explicit personal conversion stores format with revision");
+  check((await api(`/api/notes/${personalNoteId}`,"PATCH",{expectedUserId:a.id,mutationId:randomUUID(),baseRevision:3,subjectId:testSubject.id,subjectName:testSubject.name,title:"Corrupt",content:"plain",contentFormat:"plain",expectedContentFormat:"plain",pinned:true},a.cookie)).status,409,"stale expected format cannot overwrite converted note");
+  check((await api(`/api/notes/${personalNoteId}`,"GET",undefined,a.cookie,{"X-IPagell-Notes-Contract":"1"})).status,426,"old client cannot read converted note as plain");
+  check((await api(`/api/notes/${personalNoteId}`,"GET",undefined,a.cookie)).data.note.content,"**Still private**","rejected old client leaves formatted content intact");
+  check((await api(`/api/notes/${personalNoteId}`,"DELETE",{expectedUserId:a.id,mutationId:randomUUID(),baseRevision:3},a.cookie)).status,426,"delete without expected format requires upgrade");
+  const classSubject=await api(`/api/classes/${classId}/subjects`,"POST",{name:"History"},b.cookie);
+  check(classSubject.status,201,"member creates a separate class subject");
+  const classNoteId=randomUUID(),classMutation=randomUUID();
+  const shared=await api(`/api/classes/${classId}/notes`,"POST",{id:classNoteId,expectedUserId:b.id,mutationId:classMutation,baseRevision:0,subjectId:classSubject.data.subject.id,title:"Class lesson",content:"Visible only to members",contentFormat:"plain"},b.cookie);
+  check(shared.status,201,"member publishes a class note directly");
+  check((await api(`/api/classes/${classId}/notes`,"POST",{id:classNoteId,expectedUserId:b.id,mutationId:classMutation,baseRevision:0,subjectId:classSubject.data.subject.id,title:"Class lesson",content:"Visible only to members",contentFormat:"plain"},b.cookie)).data.note.id,classNoteId,"lost class create response is idempotent");
+  check((await api(`/api/classes/${classId}/notes/${classNoteId}`,"GET",undefined,a.cookie)).data.note.title,"Class lesson","other member reads shared note");
+  check((await api(`/api/classes/${classId}/notes/${classNoteId}`,"PATCH",{expectedUserId:a.id,mutationId:randomUUID(),baseRevision:1,subjectId:classSubject.data.subject.id,title:"Forbidden",content:"",contentFormat:"plain",expectedContentFormat:"plain"},a.cookie)).status,403,"owner cannot rewrite member's class note");
+  check((await api(`/api/classes/${classId}/notes/${classNoteId}/pin`,"PUT",{},a.cookie)).status,200,"class pin is per member");
+  check((await api(`/api/classes/${classId}/notes/${classNoteId}`,"GET",undefined,a.cookie)).data.note.pinned,true,"pin visible to its owner");
+  check((await api(`/api/classes/${classId}/notes/${classNoteId}`,"GET",undefined,b.cookie)).data.note.pinned,false,"class pin does not affect another member");
+  check((await api("/api/my-class-notes","GET",undefined,b.cookie)).data.notes.some(n=>n.id===classNoteId),true,"author archive lists own class note");
+  check((await api("/api/my-class-notes","GET",undefined,a.cookie)).data.notes.some(n=>n.id===classNoteId),false,"author archive excludes others' text");
+  const sharedUpdated=await api(`/api/classes/${classId}/notes/${classNoteId}`,"PATCH",{expectedUserId:b.id,mutationId:randomUUID(),baseRevision:1,subjectId:classSubject.data.subject.id,title:"Class lesson",content:"Revised by author",contentFormat:"plain",expectedContentFormat:"plain"},b.cookie);
+  check(sharedUpdated.status,200,"author can update a published class note");
+  check((await api(`/api/classes/${classId}/notes/${classNoteId}/pin`,"PUT",{},a.cookie,{"X-IPagell-Notes-Contract":"1"})).status,426,"old client cannot mutate a class pin");
+  check((await api(`/api/classes/${classId}/notes/${classNoteId}`,"PATCH",{expectedUserId:b.id,mutationId:randomUUID(),baseRevision:1,subjectId:classSubject.data.subject.id,title:"Old draft",content:"Stale",contentFormat:"plain",expectedContentFormat:"plain"},b.cookie)).status,409,"stale class edit cannot overwrite published text");
+  const renamedSubject=await api(`/api/classes/${classId}/subjects/${classSubject.data.subject.id}`,"PATCH",{name:"World History",baseRevision:1},a.cookie);
+  check(renamedSubject.status,200,"owner can rename class subject without changing note ID");
+  const archivedSubject=await api(`/api/classes/${classId}/subjects/${classSubject.data.subject.id}`,"PATCH",{archived:true,baseRevision:2},a.cookie);
+  check(archivedSubject.status,200,"class subject can be archived");
+  check((await api(`/api/classes/${classId}/notes/${classNoteId}`,"GET",undefined,a.cookie)).data.note.content,"Revised by author","archiving subject preserves class note");
+  check((await api(`/api/classes/${classId}/subjects/${classSubject.data.subject.id}`,"DELETE",{baseRevision:3},a.cookie)).status,200,"class subject can be deleted without deleting its notes");
+  check((await api(`/api/classes/${classId}/notes/${classNoteId}`,"GET",undefined,a.cookie)).data.note.subjectName,"History","deleted subject leaves historical name on note");
   const optionsA={semesterId:diary.data.semesters[0].id,subjectId:diary.data.subjects[0].id,reminder:true};
   const optionsB={semesterId:diaryB.data.diary.data.semesters[0].id,subjectId:"",reminder:false};
   const subA=await api(`/api/class-events/${eventId}/subscription`,"POST",optionsA,a.cookie);
@@ -408,6 +452,9 @@ try {
   const detachedB=(await api("/api/class-agenda","GET",undefined,b.cookie)).data.subscriptions[0];
   check(!!detachedB.detachedAt,true,"deleting class preserves detached personal copy");
   check(detachedB.event.title,"Solo per la classe","deleting class preserves latest version");
+  const pastNote=(await api("/api/my-class-notes","GET",undefined,b.cookie)).data.notes.find(n=>n.id===classNoteId);
+  check(pastNote?.content,"Revised by author","deleting class preserves author's text");
+  check(pastNote?.classId,null,"deleted class no longer grants class access to its note");
   check((await api(`/api/class-agenda/${subBId}`,"PATCH",{revision:detachedB.revision,personalEvent:{...eventInput,title:"Titolo personale"}},b.cookie)).status,200,"detached copy can be edited privately");
   check((await api(`/api/class-agenda/${subAId}`,"DELETE",{revision:detachedA.revision},a.cookie)).status,200,"private copy can be removed");
   const recovery = await call("/api/auth/recover", {

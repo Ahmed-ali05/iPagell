@@ -9,7 +9,7 @@ export function EmptyState({
 }: {
   icon: typeof CalendarDays;
   title: string;
-  text: string;
+  text?: string;
   actionLabel?: string;
   onAction?: () => void;
 }) {
@@ -17,7 +17,7 @@ export function EmptyState({
     <div className="empty-state">
       <Icon />
       <b>{title}</b>
-      <p>{text}</p>
+      {text && <p>{text}</p>}
       {actionLabel && onAction && (
         <button className="primary-button small" onClick={onAction}>
           {actionLabel}

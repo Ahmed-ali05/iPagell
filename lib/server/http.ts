@@ -3,6 +3,7 @@ export class HttpError extends Error {
   constructor(
     public status: number,
     message: string,
+    public code?: string,
   ) {
     super(message);
   }
@@ -79,7 +80,7 @@ export function errorResponse(error: unknown) {
         : "unknown",
     );
   return error instanceof HttpError
-    ? json({ error: error.message }, error.status)
+    ? json({ error: error.message, ...(error.code ? {code:error.code} : {}) }, error.status)
     : json(
         { error: "Servizio temporaneamente non disponibile. Riprova." },
         503,

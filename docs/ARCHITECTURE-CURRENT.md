@@ -393,6 +393,8 @@ Se diverso, la route restituisce 404.
 - `components/class-events-panel.tsx`: attività condivise dentro una classe.
 - `components/ipagell-app.tsx`: tab Classi e integrazione agenda.
 
+La vista Classi viene montata al primo accesso e resta montata finché resta attivo lo stesso `DiaryWorkspace` (identificato da `user.id`). Conserva in memoria elenco, selezione e dettagli per `classId`; il pannello conserva anche gli eventi per `classId`. Tornando al tab, i dati sono subito visibili e una lettura non bloccante parte se l'elenco o gli eventi hanno più di 30 secondi. L'elenco sblocca la UI senza attendere il dettaglio. Gli inviti si caricano aprendo la sezione di gestione. Le scritture confermate aggiornano o invalidano i dati coinvolti. Questa cache di vista non è persistente e non sostituisce i controlli di accesso server. [Misurazione e limiti](CLASSI-PERFORMANCE.md).
+
 ### 6.3 Client HTTP
 
 `lib/classes/client.ts` fornisce `classRequest()`:
@@ -588,6 +590,8 @@ UI: `PersonalEventDialog` in `components/class-events-panel.tsx`.
 localStorage key = ipagell-class-agenda-v1:<userId>
 ```
 
+La cache dell'agenda sottoscritta è distinta dalla cache in memoria della vista Classi descritta in §6.2.
+
 La cache è validata da uno schema Zod e accettata solo se `activeAccountId() === userId`.
 
 ### 9.2 Aggiornamento
@@ -677,6 +681,18 @@ preferences
 
 L'import del backup non ricostruisce la classe.
 
+### 11.3 Appunti e backup V3 (working tree del 30 settembre 2026)
+
+`lib/notes/backup.ts` esporta `backupVersion: 3` con `contentFormat` esplicito in note, bozze, conflitti e snapshot di classe. Accetta V1 (solo diario) e V2 (testi interpretati come `plain`). L'import assegna nuovi ID a diario, materie e appunti, verifica le quote prima del commit e registra un piano in IndexedDB per riprendere dopo un'interruzione. Le note di classe esportate rientrano solo come copie personali non associate a una classe; importare un backup non ripubblica contenuti. L'export completo richiede accesso al server per aggiornare le note personali e leggere quelle di classe scritte dall'utente; in caso di errore l'interfaccia segnala che la copia è limitata al dispositivo.
+
+### 11.4 Appunti per materia (working tree del 30 settembre 2026)
+
+La vista personale si apre da Home e dalla materia in Voti senza aggiungere una sesta voce alla barra fissa. `PersonalNotesView` usa `useNotes` e `ipagell-notes-db` versione 2 (store `personal`, `classDrafts`, `meta`) separati da `ipagell-db` del diario. Un appunto personale punta all'ID stabile di una materia privata ma non al semestre: rinominare o archiviare la materia conserva il riferimento; eliminarla lascia il testo con nome storico, ancora modificabile, e permette di scegliere esplicitamente un'altra materia. Le note non sono dentro `SchoolData.version=1`; un vecchio client può salvare il diario senza eliminarle. Il cursore `change_seq` avanza in una transazione insieme alla pagina ricevuta; ogni bozza ha ID di mutazione, revisione base, formato e confronto locale. L'editor condiviso ProseMirror mantiene `plain` fino al primo comando di formattazione; `md-lite-v1` è serializzato da un AST chiuso. `NoteContent` rende solo nodi React ammessi. Il modulo PDF e i font si caricano al comando Esporta, con Markdown secondario e `.txt` per recuperare una nota plain.
+
+`ClassNotesPanel` compare nel dettaglio Classe. Ogni classe ha `class_subjects` separati dalle materie private; le etichette delle attività esistenti vengono seminate dalla migrazione 0005 e i vecchi client possono continuare a creare attività con etichette libere. L'editor di classe salva soltanto una bozza privata in IndexedDB finché l'utente non conferma l'anteprima e pubblica online. Le letture richiedono membership corrente; l'autore può modificare o ritirare, owner/moderator possono moderare, e il pin è per membro. Uscita o cancellazione della classe stacca le note condivise senza cancellare automaticamente il testo dell'autore, che resta recuperabile dall'archivio personale. Copiare tra i due spazi crea un nuovo testo e richiede una materia nello spazio di destinazione.
+
+Le API sono `app/api/notes/**`, `app/api/classes/[classId]/subjects/**`, `app/api/classes/[classId]/notes/**` e `app/api/my-class-notes/**`, con repository SQL in `lib/server/note-repository.ts` e guard in `lib/server/note-http.ts`. La migrazione 0005 aggiunge tabelle e trigger; la 0006 aggiunge `content_format` con default `plain` e aggiorna i trigger. Tutte le route note richiedono `X-IPagell-Notes-Contract: 2`, incluse le letture, il pin e l'archivio autore. Le scritture hanno formato esplicito e gli update/delete confrontano atomicamente anche `expectedContentFormat`; i vecchi client ricevono 426 senza toccare le righe. Restano i limiti di 500 note/8 MiB per account, 200/4 MiB per classe, 60 materie attive, 20.000 code point serializzati e 64 KiB per appunto. Le mutazioni usano revisione e ID di mutazione; le liste sono paginate a 50 righe e al massimo 512 KiB di risposta. Le note di classe richiedono rete per pubblicazione e lettura autorizzata; una bozza aperta resta salvabile localmente se la connessione cade.
+
 ## 12. Database e layer server
 
 ### Accesso D1
@@ -709,6 +725,7 @@ Gli eventi costruiscono direttamente `ClassEventRepository(database())` tramite 
 | `lib/server/class-repository.ts` | Classi, membri, ruoli, inviti. |
 | `lib/server/class-event-http.ts` | Guard comune per route eventi/sottoscrizioni. |
 | `lib/server/class-event-repository.ts` | Eventi, sottoscrizioni e revisioni. |
+| `lib/server/note-http.ts`, `lib/server/note-repository.ts` | Autorizzazione, validazione, quote e revisione di note e materie di classe. |
 
 ## 13. Cloudflare / Sites
 

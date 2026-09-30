@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { ArrowRight, BookOpenCheck, CalendarCheck2, Check, LockKeyhole, UsersRound } from "lucide-react";
+import { ArrowRight, CalendarCheck2, LockKeyhole, UsersRound } from "lucide-react";
 import { LegacyEntryRedirect } from "@/components/legacy-entry-redirect";
 import { InstallAppOffer } from "@/components/install-app";
 import { formatNumber } from "@/lib/i18n";
@@ -28,7 +28,6 @@ export function LandingContent({ localePath, authenticated = false }: { localePa
     { title: t("landing.feature1Title"), text: t("landing.feature1Text") },
     { title: t("landing.feature2Title"), text: t("landing.feature2Text") },
     { title: t("landing.feature3Title"), text: t("landing.feature3Text") },
-    { title: t("landing.feature4Title"), text: t("landing.feature4Text") },
   ];
   const faqs = [
     { question: t("landing.faq1Q"), answer: t("landing.faq1A") },
@@ -36,12 +35,6 @@ export function LandingContent({ localePath, authenticated = false }: { localePa
     { question: t("landing.faq3Q"), answer: t("landing.faq3A") },
     { question: t("landing.faq4Q"), answer: t("landing.faq4A") },
   ];
-  const steps = [
-    { title: t("landing.step1Title"), text: t("landing.step1Text") },
-    { title: t("landing.step2Title"), text: t("landing.step2Text") },
-    { title: t("landing.step3Title"), text: t("landing.step3Text") },
-  ];
-  const trust = [t("landing.trust1"), t("landing.trust2"), t("landing.trust3")];
   return <div className={styles.page}>
     <LegacyEntryRedirect locale={localePath} />
     <header className={styles.header}>
@@ -57,16 +50,12 @@ export function LandingContent({ localePath, authenticated = false }: { localePa
     <main>
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
-          <p className={styles.eyebrow}><span /> {t("landing.eyebrow")}</p>
           <h1>{t("landing.title")}</h1>
           <p className={styles.lead}>{t("landing.lead")}</p>
           <div className={styles.heroActions}>
             <a className={styles.primaryCta} href={registerHref}>{t("landing.create")} <ArrowRight size={18} aria-hidden="true" /></a>
             <a className={styles.secondaryCta} href={appHref}>{t("common.login")}</a>
           </div>
-          <ul className={styles.trustList}>
-            {trust.map((item) => <li key={item}><Check size={15} aria-hidden="true" /> {item}</li>)}
-          </ul>
           <InstallAppOffer placement="landing" />
         </div>
         <figure className={styles.productPreview} aria-label={t("landing.preview")}>
@@ -82,24 +71,17 @@ export function LandingContent({ localePath, authenticated = false }: { localePa
           <figcaption>{t("landing.previewCaption")}</figcaption>
         </figure>
       </section>
-      <section className={styles.featureSection} id="funzioni"><div className={styles.sectionHeading}><h2>{t("landing.featuresTitle")}</h2><p>{t("landing.featuresLead")}</p></div><div className={styles.featureGrid}>
-        {features.map(({ title, text }, index) => <article className={styles.featureCard} key={title}><span className={styles.featureNumber}>0{index + 1}</span><h3>{title}</h3><p>{text}</p></article>)}
+      <section className={styles.featureSection} id="funzioni"><div className={styles.sectionHeading}><h2>{t("landing.featuresTitle")}</h2></div><div className={styles.featureGrid}>
+        {features.map(({ title, text }) => <article className={styles.featureCard} key={title}><h3>{title}</h3><p>{text}</p></article>)}
       </div><a className={styles.toolLink} href={publicAveragePaths[locale]}>{t("landing.averageToolLink")} <ArrowRight size={16} aria-hidden="true" /></a></section>
       <section className={styles.privacySection} id="privacy">
         <div className={styles.privacyVisual} aria-hidden="true"><div className={styles.privateCard}><span><LockKeyhole size={17} /> {t("workspace.private")}</span><b>{t("landing.personalData")}</b></div><div className={styles.separator}><span /></div><div className={styles.sharedCard}><span><UsersRound size={17} /> {t("workspace.shared")}</span><b>{t("landing.sharedActivity")}</b></div></div>
-        <div className={styles.privacyCopy}><h2>{t("landing.privacyTitle")}</h2><p>{t("landing.privacyText")}</p><ul>
-          <li><LockKeyhole size={18} aria-hidden="true" /> {t("landing.personalData")}</li>
-          <li><UsersRound size={18} aria-hidden="true" /> {t("landing.sharedActivity")}</li>
-          <li><BookOpenCheck size={18} aria-hidden="true" /> {t("landing.personalProgress")}</li>
-        </ul></div>
+        <div className={styles.privacyCopy}><h2>{t("landing.privacyTitle")}</h2><p>{t("landing.privacyText")}</p></div>
       </section>
-      <section className={styles.stepsSection} id="come-funziona"><div className={styles.sectionHeading}><h2>{t("landing.stepsTitle")}</h2></div><ol className={styles.steps}>
-        {steps.map((step, index) => <li key={step.title}><span>0{index + 1}</span><div><h3>{step.title}</h3><p>{step.text}</p></div></li>)}
-      </ol></section>
-      <section className={styles.faqSection} id="domande"><div className={styles.faqIntro}><h2>{t("landing.faqTitle")}</h2><p>{t("landing.faqIntro")}</p></div><div className={styles.faqList}>
+      <section className={styles.faqSection} id="domande"><div className={styles.faqIntro}><h2>{t("landing.faqTitle")}</h2></div><div className={styles.faqList}>
         {faqs.map((item) => <details key={item.question}><summary>{item.question}<span>+</span></summary><p>{item.answer}</p></details>)}
       </div></section>
-      <section className={styles.finalCta}><div><h2>{t("landing.finalTitle")}</h2><p>{t("landing.finalText")}</p></div><a className={styles.lightCta} href={appHref}>{t("landing.open")} <ArrowRight size={18} aria-hidden="true" /></a></section>
+      <section className={styles.finalCta}><a className={styles.lightCta} href={registerHref}>{t("landing.create")} <ArrowRight size={18} aria-hidden="true" /></a></section>
     </main>
     <section className={styles.githubSection} aria-labelledby="github-title"><div className={styles.githubCopy}><h2 id="github-title">{t("landing.openSource")}</h2><p>{t("landing.opensource")}</p></div><a className={styles.githubLink} href="https://github.com/Ahmed-ali05/iPagell" target="_blank" rel="noopener noreferrer">{t("landing.github")}</a></section>
     <footer className={styles.footer}><div className={styles.brand}><span className={styles.logo}>iP</span><span>iPagell</span></div><p>{t("landing.footer")}</p><a href={appHref}>{t("common.login")}</a></footer>

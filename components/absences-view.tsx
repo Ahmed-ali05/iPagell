@@ -34,7 +34,7 @@ export function AbsencesView({
         ? t("absence.atThreshold")
         : percentage >= 80
           ? t("absence.nearThreshold", { value: formatNumber(locale, threshold - total, { maximumFractionDigits: 1 }) })
-          : t("absence.totalProgress", { total: formatNumber(locale, total, { maximumFractionDigits: 1 }), threshold: formatNumber(locale, threshold) });
+          : null;
   const bySubject = subjects
     .map((subject) => ({
       subject,
@@ -47,12 +47,11 @@ export function AbsencesView({
   return (
     <section className="module-view">
       <div className="module-toolbar">
-        <p>{t("absence.intro")}</p>
         <button className="primary-button" onClick={onAdd}>
           <Plus size={18} /> {t("absence.add")}
         </button>
       </div>
-      <div className="absence-stats">
+      {!!items.length && <div className="absence-stats">
         <div className="absence-stat">
           <small>{t("absence.totalHours")}</small>
           <b>{formatNumber(locale, total, { maximumFractionDigits: 1 })} <span>{t("common.hoursShort")}</span></b>
@@ -65,8 +64,8 @@ export function AbsencesView({
           <small>{t("absence.registered")}</small>
           <b>{items.length}</b>
         </div>
-      </div>
-      <section className={`absence-alert ${percentage >= 80 ? "warning" : ""}`}>
+      </div>}
+      {!!items.length && <section className={`absence-alert ${percentage >= 80 ? "warning" : ""}`}>
         <div
           className="circle-progress"
           style={
@@ -80,7 +79,7 @@ export function AbsencesView({
           <h3>
             {formatNumber(locale, total, { maximumFractionDigits: 1 })} {t("common.of")} {formatNumber(locale, threshold)} {t("common.hours")}
           </h3>
-          <p>{thresholdMessage} {t("absence.notOfficialLimit")}</p>
+          <p>{thresholdMessage && `${thresholdMessage} `}{t("absence.notOfficialLimit")}</p>
         </div>
         <label>
           {t("absence.referenceHours")}
@@ -96,14 +95,14 @@ export function AbsencesView({
             }}
           />
         </label>
-      </section>
-      <div className="absence-layout">
+      </section>}
+      <div className={`absence-layout ${bySubject.length ? "" : "single"}`}>
         <section className="panel absence-list">
-          <div className="panel-title">
+          {!!items.length && <div className="panel-title">
             <div>
               <h3>{t("absence.recent")}</h3>
             </div>
-          </div>
+          </div>}
           {items.length ? (
             [...items]
               .sort((a, b) => b.date.localeCompare(a.date))
@@ -145,11 +144,10 @@ export function AbsencesView({
             <EmptyState
               icon={UserRoundCheck}
               title={t("absence.emptyTitle")}
-              text={t("absence.emptyText")}
             />
           )}
         </section>
-        <aside className="panel absence-subjects">
+        {!!bySubject.length && <aside className="panel absence-subjects">
           <div className="panel-title">
             <div>
               <h3>{t("common.bySubject")}</h3>
@@ -174,7 +172,7 @@ export function AbsencesView({
               </span>
             </div>
           ))}
-        </aside>
+        </aside>}
       </div>
     </section>
   );

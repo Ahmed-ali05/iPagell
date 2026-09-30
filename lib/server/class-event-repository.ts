@@ -23,7 +23,7 @@ export class ClassEventRepository {
       SELECT ?,?,?,?,?,?,?,?,?,1,?,? WHERE EXISTS (SELECT 1 FROM class_members WHERE class_id=? AND user_id=?)
       AND (SELECT count(*) FROM class_events WHERE class_id=?)<500`)
       .bind(id,classId,user.id,input.subject,input.kind,input.title,input.description,input.dueAt,input.status,now,now,classId,user.id,classId).run();
-    if(r.meta.changes!==1) throw new HttpError(409,"Classe non disponibile o limite di 500 eventi raggiunto.");
+    if(r.meta.changes<1) throw new HttpError(409,"Classe non disponibile o limite di 500 eventi raggiunto.");
     return id;
   }
   async update(user: AccountIdentity, classId: string, id: string, input: z.infer<typeof eventFields>, revision: number) {

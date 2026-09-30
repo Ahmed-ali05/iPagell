@@ -80,6 +80,14 @@ Operazioni membro:
 
 Un moderatore può rimuovere membri ordinari, non proprietario o altri moderatori. Il proprietario non può uscire o eliminare il proprio account finché non trasferisce o elimina le classi possedute.
 
+### Appunti
+
+Le route `/api/notes/**`, `/api/classes/:classId/notes/**` (pin incluso) e `/api/my-class-notes/**` richiedono sempre `X-IPagell-Notes-Contract: 2`. Senza header o con altra versione rispondono 426 con `{ "code": "NOTES_CLIENT_UPGRADE_REQUIRED", "error": "..." }` e `Cache-Control: private, no-store`. L'identità continua a provenire dal cookie; `X-IPagell-Account` e `expectedUserId` rilevano un cambio di account, senza autorizzare accessi. Le materie di classe hanno route separate.
+
+Ogni nota include `contentFormat: "plain" | "md-lite-v1"` nelle liste, nel dettaglio e nelle risposte di scrittura. `plain` conserva il testo preesistente; `md-lite-v1` è un Markdown limitato a titoli di sezione, grassetto, elenchi e paragrafi, validato e canonico. `POST` richiede `contentFormat`. `PATCH` richiede il nuovo `contentFormat`, `expectedContentFormat`, `baseRevision` e `mutationId`; `DELETE` richiede `expectedContentFormat`, `baseRevision` e `mutationId`. Il server confronta revisione e formato precedente nella stessa `UPDATE`. Il pin personale passa da `PATCH` della nota, quello di classe ha una route distinta ma richiede comunque l'header 2. Formati mancanti/sconosciuti danno 426, una revisione o un formato precedente diverso dà 409. Il limite per nota è 20.000 code point serializzati e 64 KiB del record; il corpo di scrittura è limitato a 64 KiB.
+
+L'esportazione del backup usa `backupVersion: 3` e include il formato in note personali, bozze, conflitti e snapshot di classe. L'import V1 riguarda soltanto il diario; V2 viene interpretato come testo `plain`; V3 preserva il formato. Le copie importate ricevono nuovi ID e non vengono pubblicate automaticamente nella classe. La dimensione massima del file V2/V3 resta 24 MiB.
+
 ### Operazioni sensibili
 
 - Cambio password: `{ operation: "password", expectedUserId, currentPassword, newPassword }`.
@@ -97,10 +105,11 @@ Il cambio password incrementa `auth_version`, mantiene il codice di recupero e i
 | 409 | Username/profilo già presente, revisione o credenziali cambiate; distinguere per endpoint |
 | 413 | Corpo oltre limite: 4.096 byte per login/registrazione/recupero/sicurezza; 1.500.000 per profilo/diario |
 | 415 | Tipo di contenuto non supportato |
+| 426 | Client note da aggiornare; conservare la bozza locale e ricaricare l'app |
 | 429 | Limite tentativi; attendere, non generare retry automatici |
 | 503 | Errore operativo o hashing già occupato; mostrare errore senza perdere il draft |
 
-Le risposte applicative usano `{ error: "messaggio" }`; `GET /api/account` anonimo è l’eccezione: `{ user: null }` con 401. Gateway e runtime possono produrre altri formati: il client deve controllare stato e Content-Type, non assumere sempre JSON.
+Le risposte applicative usano `{ error: "messaggio" }`, con `code` aggiuntivo per l'upgrade obbligatorio delle note; `GET /api/account` anonimo è l’eccezione: `{ user: null }` con 401. Gateway e runtime possono produrre altri formati: il client deve controllare stato e Content-Type, non assumere sempre JSON.
 
 Limiti autenticazione: finestre fisse di 15 minuti, separatamente per azione, 40 tentativi per indirizzo edge, 12 per username, 400 globali. Contano anche tentativi validi; non è un blocco permanente né un limite su ogni endpoint del diario. In assenza di indirizzo edge si usa un bucket condiviso `unknown`.
 

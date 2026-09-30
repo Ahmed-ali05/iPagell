@@ -30,6 +30,8 @@ Usare la skill Sites hosting: verificare il progetto e i domini esistenti, compi
 
 Preservare accesso pubblico e binding esistenti. Le migrazioni incluse nel pacchetto devono essere compatibili con i dati correnti; un rollback del codice non annulla le migrazioni. Nessun token, backup, database locale o `.env` nel pacchetto o nel repository.
 
+Per il rilascio degli appunti, verificare che le migrazioni additive `drizzle/0005_heavy_elektra.sql` e `drizzle/0006_daily_stranger.sql` siano applicate nell'ordine al D1 **del progetto Sites esistente** prima di rendere disponibile il nuovo codice. La 0006 lascia i testi preesistenti intatti e assegna `plain` per default; controllare colonne, trigger, `change_seq` e quote su dati campione. Fare prima un backup verificato del D1 Sites. Pubblicare poi backend con contratto note 2 e frontend con IndexedDB v2/editor, provando schede/PWA vecchie online e offline: le API note devono restituire 426 e un vecchio salvataggio diario non deve alterare le note. Provare creazione, riapertura, conflitto, backup V2/V3, PDF e pubblicazione esplicita di classe su dispositivi mobili prima di dichiarare la funzione pronta. Non usare il D1 del Worker sperimentale come prova dello schema Sites. Questa procedura è per un rilascio futuro: il lavoro locale non è pubblicato.
+
 ## Worker sperimentale separato
 
 Solo per prove esplicitamente richieste, dopo `npx wrangler login`:
