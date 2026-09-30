@@ -15,6 +15,10 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { ClassEventsPanel } from "@/components/class-events-panel";
+import { ClassNotesPanel } from "@/components/class-notes-panel";
+import { flushOpenNotes } from "@/lib/notes/flush";
+import type { useNotes } from "@/hooks/use-notes";
+import type { ClassNote,PersonalNote } from "@/types/notes";
 import type { SchoolData } from "@/types/domain";
 import type { ClassAgendaController } from "@/hooks/use-class-agenda";
 import type { PendingActionController } from "@/hooks/use-pending-actions";
@@ -74,6 +78,10 @@ export function ClassesView({
   semesterId,
   agenda,
   actions,
+  notes,
+  copyToClass,
+  onCopyConsumed,
+  onCopyPersonal,
 }: {
   active: boolean;
   currentUserId: string;
@@ -82,6 +90,10 @@ export function ClassesView({
   semesterId: string;
   agenda: ClassAgendaController;
   actions: PendingActionController;
+  notes: ReturnType<typeof useNotes>;
+  copyToClass: PersonalNote|null;
+  onCopyConsumed:()=>void;
+  onCopyPersonal:(note:ClassNote)=>void;
 }) {
   const { t, locale } = useI18n();
   const request = useCallback(<T,>(path: string, init?: RequestInit) => classRequest<T>(currentUserId, path, init), [currentUserId]);
@@ -286,6 +298,7 @@ export function ClassesView({
 
   async function selectClass(id: string) {
     if (id === selectedId) return;
+    try { await flushOpenNotes(); } catch { toast.error(t("notes.saveFailed")); return; }
     selectedIdRef.current = id;
     invitesSequence.current++;
     setSelectedId(id);
@@ -541,6 +554,7 @@ export function ClassesView({
                 </section>
 
                 <ClassEventsPanel active={active} cached={eventsCache.get(detail.id)} onLoaded={cacheEvents} onInvalidate={invalidateEvents} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} actions={actions} />
+                <ClassNotesPanel active={active} detail={detail} userId={currentUserId} controller={notes} copySeed={copyToClass} onCopyConsumed={onCopyConsumed} onCopyPersonal={onCopyPersonal} />
 
                 <details className="class-administration" onToggle={event => { if (event.currentTarget.open && canManageInvites && invitesLoadedFor !== detail.id) void loadInvites(detail.id).catch(() => setError("classes.unavailable")); }}>
                   <summary>{t("classes.management")} <span>{detail.memberCount} {t(selectPlural(locale, detail.memberCount, "classes.member", "classes.members"))}</span></summary>

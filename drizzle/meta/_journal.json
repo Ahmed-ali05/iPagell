@@ -36,6 +36,13 @@
       "when": 1789567010348,
       "tag": "0004_glossy_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1790694502585,
+      "tag": "0005_heavy_elektra",
+      "breakpoints": true
     }
   ]
 }

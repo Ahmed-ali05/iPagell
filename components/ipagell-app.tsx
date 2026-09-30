@@ -69,12 +69,17 @@ import {
 } from "@/lib/grading";
 import { EntryDialog, type ModalType } from "@/components/entry-dialog";
 import { ClassesView } from "@/components/classes-view";
+import { PersonalNotesView } from "@/components/notes-view";
+import { flushOpenNotes } from "@/lib/notes/flush";
+import { useNotes } from "@/hooks/use-notes";
+import type { ClassNote, PersonalNote, NoteDraft, NotesBackupV2 } from "@/types/notes";
 import { PersonalEventDialog } from "@/components/class-events-panel";
 import { useClassAgenda } from "@/hooks/use-class-agenda";
 import { usePendingActions } from "@/hooks/use-pending-actions";
 import { Spinner } from "@/components/ui/spinner";
 import { subscriptionAgenda, type AgendaDisplayItem, type ClassSubscription } from "@/lib/classes/events";
-import { backupWithClassAgenda } from "@/lib/classes/backup";
+import { makeNotesBackup,parseAnyBackup,remapDiaryForImport,estimatedImportUsage,planNotesImport } from "@/lib/notes/backup";
+import { listPersonal,listClassDrafts,readMeta,readImportPlan,writeImportPlan,readPersonal,forgetNotes,type ImportPlan } from "@/lib/notes/storage";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   generalAverage,
@@ -82,7 +87,6 @@ import {
   subjectAverage,
 } from "@/lib/calculations";
 import {
-  parseBackup,
   downloadBackup,
   legacyBackup,
 } from "@/lib/account-storage";
@@ -95,7 +99,7 @@ import type {
   Subject,
 } from "@/types/domain";
 
-type TabId = "home" | "agenda" | "grades" | "absences" | "stats" | "classes";
+type TabId = "home" | "agenda" | "grades" | "absences" | "stats" | "classes" | "notes";
 
 declare global {
   interface Document {
@@ -115,7 +119,7 @@ const nav = [
   { id: "absences", icon: UserRoundCheck },
   { id: "classes", icon: UsersRound },
 ] as const;
-const navKeys = { home: "common.home", agenda: "nav.agenda", grades: "nav.grades", absences: "nav.absences", classes: "nav.classes", stats: "nav.stats" } as const;
+const navKeys = { home: "common.home", agenda: "nav.agenda", grades: "nav.grades", absences: "nav.absences", classes: "nav.classes", stats: "nav.stats", notes: "notes.my" } as const;
 
 const uid = (prefix: string) => `${prefix}-${crypto.randomUUID()}`;
 const formatDate = (locale: Locale, date: string, options?: Intl.DateTimeFormatOptions) =>
@@ -191,10 +195,13 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const { t, locale } = useI18n();
   const { data, preferences } = session.diary!;
   const classAgenda = useClassAgenda(session.user!.id);
+  const notes = useNotes(session.user!.id);
   const classActions = usePendingActions();
   const allAgenda = useMemo(() => [...data.agenda, ...subscriptionAgenda(classAgenda.items.filter(s => !data.agenda.some(a => a.id === `class-snapshot-${s.id}`)))], [data.agenda, classAgenda.items]);
   const [personalEvent, setPersonalEvent] = useState<ClassSubscription | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
+  const [notesIntent,setNotesIntent]=useState<{subjectId:string;newNote:boolean;openId:string;serial:number}>({subjectId:"",newNote:false,openId:"",serial:0});
+  const [copyToClass,setCopyToClass]=useState<PersonalNote|null>(null);
   const [classesVisited, setClassesVisited] = useState(false);
   const [agendaFocusId, setAgendaFocusId] = useState<string | null>(null);
   const [selectedGradeSubjectId, setSelectedGradeSubjectId] = useState("");
@@ -204,17 +211,21 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [deleteSubjectId, setDeleteSubjectId] = useState<string | null>(null);
   const [deleteSemesterId, setDeleteSemesterId] = useState<string | null>(null);
-  const [pendingBackup, setPendingBackup] = useState<BackupPayload | null>(
+  const [pendingBackup, setPendingBackup] = useState<BackupPayload | NotesBackupV2 | null>(
     null,
   );
+  const [backupExported,setBackupExported]=useState(false);
+  const [importPlanExists,setImportPlanExists]=useState(false);
   const [removal, setRemoval] = useState<{
     title: string;
     description: string;
     actionLabel: string;
     run: () => Promise<void | boolean>;
     subscriptionId?: string;
+    offerExport?: boolean;
   } | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
+  useEffect(()=>{void readImportPlan(session.user!.id).then(plan=>setImportPlanExists(!!plan)).catch(()=>undefined);},[session.user]);
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
@@ -408,10 +419,20 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     (absence) => absence.semesterId === currentSemester.id,
   );
   const average = generalAverage(data.subjects, semesterGrades);
-  const navigate = (tab: TabId, agendaItemId?: string) => {
+  const navigate = async (tab: TabId, agendaItemId?: string) => {
+    try { await flushOpenNotes(); } catch { toast.error(t("notes.saveFailed")); return false; }
     setAgendaFocusId(tab === "agenda" ? agendaItemId ?? null : null);
     if (tab === "classes") setClassesVisited(true);
     setActiveTab(tab);
+    return true;
+  };
+  const openNotes=async(subjectId="",newNote=false,openId="")=>{
+    if(await navigate("notes"))setNotesIntent({subjectId,newNote,openId,serial:Date.now()});
+  };
+  const copyClassToPersonal=async(note:ClassNote)=>{
+    const id=crypto.randomUUID();
+    const draft:NoteDraft={userId:session.user!.id,id,space:"personal",subjectId:"",subjectName:note.subjectName,title:note.title,content:note.content,pinned:false,baseRevision:0,mutationId:crypto.randomUUID(),localVersion:0,localEditedAt:Date.now()};
+    try{await notes.savePersonalDraft(draft,null);openNotes("",false,id);}catch{toast.error(t("notes.saveFailed"));}
   };
   const toggleTheme = () =>
     savePreference({
@@ -457,20 +478,71 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     setDeleteSemesterId(null);
   };
 
-  const exportBackup = () => {
+  const exportBackup = async () => {
     try {
-      downloadBackup(backupWithClassAgenda(data, preferences, classAgenda.items));
+      await flushOpenNotes();
+      let complete=true;
+      try{await notes.pullForBackup();const meta=await readMeta(session.user!.id);complete=meta.complete&&navigator.onLine;}catch{complete=false;}
+      let authored:ClassNote[]=[];
+      if(complete){try{let after="";while(true){const page=await notes.request<{notes:ClassNote[];nextAfter:string;hasMore:boolean}>(`/api/my-class-notes?after=${after}`);authored.push(...page.notes);after=page.nextAfter;if(!page.hasMore)break;if(!page.notes.length)throw new Error("Incomplete archive");}}catch{complete=false;authored=[];}}
+      const [records,drafts]=await Promise.all([listPersonal(session.user!.id).catch(()=>{complete=false;return notes.records;}),listClassDrafts(session.user!.id).catch(()=>{complete=false;return notes.classDrafts;})]);
+      if(!complete&&!window.confirm(t("notes.backupPartial")))return;
+      const backup=makeNotesBackup(data,preferences,classAgenda.items,records,drafts,authored,complete);
+      downloadBackup(backup,"ipagell-diario-appunti");
+      setBackupExported(true);
       toast.success(t("backup.ready"));
-    } catch { reportError(); }
+    } catch(error) { toast.error(error instanceof Error&&error.message==="BACKUP_LIMIT"?t("notes.backupLimit"):t("entry.saveFailed")); }
+  };
+
+  const resumeImport=async(start?:ImportPlan)=>{
+    const userId=session.user!.id;
+    let plan=start??await readImportPlan(userId);
+    if(!plan||plan.userId!==userId)return;
+    if(!plan.diaryCommitted){
+      const already=data.semesters.length===plan.data.semesters.length&&plan.data.semesters.every(s=>data.semesters.some(d=>d.id===s.id));
+      if(!already)await session.commit(()=>plan!.data,plan.preferences);
+      plan={...plan,diaryCommitted:true};await writeImportPlan(plan,userId);
+    }
+    for(let index=plan.next;index<plan.entries.length;index++){
+      const entry=plan.entries[index];
+      if(!await readPersonal(userId,entry.id))await notes.savePersonalDraft(entry,null);
+      plan={...plan,next:index+1};await writeImportPlan(plan,userId);
+    }
+    await writeImportPlan(null,userId);setImportPlanExists(false);await notes.refresh();
+  };
+
+  const confirmImport=async()=>{
+    const backup=pendingBackup;if(!backup)return;
+    try{
+      await flushOpenNotes();
+      if("backupVersion" in backup){
+        if(!backupExported){toast.error(t("backup.exportCurrent"));return;}
+        await notes.pullForBackup();
+        const records=await listPersonal(session.user!.id);
+        if(!estimatedImportUsage(records,backup).withinLimit){toast.error(t("notes.importQuota"));return;}
+        const existing=await readImportPlan(session.user!.id);
+        if(existing){toast.error(t("notes.importPreview",{count:existing.entries.length}));return;}
+        const plan=planNotesImport(session.user!.id,backup);
+        await writeImportPlan(plan,session.user!.id);setImportPlanExists(true);
+        await resumeImport(plan);
+      } else {
+        const remapped=remapDiaryForImport(backup.data,backup.preferences);
+        await session.commit(()=>remapped.data,remapped.preferences);
+      }
+      setPendingBackup(null);toast.success(t("backup.imported"));
+    }catch{toast.error(t("entry.saveFailed"));}
   };
 
   const importBackup = async (file?: File) => {
     if (!file) return;
     try {
-      if (file.size > 1_500_000)
+      if (file.size > 24*1024*1024)
         throw new Error(t("error.backupTooLarge"));
       const parsed: unknown = JSON.parse(await file.text());
-      setPendingBackup(parseBackup(parsed));
+      const backup=parseAnyBackup(parsed);
+      if(!("backupVersion" in backup)&&file.size>1_500_000)throw new Error(t("error.backupTooLarge"));
+      setBackupExported(false);
+      setPendingBackup(backup);
     } catch {
       toast.error(t("error.backupInvalid"));
     }
@@ -539,7 +611,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           </div>
           <div className="top-actions">
             <LanguageSelect className="language-select" />
-            {activeTab !== "classes" && (
+            {activeTab !== "classes" && activeTab !== "notes" && (
               <NativeSelect
                 aria-label={t("workspace.currentSemester")}
                 value={currentSemester.id}
@@ -568,7 +640,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         </header>
 
         <div className="account-toolbar">
-          {activeTab !== "classes" && (
+          {importPlanExists&&<button className="soft-button" onClick={()=>void resumeImport().catch(reportError)}>{t("notes.retry")} · {t("notes.backupImport")}</button>}
+          {activeTab !== "classes" && activeTab !== "notes" && (
             <NativeSelect
               aria-label={t("workspace.diaryPeriod")}
               value={currentSemester.id}
@@ -649,6 +722,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                 onNavigate={navigate}
                 onAdd={setModal}
                 onManageSubjects={() => setSettingsOpen(true)}
+                onOpenNotes={()=>openNotes()}
+                onNewNote={()=>openNotes("",true)}
               />
               <InstallAppOffer placement="home" hasRealContent={data.grades.length + data.agenda.length + data.absences.length > 0} />
             </>
@@ -716,6 +791,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               selectedId={selectedGradeSubjectId}
               onSelectSubject={setSelectedGradeSubjectId}
               onOpenStats={() => navigate("stats")}
+              onOpenNotes={(subjectId)=>openNotes(subjectId)}
             />
           )}
           {activeTab === "absences" && (
@@ -754,6 +830,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onBackToGrades={() => navigate("grades")}
             />
           )}
+          {activeTab === "notes" && <PersonalNotesView key={notesIntent.serial} controller={notes} userId={session.user!.id} data={data} initialSubjectId={notesIntent.subjectId} initialNew={notesIntent.newNote} initialOpenId={notesIntent.openId} onAddSubject={()=>openSubjectEditor()} onCopyToClass={(note)=>{setCopyToClass(note);navigate("classes");}} />}
         </div>
         {classesVisited && (
           <div className="view-stage" style={activeTab === "classes" ? undefined : { display: "none" }}>
@@ -765,6 +842,10 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               semesterId={currentSemester.id}
               agenda={classAgenda}
               actions={classActions}
+              notes={notes}
+              copyToClass={copyToClass}
+              onCopyConsumed={()=>setCopyToClass(null)}
+              onCopyPersonal={(note)=>void copyClassToPersonal(note)}
             />
           </div>
         )}
@@ -851,18 +932,29 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         }
         onExport={exportBackup}
         onImport={() => importRef.current?.click()}
-        onLogout={() =>
-          setRemoval({
-            title: t("account.logoutConfirm"),
-            description: t("account.logoutWarning"),
-            actionLabel: t("settings.logoutRemoveCopy"),
-            run: () => session.logout(true),
-          })
-        }
+        onLogout={async () => {
+          try {
+            await flushOpenNotes();
+            const [records,drafts]=await Promise.all([listPersonal(session.user!.id),listClassDrafts(session.user!.id)]);
+            const pending=records.filter(record=>record.draft).length+drafts.length;
+            setRemoval({
+              title:t("account.logoutConfirm"),
+              description:pending?t("notes.logoutWarning",{count:pending}):t("account.logoutWarning"),
+              actionLabel:pending?t("notes.logoutKeepDevice"):t("settings.logoutRemoveCopy"),
+              offerExport:pending>0,
+              run:async()=>{
+                await flushOpenNotes();
+                const [latest,latestDrafts]=await Promise.all([listPersonal(session.user!.id),listClassDrafts(session.user!.id)]);
+                if(!latest.some(record=>record.draft)&&latestDrafts.length===0)await forgetNotes(session.user!.id);
+                await session.logout(true);
+              },
+            });
+          } catch { toast.error(t("notes.saveFailed")); }
+        }}
         accountEmail={session.user!.username}
         accountId={session.user!.id}
-        securityDisabled={session.diary!.dirty || session.status !== "saved"}
-        onSecurityChanged={() => session.logout(true)}
+        securityDisabled={session.diary!.dirty || session.status !== "saved" || notes.pending>0}
+        onSecurityChanged={async(operation)=>{await flushOpenNotes();if(operation==="delete")await forgetNotes(session.user!.id);session.reauthenticate();}}
       />
       <input
         ref={importRef}
@@ -880,24 +972,16 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             <AlertDialogTitle>{t("backup.confirmTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
               {pendingBackup && t("backup.confirmDescription", { subjects: intlNumber(locale, pendingBackup.data.subjects.length), grades: intlNumber(locale, pendingBackup.data.grades.length) })}
+              {pendingBackup&&<span> {"backupVersion" in pendingBackup?t("notes.importPreview",{count:pendingBackup.notes.length+pendingBackup.pendingNotes.length+pendingBackup.classDrafts.length+pendingBackup.authoredClassNotes.length}):t("notes.importLegacy")}</span>}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <button className="soft-button" onClick={exportBackup}>
+          <button className="soft-button" onClick={()=>void exportBackup()}>
             {t("backup.exportCurrent")}
           </button>
           <AlertDialogFooter>
             <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                if (pendingBackup)
-                  void session
-                    .commit(() => pendingBackup.data, pendingBackup.preferences)
-                    .then(() => {
-                      setPendingBackup(null);
-                      toast.success(t("backup.imported"));
-                    })
-                    .catch(reportError);
-              }}
+              onClick={() => void confirmImport()}
             >
             {t("backup.importReplace")}
             </AlertDialogAction>
@@ -916,6 +1000,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
+            {removal?.offerExport&&<button className="soft-button" onClick={()=>void exportBackup()}>{t("sync.export")}</button>}
             <AlertDialogCancel disabled={classActions.has("removal")}>{t("common.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               disabled={classActions.has("removal") || !!(removal?.subscriptionId && (classAgenda.pendingSubscription(removal.subscriptionId) || classAgenda.blockedSubscription(removal.subscriptionId)))}
@@ -1005,6 +1090,8 @@ function Dashboard({
   onNavigate,
   onAdd,
   onManageSubjects,
+  onOpenNotes,
+  onNewNote,
 }: {
   data: SchoolData;
   grades: Grade[];
@@ -1013,6 +1100,8 @@ function Dashboard({
   onNavigate: (tab: TabId, agendaItemId?: string) => void;
   onAdd: (type: ModalType) => void;
   onManageSubjects: () => void;
+  onOpenNotes: () => void;
+  onNewNote: () => void;
 }) {
   const { t, locale } = useI18n();
   const openItems = agenda
@@ -1072,6 +1161,7 @@ function Dashboard({
       </section>}
 
       {grades.length > 0 ? <button className="grade-summary" onClick={() => onNavigate("grades")}><span>{t("home.gradeSituation")}</span><strong>{t("home.average", { value: gradeText(locale, average) })}</strong><small>{selectPlural(locale, grades.length, t("home.gradeCountOne"), t("home.gradeCount", { count: grades.length }))} · {selectPlural(locale, gradedSubjects, t("home.subjectCountOne"), t("home.subjectCount", { count: gradedSubjects }))}</small><ChevronRight size={18} /></button> : !emptyDiary && <section className="grade-prompt"><div><b>{t("home.noGrades")}</b></div><button onClick={() => data.subjects.length ? onAdd("grade") : onManageSubjects()}>{data.subjects.length ? t("grades.add") : t("home.addSubject")}</button></section>}
+      <section className="panel notes-home-card"><div className="panel-title"><div><h3>{t("notes.my")}</h3><p>{t("notes.emptyHelp")}</p></div><BookOpen size={22}/></div><div className="notes-actions"><button className="soft-button" onClick={onOpenNotes}>{t("notes.open")}</button><button className="primary-button" onClick={onNewNote}><Plus size={17}/>{t("notes.new")}</button></div></section>
     </div>
   );
 }
@@ -1409,6 +1499,7 @@ function GradesView({
   onAdd,
   onDelete,
   onOpenStats,
+  onOpenNotes,
 }: {
   subjects: Subject[];
   grades: Grade[];
@@ -1419,6 +1510,7 @@ function GradesView({
   onAdd: () => void;
   onDelete: (id: string) => void;
   onOpenStats: () => void;
+  onOpenNotes: (subjectId:string) => void;
 }) {
   const { t, locale } = useI18n();
   const subject =
@@ -1441,6 +1533,7 @@ function GradesView({
       <div className="module-toolbar">
         <p>{t("grades.scale")}</p>
         <div className="grades-actions">
+          {!!subjects.length && <button className="grades-stats-link" onClick={()=>subject&&onOpenNotes(subject.id)}><BookOpen size={17}/>{t("notes.my")}</button>}
           {!!subjects.length && <button className="grades-stats-link" onClick={onOpenStats}><BarChart3 size={17} /> {t("grades.stats")}</button>}
           <button className="primary-button" onClick={onAdd}><Plus size={18} /> {subjects.length ? t("grades.add") : t("home.addSubject")}</button>
         </div>
@@ -1636,7 +1729,7 @@ function SettingsDialog({
   accountEmail: string;
   accountId: string;
   securityDisabled: boolean;
-  onSecurityChanged: () => Promise<void>;
+  onSecurityChanged: (operation:"password"|"delete") => Promise<void>;
 }) {
   const { t, locale } = useI18n();
   return (
@@ -1805,7 +1898,7 @@ function SettingsDialog({
                 <b>{t("settings.localBackup")}</b>
                 <div>
                   <button className="soft-button" onClick={onExport}>
-                    <Download /> {t("settings.export")}
+                    <Download /> {t("settings.export")} · {t("notes.backupComplete")}
                   </button>
                   <button className="soft-button" onClick={onImport}>
                     <Upload /> {t("settings.import")}

@@ -19,6 +19,7 @@ npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-
 npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0002_loving_roland_deschain.sql
 npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0003_melted_dark_phoenix.sql
 npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0004_glossy_stranger.sql
+npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0005_heavy_elektra.sql
 ```
 
 Questi comandi non sono idempotenti e non registrano una cronologia Wrangler delle migrazioni: sono il bootstrap manuale dello schema locale iniziale. Non rieseguirli su un database già inizializzato. Il percorso assoluto di persistenza evita di creare accidentalmente un database sotto `dist/server/`. Le migrazioni remote sono gestite dal flusso descritto in [Distribuzione](DEPLOYMENT.md).

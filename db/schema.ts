@@ -161,3 +161,61 @@ export const classSubscriptions = sqliteTable("class_event_subscriptions", {
   revision: integer("revision").notNull().default(1),
   detachedAt: integer("detached_at"),
 }, (t) => [uniqueIndex("class_subscriptions_user_event_idx").on(t.userId, t.sourceEventId), index("class_subscriptions_event_idx").on(t.eventId)]);
+
+// Notes intentionally live outside the version-one diary snapshot. Subject IDs
+// are soft references because diary imports and subject deletion must not erase text.
+export const personalNotes = sqliteTable("personal_notes", {
+  id: text("id").notNull(),
+  userId: text("user_id").notNull().references(() => accounts.id, { onDelete: "cascade" }),
+  subjectId: text("subject_id").notNull(),
+  subjectName: text("subject_name").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  pinned: integer("pinned").notNull().default(0),
+  revision: integer("revision").notNull().default(1),
+  changeSeq: integer("change_seq").notNull().default(0),
+  byteSize: integer("byte_size").notNull(),
+  lastMutationId: text("last_mutation_id").notNull(),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+  deletedAt: integer("deleted_at"),
+}, (t) => [primaryKey({ columns: [t.userId, t.id] }), index("personal_notes_changes_idx").on(t.userId, t.changeSeq)]);
+
+export const personalNoteSequences = sqliteTable("personal_note_sequences", {
+  userId: text("user_id").primaryKey().references(() => accounts.id, { onDelete: "cascade" }),
+  seq: integer("seq").notNull().default(0),
+});
+
+export const classSubjects = sqliteTable("class_subjects", {
+  id: text("id").primaryKey(),
+  classId: text("class_id").notNull().references(() => classes.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  nameKey: text("name_key").notNull(),
+  revision: integer("revision").notNull().default(1),
+  archivedAt: integer("archived_at"),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+}, (t) => [uniqueIndex("class_subjects_name_idx").on(t.classId, t.nameKey), index("class_subjects_class_idx").on(t.classId)]);
+
+export const classNotes = sqliteTable("class_notes", {
+  id: text("id").primaryKey(),
+  classId: text("class_id").references(() => classes.id, { onDelete: "set null" }),
+  className: text("class_name").notNull(),
+  authorId: text("author_id").notNull().references(() => accounts.id, { onDelete: "cascade" }),
+  authorName: text("author_name").notNull(),
+  subjectId: text("subject_id").notNull(),
+  subjectName: text("subject_name").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  revision: integer("revision").notNull().default(1),
+  byteSize: integer("byte_size").notNull(),
+  lastMutationId: text("last_mutation_id").notNull(),
+  createdAt: integer("created_at").notNull(),
+  updatedAt: integer("updated_at").notNull(),
+  deletedAt: integer("deleted_at"),
+}, (t) => [index("class_notes_class_idx").on(t.classId, t.updatedAt), index("class_notes_author_idx").on(t.authorId, t.updatedAt)]);
+
+export const classNotePins = sqliteTable("class_note_pins", {
+  noteId: text("note_id").notNull().references(() => classNotes.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => accounts.id, { onDelete: "cascade" }),
+}, (t) => [primaryKey({ columns: [t.noteId, t.userId] })]);

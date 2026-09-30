@@ -140,3 +140,14 @@ La matrice certifica soltanto ciò che può essere ancorato al commit e, per CI,
 - processi manuali esterni o servizi non rappresentati nel repository.
 
 Per le proprietà che dipendono da uno di questi fattori lo stato è deliberatamente **NON VERIFICABILE**, anziché trasformare configurazione/intenzione in un'affermazione sul runtime reale.
+
+## Aggiornamento Appunti (working tree del 30 settembre 2026)
+
+La matrice precedente resta l'audit del commit indicato nel suo testo iniziale. Nel working tree corrente, le righe 46, 58, 62, 63, 64 e 86 sono superate dalle modifiche Appunti; lo stato della produzione resta non verificato. Evidenze locali mirate:
+
+| Affermazione sul working tree | Stato | Evidenza e limite |
+| --- | --- | --- |
+| Gli appunti personali sono separati dal payload del diario e sincronizzati per nota con revisione e cursore. | VERIFICATO nel codice e nei test locali | `db/schema.ts`, `drizzle/0005_heavy_elektra.sql`, `hooks/use-notes.ts`, `lib/server/note-repository.ts`, `tests/notes.test.ts`, `tests/api-smoke.mjs`; non prova il D1 Sites. |
+| Le note di classe richiedono membership; autore e moderatori hanno azioni diverse. | VERIFICATO nel codice e nella suite API locale | `lib/server/note-repository.ts`, `app/api/classes/[classId]/notes/**`, `tests/api-smoke.mjs`; i 123 controlli API sono precedenti all'ultimo controllo anti-duplicato sulle materie di classe, che non è stato rieseguito su D1; il flag Classi del live resta ignoto. |
+| Il backup V2 contiene appunti e accetta il precedente V1 senza alterarne lo schema. | VERIFICATO nel codice e nei test locali | `lib/notes/backup.ts`, `tests/notes.test.ts`; restore reale da un backup utente non eseguito. |
+| La migrazione 0005 è additiva e preserva le etichette di classe legacy. | VERIFICATO su SQLite locale e D1 locale isolato | `drizzle/0005_heavy_elektra.sql`, `tests/notes.test.ts`; applicazione al D1 Sites non eseguita. |

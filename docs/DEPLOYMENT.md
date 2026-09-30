@@ -30,6 +30,8 @@ Usare la skill Sites hosting: verificare il progetto e i domini esistenti, compi
 
 Preservare accesso pubblico e binding esistenti. Le migrazioni incluse nel pacchetto devono essere compatibili con i dati correnti; un rollback del codice non annulla le migrazioni. Nessun token, backup, database locale o `.env` nel pacchetto o nel repository.
 
+Per il rilascio degli appunti, verificare che la migrazione additiva `drizzle/0005_heavy_elektra.sql` sia applicata al D1 **del progetto Sites esistente** prima di rendere disponibile il nuovo codice. La migrazione crea tabelle e trigger per note personali, materie e note di classe; non modifica il payload `SchoolData.version=1`. Dopo il rilascio, provare con account sintetici creazione, riapertura e conflitto degli appunti, oltre a un salvataggio del diario da un vecchio client aperto. Non usare il D1 del Worker sperimentale come prova dello schema Sites.
+
 ## Worker sperimentale separato
 
 Solo per prove esplicitamente richieste, dopo `npx wrangler login`:

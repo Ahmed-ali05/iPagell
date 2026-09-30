@@ -681,6 +681,18 @@ preferences
 
 L'import del backup non ricostruisce la classe.
 
+### 11.3 Appunti e backup V2 (working tree del 30 settembre 2026)
+
+`lib/notes/backup.ts` aggiunge `backupVersion: 2` al JSON esportato dall'interfaccia e include note personali confermate, bozze personali e di classe ancora locali e copie dei testi di classe scritti dall'utente. La vecchia struttura V1 resta accettata; l'import V2 assegna nuovi ID a diario, materie e appunti, verifica le quote prima del commit e registra un piano di import in IndexedDB per riprendere dopo un'interruzione. Le note di classe esportate rientrano solo come copie personali non associate a una classe; importare un backup non ripubblica contenuti. L'export completo richiede accesso al server per aggiornare le note personali e leggere quelle di classe scritte dall'utente; in caso di errore l'interfaccia segnala che la copia è limitata al dispositivo.
+
+### 11.4 Appunti per materia (working tree del 30 settembre 2026)
+
+La vista personale si apre da Home e dalla materia in Voti senza aggiungere una sesta voce alla barra fissa. `PersonalNotesView` usa `useNotes` e `ipagell-notes-db` (store `personal`, `classDrafts`, `meta`) separati da `ipagell-db` del diario. Un appunto personale punta all'ID stabile di una materia privata ma non al semestre: rinominare o archiviare la materia conserva il riferimento; eliminarla lascia il testo con nome storico, ancora modificabile, e permette di scegliere esplicitamente un'altra materia. Le note non sono dentro `SchoolData.version=1`; un vecchio client può salvare il diario senza eliminare le note. Il cursore `change_seq` avanza in una transazione insieme alla pagina ricevuta; ogni bozza ha ID di mutazione, revisione base e confronto locale per evitare sovrascritture tra schede. Il testo resta semplice e viene renderizzato come testo React.
+
+`ClassNotesPanel` compare nel dettaglio Classe. Ogni classe ha `class_subjects` separati dalle materie private; le etichette delle attività esistenti vengono seminate dalla migrazione 0005 e i vecchi client possono continuare a creare attività con etichette libere. L'editor di classe salva soltanto una bozza privata in IndexedDB finché l'utente non conferma l'anteprima e pubblica online. Le letture richiedono membership corrente; l'autore può modificare o ritirare, owner/moderator possono moderare, e il pin è per membro. Uscita o cancellazione della classe stacca le note condivise senza cancellare automaticamente il testo dell'autore, che resta recuperabile dall'archivio personale. Copiare tra i due spazi crea un nuovo testo e richiede una materia nello spazio di destinazione.
+
+Le API sono `app/api/notes/**`, `app/api/classes/[classId]/subjects/**`, `app/api/classes/[classId]/notes/**` e `app/api/my-class-notes/**`, con repository SQL in `lib/server/note-repository.ts` e guard in `lib/server/note-http.ts`. La migrazione `drizzle/0005_heavy_elektra.sql` aggiunge le tabelle e trigger di quota: 500 note e 8 MiB attivi per account, 200 note e 4 MiB attivi per classe, 60 materie di classe attive create dopo la migrazione. Il singolo appunto è limitato a 20.000 caratteri e 64 KiB serializzati. Le mutazioni usano revisione e ID di mutazione; le liste sono paginate a 50 righe e al massimo 512 KiB di risposta. Questi limiti non modificano il limite del payload del diario. Gli appunti di classe richiedono rete per la pubblicazione e per la lettura autorizzata; una bozza aperta resta salvabile localmente se la connessione cade.
+
 ## 12. Database e layer server
 
 ### Accesso D1
@@ -713,6 +725,7 @@ Gli eventi costruiscono direttamente `ClassEventRepository(database())` tramite 
 | `lib/server/class-repository.ts` | Classi, membri, ruoli, inviti. |
 | `lib/server/class-event-http.ts` | Guard comune per route eventi/sottoscrizioni. |
 | `lib/server/class-event-repository.ts` | Eventi, sottoscrizioni e revisioni. |
+| `lib/server/note-http.ts`, `lib/server/note-repository.ts` | Autorizzazione, validazione, quote e revisione di note e materie di classe. |
 
 ## 13. Cloudflare / Sites
 
