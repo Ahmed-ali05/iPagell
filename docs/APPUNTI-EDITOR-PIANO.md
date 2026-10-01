@@ -1,5 +1,8 @@
 # Appunti più leggibili — analisi documentale
 
+> **Piano storico del 30 settembre 2026.** Editor e export sono ora implementati nella pubblicazione Sites 27. La tabella iniziale seguente fotografa il codice prima dell’intervento; per il comportamento corrente vedere [Editor](APPUNTI-EDITOR-SPEC.md) e [Verifiche](VERIFICATION-MATRIX.md).
+
+
 > 30 settembre 2026. Questa analisi riguarda il working tree locale, che contiene modifiche degli appunti non ancora committate. Non certifica che la funzione sia già pubblicata su ipagell.website. La specifica della prima versione resta in [APPUNTI-SPEC.md](APPUNTI-SPEC.md).
 
 ## Obiettivo

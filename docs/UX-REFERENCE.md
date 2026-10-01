@@ -1,5 +1,8 @@
 # iPagell — Riferimento UX, UI e contenuti
 
+> **Reference con sezioni cronologiche.** Per il comportamento attuale usare [Architettura](ARCHITECTURE-CURRENT.md) e [Guida](GUIDA-UTENTE.md); descrizioni e priorità delle revisioni precedenti non attestano automaticamente lavoro ancora aperto.
+
+
 Aggiornato: 27 settembre 2026. Pulizia mirata di copy e gerarchia informativa.
 
 ## Pulizia UX e copy — 27 settembre 2026

@@ -2,11 +2,11 @@
 
 [Indice](../README.md) · [Piano prodotto](PRODOTTO.md) · [Sicurezza](../SECURITY.md)
 
-Specifica di prodotto e tecnica. C1 (gruppi), C2 (eventi) e C3 (agenda personale collegata) sono implementati. Annunci, materiali e le estensioni C4/C5 restano pianificati.
+Aggiornamento: **1 ottobre 2026**. C1 (gruppi), C2 (eventi), C3 (agenda personale collegata), materie e appunti della classe sono implementati. Annunci, materiali e le estensioni C4/C5 restano pianificati. [Appunti correnti](APPUNTI-SPEC.md) e [matrice di verifica](VERIFICATION-MATRIX.md).
 
 ## Obiettivo
 
-Una classe iPagell è un gruppo privato di studenti che si autogestisce. Serve a mantenere un'agenda comune, distribuire annunci e materiali e permettere a ogni membro di riportare gli eventi utili nella propria agenda. Non è un registro scolastico, non richiede la presenza di un docente e non rende pubblici voti, assenze, medie o note personali.
+Una classe iPagell è un gruppo privato di studenti che si autogestisce. Serve a mantenere un'agenda comune, condividere appunti e permettere a ogni membro di riportare gli eventi utili nella propria agenda. Annunci e materiali sono sviluppi futuri. Non è un registro scolastico, non richiede la presenza di un docente e non rende pubblici voti, assenze, medie o note personali.
 
 Principi:
 
@@ -24,14 +24,14 @@ Principi:
 4. Titolo, descrizione, materia e data dell'attività seguono gli aggiornamenti della classe. Avvisi e stato completato rimangono personali.
 5. Se l'evento è annullato, importato o la persona lascia la classe, la copia non scompare: diventa annullata o non più sincronizzata.
 
-La schermata della classe privilegia “Prossime attività”, non chat e funzioni social. Annunci e materiali sono sezioni secondarie. Il prodotto deve funzionare bene anche con una sola classe.
+La schermata separa Attività e Appunti della classe con un selettore. Membri e amministrazione sono sezioni secondarie; le bozze private precedono le note pubblicate. Il prodotto deve funzionare bene anche con una sola classe.
 
 ## Ruoli e permessi
 
 | Azione | Proprietario | Moderatore | Membro |
 |---|---:|---:|---:|
 | Vedere contenuti e membri consentiti | sì | sì | sì |
-| Creare eventi, annunci e materiali | sì | sì | sì |
+| Creare eventi, materie e propri appunti | sì | sì | sì |
 | Modificare/eliminare i propri contenuti | sì | sì | sì |
 | Moderare contenuti altrui | sì | sì | no |
 | Creare/revocare inviti e rimuovere membri | sì | sì | no |
@@ -39,7 +39,7 @@ La schermata della classe privilegia “Prossime attività”, non chat e funzio
 | Cambiare impostazioni o eliminare la classe | sì | no | no |
 | Trasferire la proprietà | sì | no | no |
 
-Il proprietario può attivare la modalità opzionale “contenuti approvati”; non fa parte del primo MVP. Non sono previste votazioni, gerarchie aggiuntive o verifica dei docenti.
+Una modalità “contenuti approvati” è soltanto proposta e non è attivabile nel prodotto corrente. Non sono previste votazioni, gerarchie aggiuntive o verifica dei docenti.
 
 Il proprietario deve trasferire la proprietà prima di uscire. Una rimozione invalida subito l'accesso. L'elenco membri è visibile ai membri della classe; l'impostazione `membersVisible` non viene attualmente applicata per nasconderlo. Username, email eventuali e credenziali non vengono mai mostrati: nella classe si usa un nome visualizzato modificabile.
 
@@ -70,23 +70,31 @@ Se un evento cambia, la nuova revisione viene applicata automaticamente senza mo
 
 Le materie condivise sono etichette della classe, non riferimenti diretti alle materie private. Ogni persona può associare un'etichetta condivisa a una propria materia senza rivelare il proprio piano di studi.
 
-## Modello dati proposto
+## Modello dati implementato
 
-Questa tabella descrive il modello progettuale complessivo, non lo schema D1 corrente. `classes`, `class_members`, `class_invites`, `class_events`, `class_event_subscriptions` e `class_departures` sono implementate; `class_subjects`, `class_announcements`, `class_materials` e `class_activity` restano proposte. Nello schema attuale `class_events.subject` è testo, non un riferimento `subject_id`; verificare `db/schema.ts` per i campi effettivi. Nessuna di queste tabelle va inserita dentro `diaries.payload`.
+Le tabelle sono separate da `diaries.payload`. Il riferimento completo è [db/schema.ts](../db/schema.ts); le migrazioni sono nell'[inventario](REPO-INVENTORY.md).
 
-| Entità | Campi principali | Note |
-|---|---|---|
-| `classes` | id, nome, descrizione, owner_id, impostazioni, created_at | Gruppo privato; nome non globalmente univoco |
-| `class_members` | class_id, user_id, ruolo, display_name, joined_at | Chiave composta; un solo proprietario |
-| `class_invites` | id, class_id, secret_hash, created_by, expires_at, max_uses, uses, revoked_at | Mai conservare il segreto in chiaro |
-| `class_subjects` | id, class_id, nome, colore, archived_at | Tassonomia condivisa minimale |
-| `class_events` | id, class_id, author_id, subject_id, tipo, titolo, descrizione, due_at, status, revision, timestamps | Modifica con controllo revisione |
-| `class_event_subscriptions` | user_id, event_id, completed, reminder_at, cached_snapshot, detached_at | Campi personali e continuità dopo l'uscita |
-| `class_announcements` | id, class_id, author_id, testo, timestamps | Fase successiva all'agenda |
-| `class_materials` | id, class_id, author_id, tipo, titolo, url/storage_key, timestamps | I file richiedono storage e scansione dedicati |
-| `class_activity` | id, class_id, actor_id, action, target_id, created_at | Traccia minimale delle azioni amministrative |
+| Entità | Contenuto corrente |
+|---|---|
+| `classes`, `class_members` | Identità, proprietà, appartenenza, ruoli e nome visibile |
+| `class_invites`, `class_departures` | Digest inviti, limiti/revoca e data di partenza per il rientro |
+| `class_events` | Autore, etichetta `subject` testuale, tipo, titolo, descrizione, data/stato e revisione |
+| `class_event_subscriptions` | Utente, riferimento evento, snapshot, semestre/materia privati, completamento, avviso, revisione e detach |
+| `class_subjects` | Nome/chiave normalizzata, revisione e archiviazione; nessun colore nel modello corrente |
+| `class_notes` | Classe/nome storico, autore/nome storico, materia, titolo/testo/formato, revisione, mutazione, quota e cancellazione |
+| `class_note_pins` | Nota e utente: il pin non è comune alla classe |
 
-Le foreign key eliminano le dipendenze interne quando una classe viene cancellata. Prima di rimuovere accesso o classe, le sottoscrizioni dell'utente vengono rese autonome usando lo snapshot già memorizzato. L'attività amministrativa non contiene il testo dei contenuti e viene conservata al massimo 90 giorni.
+Gli eventi conservano etichette compatibili con i client precedenti. Migrazione 0005 e trigger alimentano le materie normalizzate; gli appunti referenziano quelle della classe. Il limite di creazione è 60 nuove materie attive, con le etichette legacy seminate escluse dal conteggio. Rinomina/archiviazione/eliminazione non cancella il testo degli appunti.
+
+I trigger preservano gli snapshot delle sottoscrizioni su uscita o cancellazione. Le note della classe cancellata conservano il testo per l'autore con `classId` staccato; dopo uscita l'autore può recuperare o ritirare solo le proprie note tramite l'archivio autore. Nessun accesso residuo alle note altrui.
+
+`class_announcements`, `class_materials` e `class_activity` restano proposte: non ci sono tabelle/runtime relativi né una retention operativa di 90 giorni già attiva. File richiederebbero storage e gestione dedicati.
+
+## Appunti e bozze
+
+Un membro scrive una bozza privata sul dispositivo; **Controlla e condividi** apre l'anteprima e una seconda conferma pubblica online. Una riconnessione non pubblica automaticamente. La revisione base resta quella del testo aperto, anche se un refresh riceve una versione successiva.
+
+Solo l'autore può modificare il testo condiviso; proprietario/moderatore possono ritirarlo. Copie personale↔classe hanno nuovi ID e richiedono una materia nel contesto di destinazione. Eliminare una bozza non ritira il testo già pubblicato. Il backup V3 include bozze e snapshot dei testi dell'autore, mai una copia indiscriminata dell'archivio altrui. [Contratto Appunti](APPUNTI-SPEC.md).
 
 ## Contratto API
 
@@ -114,12 +122,26 @@ GET             /api/class-agenda
 PATCH, DELETE   /api/class-agenda/:subscriptionId
 ```
 
+Disponibili per materie e appunti:
+
+```text
+GET, POST          /api/classes/:classId/subjects
+PATCH, DELETE      /api/classes/:classId/subjects/:subjectId
+GET, POST          /api/classes/:classId/notes
+GET, PATCH, DELETE /api/classes/:classId/notes/:noteId
+PUT, DELETE        /api/classes/:classId/notes/:noteId/pin
+GET                /api/my-class-notes
+DELETE             /api/my-class-notes/:noteId
+```
+
+Le route dei testi/pin/archivio richiedono contratto Appunti 2, anche in lettura; corpi, revisioni e formati in [API](API.md). Le liste note sono paginate, a differenza delle attuali liste eventi limitate a 500.
+
 Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di eventi e campi personali richiedono una revisione attesa. Le scritture condivise verificano il permesso nella stessa query; le richieste C2/C3 verificano anche l'account atteso. Limiti: 500 eventi per classe, 500 sottoscrizioni per account. La paginazione completa rientra in C4.
 
 ### Integrazione attuale
 
 - Home, calendario, elenco e riepilogo WebMCP includono gli eventi scelti dall'utente. Voti, assenze e statistiche non vengono condivisi.
-- Le materie di classe sono etichette suggerite dagli eventi esistenti; non esiste ancora una tassonomia con archiviazione. L'associazione alla materia del diario è privata.
+- Gli appunti usano materie di classe normalizzate con archiviazione; gli eventi conservano etichette testuali compatibili. L'associazione alla materia del diario è privata.
 - Completamento, avvisi e periodo personale hanno persistenza separata dal diario e sono accessibili solo al titolare. Gli avvisi funzionano ad app aperta, non sono notifiche push programmate.
 - L'ultima agenda collegata è disponibile senza rete nella cache locale separata per account. Le modifiche condivise e delle sottoscrizioni richiedono connessione. La cache viene rimossa su logout o sessione non valida.
 - Aggiornamenti attivi ogni 30 secondi, al ritorno nell'app e alla riconnessione; nessuna promessa di aggiornamento istantaneo.
@@ -145,6 +167,7 @@ Gli ID sono opachi. Un ID valido non concede accesso. Gli aggiornamenti di event
 | C1 — gruppo | Completata | Creazione classe, membri, link/codice, revoca, uscita e trasferimento | Due account possono completare il ciclo senza accessi residui |
 | C2 — agenda | Implementata | Etichette materia, eventi, aggiornamenti e annullamenti | Concorrenza e autorizzazioni verificate |
 | C3 — personale | Implementata | Sottoscrizione, campi personali, scollegamento e cache offline | Snapshot conservato dopo uscita e cancellazione; lettura offline |
+| Appunti e materie | Implementati | Editor condiviso, bozze private, conferma di pubblicazione, archivio autore e copie | Formato, permessi, conflitti e backup verificati localmente; QA su telefoni fisici aperta |
 | C4 — cura | Pianificata | Attività minima, segnalazioni, liste grandi, accessibilità e notifiche in-app | Prova con più classi e dataset realistico |
 | C5 — materiali | Pianificata | Annunci, link e poi file con storage/scansione | Politica dati e infrastruttura file approvate |
 

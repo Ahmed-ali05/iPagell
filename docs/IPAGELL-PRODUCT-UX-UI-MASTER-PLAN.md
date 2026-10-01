@@ -1,5 +1,8 @@
 # iPagell — Master Plan UX, UI e Product Flow
 
+> **Piano di progetto, non stato del software.** Alcune proposte sono state implementate in interventi successivi; il perimetro corrente e le evidenze sono in [Snapshot](REPO-SNAPSHOT.md), [Roadmap](PRODOTTO.md) e [Verifiche](VERIFICATION-MATRIX.md).
+
+
 > Documento di lavoro per preparare, in un secondo momento, prompt specifici per agenti che lavorano su iPagell.
 >
 > Questo file **non contiene i prompt operativi**. Definisce invece le fasi, gli obiettivi, i deliverable, i vincoli e i criteri di verifica da usare quando i prompt verranno scritti.

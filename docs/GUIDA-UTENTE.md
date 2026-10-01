@@ -27,7 +27,7 @@ La prima apertura online serve a preparare la copia offline. L’installazione s
 | Voti | Registrare risultati, selezionare materia e simulare il voto necessario |
 | Assenze | Registrare data, ore e tipo di assenza; impostare una soglia personale |
 | Statistiche | Confrontare materie, andamento e periodi presenti |
-| Classi | Creare o raggiungere un gruppo privato, gestire membri e inviti |
+| Classi | Consultare attività e appunti condivisi; creare o raggiungere un gruppo privato |
 | Impostazioni | Gestire materie e semestri, tema, movimento, backup e account |
 
 Il selettore del periodo cambia i voti, le attività e le assenze visualizzati. Le materie sono condivise tra i periodi dello stesso diario. Archiviare un semestre non lo rende immutabile.
@@ -56,6 +56,22 @@ Il proprietario può nominare o revocare moderatori, rimuovere membri, modificar
 
 Voti, assenze, medie, preferenze e completamento personale non vengono mostrati alla classe. I membri possono condividere compiti e verifiche; ciascuno sceglie quali aggiungere alla propria agenda. Titolo e data delle attività collegate seguono gli aggiornamenti della classe, mentre completamento, materia personale e avvisi restano privati. **Scollega dalla classe** conserva l’attività nell’agenda ma interrompe gli aggiornamenti.
 
+## Appunti personali e di classe
+
+In Home puoi riprendere gli appunti recenti oppure scegliere **Tutti gli appunti** e **Nuovo appunto**. **Appunti di {materia}** nella prossima scadenza, nell’Agenda e in Voti apre l’elenco personale filtrato. **Torna a…** riporta al contesto di partenza; nell’Agenda restano calendario/elenco e filtri scelti durante la sessione.
+
+I tuoi appunti sono privati e indipendenti dal semestre. Puoi iniziare a scrivere prima di scegliere la materia e aggiungerla dall’editor senza perdere il testo. Titolo e materia servono per sincronizzare nell’account; **Salvato sul dispositivo** conferma solo la copia locale. Gli appunti personali già disponibili sul dispositivo restano utilizzabili senza rete.
+
+Dentro una classe scegli **Appunti della classe → Scrivi un appunto**. Le materie di classe sono separate da quelle del diario: puoi aggiungerne una direttamente nell’editor. **Salva bozza e chiudi** mantiene il testo privato sul dispositivo; lo ritrovi in **Le tue bozze**. **Controlla e condividi** apre un’anteprima: solo confermando **Pubblica nella classe** il testo diventa visibile ai membri. Per leggere o condividere in classe serve la connessione.
+
+Le copie fra spazio personale e classe sono indipendenti. Da un appunto personale scegli la classe e **Prepara una copia in…**, poi la materia della classe e la conferma di condivisione. **Ritira dalla classe** rimuove il testo condiviso; eliminare una bozza privata non ritira un appunto già condiviso. Copie, gestione materie e **Bozze e classi passate** si aprono solo quando ti servono.
+
+La barra dell'editor offre **Grassetto**, **Titolo di sezione**, elenchi puntati o numerati e **Annulla/Ripeti**. Seleziona il testo o posiziona il cursore nel blocco da cambiare; non occorre scrivere Markdown. Il limite include i marcatori del formato: una formattazione può raggiungerlo anche se il testo visibile sembra più corto. Il comando viene rifiutato conservando il testo.
+
+Dal lettore scegli **Esporta PDF**, poi **Salva PDF**, **Apri PDF** o **Condividi** se il dispositivo lo consente. **Altri formati** offre Markdown e copia del testo; per note semplici anche `.txt`. Il PDF è una copia leggibile della nota; il backup JSON serve a ripristinare i dati nell'app.
+
+Se compare **Salvataggio non riuscito**, il testo ancora aperto permette **Riprova**, **Copia testo** e download di recupero. Conservalo prima di chiudere o aggiornare l'app. Un conflitto vero richiede di confrontare le copie; la riconnessione non deve pubblicare da sola una bozza di classe.
+
 ## Salvataggio, offline e conflitti
 
 - **Diario personale salvato:** il server ha confermato la copia del diario. Un backup indipendente resta utile.
@@ -70,9 +86,9 @@ Offline puoi usare la copia dell’ultimo account attivo, se già presente. Prim
 
 ## Backup e vecchi dati
 
-In **Impostazioni → Preferenze**, scegli **Esporta**. Il JSON contiene dati scolastici e preferenze, non password, sessione o codice di recupero. Non pubblicarlo: non è cifrato.
+In **Impostazioni → Preferenze**, scegli **Esporta**. Il backup V3 contiene diario e preferenze, appunti personali, bozze e conflitti, bozze di classe e copie delle note condivise scritte da te. Le attività collegate diventano copie personali. Non include password, sessione, codice di recupero o inviti. Non pubblicarlo: non è cifrato. Se l'archivio remoto non è completamente leggibile, l'app chiede conferma per esportare una copia limitata al dispositivo.
 
-Prima di **Importa**, esporta la situazione corrente e controlla account e file. L’app valida il contenuto e richiede conferma della sostituzione. Limite del file: 1.500.000 byte. Per tornare indietro serve il backup precedente; non esiste un cestino.
+Prima di **Importa**, esporta la situazione corrente e controlla account e file. L'app valida il contenuto e richiede conferma: sostituisce diario e preferenze, mentre aggiunge copie degli appunti con nuovi identificativi. Le note di classe importate diventano personali e possono richiedere una materia; non vengono pubblicate nella classe. Un'importazione interrotta può essere ripresa. I vecchi backup V1 riguardano solo il diario e mantengono gli appunti già presenti; V2 conserva i testi semplici, V3 anche il formato. Limite file: 24 MiB per V2/V3, 1.500.000 byte per V1. Restano i limiti del diario e delle note: un file valido può superare lo spazio disponibile nell'account. Per tornare indietro serve il backup precedente; non esiste un cestino.
 
 **Recupera vecchio diario** cerca la versione precedente nello stesso browser e sullo stesso sito. Non recupera dati già cancellati né quelli di un altro dispositivo. Esporta il vecchio archivio, controllalo e importalo esplicitamente: non viene associato automaticamente al nuovo account.
 
@@ -84,7 +100,7 @@ Non cancellare dati del sito o disinstallare l’app per risolvere un errore pri
 
 In **Impostazioni → Preferenze → Sicurezza e gestione account** puoi cambiare password o eliminare l’account, confermando la password attuale. Il cambio password mantiene valido il codice di recupero e chiude le sessioni.
 
-**Esci e rimuovi la copia locale** rimuove la copia attiva su quel browser, non i backup scaricati o ogni archivio storico del dispositivo. Esporta prima le modifiche in attesa: confermando l’uscita puoi perderle. L’eliminazione dell’account cancella il diario dal database applicativo, ma non può cancellare file esportati o copie offline su altri dispositivi.
+L'uscita rimuove la copia attiva del diario su quel browser. Se ci sono note o bozze pendenti, l'app lo segnala e offre l'uscita conservandole sul dispositivo per lo stesso account; esportale prima, soprattutto su un dispositivo condiviso. Non vengono rimosse le esportazioni scaricate o necessariamente ogni archivio storico. L'eliminazione dell'account cancella i dati correnti dal database applicativo, ma non può cancellare file esportati o copie offline su altri dispositivi.
 
 ## Segnalare un problema
 

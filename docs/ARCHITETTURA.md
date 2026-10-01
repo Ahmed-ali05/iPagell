@@ -2,7 +2,7 @@
 
 [Indice](../README.md) · [API](API.md) · [Manutenzione](MANUTENZIONE.md)
 
-Descrizione del codice corrente, non del solo brief iniziale. Sincronizzazione aggiornata: 23 settembre 2026; evidenze in [Affidabilità](RELIABILITY.md). Le architetture future sono separate nelle specifiche [Classi](CLASSI.md) e [Spazio studio AI](SPAZIO-STUDIO-AI.md).
+Sintesi aggiornata al **1 ottobre 2026**. La descrizione completa è in [Architettura corrente](ARCHITECTURE-CURRENT.md), con [inventario generato](REPO-INVENTORY.md) e [verifiche](VERIFICATION-MATRIX.md). [Affidabilità](RELIABILITY.md) conserva l’intervento sul diario del 23 settembre; [Spazio studio AI](SPAZIO-STUDIO-AI.md) resta futuro.
 
 ## Componenti e responsabilità
 
@@ -27,6 +27,8 @@ Service worker: solo shell e asset statici; nessuna API in cache
 | `lib/validation.ts`, `auth-validation.ts` | Schemi runtime e limiti; riferimento per dati accettati |
 | `lib/calculations.ts` | Medie, simulatore e andamento incrementale |
 | `lib/account-storage.ts` | IndexedDB, backup e recupero legacy |
+| `hooks/use-notes.ts`, `lib/notes/storage.ts`, `reconcile.ts` | Persistenza e riconciliazione per nota, outbox personale e bozze di classe |
+| `components/note-editor.tsx`, `lib/notes/format.ts`, `autosave.ts` | Editor condiviso, AST chiuso e coda dei salvataggi |
 | `lib/server/` | Sessioni, hashing, controlli HTTP e query parametrizzate |
 | `db/schema.ts`, `drizzle/` | Schema D1 e migrazioni versionate per diario, account, classi, eventi condivisi, agenda collegata e partenze |
 | `public/`, `scripts/generate-precache.mjs` | Asset PWA e generazione allowlist del service worker |
@@ -58,6 +60,8 @@ Un intervento è utile se rende il comportamento più prevedibile, un problema p
 | `class_invites` | Solo digest dell’invito, limiti, scadenza, utilizzi e revoca |
 | `class_events`, `class_event_subscriptions` | Eventi condivisi e copie personali sottoscritte, con snapshot e campi privati |
 | `class_departures` | Partenze/rimozioni, per limitare il rientro con inviti precedenti |
+| `personal_notes`, `personal_note_sequences` | Testi personali con formato/revisione, quote e cursore delle modifiche |
+| `class_subjects`, `class_notes`, `class_note_pins` | Materie normalizzate, testi condivisi, metadati autore e pin per membro |
 
 `diaries.user_id` è una chiave primaria, ma **non ha una FK SQL verso accounts**: l’integrità è attualmente mantenuta dalle API e dalla cancellazione transazionale. Non inserire snapshot tramite SQL operativo senza verificarne il proprietario.
 
@@ -99,6 +103,12 @@ La coda serializza caricamento, modifiche, sync e logout della sessione. Tra sch
 
 All’avvio una copia offline viene aperta solo dopo un fallimento di rete della richiesta di identità e se esiste l’account locale attivo. Un errore di storage successivo a una risposta autenticata non può attivare questo fallback. Il puntatore viene aggiornato all’apertura dell’account, mai da salvataggi tardivi. Un `401` rimuove il puntatore attivo, non automaticamente tutti i draft in IndexedDB; l’account successivo non li eredita. `503` del server non è un’autenticazione offline alternativa.
 
+## Appunti e backup
+
+Gli appunti sono righe separate da `SchoolData`, associate a materia ma indipendenti dal semestre. I due editor condividono ProseMirror, formato plain/md-lite-v1, coda autosave e rendering sicuro. Lo storage personale riconcilia le conferme della propria mutazione senza scartare nuove modifiche; conserva un payload `inFlight` per risposte perse e distingue conflitti reali. La classe salva una bozza privata e pubblica solo dopo anteprima e conferma online, con revisione base conservata.
+
+`ipagell-notes-db` versione 2 contiene `personal`, `classDrafts` e `meta`, separati per account. Il backup V3 conserva formato, note, bozze/conflitti e copie delle proprie note di classe; `inFlight` è escluso. Import V1 solo diario, V2 plain, V3 con formato; ID rimappati e piano locale riprendibile. I testi importati non vengono pubblicati in classe. File V1 massimo 1.500.000 byte, V2/V3 24 MiB; quote di account e busta HTTP restano distinte. [Appunti](APPUNTI-SPEC.md).
+
 ## Storage locale e PWA
 
 IndexedDB `ipagell-db`, versione 2: store `accounts` per ID utente e store `state` mantenuto per recupero legacy. LocalStorage: puntatore `ipagell-active-account-v2`, vecchie preferenze legacy e marcatori delle notifiche. Le preferenze correnti risiedono nello snapshot, non solo in localStorage.
@@ -109,6 +119,6 @@ Il service worker non forza `skipWaiting`: un aggiornamento può attendere la ch
 
 ## Confine delle estensioni future
 
-Classi, appartenenze, inviti, eventi e sottoscrizioni usano tabelle normalizzate separate da `diaries.payload`: una classe non può leggere o dedurre voti, assenze o preferenze private. Ogni endpoint verifica sessione, appartenenza e ruolo; i segreti degli inviti sono conservati soltanto come digest e i link usano il frammento URL, che non viene inviato al server. C1 (classi e inviti), C2 (eventi condivisi) e C3 (agenda personale collegata) sono implementati nel codice; l'attivazione del flag nell'ambiente Sites live non è verificabile dalla repository. Annunci, materiali e spazio studio AI restano futuri.
+Classi, appartenenze, inviti, eventi, sottoscrizioni, materie e appunti condivisi usano tabelle normalizzate separate da `diaries.payload`: una classe non può leggere o dedurre voti, assenze o preferenze private. Ogni endpoint verifica sessione, appartenenza e ruolo; i segreti degli inviti sono conservati soltanto come digest e i link usano il frammento URL, che non viene inviato al server. C1 (classi e inviti), C2 (eventi condivisi) e C3 (agenda personale collegata) sono implementati nel codice; l'attivazione del flag nell'ambiente Sites live non è verificabile dalla repository. Annunci, materiali e spazio studio AI restano futuri.
 
 I documenti dello spazio studio AI richiederanno object storage, coda di elaborazione e indice di ricerca separati. Non inserire file, testo estratto o embedding nel payload del diario e non eseguire analisi AI nella richiesta HTTP di upload.

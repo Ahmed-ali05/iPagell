@@ -14,7 +14,7 @@
   ·
   <a href="docs/GUIDA-UTENTE.md">Guida utente</a>
   ·
-  <a href="docs/ARCHITETTURA.md">Documentazione tecnica</a>
+  <a href="docs/README.md">Documentazione</a>
 </p>
 
 <p align="center">
@@ -37,10 +37,17 @@
 - **Uso offline:** copia locale in IndexedDB, shell PWA installabile e backup JSON esportabile.
 - **Configurazione flessibile:** semestri, materie, colori e tipologie personalizzabili; i voti usano la scala attuale 1–6.
 - **Classi private:** gruppi su invito con ruoli, membri e codici revocabili, senza condividere voti o assenze.
+- **Appunti per materia:** personali o della classe, editor visivo, bozze sul dispositivo, sincronizzazione e condivisione esplicita, export PDF/Markdown.
+- **Quattro lingue:** italiano, tedesco, francese e inglese; contenuti personali mantenuti nella lingua in cui sono scritti.
+- **Calcolatore pubblico:** media ponderata nella scala attuale 1–6, senza account e senza salvare i voti inseriti.
 
 ## Stato del progetto
 
 La versione iniziale è pubblicata e utilizzabile. L'app ha un backend su Cloudflare Workers e D1; IndexedDB conserva una copia del diario per l'uso offline. Le preferenze fanno parte del diario sincronizzato.
+
+Il riferimento applicativo documentato è la pubblicazione Sites **27** del 1 ottobre 2026. Gli appunti hanno persistenza e revisioni separate dal diario; la bozza di classe diventa condivisa solo dopo anteprima e conferma. [Rilasci ed evidenze](docs/DEPLOYMENT.md), [snapshot corrente](docs/REPO-SNAPSHOT.md) e [matrice di verifica](docs/VERIFICATION-MATRIX.md) distinguono codice, prove e produzione.
+
+Gli aggiornamenti della documentazione, dell'inventario e delle dipendenze successivi a questo rilascio sono registrati nel [changelog](CHANGELOG.md); non sono ancora pubblicati su Sites.
 
 Sono ancora aperte verifiche operative e di qualità elencate nel [piano prodotto](docs/PRODOTTO.md). In particolare, il progetto non dichiara cifratura end-to-end, notifiche programmate ad app chiusa o installazione iOS certificata.
 
@@ -75,6 +82,7 @@ Controlli principali:
 npm test
 npx tsc --noEmit
 npm run lint
+npm run check:i18n
 npm run docs:check
 ```
 
@@ -83,6 +91,8 @@ Le prove API creano dati sintetici e devono essere eseguite soltanto contro un a
 ## Documentazione
 
 Per lavorare sul codice e pubblicarlo segui [Sviluppo e pubblicazione](docs/DEPLOYMENT.md). `npm run release:prepare` esegue controlli e build; la pubblicazione su **ipagell.website** passa dal progetto Sites esistente. GitHub esegue i controlli sulle pull request e su `main`.
+
+L'[indice della documentazione](docs/README.md) separa guide correnti, specifiche future e storico. L'[inventario](docs/REPO-INVENTORY.md) deriva da route, schema, migrazioni, script e lockfile: `npm run docs:generate` lo aggiorna, `docs:check` ne rileva il disallineamento.
 
 | Documento | Contenuto |
 |---|---|
@@ -95,7 +105,7 @@ Per lavorare sul codice e pubblicarlo segui [Sviluppo e pubblicazione](docs/DEPL
 | [Sicurezza](SECURITY.md) | Confini di fiducia e segnalazioni riservate |
 | [Changelog](CHANGELOG.md) | Evoluzione e note di rilascio |
 
-La specifica [Classi](docs/CLASSI.md) distingue il gruppo C1 già disponibile dalle fasi condivise successive. [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md) resta un possibile sviluppo futuro.
+La specifica [Classi](docs/CLASSI.md) distingue gruppi, attività/agenda e appunti implementati da annunci e materiali futuri. [Appunti](docs/APPUNTI-SPEC.md) descrive anche backup V3, copie e recupero. [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md) resta un possibile sviluppo futuro.
 
 ## Contribuire
 

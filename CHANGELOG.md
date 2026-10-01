@@ -1,62 +1,61 @@
 # Registro modifiche
 
-Le date sono quelle del progetto. Versione npm, formato del diario e numero di pubblicazione Sites sono contatori distinti.
+[Documentazione](docs/README.md) · [Pubblicazione](docs/DEPLOYMENT.md) · [Verifiche](docs/VERIFICATION-MATRIX.md)
 
-## Non rilasciato
+Versione npm, formato del diario, backup, revisione dati e numero Sites sono contatori distinti. Le voci di rilascio riportano solo pubblicazioni documentate; il [registro precedente](docs/CHANGELOG-HISTORY.md) conserva i passaggi storici.
 
-- Produzione esplicitamente su ipagell.website tramite Sites; alias www/ChatGPT reindirizzati, workflow GitHub di controlli e comando di preparazione del rilascio. Deploy del Worker separato rinominato sandbox per evitare destinazioni ambigue.
+## Non rilasciato — documentazione, repository e dipendenze
 
-- Anteprima di condivisione Open Graph e X con immagine dedicata, nome iPagell e descrizione leggibile.
+- Allineate le guide correnti al codice applicativo Sites 27: architettura, API, appunti/editor, backup V3, materie di classe, sicurezza, lingua e flussi utente.
+- Aggiunto indice con guide, specifiche future e storico; conservati gli audit e design iniziali con riferimenti espliciti alla loro versione.
+- Inventario generato di route/metodi, schema/migrazioni, script npm e versioni da lockfile; docs:check rileva il disallineamento e include i link di AGENTS.md.
+- Output della ricerca e bytecode Python ignorati, sorgenti conservati.
+- Aggiornati Next ed eslint-config-next a 16.3.8, plugin Cloudflare a 1.62.3, Wrangler a 4.145.0 e workers-types a 5.20261001.1; lockfile aggiornato anche per fast-uri. L'audit completo passa da sei pacchetti segnalati a zero nel controllo del 1 ottobre. Questo esito non equivale a un audit di sicurezza dell'app.
 
-- Password: minimo ridotto a 12 caratteri per registrazione, recupero e cambio password; interfaccia e guida allineate.
+Queste modifiche aggiornano la repository, gli strumenti di verifica e le dipendenze. La versione applicativa pubblicata resta Sites 27; le correzioni successive delle dipendenze richiedono un nuovo rilascio Sites e il push GitHub non costituisce un deploy.
 
-- Avviato il passaggio UX leggero: copy più espliciti, registrazione separata dall’accesso, conferme specifiche e stati vuoti/assenze/classi più chiari; gli interventi strutturali restano pianificati nella reference UX.
+## 2026-10-01 — Sites 27, affidabilità Appunti
 
-### Semplificazione e contenuti generici
+- Confronto e transizioni IndexedDB atomici: le conferme della propria sincronizzazione non generano falsi conflitti e non scartano modifiche successive.
+- Payload in volo persistito per retry dopo risposta persa, protezione di veri conflitti e pagine vecchie, correzione dopo rifiuto definitivo.
+- Coda autosave comune per personale/classe: flush sovrapposti e modifiche durante salvataggio; un refresh UI fallito non invalida il commit locale.
+- A-capo canonici anche in titoli ed elementi di elenco, con grassetto e testo multilinea.
+- Comandi rifiutati conservano testo/stato; bozza di classe mantiene la revisione iniziale, con retry/copia/download dopo errore.
 
-- Modello iniziale con materie generiche personalizzabili; diario vuoto ancora disponibile e compatibilità con i client precedenti.
-- Rimossi crediti personali e riferimenti a istituti specifici dai contenuti e dai metadati del progetto.
-- Separate le viste Assenze e Statistiche dal coordinamento del diario, senza modificare calcoli o persistenza.
-- Corretta la configurazione locale per evitare flag e binding duplicati e usare una data supportata dal runtime installato.
-- Documentata la direzione tecnica: evoluzione graduale, comportamenti standard del Web e priorità al prodotto.
+Sorgente Sites `9535676a53a75f9ff52cf90a501435e1bcee40db`, deployment `appgdep_6abe17938bf48191938483d415de60bf` riuscito. Prima del rilascio: 103 test, 146 verifiche API locali, build e prove browser con dati sintetici. Nessuna nuova migrazione. QA su telefoni fisici aperta.
 
-### Distribuzione indipendente e pagina pubblica
+## 2026-10-01 — Sites 26, percorso e focus Appunti
 
-- Aggiunta una landing page SEO pubblica con dati strutturati, FAQ, sitemap e regole robots; l'area account è ora separata in `/app` e i vecchi link vengono inoltrati.
-- Preparato e verificato il deploy autonomo su Cloudflare Workers con D1 europeo, osservabilità e migrazioni tracciate.
-- Aggiunti comandi ripetibili e un workflow GitHub Actions manuale per la pubblicazione.
-- Il dominio principale resta temporaneamente sul precedente ambiente fino alla migrazione verificata dei dati.
+- Ingressi da Home, Agenda e materia in Voti; ritorno al contesto e conservazione della vista Agenda nello stesso workspace.
+- Aggiunta materia nell'editor senza perdere il testo, gerarchia delle bozze/copie e separazione Attività/Appunti della classe.
+- Toolbar persistente e bookmark di selezione; comandi di titolo/lista reversibili senza perdere i blocchi selezionati.
 
-### Classi private C1
+Sorgente Sites `26c10606aaec54b17e44f94244714a1ad1fefedf`, deployment `appgdep_6abe0a69171c819198a8548fb90519c3` riuscito. Prima del rilascio: 87 test, 130 verifiche API locali e build; responsive/focus nel browser, senza certificazione fisica.
 
-- Nuova area Classi per creare un gruppo, entrare tramite link o codice e scegliere il proprio nome visibile.
-- Proprietari e moderatori possono creare e revocare inviti; il proprietario gestisce ruoli, trasferimento ed eliminazione.
-- Uscita e rimozione revocano subito l’accesso; voti, assenze e diario personale restano fuori dallo spazio condiviso.
-- Aggiornati sito e inviti per usare il dominio principale `ipagell.website`.
+## 2026-09-30 — Sites 24, appunti e editor visivo
 
-### Fondamenta classi C0
+- Appunti personali per materia con persistenza separata dal diario, outbox, revisioni/cursore e bozze sul dispositivo.
+- Materie e note della classe con permessi, pin per membro, archivio autore, copie indipendenti e anteprima prima di pubblicare.
+- Editor ProseMirror condiviso; formati plain/md-lite-v1, lettore sicuro ed export PDF/Markdown con font locali.
+- Contratto API Appunti 2, migrazioni additive 0005/0006 e formato esplicito; vecchi testi restano plain.
+- Backup V3 con import V1/V2 e piano riprendibile; note di classe importate come copie personali.
 
-- Aggiunte tabelle normalizzate per classi, membri e inviti, separate dal diario personale.
-- Introdotta una matrice centralizzata dei permessi per proprietario, moderatore e membro, coperta da test.
-- Aggiunto un interruttore server spento per impostazione predefinita: nessuna schermata o rotta classi è ancora esposta.
+Pubblicazione e verifica delle colonne content_format del D1 registrate in [DEPLOYMENT](docs/DEPLOYMENT.md). I limiti delle prove PDF/mobile sono conservati nella matrice.
 
-### Documentazione e gestione del progetto
+## Evoluzione precedente presente nel sorgente
 
-- Repository preparato per la pubblicazione open source con README riorganizzato, metadati GitHub e licenza MIT.
-- README corretto: account interni, backend D1 e preferenze sincronizzate, non più descrizione “solo locale”.
-- Guida utente, architettura, API, manutenzione e documento di sicurezza.
-- Cinque profili d’uso, roadmap prioritaria con criteri d’accettazione, checklist di rilascio e linee guida per contribuire.
-- Controllo ripetibile dei collegamenti locali della documentazione.
-- Specifica implementabile per classi autogestite, inviti revocabili, ruoli e agenda collegata.
-- Progetto dello spazio studio AI: albero/grafo incrementale dalle dispense, fonti, versionamento, privacy, rischi ed evaluation.
-- Nessuna modifica al comportamento o ai dati dell’app in questo aggiornamento documentale.
+- Lingue it/de/fr/en, route pubbliche localizzate, metadata, manifest e calcolatore pubblico della media.
+- Controller diary-session, CAS IndexedDB, protezione cambio account e riconciliazione delle risposte perse del diario.
+- Gruppi privati C1, attività C2 e sottoscrizioni personali C3, cache separata e coordinamento delle mutazioni.
+- Evoluzione UX/copy, componenti Assenze/Statistiche estratti, scala numeric-1-6 centralizzata senza modifica delle formule.
+- Produzione Sites sul dominio canonico; Worker indipendente riservato a sandbox, CI di controlli/audit/build e preparazione distinta dal deploy.
 
-## 2026-09-16 — Pubblicazione Sites 2
+Questa sezione descrive codice esistente senza assegnare numeri o date di pubblicazione non accertati. Analisi e prove precedenti sono nell'[indice storico](docs/README.md#materiale-di-progetto-e-storico).
 
-- Account interni con password scrypt e salt individuale, sessioni protette, codice di recupero e limiti ai tentativi.
-- Snapshot personali D1, copie offline per account, controllo revisione e importazioni validate.
-- Rimozione dati demo personali, superfici opache e comandi mobili accessibili.
-- Tipologie voto con ID stabili, supporto notazione `4-5`, simulatore con pesi espliciti e rimozione della proiezione artificiale.
-- Service worker con asset consentiti e API escluse dalla cache.
+## 2026-09-16 — Sites 2, storico
 
-Dettagli e limiti della verifica: [REVIEW](docs/REVIEW.md). Le funzioni avanzate non completate restano nella [roadmap](docs/PRODOTTO.md), non nelle note di consegna.
+- Account interni, password scrypt, sessioni cookie, codice recupero e limiti ai tentativi.
+- Snapshot D1 per account, copia locale e conflitti; dati demo personali rimossi.
+- Tipi voto con ID stabili, notazione 4-5, simulatore con pesi e service worker con API escluse dalla cache.
+
+Evidenze riferite a quel rilascio: [REVIEW](docs/REVIEW.md). Non attestano automaticamente la versione corrente.

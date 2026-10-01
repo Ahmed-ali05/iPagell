@@ -34,7 +34,8 @@ function escapeLineStart(value: string) {
   return /^(?:## |-|[1-9]\d*\. )/.test(value) ? `\\${value}` : value;
 }
 function inlineSource(parts: Inline[]) {
-  return parts.map(part => part.type === "break" ? "\\\n" : part.type === "strong" ? `**${escapeText(part.text)}**` : escapeText(part.text)).join("");
+  return parts.map(part => part.type === "break" ? "\\\n" : part.text.split("\n").map(text =>
+    part.type === "strong" && text ? `**${escapeText(text)}**` : escapeText(text)).join("\\\n")).join("");
 }
 
 export function parseNote(contentFormat: string, content: string): NoteDocument {
@@ -48,26 +49,28 @@ export function parseNote(contentFormat: string, content: string): NoteDocument 
   const lines = content.split("\n"), blocks: Block[] = [];
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line.startsWith("## ")) { blocks.push({ type: "section_heading", content: inline(line.slice(3)) }); continue; }
+    const readInline = (first: string) => {
+      const parts = inline(first);
+      while ((lines[i]?.match(/\\+$/)?.[0].length ?? 0) % 2 === 1 && i + 1 < lines.length) {
+        const last = parts.at(-1);
+        if (last?.type === "text" && last.text.endsWith("\\")) last.text = last.text.slice(0, -1);
+        parts.push({ type: "break" }, ...inline(lines[++i]));
+      }
+      return parts;
+    };
+    if (line.startsWith("## ")) { blocks.push({ type: "section_heading", content: readInline(line.slice(3)) }); continue; }
     const list = listLine(line);
     if (list && (list.type !== "ordered_list" || line.startsWith("1. "))) {
-      const items: Inline[][] = [inline(list.text)];
+      const items: Inline[][] = [readInline(list.text)];
       let expected = 2;
       while (i + 1 < lines.length) {
         const next = listLine(lines[i + 1]);
         if (!next || next.type !== list.type || (list.type === "ordered_list" && !lines[i + 1].startsWith(`${expected}. `))) break;
-        i++; expected++; items.push(inline(next.text));
+        i++; expected++; items.push(readInline(next.text));
       }
       blocks.push({ type: list.type, items }); continue;
     }
-    const parts = inline(line);
-    while ((lines[i]?.match(/\\+$/)?.[0].length ?? 0) % 2 === 1 && i + 1 < lines.length) {
-      // A terminal backslash represents a hard break within the same paragraph.
-      const last = parts.at(-1);
-      if (last?.type === "text" && last.text.endsWith("\\")) last.text = last.text.slice(0, -1);
-      parts.push({ type: "break" }, ...inline(lines[++i]));
-    }
-    blocks.push({ type: "paragraph", content: parts });
+    blocks.push({ type: "paragraph", content: readInline(line) });
   }
   return { blocks, supported: true };
 }

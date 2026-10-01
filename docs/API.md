@@ -29,6 +29,17 @@ Ogni mutazione richiede `Origin` uguale all’origine della richiesta e `Content
 | `POST /api/class-events/:eventId/subscription` | `semesterId`, facoltativo `subjectId` e `reminder` | 201: sottoscrizione dell'evento all'agenda personale |
 | `GET /api/class-agenda` | Nessuno | Sottoscrizioni personali alle attività di classe |
 | `PATCH, DELETE /api/class-agenda/:subscriptionId` | Revisione e campi personali; `detach: true` per scollegare | Modifica, scollegamento o rimozione della copia personale |
+| `GET, POST /api/notes` | GET: cursore numerico `after`; POST: nota personale con ID e `baseRevision: 0` | Pagina di modifiche oppure 201: `{note}` |
+| `GET, PATCH, DELETE /api/notes/:noteId` | PATCH/DELETE con revisione, mutazione e formato atteso | `{note}`, anche tombstone dopo cancellazione |
+| `GET, POST /api/classes/:classId/subjects` | POST: `{name}` | `{subjects}` oppure 201: `{subject}` |
+| `PATCH, DELETE /api/classes/:classId/subjects/:subjectId` | PATCH: `baseRevision`, `name` e/o `archived`; DELETE: `{baseRevision}` | `{subject}` oppure `{ok: true}` |
+| `GET, POST /api/classes/:classId/notes` | GET: cursore UUID `after`; POST: nota di classe | Pagina oppure 201: `{note}` |
+| `GET, PATCH, DELETE /api/classes/:classId/notes/:noteId` | PATCH/DELETE con revisione, mutazione e formato atteso | `{note}`; modifica autore, ritiro anche per moderazione |
+| `PUT, DELETE /api/classes/:classId/notes/:noteId/pin` | `{}` | `{ok: true}`; preferenza del membro corrente |
+| `GET /api/my-class-notes` | Cursore UUID `after` | Pagina dei testi del solo autore autenticato |
+| `DELETE /api/my-class-notes/:noteId` | Account atteso, revisione, mutazione e formato atteso | `{note}` ritirata, anche senza membership corrente |
+
+L'[inventario generato](REPO-INVENTORY.md#api-esportate) verifica i metodi esportati da tutti i file route. Le tabelle qui descrivono il contratto applicativo.
 
 `user = { id, username }`. Registrazione account e creazione diario sono due passaggi distinti: dopo la prima, `GET /api/account` può restituire `diary: null`. Un username duplicato restituisce 409; non esiste idempotency key per registrazione o recupero.
 
@@ -87,6 +98,14 @@ Le route `/api/notes/**`, `/api/classes/:classId/notes/**` (pin incluso) e `/api
 Ogni nota include `contentFormat: "plain" | "md-lite-v1"` nelle liste, nel dettaglio e nelle risposte di scrittura. `plain` conserva il testo preesistente; `md-lite-v1` è un Markdown limitato a titoli di sezione, grassetto, elenchi e paragrafi, validato e canonico. `POST` richiede `contentFormat`. `PATCH` richiede il nuovo `contentFormat`, `expectedContentFormat`, `baseRevision` e `mutationId`; `DELETE` richiede `expectedContentFormat`, `baseRevision` e `mutationId`. Il server confronta revisione e formato precedente nella stessa `UPDATE`. Il pin personale passa da `PATCH` della nota, quello di classe ha una route distinta ma richiede comunque l'header 2. Formati mancanti/sconosciuti danno 426, una revisione o un formato precedente diverso dà 409. Il limite per nota è 20.000 code point serializzati e 64 KiB del record; il corpo di scrittura è limitato a 64 KiB.
 
 L'esportazione del backup usa `backupVersion: 3` e include il formato in note personali, bozze, conflitti e snapshot di classe. L'import V1 riguarda soltanto il diario; V2 viene interpretato come testo `plain`; V3 preserva il formato. Le copie importate ricevono nuovi ID e non vengono pubblicate automaticamente nella classe. La dimensione massima del file V2/V3 resta 24 MiB.
+
+Payload di creazione personale: `id`, `expectedUserId`, `mutationId`, `baseRevision: 0`, `subjectId`, `subjectName`, `title`, `content`, `contentFormat` e `pinned` (default false). L'update usa l'ID nel percorso, richiede `pinned` e aggiunge `expectedContentFormat`. Il DELETE contiene solo `expectedUserId`, `mutationId`, `baseRevision`, `expectedContentFormat`. La nota di classe usa gli stessi campi senza `subjectName` e `pinned`: nome materia e identità dell'autore vengono ricavati dal server. I corpi sono strict. [Schemi](../lib/notes/validation.ts) e [costruttori dei payload](../lib/notes/request-body.ts) sono la fonte eseguibile.
+
+Le mutazioni richiedono `X-IPagell-Account` uguale all'utente del cookie; le letture lo verificano se presente. Il contratto 2 è richiesto anche senza mutazione. L'archivio autore non richiede membership attuale; restituisce esclusivamente i testi scritti dall'utente. Per la classe, solo l'autore modifica testo/materia; autore e moderatori autorizzati possono ritirare. Le materie della classe non richiedono il contratto note: i membri possono crearle, owner/moderator possono aggiornarle o eliminarle con revisione.
+
+Le risposte paginate sono `{notes, nextAfter, hasMore}`: il personale usa `changeSeq` numerico e include tombstone; classe e archivio autore usano ID. Limiti: fino a 50 righe e 512 KiB per pagina; quote attive 500 note/8 MiB personali e 200 note/4 MiB per classe. Il limite di creazione è 60 nuove materie attive della classe, escludendo dal conteggio le etichette legacy seminate. Una quota può produrre 413; conflitto di revisione/formato 409; accesso negato 403/404 secondo l'operazione.
+
+Il retry conserva ID e payload della mutazione in volo. Ripetere la medesima scrittura può restituire la nota già accettata; non riutilizzare l'ID di mutazione per contenuti diversi. Una conferma viene riconosciuta solo confrontando anche il contenuto previsto. Il client conserva la bozza dopo rete/409 e distingue commit locale da conferma server. Metadati locali come `inFlight`, `localVersion` e conflitto non vanno inviati nei corpi strict.
 
 ### Operazioni sensibili
 

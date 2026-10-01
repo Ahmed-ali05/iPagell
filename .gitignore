@@ -48,3 +48,8 @@ next-env.d.ts
 /.codex/
 /outputs/
 /work/
+
+# Generated research previews and Python bytecode; keep source scripts tracked.
+/output/
+__pycache__/
+*.py[cod]

@@ -2,19 +2,17 @@
 import { useCallback,useEffect,useRef,useState } from "react";
 import { activeAccountId } from "@/lib/account-storage";
 import { requestJson,RequestError } from "@/lib/client-http";
-import { applyPersonalPage,listClassDrafts,listPersonal,mutatePersonal,readMeta,readPersonal,removeClassDraft,saveClassDraft,NoteDeviceConflict,type PersonalRecord } from "@/lib/notes/storage";
+import { acceptPersonalNote,beginPersonalWrite,rejectPersonalWrite,persistPersonalDraft,applyPersonalPage,listClassDrafts,listPersonal,mutatePersonal,readMeta,readPersonal,removeClassDraft,saveClassDraft,NoteDeviceConflict,type PersonalRecord } from "@/lib/notes/storage";
 import type { NoteDraft,PersonalNote } from "@/types/notes";
 import { localDraftBytes,validateNoteBytes } from "@/lib/notes/validation";
 import { personalWriteBody } from "@/lib/notes/request-body";
+import { persistAndNotify } from "@/lib/notes/autosave";
+import { writtenMatches } from "@/lib/notes/reconcile";
 
 type Phase="loading"|"ready"|"partial"|"offline"|"error"|"expired"|"upgrade-required";
 type State={phase:Phase;records:PersonalRecord[];classDrafts:NoteDraft[];error:string};
 const initial:State={phase:"loading",records:[],classDrafts:[],error:""};
 const same=(a:unknown,b:unknown)=>JSON.stringify(a)===JSON.stringify(b);
-const writtenMatches=(draft:NoteDraft,note:PersonalNote)=>draft.deleted
-  ? !!note.deletedAt && note.lastMutationId===draft.mutationId
-  : note.lastMutationId===draft.mutationId && draft.contentFormat===note.contentFormat && draft.content===note.content
-    && draft.title.trim()===note.title && draft.subjectId===note.subjectId && draft.subjectName===note.subjectName && draft.pinned===note.pinned;
 async function checkLocalDraftSpace(userId:string,next:NoteDraft){
   const [personal,classDrafts]=await Promise.all([listPersonal(userId),listClassDrafts(userId)]);
   if(localDraftBytes(personal.flatMap(record=>record.draft?[record.draft]:[]),classDrafts,next)>8*1024*1024)throw new Error("Spazio locale per bozze esaurito.");
@@ -28,8 +26,8 @@ export function useNotes(userId:string){
   const channel=useRef<BroadcastChannel|null>(null);
   const assertAccount=useCallback(()=>{if(activeAccountId()!==userId)throw new RequestError(401,"Accedi di nuovo allo stesso account.");},[userId]);
   const request=useCallback(<T,>(path:string,init?:RequestInit)=>requestJson<T>(path,{...init,headers:{...init?.headers,"X-IPagell-Account":userId,"X-IPagell-Notes-Contract":"2"}}),[userId]);
-  const publish=useCallback(async()=>{const [records,classDrafts]=await Promise.all([listPersonal(userId),listClassDrafts(userId)]);if(live.current)setState(s=>({...s,records,classDrafts}));},[userId]);
-  const broadcast=useCallback(()=>{channel.current?.postMessage("changed");},[]);
+  const publish=useCallback(async()=>{const [records,classDrafts]=await Promise.all([listPersonal(userId),listClassDrafts(userId)]);if(live.current&&activeAccountId()===userId)setState(s=>({...s,records,classDrafts}));},[userId]);
+  const broadcast=useCallback(()=>{try{channel.current?.postMessage("changed");}catch{/* A closed channel must not turn a durable save into failure. */}},[]);
   const fail=useCallback((error:unknown)=>{
     if(!live.current)return;
     if(error instanceof RequestError&&error.status===426){upgradeRequired.current=true;setState(s=>({...s,phase:"upgrade-required",error:error.message}));return;}
@@ -51,49 +49,44 @@ export function useNotes(userId:string){
   },[assertAccount,broadcast,publish,request,userId]);
   const syncOne=useCallback(async(id:string)=>{
     if(upgradeRequired.current)return;
-    assertAccount();const record=await readPersonal(userId,id),draft=record?.draft;
-    if(!record||!draft||draft.conflict||!draft.title.trim()||!draft.subjectId||!validateNoteBytes(draft))return;
-    if(record.remote?.deletedAt && !draft.deleted){
-      await mutatePersonal(userId,id,record,current=>({...current!,draft:{...draft,conflict:record.remote}}));await publish();return;
-    }
-    const base={expectedUserId:userId,mutationId:draft.mutationId,baseRevision:draft.baseRevision,expectedContentFormat:draft.expectedContentFormat??record.remote?.contentFormat??"plain"};
-    const path=`/api/notes/${encodeURIComponent(id)}`;
-    try {
-      const result=await request<{note:PersonalNote}>(draft.deleted?path:record.remote?path:"/api/notes",{
-        method:draft.deleted?"DELETE":record.remote?"PATCH":"POST",
-        body:JSON.stringify(draft.deleted?base:personalWriteBody(draft,userId,!record.remote)),
-      });
-      assertAccount();
-      const current=await readPersonal(userId,id);
-      if(!current)return;
-      await mutatePersonal(userId,id,current,old=>{
-        if(!old)return null;
-        const still=old.draft;
-        const nextDraft=still?.mutationId===draft.mutationId
-          ? writtenMatches(draft,result.note)?null:{...still,conflict:result.note}
-          : still?{...still,baseRevision:result.note.revision,expectedContentFormat:result.note.contentFormat}:null;
-        return {...old,remote:result.note,draft:nextDraft,localVersion:old.localVersion+1};
-      });
-      await publish();broadcast();
-    }catch(error){
-      if(error instanceof RequestError&&error.status===409){
-        try {const result=await request<{note:PersonalNote}>(path);assertAccount();const current=await readPersonal(userId,id);
-          if(current?.draft?.mutationId===draft.mutationId){
-            if(writtenMatches(draft,result.note)){
-              await mutatePersonal(userId,id,current,old=>({...old!,remote:result.note,draft:null,localVersion:old!.localVersion+1}));
-            }else await mutatePersonal(userId,id,current,old=>({...old!,remote:result.note,draft:{...old!.draft!,conflict:result.note},localVersion:old!.localVersion+1}));
-            await publish();broadcast();
-          }
-          return;
-        }catch(fetchError){fail(fetchError);return;}
+    // The stored in-flight snapshot is replayed after a lost response. A newer
+    // local draft is rebased only when that exact write is acknowledged.
+    for(let writes=0;writes<8;writes++){
+      assertAccount();const current=await readPersonal(userId,id),candidate=current?.inFlight??current?.draft;
+      if(!candidate||current?.draft?.conflict||!candidate.title.trim()||!candidate.subjectId||!validateNoteBytes(candidate))return;
+      const record=await beginPersonalWrite(userId,id),draft=record?.inFlight;
+      if(!record||!draft||record.draft?.conflict)return;
+      const base={expectedUserId:userId,mutationId:draft.mutationId,baseRevision:draft.baseRevision,expectedContentFormat:draft.expectedContentFormat??"plain"};
+      const path=`/api/notes/${encodeURIComponent(id)}`;
+      try{
+        const result=await request<{note:PersonalNote}>(draft.deleted?path:draft.baseRevision?path:"/api/notes",{
+          method:draft.deleted?"DELETE":draft.baseRevision?"PATCH":"POST",
+          body:JSON.stringify(draft.deleted?base:personalWriteBody(draft,userId,!draft.baseRevision)),
+        });
+        assertAccount();
+        if(result.note.id!==id||!writtenMatches(draft,result.note))throw new Error("Conferma appunto non valida.");
+        await acceptPersonalNote(userId,result.note);await publish();broadcast();
+        if(live.current)setState(s=>({...s,phase:"ready",error:""}));
+      }catch(error){
+        if(error instanceof RequestError&&error.status===409){
+          try{const result=await request<{note:PersonalNote}>(path);assertAccount();if(result.note.id!==id)throw new Error("Conferma appunto non valida.");await acceptPersonalNote(userId,result.note);await publish();broadcast();}
+          catch(fetchError){fail(fetchError);return;}
+          continue;
+        }
+        if(error instanceof RequestError&&[400,413].includes(error.status)){
+          assertAccount();const latest=await rejectPersonalWrite(userId,id,draft.mutationId);
+          if(latest?.draft&&latest.draft.mutationId!==draft.mutationId)continue;
+        }
+        fail(error);return;
       }
-      fail(error);
     }
+    return true;
   },[assertAccount,broadcast,fail,publish,request,userId]);
-  const sync=useCallback(()=>{
+  const sync=useCallback(function runSync():Promise<void>{
     if(syncing.current)return syncing.current;
-    const task=(async()=>{try{assertAccount();if(!navigator.onLine||upgradeRequired.current)return;const records=await listPersonal(userId);for(const record of records){if(upgradeRequired.current)break;if(record.draft)await syncOne(record.id);}}catch(error){fail(error);}})();
-    syncing.current=task.finally(()=>{syncing.current=null;});return syncing.current;
+    let more=false;
+    const task=(async()=>{try{assertAccount();if(!navigator.onLine||upgradeRequired.current)return;const records=await listPersonal(userId);for(const record of records){if(upgradeRequired.current)break;if(record.draft)more=!!await syncOne(record.id)||more;}}catch(error){fail(error);}})();
+    syncing.current=task.finally(()=>{syncing.current=null;if(more&&live.current)timer.current=setTimeout(()=>{void runSync();},500);});return syncing.current;
   },[assertAccount,fail,syncOne,userId]);
   const refresh=useCallback(()=>{
     if(refreshing.current)return refreshing.current;
@@ -112,18 +105,18 @@ export function useNotes(userId:string){
   const queueSync=useCallback(()=>{if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{void sync();},500);},[sync]);
   const savePersonalDraft=useCallback(async(draft:NoteDraft,expected:NoteDraft|null)=>{
     assertAccount();
-    const current=await readPersonal(userId,draft.id);
-    if(!same(current?.draft??null,expected))throw new NoteDeviceConflict();
-    const next={...draft,userId,space:"personal" as const,localVersion:(current?.localVersion??0)+1,localEditedAt:Date.now()};
+    const next={...draft,userId,space:"personal" as const};
     await checkLocalDraftSpace(userId,next);
-    await mutatePersonal(userId,draft.id,current,old=>({userId,id:draft.id,remote:old?.remote??null,draft:next,localVersion:next.localVersion}));
-    await publish();broadcast();queueSync();return next;
-  },[assertAccount,broadcast,publish,queueSync,userId]);
+    const saved=await persistAndNotify(()=>persistPersonalDraft(next,expected),publish,fail);
+    // Once IndexedDB commits, optional view refresh/notification cannot make
+    // the editor believe its expected draft was never written.
+    broadcast();queueSync();return saved;
+  },[assertAccount,broadcast,fail,publish,queueSync,userId]);
   const saveClass=useCallback(async(draft:NoteDraft,expected:NoteDraft|null)=>{
     assertAccount();const next={...draft,userId,space:"class" as const,localVersion:(expected?.localVersion??0)+1,localEditedAt:Date.now()};
     await checkLocalDraftSpace(userId,next);
-    await saveClassDraft(next,expected);await publish();broadcast();return next;
-  },[assertAccount,broadcast,publish,userId]);
+    await persistAndNotify(()=>saveClassDraft(next,expected),publish,fail);broadcast();return next;
+  },[assertAccount,broadcast,fail,publish,userId]);
   const deleteClass=useCallback(async(id:string,expected?:NoteDraft)=>{await removeClassDraft(userId,id,expected);await publish();broadcast();},[broadcast,publish,userId]);
   const deletePersonal=useCallback(async(note:PersonalNote,expected:NoteDraft|null)=>{
     const current=await readPersonal(userId,note.id);
@@ -136,7 +129,7 @@ export function useNotes(userId:string){
     const current=await readPersonal(userId,id);
     if(!same(current?.draft??null,expected))throw new NoteDeviceConflict();
     if(!current)return;
-    await mutatePersonal(userId,id,current,old=>old?.remote?{...old,draft:null,localVersion:old.localVersion+1}:null);
+    await mutatePersonal(userId,id,current,old=>old?.remote?{...old,draft:null,inFlight:null,localVersion:old.localVersion+1}:null);
     await publish();broadcast();
   },[broadcast,publish,userId]);
   const pending=state.records.filter(r=>r.draft).length+state.classDrafts.length;

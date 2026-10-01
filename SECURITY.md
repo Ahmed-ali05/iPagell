@@ -20,15 +20,17 @@ CSRF: origine esatta e JSON sulle mutazioni, più controllo Fetch Metadata. Ques
 
 | Sede | Contenuto / limite |
 |---|---|
-| D1 | Account, digest credenziali/sessioni, snapshot diario e bucket rate limit |
-| IndexedDB | Copia per account, anche draft; non cifrata con la password |
-| localStorage | Puntatore account, marcatori notifiche e possibili preferenze legacy |
+| D1 | Account, digest credenziali/sessioni, snapshot diario, bucket rate limit, classi/membri/inviti, attività/sottoscrizioni, appunti personali e condivisi, materie e pin di classe |
+| IndexedDB | Diario per account e archivio Appunti separato con bozze, conflitti, payload in volo e piano d'import; non cifrati con la password |
+| localStorage | Puntatore account, lingua interfaccia, cache agenda collegata, marcatori notifiche/installazione e possibili preferenze legacy |
 | Cache service worker | Shell generica e asset consentiti, non API |
-| Backup JSON scaricato | Dati scolastici e preferenze in chiaro; fuori dal controllo dell’app |
+| Backup JSON scaricato | Diario/preferenze, note/bozze/conflitti e copie delle proprie note di classe in chiaro; fuori dal controllo dell’app, senza credenziali o payload in volo |
 
 La cancellazione account rimuove i dati applicativi correnti dal database e invalida le sessioni; non garantisce rimozione da backup infrastrutturali, esportazioni o dispositivi offline. Tempi di conservazione infrastrutturali, titolare, contatto e informativa vanno definiti dal responsabile del servizio: non inventarli nella UI.
 
-La pulizia di sessioni scadute e bucket avviene in occasione della creazione di una sessione, non tramite un job periodico dedicato. Logout rimuove la copia locale attiva, non necessariamente tutti gli archivi legacy o di precedenti account.
+La pulizia di sessioni scadute e bucket avviene in occasione della creazione di una sessione, non tramite un job periodico dedicato. Logout rimuove la copia del diario attivo; l'interfaccia può conservare l'archivio Appunti dello stesso account se contiene note o bozze pendenti, dopo il flush e l'avviso. Non cancella necessariamente tutti gli archivi legacy o di precedenti account. Su un dispositivo condiviso verificare questo stato prima di uscire.
+
+Gli appunti personali hanno solo endpoint per il titolare. Quelli di classe richiedono membership corrente; solo l'autore può riscrivere il testo, owner/moderator possono moderare tramite ritiro. L'archivio autore espone soltanto i propri testi anche dopo la perdita della membership. Pin e bozze restano personali. La lettura usa un AST chiuso e nodi React ammessi; il protocollo richiede formato e contratto client espliciti. Le copie fra spazi sono un'azione volontaria dell'utente.
 
 ## Segnalazioni riservate
 
@@ -38,7 +40,7 @@ Includere versione interessata, impatto, passaggi riproducibili su account sinte
 
 ## Stato delle funzioni
 
-Classi, eventi condivisi e agenda personale collegata sono implementati nel codice: verificano autorizzazioni server-side e separano i dati condivisi dal diario. L'attivazione delle classi nell'ambiente Sites pubblicato non è verificabile dalla repository. Lo spazio studio AI resta futuro. Le specifiche fissano requisiti di sicurezza prima dell'eventuale estensione:
+Classi, eventi, agenda personale collegata, materie e appunti condivisi sono implementati nel codice: verificano autorizzazioni server-side e separano i dati condivisi dal diario. Il valore runtime del flag Classi non deriva dalla sola repository. Le prove del rilascio e i limiti sono nella [matrice](docs/VERIFICATION-MATRIX.md). Lo spazio studio AI resta futuro. Le specifiche fissano requisiti di sicurezza prima dell'eventuale estensione:
 
 - [Classi autogestite](docs/CLASSI.md): autorizzazioni server-side, inviti conservati come digest, isolamento del diario e test contro IDOR/escalation;
 - [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md): file non fidati, prompt injection, isolamento di storage/vettori, cancellazione dei derivati, quote e trattamento da parte del fornitore.

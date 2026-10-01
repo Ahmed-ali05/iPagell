@@ -2,6 +2,8 @@
 
 [Indice](../README.md) · [Classi](CLASSI.md) · [Spazio studio AI](SPAZIO-STUDIO-AI.md) · [Revisione storica](REVIEW.md)
 
+Aggiornamento: **1 ottobre 2026**. Stato implementato in [Snapshot](REPO-SNAPSHOT.md); prove e limiti in [Matrice](VERIFICATION-MATRIX.md).
+
 ## Promessa e confini
 
 iPagell aiuta uno studente a sapere cosa scade, come sta andando e quali dati ha registrato. Non sostituisce il registro scolastico, non certifica assenze o promozioni e non è affiliato a scuole o istituti.
@@ -32,20 +34,21 @@ Stato: **versione iniziale pubblicata**, non “prodotto completo”. L’accoun
 
 La direzione tecnica è evolvere senza riscrivere: soluzioni Web standard, nessuna nuova dipendenza senza un beneficio concreto e separazione graduale delle viste. I [criteri architetturali](ARCHITETTURA.md#semplicità-architetturale-e-priorità-di-prodotto) guidano questo lavoro. La priorità resta rendere più utile il diario per chi studia.
 
-Le righe seguenti sono **aperte**, non funzionalità già consegnate. P0 indica un requisito prima di allargare significativamente l’uso, non una vulnerabilità confermata.
+La tabella distingue lavoro **aperto** e funzioni consegnate nel codice. P0 indica un requisito prima di allargare significativamente l’uso, non una vulnerabilità confermata.
 
 | ID / priorità | Intervento | Condizione di completamento |
 |---|---|---|
 | Q01 / P0 | Prova iPhone reale e offline | Installazione, riapertura senza rete, modifica, riconnessione e aggiornamento worker documentati su dispositivo/versione |
 | Q02 / P0 | Recupero operativo e responsabilità | Responsabile nominato, backup database e restore isolato riuscito, canale privato di sicurezza e informativa dati approvata |
-| Q03 / P0 | Concorrenza e failure injection | Due schede e due dispositivi; timeout dopo commit, quota IndexedDB, logout con draft e reset testati senza perdita silenziosa |
+| Q03 / P0, parziale | Concorrenza e failure injection | Coda/CAS/risposta persa/quota testati nel diario e negli appunti; completare due dispositivi reali, IME e ciclo PWA senza perdita silenziosa |
 | Q04 / P0 | Chiarezza del recupero account | Gestire risposta di registrazione/recupero persa e codice non conservato; nessun retry cieco che ruoti codici senza controllo |
 | Q05 / P1 | Liste grandi e prestazioni | Paginazione/filtri, caricamento grafici differito e benchmark con dataset sintetico; allineare limite locale e busta API |
-| Q06 / P1 | Manutenibilità e test | Separare viste dal componente principale; runner locale migrazioni tracciato e ripetibile; controlli automatizzati in CI |
+| Q06 / P1, parziale | Manutenibilità e test | Controller/coda estratti, controlli e inventario automatici in CI; restano estrazioni mirate, runner locale migrazioni tracciato e integrazione API/browser in CI |
 | Q07 / P1 | Accuratezza scolastica avanzata | Definire medie per componenti e congelamento storico, con esempi approvati e test prima dell’implementazione |
 | Q08 / P2 | Estensioni d’uso | Valutare vista settimana e promemoria push reali solo con infrastruttura, consenso e costi chiariti |
 | C01 / consegnato | Classi autogestite | Implementato: ruoli proprietario/moderatore/membro, inviti revocabili e dati separati dal diario; l'attivazione live del flag non è verificabile dalla repository |
 | C02 / consegnato | Agenda condivisa | Implementati eventi collaborativi e sottoscrizioni personali aggiornabili senza condividere il diario |
+| N01 / consegnato | Appunti personali e di classe | Editor condiviso, formato, sincronizzazione, bozze e conferma di classe, PDF e backup V3; QA fisica resta in Q01 |
 | C03 / P2 | Annunci e materiali | Introdurre prima link/testo; file soltanto con storage privato, scansione e policy dati |
 | A01 / ricerca | Spazio studio AI | Prototipo offline su corpus autorizzato con citazioni, albero incrementale ed evaluation documentata |
 | A02 / futuro | AI personale in produzione | Solo dopo privacy, cancellazione, quote, storage, code e soglie di qualità approvate |
@@ -69,5 +72,7 @@ Le specifiche [Classi](CLASSI.md) e [Spazio studio AI](SPAZIO-STUDIO-AI.md) desc
 Questa checklist è un modello da compilare per ciascun rilascio, non una dichiarazione che tutte le voci siano già superate.
 
 ## Evidenza disponibile
+
+Il rilascio Appunti 27 riporta 103 test e 146 verifiche API locali, build e prove browser con dati sintetici. La [matrice corrente](VERIFICATION-MATRIX.md) distingue prove eseguite, produzione e controlli non coperti; lo [storico](VERIFICATION-HISTORY.md) conserva i risultati precedenti.
 
 Nella revisione del 16 settembre 2026 sono stati riportati 6 test unitari e 29 controlli API superati, build e TypeScript riusciti, audit delle dipendenze di produzione senza vulnerabilità segnalate. Prova browser locale compilata: desktop e viewport 390×844, accesso, voto `4-5`, media `4.5`, ricaricamento. Non equivale a prova su iPhone fisico, test di carico, suite completa di accessibilità o penetration test indipendente.

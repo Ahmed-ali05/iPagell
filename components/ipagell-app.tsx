@@ -201,8 +201,10 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const [personalEvent, setPersonalEvent] = useState<ClassSubscription | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
   const [notesIntent,setNotesIntent]=useState<{subjectId:string;newNote:boolean;openId:string;serial:number}>({subjectId:"",newNote:false,openId:"",serial:0});
+  const [notesOrigin,setNotesOrigin]=useState<{tab:TabId;agendaItemId?:string}>({tab:"home"});
   const [copyToClass,setCopyToClass]=useState<NoteCopySeed|null>(null);
   const [classesVisited, setClassesVisited] = useState(false);
+  const [agendaVisited,setAgendaVisited]=useState(false);
   const [agendaFocusId, setAgendaFocusId] = useState<string | null>(null);
   const [selectedGradeSubjectId, setSelectedGradeSubjectId] = useState("");
   const [modal, setModal] = useState<ModalType>(null);
@@ -230,7 +232,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);
     queueMicrotask(() => {
-      if (query.get("view") === "agenda") setActiveTab("agenda");
+      if (query.get("view") === "agenda") {setAgendaVisited(true);setActiveTab("agenda");}
       if (
         query.get("view") === "classes" ||
         window.location.hash.includes("join=")
@@ -421,13 +423,18 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const average = generalAverage(data.subjects, semesterGrades);
   const navigate = async (tab: TabId, agendaItemId?: string) => {
     try { await flushOpenNotes(); } catch { toast.error(t("notes.saveFailed")); return false; }
-    setAgendaFocusId(tab === "agenda" ? agendaItemId ?? null : null);
+    if(tab === "agenda")setAgendaFocusId(agendaItemId ?? null);
+    else if(tab !== "notes")setAgendaFocusId(null);
     if (tab === "classes") setClassesVisited(true);
+    if (tab === "agenda")setAgendaVisited(true);
     setActiveTab(tab);
     return true;
   };
-  const openNotes=async(subjectId="",newNote=false,openId="")=>{
-    if(await navigate("notes"))setNotesIntent({subjectId,newNote,openId,serial:Date.now()});
+  const openNotes=async(subjectId="",newNote=false,openId="",agendaItemId?:string)=>{
+    if(await navigate("notes")){
+      if(activeTab!=="notes")setNotesOrigin({tab:activeTab,agendaItemId:agendaItemId??agendaFocusId??undefined});
+      setNotesIntent({subjectId,newNote,openId,serial:Date.now()});
+    }
   };
   const copyClassToPersonal=async(note:ClassNote)=>{
     const id=crypto.randomUUID();
@@ -724,50 +731,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
                 onManageSubjects={() => setSettingsOpen(true)}
                 onOpenNotes={()=>openNotes()}
                 onNewNote={()=>openNotes("",true)}
+                recentNotes={notes.records}
+                onResumeNote={(id)=>openNotes("",false,id)}
+                onSubjectNotes={(id)=>openNotes(id)}
               />
               <InstallAppOffer placement="home" hasRealContent={data.grades.length + data.agenda.length + data.absences.length > 0} />
             </>
-          )}
-          {activeTab === "agenda" && (
-            <AgendaView
-              items={semesterAgenda}
-              focusItemId={agendaFocusId}
-              subjects={data.subjects}
-              onAdd={() => data.subjects.length ? setModal("agenda") : openSubjectEditor()}
-              onClasses={() => navigate("classes")}
-              onPersonal={setPersonalEvent}
-              onToggle={(id) => {
-                const shared = semesterAgenda.find(item => item.id === id)?.shared;
-                if (shared) { void classAgenda.update(shared, {completed: !shared.completed}).catch(reportError); return; }
-                saveAction((current) => ({
-                  ...current,
-                  agenda: current.agenda.map((item) =>
-                    item.id === id
-                      ? { ...item, completed: !item.completed }
-                      : item,
-                  ),
-                }));
-              }}
-              onDelete={(id) => {
-                const shared = semesterAgenda.find(item => item.id === id)?.shared;
-                setRemoval({
-                  title: shared ? t("agenda.removeSharedConfirm") : t("agenda.deleteConfirm"),
-                  description: shared
-                    ? t("agenda.removeSharedWarning")
-                    : t("agenda.deleteWarning"),
-                  actionLabel: shared ? t("agenda.removeShared") : t("agenda.deleteActivity"),
-                  subscriptionId: shared?.id,
-                  run: () =>
-                    shared ? classAgenda.remove(shared) : updateData((current) => ({
-                      ...current,
-                      agenda: current.agenda.filter((item) => item.id !== id),
-                    })),
-                });
-              }}
-              onNotifications={requestNotifications}
-              pendingShared={classAgenda.pendingSubscription}
-              blockedShared={classAgenda.blockedSubscription}
-            />
           )}
           {activeTab === "grades" && (
             <GradesView
@@ -830,8 +799,50 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onBackToGrades={() => navigate("grades")}
             />
           )}
-          {activeTab === "notes" && <PersonalNotesView key={notesIntent.serial} controller={notes} userId={session.user!.id} data={data} initialSubjectId={notesIntent.subjectId} initialNew={notesIntent.newNote} initialOpenId={notesIntent.openId} onAddSubject={()=>openSubjectEditor()} onCopyToClass={(note)=>{setCopyToClass(note);navigate("classes");}} />}
+          {activeTab === "notes" && <PersonalNotesView key={notesIntent.serial} controller={notes} userId={session.user!.id} data={data} initialSubjectId={notesIntent.subjectId} initialNew={notesIntent.newNote} initialOpenId={notesIntent.openId} onBackToContext={()=>void navigate(notesOrigin.tab,notesOrigin.agendaItemId)} contextLabel={t(navKeys[notesOrigin.tab])} onAddSubject={()=>openSubjectEditor()} onCopyToClass={(note)=>{void navigate("classes").then(ok=>{if(ok)setCopyToClass(note);});}} />}
         </div>
+          {agendaVisited&&<div hidden={activeTab !== "agenda"}>
+            <AgendaView
+              items={semesterAgenda}
+              focusItemId={agendaFocusId}
+              subjects={data.subjects}
+              onAdd={() => data.subjects.length ? setModal("agenda") : openSubjectEditor()}
+              onClasses={() => navigate("classes")}
+              onOpenNotes={(item)=>openNotes(item.subjectId,false,"",item.id)}
+              onPersonal={setPersonalEvent}
+              onToggle={(id) => {
+                const shared = semesterAgenda.find(item => item.id === id)?.shared;
+                if (shared) { void classAgenda.update(shared, {completed: !shared.completed}).catch(reportError); return; }
+                saveAction((current) => ({
+                  ...current,
+                  agenda: current.agenda.map((item) =>
+                    item.id === id
+                      ? { ...item, completed: !item.completed }
+                      : item,
+                  ),
+                }));
+              }}
+              onDelete={(id) => {
+                const shared = semesterAgenda.find(item => item.id === id)?.shared;
+                setRemoval({
+                  title: shared ? t("agenda.removeSharedConfirm") : t("agenda.deleteConfirm"),
+                  description: shared
+                    ? t("agenda.removeSharedWarning")
+                    : t("agenda.deleteWarning"),
+                  actionLabel: shared ? t("agenda.removeShared") : t("agenda.deleteActivity"),
+                  subscriptionId: shared?.id,
+                  run: () =>
+                    shared ? classAgenda.remove(shared) : updateData((current) => ({
+                      ...current,
+                      agenda: current.agenda.filter((item) => item.id !== id),
+                    })),
+                });
+              }}
+              onNotifications={requestNotifications}
+              pendingShared={classAgenda.pendingSubscription}
+              blockedShared={classAgenda.blockedSubscription}
+            />
+          </div>}
         {classesVisited && (
           <div className="view-stage" style={activeTab === "classes" ? undefined : { display: "none" }}>
             <ClassesView
@@ -1092,6 +1103,9 @@ function Dashboard({
   onManageSubjects,
   onOpenNotes,
   onNewNote,
+  recentNotes,
+  onResumeNote,
+  onSubjectNotes,
 }: {
   data: SchoolData;
   grades: Grade[];
@@ -1102,6 +1116,9 @@ function Dashboard({
   onManageSubjects: () => void;
   onOpenNotes: () => void;
   onNewNote: () => void;
+  recentNotes: ReturnType<typeof useNotes>["records"];
+  onResumeNote: (id:string) => void;
+  onSubjectNotes: (id:string) => void;
 }) {
   const { t, locale } = useI18n();
   const openItems = agenda
@@ -1114,6 +1131,8 @@ function Dashboard({
   const subject = findSubject(data.subjects, nextTest?.subjectId);
   const gradedSubjects = data.subjects.filter((item) => subjectAverage(item, grades) !== null).length;
   const emptyDiary = !agenda.length && !grades.length;
+  const recent = recentNotes.filter(record=>record.draft?!record.draft.deleted:record.remote&&!record.remote.deletedAt)
+    .sort((a,b)=>((b.draft?.localEditedAt??b.remote?.updatedAt)??0)-((a.draft?.localEditedAt??a.remote?.updatedAt)??0)).slice(0,3);
 
   return (
     <div className={`dashboard-grid ${emptyDiary ? "empty-dashboard" : ""}`}>
@@ -1129,6 +1148,7 @@ function Dashboard({
             {nextTest.shared && <span className="agenda-origin">{nextTest.shared.detachedAt ? t("home.personalOrigin", { className: nextTest.shared.event.className }) : t("home.classOrigin", { className: nextTest.shared.event.className })}</span>}
             <p>{titleCase(formatDate(locale, nextTest.dueAt, { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }))}</p>
             <button onClick={() => onNavigate("agenda", nextTest.id)}><BookOpen size={18} /> {t("home.openActivity")}</button>
+            {subject&&<button className="secondary-action" onClick={()=>onSubjectNotes(subject.id)}>{t("notes.forSubject",{name:subject.name})}</button>}
           </>
         ) : overdue.length ? (
           <div className="empty-hero">
@@ -1161,7 +1181,7 @@ function Dashboard({
       </section>}
 
       {grades.length > 0 ? <button className="grade-summary" onClick={() => onNavigate("grades")}><span>{t("home.gradeSituation")}</span><strong>{t("home.average", { value: gradeText(locale, average) })}</strong><small>{selectPlural(locale, grades.length, t("home.gradeCountOne"), t("home.gradeCount", { count: grades.length }))} · {selectPlural(locale, gradedSubjects, t("home.subjectCountOne"), t("home.subjectCount", { count: gradedSubjects }))}</small><ChevronRight size={18} /></button> : !emptyDiary && <section className="grade-prompt"><div><b>{t("home.noGrades")}</b></div><button onClick={() => data.subjects.length ? onAdd("grade") : onManageSubjects()}>{data.subjects.length ? t("grades.add") : t("home.addSubject")}</button></section>}
-      <section className="panel notes-home-card"><div className="panel-title"><div><h3>{t("notes.my")}</h3><p>{t("notes.emptyHelp")}</p></div><BookOpen size={22}/></div><div className="notes-actions"><button className="soft-button" onClick={onOpenNotes}>{t("notes.open")}</button><button className="primary-button" onClick={onNewNote}><Plus size={17}/>{t("notes.new")}</button></div></section>
+      <section className="panel notes-home-card"><div className="panel-title"><div><h3>{t("notes.my")}</h3><p>{t(recent.length?"notes.resumeHelp":"notes.personalHelp")}</p></div><BookOpen size={22}/></div>{recent.length>0&&<div className="notes-recent-list">{recent.map(record=>{const note=(record.draft??record.remote)!;return <button className="notes-recent-row" key={record.id} onClick={()=>onResumeNote(record.id)}><div><b>{note.title||t("notes.untitled")}</b><small>{data.subjects.find(s=>s.id===note.subjectId)?.name||note.subjectName||t("notes.chooseSubject")}</small></div><ChevronRight size={18}/></button>;})}</div>}<div className="notes-actions"><button className="soft-button" onClick={onOpenNotes}>{t("notes.viewAll")}</button><button className="primary-button" onClick={onNewNote}><Plus size={17}/>{t("notes.new")}</button></div></section>
     </div>
   );
 }
@@ -1175,6 +1195,7 @@ function AgendaView({
   onDelete,
   onNotifications,
   onClasses,
+  onOpenNotes,
   onPersonal,
   pendingShared,
   blockedShared,
@@ -1187,6 +1208,7 @@ function AgendaView({
   onDelete: (id: string) => void;
   onNotifications: () => void;
   onClasses: () => void;
+  onOpenNotes: (item:AgendaDisplayItem) => void;
   onPersonal: (item: ClassSubscription) => void;
   pendingShared: (id: string) => boolean;
   blockedShared: (id: string) => boolean;
@@ -1200,6 +1222,14 @@ function AgendaView({
     () => focusedDate ? new Date(focusedDate.getFullYear(), focusedDate.getMonth(), 1) : new Date(new Date().getFullYear(), new Date().getMonth(), 1),
   );
   const [selectedDay, setSelectedDay] = useState<string | null>(() => focusedDate ? localDayKey(focusedDate) : null);
+  const lastFocused=useRef<string|null|undefined>(undefined);
+  useEffect(()=>{
+    if(!focusedItem){lastFocused.current=undefined;return;}
+    if(lastFocused.current===focusedItem.id)return;
+    lastFocused.current=focusedItem.id;
+    const date=new Date(focusedItem.dueAt);
+    queueMicrotask(()=>{setMonth(new Date(date.getFullYear(),date.getMonth(),1));setSelectedDay(localDayKey(date));});
+  },[focusedItem]);
   const sorted = [...items].sort((a, b) => a.dueAt.localeCompare(b.dueAt));
   const firstOffset =
     (new Date(month.getFullYear(), month.getMonth(), 1).getDay() + 6) % 7;
@@ -1361,6 +1391,7 @@ function AgendaView({
                 onToggle={onToggle}
                 onDelete={onDelete}
                 onPersonal={onPersonal}
+                onOpenNotes={onOpenNotes}
                 pendingShared={pendingShared}
                 blockedShared={blockedShared}
                 focusItemId={focusItemId}
@@ -1377,6 +1408,7 @@ function AgendaView({
             onToggle={onToggle}
             onDelete={onDelete}
             onPersonal={onPersonal}
+            onOpenNotes={onOpenNotes}
             pendingShared={pendingShared}
             blockedShared={blockedShared}
             focusItemId={focusItemId}
@@ -1394,6 +1426,7 @@ function AgendaList({
   onToggle,
   onDelete,
   onPersonal,
+  onOpenNotes,
   pendingShared,
   blockedShared,
   focusItemId,
@@ -1405,6 +1438,7 @@ function AgendaList({
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onPersonal: (item: ClassSubscription) => void;
+  onOpenNotes: (item:AgendaDisplayItem) => void;
   pendingShared: (id: string) => boolean;
   blockedShared: (id: string) => boolean;
   focusItemId?: string | null;
@@ -1462,6 +1496,7 @@ function AgendaList({
                 <h4>{item.title}</h4>
                 {item.shared && <button className="agenda-origin" onClick={() => onPersonal(item.shared!)}>{item.shared.event.status === "cancelled" ? `${t("classEvents.cancelled")} · ` : ""}{item.shared.detachedAt ? `${t("agenda.personalOrigin")} · ` : `${t("agenda.classOrigin")} · `}{item.shared.event.className} <Settings2 size={12} /></button>}
                 {item.description && <p className="agenda-description">{item.description}</p>}
+                {subject&&<button className="text-link agenda-notes-link" onClick={()=>onOpenNotes(item)}><BookOpen size={15}/>{t("notes.forSubject",{name:subject.name})}</button>}
                 <small>
                   {item.kind === "test" ? t("entry.test") : t("entry.task")} ·{" "}
                   {intlDate(locale, item.dueAt, { hour: "2-digit", minute: "2-digit" })}
@@ -1533,7 +1568,7 @@ function GradesView({
       <div className="module-toolbar">
         <p>{t("grades.scale")}</p>
         <div className="grades-actions">
-          {!!subjects.length && <button className="grades-stats-link" onClick={()=>subject&&onOpenNotes(subject.id)}><BookOpen size={17}/>{t("notes.my")}</button>}
+          {!!subjects.length && <button className="grades-stats-link" onClick={()=>subject&&onOpenNotes(subject.id)}><BookOpen size={17}/>{t("notes.forSubject",{name:subject?.name??t("common.subject")})}</button>}
           {!!subjects.length && <button className="grades-stats-link" onClick={onOpenStats}><BarChart3 size={17} /> {t("grades.stats")}</button>}
           <button className="primary-button" onClick={onAdd}><Plus size={18} /> {subjects.length ? t("grades.add") : t("home.addSubject")}</button>
         </div>

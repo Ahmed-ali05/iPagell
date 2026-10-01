@@ -44,13 +44,14 @@ La registrazione del service worker è disabilitata in sviluppo. Dopo una nuova 
 ## Controlli
 
 ```bash
-npm run docs:check
-npm test
-npx tsc --noEmit
-npm run lint
-npm audit --omit=dev
+npm run check
+npm audit --audit-level=low
 npm run build
 ```
+
+`check` comprende lint, TypeScript, unit test, i18n e documentazione. `release:prepare` esegue `check` e build; la CI aggiunge prima l'audit di tutte le dipendenze dopo l'installazione da lockfile. `npm audit --omit=dev` è una verifica più limitata e non equivale all'audit CI.
+
+Se cambiano route, tabelle, migrazioni, script o dipendenze, eseguire `npm run docs:generate` e includere l'inventario. `docs:check` lo confronta con il sorgente e poi verifica i collegamenti locali, incluso `AGENTS.md`; le guide vanno comunque rilette. Gli archivi storici sono distinti nell'[indice](README.md).
 
 Ogni comando ha un significato distinto: build non significa correttezza dei calcoli; audit dipendenze non significa audit completo; link validi non garantiscono documentazione veritiera. Registrare gli esiti reali, incluse eventuali segnalazioni lint, senza dichiarare “tutto passato” se un controllo non è stato eseguito.
 
@@ -60,13 +61,13 @@ Con l’anteprima locale già in esecuzione:
 TEST_BASE_URL=http://127.0.0.1:8787 npm run test:api
 ```
 
-La suite accetta solo host locali, crea due account sintetici e ne tenta la cancellazione nel `finally`. Un’interruzione può lasciare account di test: identificare esattamente quelli creati prima di rimuoverli; mai cancellare tutti gli utenti. Include richieste errate, reset delle credenziali, revoca e rate limiting. Non usare account reali. Se il runtime si riavvia durante un test, conservare l’errore e ripetere a server stabile, non ignorare l’asserzione.
+La suite accetta solo host locali, crea account sintetici e ne tenta la cancellazione nel `finally`. Un’interruzione può lasciare account di test: identificare esattamente quelli creati prima di rimuoverli; mai cancellare tutti gli utenti. Include richieste errate, reset delle credenziali, revoca e rate limiting. Non usare account reali. Se il runtime si riavvia durante un test, conservare l’errore e ripetere a server stabile, non ignorare l’asserzione.
 
 ## Prove dello storage nel browser
 
 `node scripts/test-storage-browser.mjs` avvia una pagina di test su una porta locale casuale distinta dall'app. Aprire l'URL stampato e verificare `DONE: 10 browser storage checks passed`; poi interrompere il server. La pagina usa solo account sintetici e prova IndexedDB reale, inclusi abort e scritture concorrenti. Non servirla dall'origine dell'app in uso. Non è inclusa automaticamente in `release:prepare`.
 
-I test del controller di sessione sono invece inclusi in `npm test`. Per scenari, risultati e limiti, vedere [Affidabilità](RELIABILITY.md).
+I test del controller di sessione, della coda autosave e delle transizioni Appunti sono invece inclusi in `npm test`. `tests/note-storage.test.ts` usa fake-indexeddb per failure/concorrenza riproducibili; questo non equivale a una prova su IndexedDB di un telefono fisico. Per scenari, risultati e limiti, vedere [Affidabilità](RELIABILITY.md) e [Matrice corrente](VERIFICATION-MATRIX.md).
 
 ## Modifiche schema e pubblicazione
 
@@ -91,7 +92,8 @@ Un rollback del codice **non annulla le migrazioni**. Prima di ripubblicare una 
 | 503 / D1 non disponibile | Controllare stato deploy, binding e migrazioni; non creare tabelle nel gestore HTTP |
 | Interfaccia vecchia | Salvare/esportare, chiudere tutte le schede e riaprire online |
 | Asset 404 in locale | Fermare anteprima, ricostruire e riavviare; non cancellare IndexedDB |
-| Storage pieno o bloccato | Esportare se possibile e chiudere altre schede; non promettere salvataggio |
+| Storage pieno o bloccato | Copiare/scaricare il testo aperto, poi liberare spazio e ritentare; non cancellare IndexedDB prima del recupero |
+| Errore di salvataggio Appunti | Distinguere errore locale, rete, 426 e conflitto; conservare bozza/testo e usare Riprova, senza forzare revisione o formato |
 
 Per un sospetto accesso incrociato: fermare l’ampliamento del rilascio, preservare prove minime senza segreti, coinvolgere il responsabile del progetto e verificare API/proprietà/cache. Non esplorare dati di utenti reali per dimostrare il problema. Qualunque intervento su accesso pubblico, credenziali o dati di produzione richiede una decisione esplicita del responsabile.
 
