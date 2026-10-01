@@ -74,10 +74,13 @@ Il nuovo `docs:check` confronta inventario con manifest/lockfile, route, schema,
 | Verifica del 1 ottobre 2026 | Esito |
 |---|---|
 | `npm run release:prepare`, dopo gli aggiornamenti delle dipendenze | Lint, TypeScript, 103 test, 719 chiavi i18n, inventario di 27 route/15 tabelle/7 migrazioni, link documentali, build e precache completati. Resta l'avviso chunk oltre 500 kB. |
-| `npm run docs:check`, revisione finale | 38 documenti e 264 collegamenti locali verificati; inventario allineato. |
+| `npm run docs:check`, revisione finale | 38 documenti e 263 collegamenti locali verificati; inventario allineato. Anche i percorsi ignorati da Git vengono rifiutati. |
 | Suite API dopo gli aggiornamenti delle dipendenze | 146 verifiche passate sul Worker compilato e database locale nuovo in una directory isolata. Account sintetici rimossi dalla suite; nessuna richiesta ai dati di produzione. |
 | Inventario obsoleto, prova negativa | Aggiunta temporanea di una riga al documento generato: `--check` rifiuta con exit 1; ripristinato il file originale, il controllo passa. Nessun artefatto di prova nel commit. |
+| Link a un artefatto ignorato, prova negativa | Un link temporaneo a `output/pdf/`, esistente solo in locale, viene rifiutato con exit 1; dopo il ripristino il controllo passa. |
 | `npm audit --audit-level=low` | Prima: 6 pacchetti segnalati, di cui 1 critical, 1 high e 4 moderate. Dopo gli aggiornamenti diretti e del lockfile: 0 vulnerabilità segnalate. Non attesta l'assenza di difetti di sicurezza nel codice o nel sito pubblicato. |
+
+La prima CI dell'allineamento, sul commit `c863844`, ha passato installazione, audit, lint/tipi, 103 test e i18n; si è fermata su un link del design storico a PDF non versionati. Il riferimento è stato convertito in un percorso testuale rigenerabile e il controllo locale ora rifiuta i link a destinazioni ignorate da Git. L'esito completo va letto nella CI del successivo commit.
 
 Gli aggiornamenti delle dipendenze sono verificati nella repository ma non ancora pubblicati; lo stato Sites rimane quello della versione 27 riportato sopra. I controlli remoti GitHub sono associati al commit, consultabili in Actions; non sono dedotti dall'esito locale.
 

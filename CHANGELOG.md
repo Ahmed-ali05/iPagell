@@ -8,7 +8,7 @@ Versione npm, formato del diario, backup, revisione dati e numero Sites sono con
 
 - Allineate le guide correnti al codice applicativo Sites 27: architettura, API, appunti/editor, backup V3, materie di classe, sicurezza, lingua e flussi utente.
 - Aggiunto indice con guide, specifiche future e storico; conservati gli audit e design iniziali con riferimenti espliciti alla loro versione.
-- Inventario generato di route/metodi, schema/migrazioni, script npm e versioni da lockfile; docs:check rileva il disallineamento e include i link di AGENTS.md.
+- Inventario generato di route/metodi, schema/migrazioni, script npm e versioni da lockfile; docs:check rileva il disallineamento, include i link di AGENTS.md e rifiuta destinazioni ignorate da Git che mancherebbero nel clone CI.
 - Output della ricerca e bytecode Python ignorati, sorgenti conservati.
 - Aggiornati Next ed eslint-config-next a 16.3.8, plugin Cloudflare a 1.62.3, Wrangler a 4.145.0 e workers-types a 5.20261001.1; lockfile aggiornato anche per fast-uri. L'audit completo passa da sei pacchetti segnalati a zero nel controllo del 1 ottobre. Questo esito non equivale a un audit di sicurezza dell'app.
 

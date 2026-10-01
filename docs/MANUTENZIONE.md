@@ -51,7 +51,7 @@ npm run build
 
 `check` comprende lint, TypeScript, unit test, i18n e documentazione. `release:prepare` esegue `check` e build; la CI aggiunge prima l'audit di tutte le dipendenze dopo l'installazione da lockfile. `npm audit --omit=dev` è una verifica più limitata e non equivale all'audit CI.
 
-Se cambiano route, tabelle, migrazioni, script o dipendenze, eseguire `npm run docs:generate` e includere l'inventario. `docs:check` lo confronta con il sorgente e poi verifica i collegamenti locali, incluso `AGENTS.md`; le guide vanno comunque rilette. Gli archivi storici sono distinti nell'[indice](README.md).
+Se cambiano route, tabelle, migrazioni, script o dipendenze, eseguire `npm run docs:generate` e includere l'inventario. `docs:check` lo confronta con il sorgente e poi verifica i collegamenti locali, incluso `AGENTS.md`; richiede Git e rifiuta anche percorsi ignorati, perché un artefatto presente sul computer può mancare nel clone CI. Le guide vanno comunque rilette. Gli archivi storici sono distinti nell'[indice](README.md).
 
 Ogni comando ha un significato distinto: build non significa correttezza dei calcoli; audit dipendenze non significa audit completo; link validi non garantiscono documentazione veritiera. Registrare gli esiti reali, incluse eventuali segnalazioni lint, senza dichiarare “tutto passato” se un controllo non è stato eseguito.
 

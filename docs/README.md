@@ -44,5 +44,5 @@ Sono conservati lo [snapshot storico](REPO-SNAPSHOT-HISTORY.md), l'[architettura
 1. Leggere `AGENTS.md` e il codice coinvolto: il sorgente prevale sulla documentazione.
 2. Aggiornare le guide che cambiano insieme alla funzionalità; conservare come storico analisi o risultati riferiti a un'altra versione.
 3. Se cambiano route, schema, migrazioni, script npm o dipendenze, eseguire `npm run docs:generate` e includere l'inventario nel commit.
-4. Eseguire `npm run docs:check` e `git diff --check`. Il controllo verifica inventario e collegamenti locali; non certifica prosa, infrastruttura o compatibilità su telefono.
+4. Eseguire `npm run docs:check` e `git diff --check`. Il controllo verifica inventario e collegamenti locali, rifiutando anche destinazioni ignorate da Git; non certifica prosa, infrastruttura o compatibilità su telefono.
 5. Registrare l'esito reale in changelog e matrice; aggiornare i riferimenti di pubblicazione soltanto dopo un deploy riuscito.
