@@ -716,5 +716,6 @@
   "classes.content": "Contenuti della classe",
   "classes.activities": "Attività",
   "notes.autoSaveHelp": "Il testo si salva mentre scrivi.",
-  "notes.withdrawClass": "Ritira dalla classe"
+  "notes.withdrawClass": "Ritira dalla classe",
+  "notes.formatFailed": "Formattazione non applicabile a questa selezione. Il testo è conservato."
 }

@@ -50,6 +50,10 @@ export function noteByteSize(value: { id: string; subjectId: string; subjectName
 export function validateNoteBytes(value: Parameters<typeof noteByteSize>[0]) {
   return noteByteSize(value) <= 65_536;
 }
+export function canSyncDraft(draft:NoteDraft){
+  return !draft.conflict && !!draft.subjectId && !!draft.subjectName.trim() && noteTitle.safeParse(draft.title).success
+    && formattedContent.safeParse(draft).success && validateNoteBytes(draft);
+}
 export function localDraftBytes(personal:NoteDraft[],classDrafts:NoteDraft[],next:NoteDraft){
   const drafts=[...personal.filter(draft=>!(next.space==="personal"&&draft.id===next.id)),...classDrafts.filter(draft=>!(next.space==="class"&&draft.id===next.id)),next];
   return new TextEncoder().encode(JSON.stringify(drafts)).byteLength;

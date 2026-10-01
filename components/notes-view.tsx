@@ -1,5 +1,5 @@
 "use client";
-import { lazy,Suspense,useCallback,useEffect,useMemo,useRef,useState } from "react";
+import { lazy,Suspense,useEffect,useMemo,useRef,useState } from "react";
 import { BookOpen,ChevronLeft,Download,Plus,Search,Star,Trash2 } from "lucide-react";
 import { useI18n } from "@/components/i18n-provider";
 import { formatDate } from "@/lib/i18n";
@@ -8,8 +8,8 @@ import type { SchoolData } from "@/types/domain";
 import type { NoteCopySeed,NoteDraft,PersonalNote } from "@/types/notes";
 import type { useNotes } from "@/hooks/use-notes";
 import type { PersonalRecord } from "@/lib/notes/storage";
-import { readPersonal } from "@/lib/notes/storage";
-import { NOTES_FLUSH_EVENT } from "@/lib/notes/flush";
+import { NoteDeviceConflict } from "@/lib/notes/storage";
+import { useNoteAutosave } from "@/hooks/use-note-autosave";
 import { NoteContent } from "@/components/note-content";
 import { NoteExport } from "@/components/note-export";
 import { noteVisibleText } from "@/lib/notes/format";
@@ -110,53 +110,39 @@ export function PersonalNotesView({controller,userId,data,initialSubjectId="",in
   </section>;
 }
 
-function PersonalEditor({id,userId,record,controller,data,initialSubjectId,onDone,onCancel,onAddSubject}:{id:string;userId:string;record:PersonalRecord|null;controller:NotesController;data:SchoolData;initialSubjectId:string;onDone:()=>void;onCancel:()=>void;onAddSubject:()=>void}){
+function PersonalEditor({id,record,controller,data,initialSubjectId,onDone,onCancel,onAddSubject}:{id:string;userId:string;record:PersonalRecord|null;controller:NotesController;data:SchoolData;initialSubjectId:string;onDone:()=>void;onCancel:()=>void;onAddSubject:()=>void}){
   const {t}=useI18n();const initial=record?.draft??record?.remote;
   const [subjectId,setSubjectId]=useState(initial?.subjectId??(initialSubjectId||(data.subjects.length===1?data.subjects[0].id:"")));
   const [title,setTitle]=useState(initial?.title??""),[content,setContent]=useState(initial?.content??""),[contentFormat,setContentFormat]=useState(initial?.contentFormat??"plain");
   const [status,setStatus]=useState<"idle"|"synced"|"saving"|"device"|"error"|"conflict">(record?.draft?"device":record?.remote?"synced":"idle");
-  const saved=useRef<NoteDraft|null>(record?.draft??null),baselineRevision=useRef(record?.remote?.revision??0),edited=useRef(0),committed=useRef(0),timer=useRef<ReturnType<typeof setTimeout>|null>(null),queue=useRef(Promise.resolve());
+  const saved=useRef<NoteDraft|null>(record?.draft??null),baselineRevision=useRef(record?.remote?.revision??0);
   const fields=useRef({subjectId,title,content,contentFormat});
   const subjectsBeforeAdd=useRef<Set<string>|null>(null);
   const saveDraft=controller.savePersonalDraft;
-  useEffect(()=>{if(record?.remote&&saved.current&&record.remote.lastMutationId===saved.current.mutationId&&!record.draft&&edited.current===committed.current)setStatus("synced");},[record?.remote,record?.draft]);
-  const flush=useCallback(async()=>{
-    if(timer.current){clearTimeout(timer.current);timer.current=null;}
-    const version=edited.current;if(version===committed.current)return queue.current;
-    const task=queue.current.then(async()=>{
-      const current=await readPersonal(userId,id);
-      const existing=saved.current;
-      const acknowledged=!!existing&&!current?.draft&&current?.remote?.lastMutationId===existing.mutationId;
-      if(existing&&!acknowledged&&current?.draft?.mutationId!==existing.mutationId)throw new Error(t("notes.deviceConflict"));
-      if(!existing&&current?.draft)throw new Error(t("notes.deviceConflict"));
-      if(!current?.draft&&(current?.remote?.revision??0)!==baselineRevision.current&&!acknowledged)throw new Error(t("notes.deviceConflict"));
-      if(current?.draft?.conflict)throw new Error(t("notes.conflict"));
-      if(acknowledged)baselineRevision.current=current?.remote?.revision??baselineRevision.current;
-      const value=fields.current;const subject=data.subjects.find(s=>s.id===value.subjectId);
-      const draft:NoteDraft={userId:"",id,space:"personal",subjectId:value.subjectId,subjectName:subject?.name??existing?.subjectName??current?.remote?.subjectName??"",title:value.title,content:value.content,contentFormat:value.contentFormat,expectedContentFormat:current?.remote?.contentFormat??"plain",pinned:existing?.pinned??current?.remote?.pinned??false,baseRevision:current?.remote?.revision??0,mutationId:crypto.randomUUID(),localVersion:0,localEditedAt:Date.now()};
-      const next=await saveDraft(draft,acknowledged?null:existing);
-      saved.current=next;committed.current=version;setStatus("device");
-    });
-    queue.current=task.catch(()=>undefined);
-    try{await task;}catch{setStatus("error");throw new Error(t("notes.saveFailed"));}
-  },[data.subjects,id,saveDraft,t,userId]);
-  const changed=()=>{edited.current++;setStatus("saving");if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{void flush().catch(()=>undefined);},700);};
+  const [saveError,setSaveError]=useState(false);
+  const persist=async()=>{
+    const value={...fields.current},existing=saved.current;
+    const subject=data.subjects.find(s=>s.id===value.subjectId);
+    const draft:NoteDraft={userId:"",id,space:"personal",subjectId:value.subjectId,subjectName:subject?.name??existing?.subjectName??record?.remote?.subjectName??"",title:value.title,content:value.content,contentFormat:value.contentFormat,expectedContentFormat:existing?.expectedContentFormat??record?.remote?.contentFormat??"plain",pinned:existing?.pinned??record?.remote?.pinned??false,baseRevision:existing?.baseRevision??baselineRevision.current,mutationId:crypto.randomUUID(),localVersion:0,localEditedAt:Date.now()};
+    saved.current=await saveDraft(draft,existing);
+  };
+  const {flush,changed,dirty}=useNoteAutosave(persist,(next,error)=>{setStatus(next);setSaveError(error instanceof NoteDeviceConflict);},!!record?.draft||!!record?.remote);
+  useEffect(()=>{if(record?.remote&&saved.current&&record.remote.lastMutationId===saved.current.mutationId&&!record.draft&&!dirty())setStatus("synced");},[record?.remote,record?.draft,dirty]);
   useEffect(()=>{
     if(!subjectsBeforeAdd.current)return;
     const added=data.subjects.find(subject=>!subjectsBeforeAdd.current!.has(subject.id));if(!added)return;
     subjectsBeforeAdd.current=null;
-    queueMicrotask(()=>{fields.current.subjectId=added.id;setSubjectId(added.id);edited.current++;setStatus("saving");void flush().catch(()=>undefined);});
-  },[data.subjects,flush]);
-  useEffect(()=>{const editedRef=edited,committedRef=committed;const before=(event:BeforeUnloadEvent)=>{if(editedRef.current!==committedRef.current){event.preventDefault();event.returnValue="";}};const visible=()=>{if(document.visibilityState==="hidden")void flush().catch(()=>undefined);};const onFlush=(event:Event)=>{(event as CustomEvent<Promise<void>[]>).detail.push(flush());};window.addEventListener("beforeunload",before);document.addEventListener("visibilitychange",visible);window.addEventListener(NOTES_FLUSH_EVENT,onFlush);return()=>{if(timer.current)clearTimeout(timer.current);if(editedRef.current!==committedRef.current)void flush().catch(()=>undefined);window.removeEventListener("beforeunload",before);document.removeEventListener("visibilitychange",visible);window.removeEventListener(NOTES_FLUSH_EVENT,onFlush);};},[flush]);
+    queueMicrotask(()=>{fields.current.subjectId=added.id;setSubjectId(added.id);changed();void flush().catch(()=>undefined);});
+  },[data.subjects,flush,changed]);
   const finish=async()=>{try{await flush();onDone();}catch{setStatus("error");}};
   const exit=async()=>{try{await flush();onCancel();}catch{setStatus("error");}};
-  const textStatus=status==="idle"?"notes.autoSaveHelp":status==="saving"?"notes.savingDevice":status==="device"?"notes.savedDevice":status==="synced"?"notes.synced":status==="conflict"?"notes.conflict":"notes.saveFailed";
+  const textStatus=status==="idle"?"notes.autoSaveHelp":status==="saving"?"notes.savingDevice":status==="device"?"notes.savedDevice":status==="synced"?"notes.synced":status==="conflict"?"notes.conflict":saveError?"notes.deviceConflict":"notes.saveFailed";
   return <div className="notes-editor panel"><div className="notes-editor-top"><button className="soft-button" onClick={()=>void exit()}><ChevronLeft size={18}/>{t("notes.back")}</button><button className="primary-button" onClick={()=>void finish()}>{t("notes.done")}</button></div>
     <label>{t("notes.subject")}<select value={subjectId} onChange={e=>{fields.current.subjectId=e.target.value;setSubjectId(e.target.value);changed();}}>{!subjectId&&<option value="">{t("notes.chooseSubject")}</option>}{!data.subjects.some(s=>s.id===subjectId)&&subjectId&&<option value={subjectId}>{t("notes.missingSubject")}</option>}{data.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label>
     <button className="text-link" onClick={()=>{subjectsBeforeAdd.current=new Set(data.subjects.map(subject=>subject.id));onAddSubject();}}>{t("notes.addSubject")}</button>
     <label>{t("notes.noteTitle")}<input value={title} maxLength={120} onChange={e=>{fields.current.title=e.target.value;setTitle(e.target.value);changed();}} placeholder={t("notes.untitled")}/></label>
     <div><span>{t("notes.content")}</span><Suspense fallback={<p>{t("notes.loading")}</p>}><NoteEditor value={{contentFormat,content}} onChange={value=>{fields.current.content=value.content;fields.current.contentFormat=value.contentFormat;setContent(value.content);setContentFormat(value.contentFormat);changed();}} label={t("notes.content")}/></Suspense></div>
     {(!subjectId||!title.trim())&&<p className="notes-meta">{t("notes.completeToSync")}</p>}
-    <div className="notes-editor-footer"><span id="notes-content-count">{[...content].length} / 20 000</span><span role="status" className={status==="error"?"notes-error":""}>{t(textStatus)}</span>{status==="error"&&<><button onClick={()=>void flush().catch(()=>undefined)}>{t("notes.retry")}</button><button onClick={()=>void navigator.clipboard.writeText(content)}>{t("notes.copyText")}</button><button onClick={()=>downloadText(title,content)}><Download size={16}/>{t("notes.downloadRecovery")}</button></>}</div>
+    <div className="notes-editor-footer"><span id="notes-content-count">{[...content].length} / 20 000</span><span role="status" className={status==="error"?"notes-error":""}>{t(textStatus)}</span>{status==="error"&&<><button onClick={()=>void flush().catch(()=>undefined)}>{t("notes.retry")}</button><button onClick={()=>void navigator.clipboard?.writeText(content).catch(()=>undefined)}>{t("notes.copyText")}</button><button onClick={()=>downloadText(title,content)}><Download size={16}/>{t("notes.downloadRecovery")}</button></>}</div>
   </div>;
 }

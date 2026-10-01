@@ -75,6 +75,7 @@
     "drizzle-kit": "0.31.10",
     "eslint": "9.39.4",
     "eslint-config-next": "16.3.4",
+    "fake-indexeddb": "^6.2.5",
     "react-server-dom-webpack": "19.2.8",
     "tailwindcss": "4.2.1",
     "tsx": "^4.22.1",

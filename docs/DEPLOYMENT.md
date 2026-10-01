@@ -32,6 +32,8 @@ Preservare accesso pubblico e binding esistenti. Le migrazioni incluse nel pacch
 
 Il rilascio Appunti è stato pubblicato come versione Sites 24 il 30 settembre 2026. Il deployment è riuscito su `https://ipagell.website`; i domini `ipagell.website` e `www.ipagell.website` risultano attivi. Dopo il deploy il D1 Sites espone `content_format` sia in `personal_notes` sia in `class_notes`. Le prove locali verificano la migrazione legacy a `plain`, API con contratto 2, backup V1/V2/V3, conflitti e limiti. Restano da verificare su dispositivi fisici l'editing mobile e la resa visiva del PDF aperto dal browser; nessuna nota reale è stata modificata durante il rilascio. Non usare il D1 del Worker sperimentale come prova dello schema Sites.
 
+Il 1 ottobre 2026 è stata pubblicata la versione Sites **26**, con sorgente `26c10606aaec54b17e44f94244714a1ad1fefedf` e deployment `appgdep_6abe0a69171c819198a8548fb90519c3`, concluso con stato `succeeded`. Include il percorso UX Appunti e la correzione di focus/selezione della barra di formattazione. Il connettore conferma `https://ipagell.website` come URL live, accesso pubblico e i due domini con TLS attivo. Il binding `DB` e le migrazioni esistenti sono stati conservati; nessuna nuova migrazione, cambio di accesso o modifica a note reali. Prima del rilascio: 87 test, 130 controlli API locali e build completata. La prova su smartphone fisico resta da eseguire.
+
 ## Worker sperimentale separato
 
 Solo per prove esplicitamente richieste, dopo `npx wrangler login`:

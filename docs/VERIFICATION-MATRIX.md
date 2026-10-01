@@ -154,9 +154,9 @@ La matrice precedente resta l'audit del commit indicato nel suo testo iniziale. 
 | Client privi del contratto Appunti v2 o del formato atteso non possono aggiornare note convertite. | VERIFICATO nella suite API locale | `lib/server/note-http.ts`, `lib/server/note-repository.ts`, `tests/api-smoke.mjs`; verifica su browser già aperti prima dell'aggiornamento non eseguita. |
 | Il PDF breve/lungo mantiene impaginazione e metadati; il lettore non interpreta HTML delle note. | PARZIALE | `tests/note-format.test.ts` e ispezione locale dei PDF: 1 e 7 pagine. Chrome genera dalla UI un PDF breve con arabo/emoji e un lungo da 7650 caratteri, entrambi con Salva/Apri/Condividi. L'apertura diretta del blob PDF è bloccata dalla policy browser della sessione, quindi non certifico l'ispezione visiva di entrambi i file. |
 
-## Intervento UX Appunti — 1 ottobre 2026, solo locale
+## Intervento UX Appunti — 1 ottobre 2026
 
-La matrice storica sopra resta riferita al suo commit. Questo intervento riguarda componenti, CSS, comandi dell’editor e testi i18n; non modifica schema, API, sincronizzazione o permessi. Non è una verifica della produzione e non è stato pubblicato.
+La matrice storica sopra resta riferita al suo commit. Questo intervento riguarda componenti, CSS, comandi dell’editor e testi i18n; non modifica schema, API, sincronizzazione o permessi. Le prove funzionali della tabella sono locali. La versione Sites 26 è stata pubblicata il 1 ottobre 2026: deployment `appgdep_6abe0a69171c819198a8548fb90519c3` con stato `succeeded`, sorgente `26c10606aaec54b17e44f94244714a1ad1fefedf`. Il connettore conferma l’URL live `https://ipagell.website`, accesso pubblico e domini principale/www attivi con TLS; questo non certifica l’editing su un dispositivo fisico.
 
 | Verifica locale | Esito e limiti |
 |---|---|
@@ -168,3 +168,11 @@ La matrice storica sopra resta riferita al suo commit. Questo intervento riguard
 | Classe | Copia personale preparata esplicitamente; API senza testo condiviso finché è una bozza; aggiunta materia dall’editor, bozza ritrovata e anteprima confermata prima della pubblicazione. Materie private e condivise restano distinte. |
 | Disconnessione | Server locale fermato dopo il caricamento dell’editor: il testo personale modificato resta salvato e riapribile dal dispositivo. Al riavvio si sincronizza senza cambiare la copia di classe. Non è una prova della shell PWA dopo chiusura completa offline. |
 | Responsive e focus | Browser a 390 e 320 px; nessuno scorrimento orizzontale nei percorsi osservati. Selezione e focus restano nel testo dopo grassetto, elenco e annulla/ripeti; Fine salva e apre la lettura. Nessuna certificazione di Safari/iOS, Chrome/Android, tastiera virtuale, IME o PDF su dispositivo fisico. |
+
+## Correzione affidabilità Appunti — 1 ottobre 2026
+
+Analisi: la conferma server poteva modificare una bozza mentre l’editor conservava il vecchio snapshot atteso; un confronto sull’intero JSON rifiutava poi la scrittura. Un refresh fallito dopo il commit poteva inoltre nascondere all’editor il risultato già persistito. Riprodotto sul parser precedente anche il formato non canonico degli a-capo in titoli ed elenchi: il server poteva rifiutarlo. Queste sono regressioni dimostrate, non l’identificazione certa di ogni sequenza avvenuta sul telefono dell’utente. I log Sites consultati non contenevano un errore Appunti correlabile alla segnalazione.
+
+Le verifiche comprendono transazioni IndexedDB reali simulate con `fake-indexeddb`, payload in volo, risposta persa, conferme concorrenti, conflitti effettivi, tombstone, cursori vecchi, bozze incomplete, rifiuti definitivi, errore di quota e retry. La coda condivisa copre Fine/visibilità/autosave sovrapposti e modifiche durante una scrittura; i test del formato coprono Shift+Enter/incolli in tutti i blocchi ammessi. Le API locali includono 16 nuove verifiche sugli a-capo formattati personali e di classe, per un totale di 146, con soli account sintetici ripuliti. Restano i limiti delle prove su browser desktop: non certificano tastiera virtuale, IME o selezione su iOS/Android fisici.
+
+`npm run check` completato: lint, TypeScript, 103 test, 719 chiavi i18n e documentazione. Browser locale con account sintetico: a-capo in titolo/grassetto personale, chiusura e riapertura dopo sincronizzazione; a-capo in elenco/grassetto condiviso, annulla/ripeti, bozza riaperta, anteprima e aggiornamento della classe. Con 19.998 caratteri il grassetto che supererebbe il limite viene rifiutato, il DOM conserva il testo e resta modificabile; una modifica successiva viene salvata e l'editor si chiude correttamente. Questo prova il percorso osservato, non ogni possibile combinazione di comandi o browser mobile.

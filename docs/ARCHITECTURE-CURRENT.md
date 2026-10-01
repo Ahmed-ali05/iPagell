@@ -849,3 +849,11 @@ Dalla sola repository non si può certificare:
 - l'esito sul commit analizzato di `tests/api-smoke.mjs`, che non viene eseguito dal workflow CI corrente.
 
 L'architettura descritta qui è pertanto l'architettura **del codice versionato al commit indicato**, non una fotografia certificata dell'infrastruttura live.
+
+### Affidabilità del salvataggio Appunti — 1 ottobre 2026
+
+`lib/notes/autosave.ts` e `hooks/use-note-autosave.ts` gestiscono entrambi gli editor con un solo writer: autosave, cambio vista, visibilità e Fine condividono la richiesta in corso. Il flush include modifiche arrivate durante il salvataggio; un errore lascia la versione sporca e può essere ritentato. I listener non vengono ricreati a ogni aggiornamento di materie o testi. Dopo il commit IndexedDB, un errore della lettura per aggiornare la UI non invalida il risultato già persistito.
+
+Le transizioni personali in `lib/notes/reconcile.ts` sono applicate dentro una transazione IndexedDB da `lib/notes/storage.ts`. Il confronto della bozza attesa distingue il contenuto scritto dai metadati aggiornati dalla sincronizzazione. Il record personale può avere un `inFlight` opzionale, contenente l’esatto payload locale inviato: una risposta persa ritenta la stessa mutazione; una conferma riconosciuta aggiorna revisione e formato della bozza successiva senza cancellarne il testo. Una risposta diversa resta un conflitto esplicito. Le pagine vecchie non fanno regredire nota o cursore. Non cambia la versione IndexedDB o lo schema D1; `inFlight` è metadato locale del record, escluso dal backup V3. Un rifiuto definitivo 400/413 libera la richiesta respinta, mentre errori di rete mantengono il payload incerto per il retry idempotente.
+
+Il parser `md-lite-v1` gestisce a-capo interni anche in titoli ed elementi di elenco, compreso testo multilinea incollato. L’editor ripristina lo stato precedente se un comando supera il limite o non è applicabile, senza convertire parzialmente il formato. La revisione di partenza dell’editor di classe resta quella del testo aperto: un refresh non autorizza a riscrivere una versione altrui. Riprova, copia e download sono disponibili anche dopo un errore di salvataggio della bozza di classe; la pubblicazione resta subordinata ad anteprima e conferma.

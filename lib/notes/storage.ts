@@ -1,12 +1,13 @@
 import type { NoteDraft, PersonalNote } from "@/types/notes";
 import type { Preferences,SchoolData } from "@/types/domain";
+import { NoteDeviceConflict } from "./errors";
+import { reconcilePersonal, savePersonalRecord } from "./reconcile";
+import { canSyncDraft } from "./validation";
+export { NoteDeviceConflict } from "./errors";
 
-export type PersonalRecord = { userId:string; id:string; remote:PersonalNote|null; draft:NoteDraft|null; localVersion:number };
+export type PersonalRecord = { userId:string; id:string; remote:PersonalNote|null; draft:NoteDraft|null; localVersion:number; inFlight?:NoteDraft|null };
 export type NotesMeta = { cursor:number; complete:boolean };
 export type ImportPlan = { userId:string; data:SchoolData; preferences:Preferences; entries:NoteDraft[]; next:number; diaryCommitted:boolean; createdAt:number };
-export class NoteDeviceConflict extends Error {
-  constructor(){super("L'appunto è stato cambiato in un'altra scheda.");}
-}
 const DB="ipagell-notes-db";
 function openDb():Promise<IDBDatabase> {
   return new Promise((resolve,reject)=>{
@@ -64,36 +65,40 @@ export async function readImportPlan(userId:string):Promise<ImportPlan|null>{
 export async function writeImportPlan(plan:ImportPlan|null,userId:string){
   const db=await openDb();try{const tx=db.transaction("meta","readwrite");const store=tx.objectStore("meta");if(plan)store.put(plan,`import:${userId}`);else store.delete(`import:${userId}`);await txDone(tx);}finally{db.close();}
 }
-export async function mutatePersonal(userId:string,id:string,expected:PersonalRecord|null,change:(current:PersonalRecord|null)=>PersonalRecord|null):Promise<PersonalRecord|null>{
+// Read, validate and replace inside one transaction. No asynchronous work is
+// allowed in the transition: an acknowledgement cannot race this write.
+export async function updatePersonal(userId:string,id:string,change:(current:PersonalRecord|null)=>PersonalRecord|null):Promise<PersonalRecord|null>{
   const db=await openDb();
-  try {const tx=db.transaction("personal","readwrite");const store=tx.objectStore("personal"); const read=store.get([userId,id]);let result:PersonalRecord|null=null;let conflict=false;
-    read.onsuccess=()=>{const current=(read.result as PersonalRecord|undefined)??null;
-      if(JSON.stringify(current)!==JSON.stringify(expected)){conflict=true;tx.abort();return;}
-      result=change(current);if(result)store.put(result);else store.delete([userId,id]);};
-    await new Promise<void>((resolve,reject)=>{tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(conflict?new NoteDeviceConflict():tx.error);});
-    return result;
-  } finally{db.close();}
+  try {const tx=db.transaction("personal","readwrite"),store=tx.objectStore("personal"),read=store.get([userId,id]);let result:PersonalRecord|null=null, failure:unknown;
+    read.onsuccess=()=>{try{result=change(read.result??null);if(result)store.put(result);else store.delete([userId,id]);}catch(error){failure=error;tx.abort();}};
+    await new Promise<void>((resolve,reject)=>{tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(failure??tx.error??new Error("Archivio appunti non disponibile."));});return result;
+  }finally{db.close();}
+}
+export function mutatePersonal(userId:string,id:string,expected:PersonalRecord|null,change:(current:PersonalRecord|null)=>PersonalRecord|null){
+  return updatePersonal(userId,id,current=>{if(JSON.stringify(current)!==JSON.stringify(expected))throw new NoteDeviceConflict();return change(current);});
+}
+export async function persistPersonalDraft(draft:NoteDraft,expected:NoteDraft|null){
+  const result=await updatePersonal(draft.userId,draft.id,current=>savePersonalRecord(current,draft,expected));return result!.draft!;
+}
+export function acceptPersonalNote(userId:string,note:PersonalNote){return updatePersonal(userId,note.id,current=>reconcilePersonal(current,note,userId));}
+export async function beginPersonalWrite(userId:string,id:string){
+  return updatePersonal(userId,id,current=>current&&current.draft&&!current.draft.conflict&&(current.inFlight||canSyncDraft(current.draft))?{...current,inFlight:current.inFlight??current.draft}:current);
+}
+export function rejectPersonalWrite(userId:string,id:string,mutationId:string){
+  return updatePersonal(userId,id,current=>current?.inFlight?.mutationId===mutationId?{...current,inFlight:null}:current);
 }
 export async function applyPersonalPage(userId:string,notes:PersonalNote[],cursor:number,expectedCursor:number,complete:boolean){
   const db=await openDb();
-  try {const tx=db.transaction(["personal","meta"],"readwrite");const store=tx.objectStore("personal");const meta=tx.objectStore("meta");const read=meta.get(userId);let conflict=false;
-    read.onsuccess=()=>{const current=(read.result as NotesMeta|undefined)??{cursor:0,complete:false};
-      if(current.cursor!==expectedCursor){conflict=true;tx.abort();return;}
-      for(const note of notes){const item=store.get([userId,note.id]);item.onsuccess=()=>{
-        const old=(item.result as PersonalRecord|undefined)??null;
-        let draft=old?.draft??null;
-        if(draft && note.lastMutationId===draft.mutationId && sameWrittenPayload(draft,note)) draft=null;
-        else if(draft && (note.revision!==draft.baseRevision || note.contentFormat!==draft.expectedContentFormat) && !draft.conflict) draft={...draft,conflict:note};
-        store.put({userId,id:note.id,remote:note,draft,localVersion:(old?.localVersion??0)+1} satisfies PersonalRecord);
-      };}
-      meta.put({cursor,complete},userId);
-    };
-    await new Promise<void>((resolve,reject)=>{tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(conflict?new NoteDeviceConflict():tx.error);});
-  } finally{db.close();}
-}
-function sameWrittenPayload(draft:NoteDraft,note:PersonalNote){
-  return draft.contentFormat===note.contentFormat && draft.content===note.content && draft.title.trim()===note.title
-    && draft.subjectId===note.subjectId && draft.subjectName===note.subjectName && draft.pinned===note.pinned;
+  try {const tx=db.transaction(["personal","meta"],"readwrite"),store=tx.objectStore("personal"),meta=tx.objectStore("meta"),read=meta.get(userId);let failure:unknown;
+    read.onsuccess=()=>{try{const current=(read.result as NotesMeta|undefined)??{cursor:0,complete:false};
+      // Another tab may already have committed this or a newer page.
+      if(current.cursor>cursor)return;
+      if(current.cursor<expectedCursor)throw new NoteDeviceConflict();
+      for(const note of notes){const item=store.get([userId,note.id]);item.onsuccess=()=>{try{store.put(reconcilePersonal(item.result??null,note,userId));}catch(error){failure=error;tx.abort();}};}
+      meta.put({cursor,complete:current.complete||complete},userId);
+    }catch(error){failure=error;tx.abort();}};
+    await new Promise<void>((resolve,reject)=>{tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(failure??tx.error);});
+  }finally{db.close();}
 }
 export async function saveClassDraft(draft:NoteDraft,expected:NoteDraft|null){
   const db=await openDb();

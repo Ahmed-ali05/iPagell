@@ -54,3 +54,14 @@ test("short and long PDF use the validated AST and preserve title metadata",asyn
   const many=await PDFDocument.load(long);assert.ok(many.getPageCount()>1);
   assert.ok(long.byteLength>short.byteLength);
 });
+
+test('soft line breaks in headings and list items remain canonical after typing and paste',()=>{
+  const parts=[{type:'strong' as const,text:'Energia\nsi conserva'},{type:'break' as const},{type:'text' as const,text:'## letterale\n- letterale\\*'}];
+  for(const type of ['paragraph','section_heading','bullet_list','ordered_list'] as const){
+    const block=type==='bullet_list'||type==='ordered_list'?{type,items:[parts,[{type:'text' as const,text:'secondo'}]]}:{type,content:parts};
+    const doc={blocks:[block],supported:true};const content=serializeNote(doc);
+    assert.equal(serializeNote(parseNote('md-lite-v1',content)),content,type);
+    assert.equal(visibleText(parseNote('md-lite-v1',content)),visibleText(doc),type);
+    assert.equal(formattedContent.safeParse({contentFormat:'md-lite-v1',content}).success,true,type);
+  }
+});

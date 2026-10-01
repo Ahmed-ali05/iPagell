@@ -64,7 +64,7 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null), view = useRef<EditorView | null>(null), callback = useRef(onChange);
   const mode = useRef<NoteFormat>(value.contentFormat), current = useRef(value.content), composing = useRef(false), pending = useRef<(() => void) | null>(null);
-  const selectionBeforeCommand=useRef<SelectionBookmark|null>(null);
+  const selectionBeforeCommand=useRef<SelectionBookmark|null>(null),rejected=useRef(false);
   const [menu, setMenu] = useState(false), [error, setError] = useState("");
   const [formatState,setFormatState]=useState({bold:false,heading:false});
   useEffect(()=>{callback.current=onChange;},[onChange]);
@@ -83,7 +83,8 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
         const next = editor.state.apply(transaction);
         const doc = toDocument(next.doc);
         const content = mode.current === "plain" ? visibleText(doc) : serializeNote(doc);
-        if ([...content].length > 20_000) { setError(t("notes.contentLimit")); return; }
+        if ([...content].length > 20_000) { rejected.current=true;setError(t("notes.contentLimit"));editor.updateState(editor.state);return; }
+        setError("");
         if(selectionBeforeCommand.current)selectionBeforeCommand.current=selectionBeforeCommand.current.map(transaction.mapping);
         editor.updateState(next);
         const marks=next.storedMarks??next.selection.$from.marks();
@@ -123,18 +124,25 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
     const apply = () => {
       const editor = view.current;
       if (!editor || disabled) return;
-      const bookmark=selectionBeforeCommand.current;selectionBeforeCommand.current=null;
-      const selection=toolbarSelection(editor.state,bookmark);
-      if(!selection.eq(editor.state.selection))editor.dispatch(editor.state.tr.setSelection(selection));
-      if (formatting && mode.current === "plain") {
-        const converted = escapePlain(current.current);
-        if (converted === null) { setError(t("notes.plainConversionFailed")); return; }
-        mode.current = "md-lite-v1"; current.current = converted;
-      }
-      run(editor); editor.focus();
-      const content = mode.current==="plain"?visibleText(toDocument(editor.state.doc)):serializeNote(toDocument(editor.state.doc));
-      if (content !== current.current || mode.current !== value.contentFormat) { current.current = content; callback.current({ contentFormat: mode.current, content }); }
-      setMenu(false); setError("");
+      const originalState=editor.state,originalMode=mode.current,originalContent=current.current;
+      rejected.current=false;
+      try{
+        const bookmark=selectionBeforeCommand.current;selectionBeforeCommand.current=null;
+        const selection=toolbarSelection(editor.state,bookmark);
+        if(!selection.eq(editor.state.selection))editor.dispatch(editor.state.tr.setSelection(selection));
+        if (formatting && mode.current === "plain") {
+          const converted = escapePlain(current.current);
+          if (converted === null) { setError(t("notes.plainConversionFailed")); return; }
+          mode.current = "md-lite-v1";
+        }
+        run(editor);
+        if(rejected.current){mode.current=originalMode;current.current=originalContent;editor.updateState(originalState);return;}
+        const content = mode.current==="plain"?visibleText(toDocument(editor.state.doc)):serializeNote(toDocument(editor.state.doc));
+        if (content !== current.current || mode.current !== value.contentFormat) { current.current = content; callback.current({ contentFormat: mode.current, content }); }
+        setMenu(false);setError("");
+      }catch{
+        mode.current=originalMode;current.current=originalContent;editor.updateState(originalState);setError(t("notes.formatFailed"));
+      }finally{editor.focus();}
     };
     if (composing.current) pending.current = apply; else apply();
   };

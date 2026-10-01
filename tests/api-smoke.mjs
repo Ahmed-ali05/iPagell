@@ -283,6 +283,15 @@ try {
   check((await api(`/api/notes/${personalNoteId}`,"DELETE",{expectedUserId:a.id,mutationId:randomUUID(),baseRevision:3},a.cookie)).status,426,"delete without expected format requires upgrade");
   const classSubject=await api(`/api/classes/${classId}/subjects`,"POST",{name:"History"},b.cookie);
   check(classSubject.status,201,"member creates a separate class subject");
+  // Regression: Shift+Enter and pasted newlines in every supported block.
+  for(const content of ["Prima\\\nSeconda","## Prima\\\nSeconda","- Prima\\\nSeconda\n- Terza","1. Prima\\\nSeconda\n2. Terza"]){
+    const privateResult=await api("/api/notes","POST",{...personalInput,id:randomUUID(),mutationId:randomUUID(),content,contentFormat:"md-lite-v1"},a.cookie);
+    check(privateResult.status,201,"private formatted line break accepted");
+    check(privateResult.data.note?.content,content,"private formatted line break preserved");
+    const sharedResult=await api(`/api/classes/${classId}/notes`,"POST",{id:randomUUID(),expectedUserId:b.id,mutationId:randomUUID(),baseRevision:0,subjectId:classSubject.data.subject.id,title:"Line breaks",content,contentFormat:"md-lite-v1"},b.cookie);
+    check(sharedResult.status,201,"class formatted line break accepted");
+    check(sharedResult.data.note?.content,content,"class formatted line break preserved");
+  }
   const classNoteId=randomUUID(),classMutation=randomUUID();
   const shared=await api(`/api/classes/${classId}/notes`,"POST",{id:classNoteId,expectedUserId:b.id,mutationId:classMutation,baseRevision:0,subjectId:classSubject.data.subject.id,title:"Class lesson",content:"Visible only to members",contentFormat:"plain"},b.cookie);
   check(shared.status,201,"member publishes a class note directly");

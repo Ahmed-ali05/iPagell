@@ -716,5 +716,6 @@
   "classes.content": "Class content",
   "classes.activities": "Activities",
   "notes.autoSaveHelp": "Your text is saved as you write.",
-  "notes.withdrawClass": "Withdraw from class"
+  "notes.withdrawClass": "Withdraw from class",
+  "notes.formatFailed": "This selection could not be formatted. Your text is preserved."
 }
