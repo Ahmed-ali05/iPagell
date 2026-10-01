@@ -32,7 +32,9 @@ La prima apertura online serve a preparare la copia offline. L’installazione s
 | Classi | Consultare attività e appunti condivisi; creare o raggiungere un gruppo privato |
 | Impostazioni | Gestire materie e semestri, tema, movimento, backup e account |
 
-Il selettore del periodo cambia i voti, le attività e le assenze visualizzati. Le materie sono condivise tra i periodi dello stesso diario. Archiviare un semestre non lo rende immutabile.
+Il periodo del diario resta il contesto di Home, Agenda, Assenze e della registrazione dei nuovi dati. Voti e Statistiche hanno un filtro di consultazione condiviso **Periodo / Anno scolastico / Tutto lo storico**, inizialmente sull’anno del periodo corrente. Le materie sono condivise fra periodi: non occorre ricrearle. Anni con etichette diverse restano separati; le etichette si possono correggere nelle impostazioni. I periodi archiviati restano consultabili e non sono immutabili.
+
+Il nuovo voto mostra **Registra nel periodo**: puoi scegliere un periodo reale senza cambiare quello del diario. La data non riassegna il voto. Il filtro e la materia restano selezionati tornando dalle statistiche o annullando il form; il filtro è stato di questa sessione, non una preferenza sincronizzata. Il registro mostra provenienza e medie per periodo; la media annuale usa tutti i singoli voti con i loro pesi, non la media delle medie dei periodi. L’andamento è la media generale cumulativa dei risultati visualizzati; il simulatore usa lo stesso ambito ed è disponibile in Periodo/Anno, non nello storico multiennale.
 
 ### Come leggere le medie
 

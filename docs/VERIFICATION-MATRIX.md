@@ -105,3 +105,8 @@ Google/Apple/email e la vista della materia per anno/storico restano pianificati
 ## Pianificazione multi-sistema — 1 ottobre 2026
 
 Aggiunta l’[analisi dedicata](improvement-2026-10-01/GRADING-EXTENSION-AUDIT.md), riutilizzando le ricerche iniziali e verificando tipi, calcoli, UI, schema strict, persistenza e backup. Fonti scolastiche primarie consultate per le famiglie candidate; cinque prompt (10–14) aggiunti al programma. Controlli documentali nel rapporto del ciclo. Non sono stati implementati nuovi preset, contratti o migrazioni; la produzione resta Sites 28 e `numeric-1-6`.
+
+
+## PERIODS-01 — consultazione annuale e storico
+
+Il [rapporto del programma](improvement-2026-10-01/VERIFICATION.md) distingue la nuova patch da Sites 28: 114 test, 146 verifiche API locali, journey annuale/storico con corrente vuoto, omonimi/archiviati, destinazione esplicita e annullamento, quattro lingue, desktop e 320/390 px chiaro/scuro. Nessuna migrazione o nuova scala. Stato pubblicazione nel rapporto; non dedurlo dalla build. Residui device fisici e verifica utenti restano aperti.

@@ -2546,3 +2546,22 @@ button.agenda-origin { min-height:32px; text-align:left; }
 .account-card .full { grid-column: 1 / -1; }
 .account-card :is(button,summary):focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
 @media(max-width:380px) { .account-card { padding: 22px 18px; border-radius: 20px; } .account-card .form-grid { grid-template-columns: minmax(0,1fr); } }
+
+/* Annual grade consultation uses the existing palette and form controls. */
+.grade-overview { margin-right:0; }
+.grade-scope-filter { display:flex; flex-wrap:wrap; align-items:end; gap:12px; padding:0 0 18px; }
+.grade-scope-filter label { display:grid; gap:6px; min-width:0; max-width:100%; flex:0 1 300px; font-size:.875rem; font-weight:600; }
+.grade-scope-filter [data-slot="native-select-wrapper"] { width:100%; min-width:0; }
+.grade-scope-filter select { min-height:44px; }
+.scope-note { color:var(--subtle); font-size:.875rem; line-height:1.5; overflow-wrap:anywhere; }
+.grade-scope-filter > .scope-note { flex-basis:100%; margin:0; }
+.grade-period-summary { display:grid; gap:8px; padding:12px 0; border-bottom:1px solid var(--line); }
+.grade-period-summary > div { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 12px; font-size:.875rem; }
+.grade-period-summary span { overflow-wrap:anywhere; }
+.grade-period-summary small { color:var(--subtle); }
+.grades-register .panel-title > div:first-child { min-width:0; }
+.grades-register > article small { overflow-wrap:anywhere; }
+.stats-hero > div:first-child { min-width:0; }
+.stats-hero .section-label { overflow-wrap:anywhere; }
+.semester-compare > div > span { min-width:0; grid-template-columns:auto minmax(0,1fr); overflow-wrap:anywhere; }
+.semester-compare > div > b { flex-shrink:0; }

@@ -1,6 +1,6 @@
 # iPagell — programma di miglioramento dell’ingresso e del prodotto
 
-Piano del **1 ottobre 2026**. [Prompt operativi](PROMPTS.md) · [Audit SEO](SEO-AUDIT.md) · [Prodotto e account](AUTH-PRODUCT-AUDIT.md) · [UX visiva](UX-VISUAL-AUDIT.md) · [Verifiche](VERIFICATION.md) · [Materie e andamento annuale](PERIODS-AUDIT.md) · [Altri sistemi di valutazione](GRADING-EXTENSION-AUDIT.md)
+Piano del **1 ottobre 2026**. [Prompt operativi](PROMPTS.md) · [Audit SEO](SEO-AUDIT.md) · [Prodotto e account](AUTH-PRODUCT-AUDIT.md) · [UX visiva](UX-VISUAL-AUDIT.md) · [Verifiche](VERIFICATION.md) · [Materie e andamento annuale](PERIODS-AUDIT.md) · [Altri sistemi di valutazione](GRADING-EXTENSION-AUDIT.md) · [Workflow e modelli](WORKFLOW-MODELS.md)
 
 ## Obiettivo e stato
 
@@ -10,7 +10,7 @@ Le analisi iniziali sono fotografie del codice prima di questo intervento, non g
 
 **Primo ciclo implementato e pubblicato in Sites 28:** landing e metadati in quattro lingue; Appunti visibili; calcolatore nel primo blocco; scala dichiarata; benefici e tre passi; privacy corretta; registrazione con progressione e aiuto; mostra/nascondi password; nome e materie nel setup, semestre/date in sezione espandibile; errore nel passaggio dal codice recupero senza scartare il codice; guida alla prima azione in Home, senza trattare chi ha già appunti come diario completamente vuoto. La conferma della sessione verifica l’identità prima di smontare il form. Sono mantenuti i default delle materie e delle date, le API, gli account e i dati esistenti. Migliorati alcuni contrasti e focus; nessun nuovo sistema grafico o schema DB.
 
-**Pianificato:** materia continua con filtri Periodo / Anno scolastico / Tutto lo storico; estensione dei metodi di valutazione con sistema indipendente dalla lingua e protezione dello storico; Google, Apple ed email verificata. L’accesso pubblicato continua a usare username/password e codice di recupero. I provider verranno mostrati soltanto quando funzionanti. Home, Agenda, Voti, Classi, Appunti e coerenza generale hanno prompt separati e criteri propri. L’audit non certifica indicizzazione Google, conversione o usabilità con persone reali.
+**PERIODS-01 in corso:** filtri annuale/storico implementati nel checkout e in verifica; pubblicazione ancora da eseguire. **Pianificato:** estensione dei metodi di valutazione con sistema indipendente dalla lingua e protezione dello storico; Google, Apple ed email verificata. L’accesso pubblicato continua a usare username/password e codice di recupero. I provider verranno mostrati soltanto quando funzionanti. Home, Agenda, Voti, Classi, Appunti e coerenza generale hanno prompt separati e criteri propri. L’audit non certifica indicizzazione Google, conversione o usabilità con persone reali.
 
 ## Mappa del prodotto e del primo percorso
 
@@ -90,7 +90,7 @@ L’anno si ricava dai periodi con la stessa etichetta `schoolYear`, mostrando e
 
 Media annuale: aggregare i singoli voti con peso voto × peso tipo, usando le funzioni esistenti. Non fare la media delle medie dei semestri: con 6 di peso 1 e 4 di peso 3, il risultato è 4,5, non 5. È una media calcolata dei risultati registrati, non un voto ufficiale annuale. I pesi/tipi attuali ricalcolano anche il passato; non esistono snapshot storici da inventare. Il grafico deve dichiarare se mostra voto singolo o media cumulativa.
 
-Questo ciclo è **pianificato, non incluso nel primo rilascio dell’ingresso**. Audit e criteri completi in PERIODS-AUDIT.md; prompt 09 dedicato. Priorità successiva consigliata: PERIODS-01 prima di una rifinitura estetica delle viste quotidiane.
+Questo ciclo non è incluso in Sites 28. **PERIODS-01 / W1 in corso** nella sessione corrente: scope UI condiviso, anno iniziale del periodo corrente, medie dei singoli voti, storico e destinazione esplicita nel nuovo voto. Nessuna migrazione. Audit e criteri in PERIODS-AUDIT.md; evidenze nel rapporto VERIFICATION.md. Prossimo ciclo dopo la pubblicazione: architettura identità, prompt 04.
 
 
 ## Estensione oltre la scala attuale
@@ -100,3 +100,17 @@ L’[analisi dedicata](GRADING-EXTENSION-AUDIT.md) riprende GRADING-SYSTEM.md e 
 La materia resta continua. Un sistema/revisione appartiene al contesto valutativo; cambi futuri non riscrivono i risultati vecchi. Nella lettura annuale possono convivere più metodi, con registro unico e medie/grafici separati quando incompatibili. Nessuna media dei ranghi, GPA universale o conversione basata sul massimo della scala. Server, client offline/PWA e backup vanno progettati insieme: gli schemi attuali strict e il salvataggio dell’intero snapshot impediscono di trattare questa estensione come sola impostazione grafica.
 
 Cinque prompt aggiunti (10–14): ricerca delle regole, modello/compatibilità, primo rilascio numerico, cicli qualitativi/complessi e QA. Sono nuovi incarichi riutilizzabili, non implementazioni avviate o sistemi già disponibili in produzione. La vista annuale resta il prossimo ciclo pratico; la scelta architetturale multi-sistema viene preparata accanto a quel lavoro.
+
+
+## Modelli e percorso operativo completo
+
+Il [workflow operativo](WORKFLOW-MODELS.md) assegna modelli/effort e revisione a tutti i 14 prompt, distingue i sottocicli UX e qualitativi, definisce dipendenze esterne, parallelismo, criteri di chiusura e previsione delle sessioni. Ordine operativo aggiornato alla richiesta corrente: annuale → architettura identità → account Google/email e Apple quando configurabile → Home/Agenda/Voti/Appunti/Classi/coerenza → scale numeriche → metodi complessi → verifica complessiva e SEO misurata. Gli audit 01–03 si aggiornano soltanto per differenze pertinenti. Le ricerche identità/valutazioni possono procedere in sola lettura durante i cicli UI; le patch a contratti condivisi vengono integrate una alla volta. Le stime sono ipotesi da aggiornare con i consuntivi, non scadenze garantite.
+
+
+## Registro del ciclo PERIODS-01 — 1 ottobre 2026
+
+- Stato: **in corso**; implementazione nel checkout, QA locale in conclusione, deploy ancora da eseguire. Partenza Git `a1ebee6`; Sites corrente 28 confermato dal connettore, domini canonico/www e TLS attivi. Conservati gli aggiornamenti documentali preesistenti non committati.
+- Prompt applicato integralmente: **09**, con PERIODS-AUDIT e precondizione numeric-1-6 di GRADING-EXTENSION-AUDIT. Responsabile unico per patch/browser/deploy; Sol high in sola lettura per UI e Astra medium per aggregazioni e revisione. Nessuna impostazione globale modificata.
+- Risultato: filtro di consultazione separato dal periodo di scrittura, materia continua e scope condivisi Voti/Statistiche, conteggi/provenienza/dettaglio periodi, anno nel trend cumulativo, recupero dallo scope vuoto e nuova destinazione esplicita. Anni con etichetta diversa restano distinti; archiviati e omonimi preservati. Simulatore limitato a Periodo/Anno e riferito ai voti visualizzati. Corretto anche il peso futuro effettivo 0,01 nel simulatore.
+- Verifica e riferimenti effettivi di commit/deploy: nel [rapporto esistente](VERIFICATION.md); una build o un commit non chiude il rilascio. Residui trasversali: device fisici, revisione madrelingua e prove utenti, senza bloccare questo ciclo.
+- Prossima sessione raccomandata: **prompt 04 / W7**, architettura Google, Apple ed email, prima di 05; nessun provider va mostrato prima della configurazione e prova reale.

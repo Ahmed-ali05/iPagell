@@ -88,3 +88,8 @@ Implementa in iPagell una vista della materia continua fra periodi, con filtro d
 ## Integrazione con altri metodi di valutazione
 
 Le formule sopra descrivono il runtime attuale con una sola scala. L’[estensione multi-sistema](GRADING-EXTENSION-AUDIT.md) aggiunge la futura precondizione di compatibilità: il filtro annuale raccoglie i risultati, ma medie/serie/confronti devono separarli per sistema/revisione e policy. Non rendere la media delle scale diverse possibile normalizzandole per massimo. Il contesto materia–periodo proposto per i dati non reintroduce una divisione della materia nella navigazione. Il prompt 09 può procedere prima dell’estensione, mantenendo la scala corrente; i prompt 10–14 coprono il lavoro successivo. Nessuna nuova capacità runtime aggiunta da questo paragrafo.
+
+
+## Esito del ciclo applicativo successivo
+
+1 ottobre 2026: l’audit iniziale sopra resta la base storica. Prompt 09 implementato nel checkout: anno iniziale, scope UI condiviso, medie pesate, provenienza/dettaglio, trend cumulativo con anno, nuovo voto con periodo reale e materia selezionata. I due punti emersi in review (cambio modalità su anno passato e nomi lunghi nelle statistiche) sono corretti. Nessuna migrazione, fusione o reinterpretazione della scala. Il rapporto [VERIFICATION](VERIFICATION.md) registra i test e il deploy; la sola patch non attesta pubblicazione. Residui fisici e madrelingua restano distinti.

@@ -63,7 +63,7 @@ export function neededGrade(
     (sum, grade) => sum + grade.value * gradeWeight(grade, subject),
     0,
   );
-  const effectiveNextWeight = Math.max(0.1, nextWeight);
+  const effectiveNextWeight = Number.isFinite(nextWeight) && nextWeight > 0 ? nextWeight : 0.1;
   return (
     (target * (accumulatedWeight + effectiveNextWeight) - accumulatedPoints) /
     effectiveNextWeight

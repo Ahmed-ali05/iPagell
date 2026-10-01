@@ -52,6 +52,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { AbsencesView } from "@/components/absences-view";
 import { StatsView } from "@/components/stats-view";
+import { GradeScopeFilter } from "@/components/grade-scope-filter";
+import { initialGradeScope, resolveGradeScope, scopeGrades, scopePeriods, type GradeScope } from "@/lib/grade-scope";
 import { EmptyState } from "@/components/diary-empty-state";
 import { AccountGate } from "@/components/account-gate";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
@@ -207,6 +209,13 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const [agendaVisited,setAgendaVisited]=useState(false);
   const [agendaFocusId, setAgendaFocusId] = useState<string | null>(null);
   const [selectedGradeSubjectId, setSelectedGradeSubjectId] = useState("");
+  const gradeScroll = useRef(0);
+  useEffect(() => {
+    if (activeTab !== "grades" && activeTab !== "stats") return;
+    const frame = requestAnimationFrame(() => window.scrollTo(0, activeTab === "grades" ? gradeScroll.current : 0));
+    return () => cancelAnimationFrame(frame);
+  }, [activeTab]);
+  const [gradeScope, setGradeScope] = useState<GradeScope>(() => initialGradeScope(data.semesters, preferences.currentSemesterId));
   const [modal, setModal] = useState<ModalType>(null);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [editingSemester, setEditingSemester] = useState<Semester | null>(null);
@@ -414,6 +423,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const semesterGrades = data.grades.filter(
     (grade) => grade.semesterId === currentSemester.id,
   );
+  const readingScope = useMemo(() => resolveGradeScope(gradeScope, data.semesters, currentSemester.id), [gradeScope, data.semesters, currentSemester.id]);
+  const visibleGrades = useMemo(() => scopeGrades(data.grades, data.semesters, readingScope), [data.grades, data.semesters, readingScope]);
+  const visiblePeriods = scopePeriods(data.semesters, readingScope);
+  const scopeLabel = readingScope.kind === "all" ? t("scope.all") : readingScope.kind === "year"
+    ? `${t("scope.year")} · ${readingScope.schoolYear}`
+    : `${visiblePeriods[0]?.name ?? ""} · ${visiblePeriods[0]?.schoolYear ?? ""}`;
   const semesterAgenda: AgendaDisplayItem[] = useMemo(() => allAgenda.filter(
     (item) => item.semesterId === currentSemester.id || ((item as AgendaDisplayItem).shared && !data.semesters.some(s => s.id === item.semesterId)),
   ), [allAgenda, currentSemester.id, data.semesters]);
@@ -427,6 +442,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     else if(tab !== "notes")setAgendaFocusId(null);
     if (tab === "classes") setClassesVisited(true);
     if (tab === "agenda")setAgendaVisited(true);
+    if (activeTab === "grades" && tab !== "grades") gradeScroll.current = window.scrollY;
     setActiveTab(tab);
     return true;
   };
@@ -618,7 +634,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           </div>
           <div className="top-actions">
             <LanguageSelect className="language-select" />
-            {activeTab !== "classes" && activeTab !== "notes" && (
+            {!["classes", "notes", "grades", "stats"].includes(activeTab) && (
               <NativeSelect
                 aria-label={t("workspace.currentSemester")}
                 value={currentSemester.id}
@@ -648,7 +664,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
 
         <div className="account-toolbar">
           {importPlanExists&&<button className="soft-button" onClick={()=>void resumeImport().catch(reportError)}>{t("notes.retry")} · {t("notes.backupImport")}</button>}
-          {activeTab !== "classes" && activeTab !== "notes" && (
+          {!["classes", "notes", "grades", "stats"].includes(activeTab) && (
             <NativeSelect
               aria-label={t("workspace.diaryPeriod")}
               value={currentSemester.id}
@@ -718,6 +734,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         )}
 
         {["home","agenda","classes"].includes(activeTab) && classAgenda.status && <div className="class-sync-status" role="status"><span>{t(classAgenda.status === "loading" ? "classEvents.agendaLoading" : classAgenda.status === "expired" ? "classEvents.sessionExpired" : "classEvents.agendaStale")}</span><button onClick={() => void classAgenda.refresh()}>{t("common.refresh")}</button></div>}
+        {["grades", "stats"].includes(activeTab) && <GradeScopeFilter scope={readingScope} semesters={data.semesters} currentSemesterId={currentSemester.id} onChange={setGradeScope} />}
         <div className="view-stage" key={activeTab}>
           {activeTab === "home" && (
             <>
@@ -741,7 +758,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           {activeTab === "grades" && (
             <GradesView
               subjects={data.subjects}
-              grades={semesterGrades}
+              grades={visibleGrades}
+              semesters={data.semesters}
+              periods={visiblePeriods}
+              scopeLabel={scopeLabel}
+              history={readingScope.kind === "all"}
+              onShowHistory={() => setGradeScope({ kind: "all" })}
               goal={preferences.gradeGoal}
               onGoal={(gradeGoal) => savePreference({ gradeGoal })}
               onAdd={() => data.subjects.length ? setModal("grade") : openSubjectEditor()}
@@ -792,8 +814,11 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           {activeTab === "stats" && (
             <StatsView
               data={data}
-              semester={currentSemester}
-              grades={semesterGrades}
+              periods={visiblePeriods}
+              scopeLabel={scopeLabel}
+              grades={visibleGrades}
+              onShowHistory={() => setGradeScope({ kind: "all" })}
+              historyAvailable={data.grades.length > visibleGrades.length}
               goal={preferences.gradeGoal}
               onAddGrade={() => setModal("grade")}
               onBackToGrades={() => navigate("grades")}
@@ -891,6 +916,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         }}
         data={data}
         semesterId={currentSemester.id}
+        initialSubjectId={activeTab === "grades" || activeTab === "stats" ? selectedGradeSubjectId : undefined}
         editingSubject={editingSubject}
         editingSemester={editingSemester}
         onRefresh={session.status === "device-conflict" ? async () => {
@@ -1528,6 +1554,11 @@ function AgendaList({
 function GradesView({
   subjects,
   grades,
+  semesters,
+  periods,
+  scopeLabel,
+  history,
+  onShowHistory,
   goal,
   selectedId,
   onSelectSubject,
@@ -1539,6 +1570,11 @@ function GradesView({
 }: {
   subjects: Subject[];
   grades: Grade[];
+  semesters: Semester[];
+  periods: Semester[];
+  scopeLabel: string;
+  history: boolean;
+  onShowHistory: () => void;
   goal: number;
   selectedId: string;
   onSelectSubject: (id: string) => void;
@@ -1607,11 +1643,19 @@ function GradesView({
               <div>
                 <span className="eyebrow">{subject.name}</span>
                 <h3>{t("grades.register")}</h3>
+                <p className="scope-note">{scopeLabel} · {t("scope.count", { count: intlNumber(locale, subjectGrades.length) })}</p>
               </div>
               <div className="big-average" style={{ color: subject.color }}>
                 {gradeText(locale, average)}
               </div>
             </div>
+            <p className="scope-note">{t("scope.calculated")}</p>
+            {periods.length > 1 && <div className="grade-period-summary" aria-label={t("scope.byPeriod")}>
+              {periods.map((period) => {
+                const values = subjectGrades.filter((grade) => grade.semesterId === period.id);
+                return <div key={period.id}><span>{period.name} · {period.schoolYear}</span><b>{gradeText(locale, subjectAverage(subject, values))}</b><small>{t("scope.count", { count: intlNumber(locale, values.length) })}</small></div>;
+              })}
+            </div>}
             {subjectGrades.length ? (
               subjectGrades.map((grade) => (
                 <article key={grade.id}>
@@ -1627,7 +1671,10 @@ function GradesView({
                         t("common.grade")}
                     </b>
                     <small>
-                      {formatDate(locale, grade.date)} · {t("grades.weight", { value: gradeText(locale, grade.weight) })}
+                      {formatDate(locale, grade.date, { day: "numeric", month: "short", year: "numeric" })} · {t("grades.weight", { value: gradeText(locale, grade.weight) })}
+                    </small>
+                    <small>
+                      {semesters.find((period) => period.id === grade.semesterId)?.name} · {semesters.find((period) => period.id === grade.semesterId)?.schoolYear}
                     </small>
                   </div>
                   <span>
@@ -1650,10 +1697,14 @@ function GradesView({
               <EmptyState
                 icon={GraduationCap}
                 title={t("home.noGrades")}
+                actionLabel={!history ? t("scope.showHistory") : undefined}
+                onAction={!history ? onShowHistory : undefined}
               />
             )}
           </section>
           <aside className="panel simulator-card">
+            {history ? <><h3>{t("grades.needed")}</h3><p className="scope-note">{t("scope.historySimulation")}</p></> : <>
+            <p className="scope-note">{t("scope.simulation")}</p>
             <h3>{t("grades.needed")}</h3>
             <label>
               {t("grades.target")} <b>{gradeText(locale, target)}</b>
@@ -1714,6 +1765,7 @@ function GradesView({
             <small className="sim-note">
               {t("grades.simNote", { weight: intlNumber(locale, nextWeight * (type?.weight ?? 1), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })}
             </small>
+            </>}
           </aside>
         </div>
       ) : (

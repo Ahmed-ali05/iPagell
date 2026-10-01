@@ -1,4 +1,4 @@
-# Verifica del ciclo ingresso iPagell
+# Verifiche del programma iPagell
 
 1 ottobre 2026. [Piano](PLAN.md) · [Prompt](PROMPTS.md)
 
@@ -47,3 +47,29 @@ Google/Apple/email e i filtri annuale/storico sono pianificati, non implementati
 Richiesta successiva al rilascio 28: [analisi dei metodi di valutazione](GRADING-EXTENSION-AUDIT.md), fonti primarie, collegamenti alle ricerche iniziali e cinque nuovi prompt (10–14). Audit codice delegato in sola lettura; aggiornati programma, prompt annuale e indice.
 
 `npm run docs:check` passato: inventario invariato, 46 documenti e 299 link locali. `git diff --check` senza errori. Nessun codice applicativo, nuovo test, migrazione o deploy in questa aggiunta. I risultati 106 test/146 API sopra restano evidenze del rilascio 28, senza attestare nuovi sistemi implementati.
+
+
+## PERIODS-01 / W1 — prompt 09, 1 ottobre 2026
+
+Stato del ciclo **in corso**: implementazione e verifiche locali concluse; pubblicazione in preparazione. Baseline Git `a1ebee6`, Sites 28 verificato attivo/pubblico, domini ipagell.website/www con TLS attivo. Gli aggiornamenti documentali non committati presenti all’avvio sono stati conservati. Un responsabile ha scritto patch e controllato browser; specialisti `gpt-6.1-sol` high per UI e `gpt-6-astra` medium per aggregazioni/revisione in sola lettura. Modelli disponibili, nessuna impostazione globale modificata.
+
+| Verifica nuova | Evidenza osservata |
+|---|---|
+| Preparazione completa finale | `npm run release:prepare` passato: lint, tipi, **114 test** (otto nuovi semantici), **770 chiavi** in quattro lingue, inventario 27 route/15 tabelle/7 migrazioni, documenti/link e build/precache. Resta l’avviso chunk oltre 500 kB. Il primo check si era fermato sull’inventario da rigenerare; corretto e ripetuto integralmente. |
+| Medie e scope | Test: 6×1 + 4×3 = **4,5**, coefficienti materia, pesi tipo correnti, etichette anno distinte, data fuori periodo, archiviati/omonimi, periodo vuoto/anno popolato, trend cumulativo ordinato/finale coerente, backup con ID/voti originali e nessuna mutazione da filtro. Il simulatore conserva peso effettivo **0,01**. |
+| API locale | **146 controlli passati**, Worker compilato e DB nuovo isolato in `/private/tmp/ipagell-annual-db-20261001`; cleanup della suite concluso. Nessuna richiesta ai dati utente di produzione. |
+| Journey Voti/Statistiche | Annuale iniziale utile nonostante corrente vuoto; materia principale 4,5, omonima 3,0, media generale 4,0. Periodo vuoto conserva filtri e offre storico. Periodo passato → Anno resta 2025/26; ritorno Voti↔Statistiche conserva materia/scope. Storico mostra cinque voti della materia e sospende simulazione. |
+| Nuovo voto | Da seconda materia e anno passato: form inizializzato su ID `same` e periodo corrente reale. Modifica valore/destinazione → annulla → riapri: campi azzerati e destinazione corrente. Salvataggio esplicito in periodo `old` riuscito, con data fuori intervallo; risposta API del solo account sintetico conferma subjectId/semesterId, sette voti totali (annullamento non crea voto) e currentSemesterId invariato. |
+| Home | Dopo consultazione/scrittura passata, Home continua a mostrare periodo corrente vuoto, nessun voto e attività corrente. Home/Agenda/Assenze/tool browser mantengono il contesto precedente per codice/revisione; nessuna riscrittura di preferenze da filtro. |
+| Browser/lingue/accessibilità | Desktop **1440×1000**, mobile **320/390 px**, chiaro/scuro; anno/nome periodo da oltre 100 caratteri in selector, hero, confronto e dialog. Eliminato margine negativo legacy delle materie che produceva 1 px di overflow; sul bundle finale scrollWidth=320 a viewport 320. Etichette accessibili del filtro/destinazione; Tab da filtro ad anno con focus viola visibile. Cataloghi it/de/fr/en letti nel browser senza cambio valori/scala. |
+| Review | Due revisioni fresche in sola lettura, invarianti matematiche confermate; corretti cambio modalità su anno passato, wrapping nomi lunghi e peso futuro minimo. Review finale senza difetti critici. |
+
+Account browser annuale creato solo nel DB isolato, eliminato tramite endpoint security con le sue credenziali sintetiche: `{ok:true}`. Una richiesta di verifica è caduta mentre il runtime locale si riavviava dopo build; ripetuta a server stabile con esito positivo. Il dataset iniziale oltrepassava il limite schoolYear: API lo ha rifiutato senza scrivere; etichetta ridotta sotto 120 e dataset validato.
+
+Screenshot locali ignorati da Git in `outputs/annual-grades/`: `annual-desktop-light.jpg`, `annual-390-light.jpg`, `stats-320-dark-long.jpg`. Non sono link/artefatti necessari alla CI; i fatti sopra restano nel rapporto versionato.
+
+Nessuna migrazione o cambio dei contratti/API/backup. Sono invariate scala numeric-1-6, identità, binding DB, audience e domini. Limiti: viewport non equivale a iOS/Android fisici; traduzioni senza revisione madrelingua, Search Console e usabilità con persone non misurate; massimo dataset/performance e PWA fisica restano nella matrice trasversale.
+
+Durante la preparazione è scomparso il helper locale Sites `site-workflow.mjs` e la skill dalla cache; verifica filesystem/ricerca senza copie, connettore ancora attivo. Dopo riattivazione Sites da parte dell’utente, entrambi i file sono tornati nello stesso percorso: **blocco risolto**, nessun deploy alternativo o modifica delle impostazioni globali. La pubblicazione segue il workflow originale e sarà registrata sotto soltanto a esito riuscito.
+
+Prossima sessione: prima chiudere questo rilascio se ancora aperto; dopo completamento, **architettura identità / prompt 04 / W7**, poi 05 con Google/email e Apple quando realmente configurabili. Non avviato automaticamente.

@@ -4,6 +4,18 @@
 
 Versione npm, formato del diario, backup, revisione dati e numero Sites sono contatori distinti. Le voci di rilascio riportano solo pubblicazioni documentate; il [registro precedente](docs/CHANGELOG-HISTORY.md) conserva i passaggi storici.
 
+## 2026-10-01 — Materie continue, anno e storico (in verifica/pubblicazione)
+
+- Voti/Statistiche condividono Periodo, Anno scolastico e Tutto lo storico, con anno iniziale e materia conservata al ritorno. Conteggi, provenienza, dettaglio periodi, trend cumulativo con anno e accesso allo storico anche dal periodo vuoto.
+- Media dei singoli voti ponderati fra periodi, inclusi archiviati, senza fusioni di etichette o materie omonime. Scritture separate: nuovo voto con materia selezionata e periodo reale esplicito, Home/Agenda/Assenze invariati. Nessuna migrazione.
+- Simulatore riferito al filtro Periodo/Anno, storico senza previsione; corretto il prodotto positivo dei pesi futuri 0,01. Quattro lingue, CSS per nomi lunghi e otto test semantici. Stato effettivo nel [rapporto](docs/improvement-2026-10-01/VERIFICATION.md).
+
+## Non rilasciato — workflow e modelli
+
+- Assegnati modelli ed effort consigliati ai 14 prompt, con revisione delle attività critiche e workflow completo W0–W15.
+- Aggiunti dipendenze, criteri di chiusura, stime dichiarate delle sessioni e scenari API distinti dall’uso in Codex. Fonti ufficiali OpenAI verificate il 1 ottobre 2026.
+- Documento operativo; nessuna configurazione globale di modello o modifica alla produzione.
+
 ## Non rilasciato — analisi dei sistemi di valutazione
 
 - Collegati GRADING-SYSTEM e ricerche iniziali multilingua/SEO/prodotto alla nuova analisi multi-sistema, con fonti primarie e vincoli verificati nel codice.
