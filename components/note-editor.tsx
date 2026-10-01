@@ -1,14 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Schema, type Node as PMNode, type Mark } from "prosemirror-model";
-import { EditorState, TextSelection } from "prosemirror-state";
+import { EditorState, type SelectionBookmark } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { keymap } from "prosemirror-keymap";
 import { baseKeymap, setBlockType, toggleMark } from "prosemirror-commands";
 import { history, redo, undo } from "prosemirror-history";
-import { liftListItem, splitListItem, wrapInList } from "prosemirror-schema-list";
+import { liftListItem, splitListItem } from "prosemirror-schema-list";
 import { escapePlain, parseNote, serializeNote, visibleText, type Block, type Inline, type NoteDocument, type NoteFormat } from "@/lib/notes/format";
 import { useI18n } from "@/components/i18n-provider";
+import { headingSelection,toolbarSelection,toggleNoteList } from "@/lib/notes/editor-selection";
 
 const schema = new Schema({
   nodes: {
@@ -63,7 +64,9 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null), view = useRef<EditorView | null>(null), callback = useRef(onChange);
   const mode = useRef<NoteFormat>(value.contentFormat), current = useRef(value.content), composing = useRef(false), pending = useRef<(() => void) | null>(null);
-  const [focused, setFocused] = useState(false), [menu, setMenu] = useState(false), [error, setError] = useState("");
+  const selectionBeforeCommand=useRef<SelectionBookmark|null>(null);
+  const [menu, setMenu] = useState(false), [error, setError] = useState("");
+  const [formatState,setFormatState]=useState({bold:false,heading:false});
   useEffect(()=>{callback.current=onChange;},[onChange]);
   useEffect(() => {
     if (!host.current || view.current || value.contentFormat !== "plain" && value.contentFormat !== "md-lite-v1" || value.content.includes("\r")) return;
@@ -81,7 +84,10 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
         const doc = toDocument(next.doc);
         const content = mode.current === "plain" ? visibleText(doc) : serializeNote(doc);
         if ([...content].length > 20_000) { setError(t("notes.contentLimit")); return; }
+        if(selectionBeforeCommand.current)selectionBeforeCommand.current=selectionBeforeCommand.current.map(transaction.mapping);
         editor.updateState(next);
+        const marks=next.storedMarks??next.selection.$from.marks();
+        setFormatState({bold:next.selection.empty?marks.some(mark=>mark.type===schema.marks.strong):next.doc.rangeHasMark(next.selection.from,next.selection.to,schema.marks.strong),heading:headingSelection(next)});
         if(composing.current)return;
         if (content !== current.current) { current.current = content; callback.current({ contentFormat: mode.current, content }); }
       },
@@ -96,16 +102,12 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
         if (!raw) { setError(t("notes.pasteEmpty")); return true; }
         view.dispatch(view.state.tr.insertText(raw)); return true;
       },
-      attributes: { "aria-label": label, spellcheck: "true" },
+      attributes: { "aria-label": label, role:"textbox", "aria-multiline":"true", spellcheck: "true" },
       editable:()=>!disabled,
     });
     view.current = editor;
-    editor.dom.addEventListener("focus", onFocus);
-    editor.dom.addEventListener("blur", onBlur);
     editor.dom.addEventListener("compositionstart", onCompositionStart);
     editor.dom.addEventListener("compositionend", onCompositionEnd);
-    function onFocus() { setFocused(true); }
-    function onBlur() { setFocused(false); }
     function onCompositionStart() { composing.current = true; }
     function onCompositionEnd() { composing.current = false; queueMicrotask(()=>{
       const content=mode.current==="plain"?visibleText(toDocument(editor.state.doc)):serializeNote(toDocument(editor.state.doc));
@@ -121,6 +123,9 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
     const apply = () => {
       const editor = view.current;
       if (!editor || disabled) return;
+      const bookmark=selectionBeforeCommand.current;selectionBeforeCommand.current=null;
+      const selection=toolbarSelection(editor.state,bookmark);
+      if(!selection.eq(editor.state.selection))editor.dispatch(editor.state.tr.setSelection(selection));
       if (formatting && mode.current === "plain") {
         const converted = escapePlain(current.current);
         if (converted === null) { setError(t("notes.plainConversionFailed")); return; }
@@ -134,20 +139,26 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
     if (composing.current) pending.current = apply; else apply();
   };
   const run = (fn: ReturnType<typeof toggleMark>,formatting=true) => command(editor => fn(editor.state, editor.dispatch, editor),formatting);
+  const preserveSelection=(event:React.PointerEvent<HTMLDivElement>)=>{
+    if(disabled)return;
+    selectionBeforeCommand.current=view.current?.state.selection.getBookmark()??null;
+    // Keep the keyboard and native selection on touch; mouse fallback below
+    // also covers browsers that move focus on the compatibility mouse event.
+    event.preventDefault();
+  };
   if (value.contentFormat !== "plain" && value.contentFormat !== "md-lite-v1") return <pre className="notes-unsupported">{value.content}</pre>;
   if (value.contentFormat === "plain" && value.content.includes("\r")) return <><textarea aria-label={label} value={value.content} disabled={disabled} rows={14} onChange={event => callback.current({ contentFormat: "plain", content: event.target.value })}/><p>{t("notes.plainConversionFailed")}</p></>;
   return <div className="visual-note-editor">
-    {(focused || menu) && <div className="visual-note-toolbar" role="toolbar" aria-label={t("notes.formatting")} onPointerDown={event => event.preventDefault()}>
-      <button type="button" aria-label={t("notes.bold")} title={t("notes.bold")} onClick={() => run(toggleMark(schema.marks.strong))}><b>B</b></button>
-      <button type="button" aria-label={t("notes.sectionHeading")} title={t("notes.sectionHeading")} onClick={() => command(editor=>{
-        editor.dispatch(editor.state.tr.setSelection(TextSelection.create(editor.state.doc,editor.state.selection.head)));
-        setBlockType(schema.nodes.section_heading)(editor.state,editor.dispatch,editor);
+    <div className="visual-note-toolbar" role="toolbar" aria-label={t("notes.formatting")} onPointerDown={preserveSelection} onMouseDown={event=>event.preventDefault()} onKeyDown={event=>{if(event.key==="Escape"){setMenu(false);view.current?.focus();}}}>
+      <button type="button" disabled={disabled} aria-pressed={formatState.bold} aria-label={t("notes.bold")} title={t("notes.bold")} onClick={() => run(toggleMark(schema.marks.strong))}><b>B</b></button>
+      <button type="button" disabled={disabled} aria-pressed={formatState.heading} aria-label={t("notes.sectionHeading")} title={t("notes.sectionHeading")} onClick={() => command(editor=>{
+        setBlockType(headingSelection(editor.state)?schema.nodes.paragraph:schema.nodes.section_heading)(editor.state,editor.dispatch,editor);
       })}>H₂</button>
-      <button type="button" aria-label={t("notes.list")} aria-expanded={menu} onClick={() => setMenu(!menu)}>≡ ▾</button>
-      <button type="button" aria-label={t("notes.undo")} onClick={() => run(undo,false)}>↶</button>
-      <button type="button" aria-label={t("notes.redo")} onClick={() => run(redo,false)}>↷</button>
-      {menu && <div className="visual-note-list-menu"><button type="button" onClick={() => run(wrapInList(schema.nodes.bullet_list))}>{t("notes.bulletList")}</button><button type="button" onClick={() => run(wrapInList(schema.nodes.ordered_list))}>{t("notes.numberedList")}</button></div>}
-    </div>}
+      <button type="button" disabled={disabled} aria-label={t("notes.list")} aria-expanded={menu} onClick={() => setMenu(!menu)}>≡ ▾</button>
+      <button type="button" disabled={disabled} aria-label={t("notes.undo")} onClick={() => run(undo,false)}>↶</button>
+      <button type="button" disabled={disabled} aria-label={t("notes.redo")} onClick={() => run(redo,false)}>↷</button>
+      {menu && <div className="visual-note-list-menu"><button type="button" disabled={disabled} onClick={() => run(toggleNoteList(schema.nodes.bullet_list))}>{t("notes.bulletList")}</button><button type="button" disabled={disabled} onClick={() => run(toggleNoteList(schema.nodes.ordered_list))}>{t("notes.numberedList")}</button></div>}
+    </div>
     <div ref={host} className="visual-note-surface" aria-disabled={disabled} onKeyDown={event => { if (event.key === "Escape" && menu) { setMenu(false); view.current?.focus(); } }} />
     {error && <p className="notes-error" role="alert">{error}</p>}
   </div>;

@@ -153,3 +153,18 @@ La matrice precedente resta l'audit del commit indicato nel suo testo iniziale. 
 | Le migrazioni 0005 e 0006 sono additive: plain resta plain e ogni nota modificata porta formato/versione espliciti. | VERIFICATO nei test e nella struttura D1 Sites | `drizzle/0005_heavy_elektra.sql`, `drizzle/0006_daily_stranger.sql`, `tests/notes.test.ts`, `tests/api-smoke.mjs`; dopo il deploy v24 il D1 Sites espone `content_format` per entrambe le tabelle. La suite prova che le righe legacy diventano `plain`. |
 | Client privi del contratto Appunti v2 o del formato atteso non possono aggiornare note convertite. | VERIFICATO nella suite API locale | `lib/server/note-http.ts`, `lib/server/note-repository.ts`, `tests/api-smoke.mjs`; verifica su browser già aperti prima dell'aggiornamento non eseguita. |
 | Il PDF breve/lungo mantiene impaginazione e metadati; il lettore non interpreta HTML delle note. | PARZIALE | `tests/note-format.test.ts` e ispezione locale dei PDF: 1 e 7 pagine. Chrome genera dalla UI un PDF breve con arabo/emoji e un lungo da 7650 caratteri, entrambi con Salva/Apri/Condividi. L'apertura diretta del blob PDF è bloccata dalla policy browser della sessione, quindi non certifico l'ispezione visiva di entrambi i file. |
+
+## Intervento UX Appunti — 1 ottobre 2026, solo locale
+
+La matrice storica sopra resta riferita al suo commit. Questo intervento riguarda componenti, CSS, comandi dell’editor e testi i18n; non modifica schema, API, sincronizzazione o permessi. Non è una verifica della produzione e non è stato pubblicato.
+
+| Verifica locale | Esito e limiti |
+|---|---|
+| Controlli statici e regressioni | `npm run check`: lint, TypeScript, 87 test, cataloghi it/de/fr/en e collegamenti documentali. Quattro nuovi test coprono selezione completa/inversa, elenchi, titoli e bookmark; non simulano una tastiera fisica o virtuale. |
+| Build | `npm run build` completa; resta l’avviso sui chunk oltre 500 kB. |
+| API | `TEST_BASE_URL=http://localhost:5173 npm run test:api`: 130 controlli passati; account della suite ripuliti. Include contratto Appunti, formati, revisioni, permessi, isolamento e conservazione del testo. |
+| Percorso personale | Account sintetico isolato: creazione senza materie, aggiunta materia senza perdere titolo/testo, selezione della nuova materia, salvataggio server e ripresa da Home dopo riapertura. |
+| Agenda | Ingresso dalla materia di una scadenza: filtro corretto; ritorno conserva vista elenco e filtro personale. Calendario/mese/giorno restano montati nello stesso workspace. |
+| Classe | Copia personale preparata esplicitamente; API senza testo condiviso finché è una bozza; aggiunta materia dall’editor, bozza ritrovata e anteprima confermata prima della pubblicazione. Materie private e condivise restano distinte. |
+| Disconnessione | Server locale fermato dopo il caricamento dell’editor: il testo personale modificato resta salvato e riapribile dal dispositivo. Al riavvio si sincronizza senza cambiare la copia di classe. Non è una prova della shell PWA dopo chiusura completa offline. |
+| Responsive e focus | Browser a 390 e 320 px; nessuno scorrimento orizzontale nei percorsi osservati. Selezione e focus restano nel testo dopo grassetto, elenco e annulla/ripeti; Fine salva e apre la lettura. Nessuna certificazione di Safari/iOS, Chrome/Android, tastiera virtuale, IME o PDF su dispositivo fisico. |

@@ -27,7 +27,7 @@ La prima apertura online serve a preparare la copia offline. L’installazione s
 | Voti | Registrare risultati, selezionare materia e simulare il voto necessario |
 | Assenze | Registrare data, ore e tipo di assenza; impostare una soglia personale |
 | Statistiche | Confrontare materie, andamento e periodi presenti |
-| Classi | Creare o raggiungere un gruppo privato, gestire membri e inviti |
+| Classi | Consultare attività e appunti condivisi; creare o raggiungere un gruppo privato |
 | Impostazioni | Gestire materie e semestri, tema, movimento, backup e account |
 
 Il selettore del periodo cambia i voti, le attività e le assenze visualizzati. Le materie sono condivise tra i periodi dello stesso diario. Archiviare un semestre non lo rende immutabile.
@@ -55,6 +55,16 @@ Apri **Classi** e scegli **Nuova classe** per creare un gruppo. Diventi propriet
 Il proprietario può nominare o revocare moderatori, rimuovere membri, modificare la classe, trasferire la proprietà ed eliminarla. I moderatori possono creare o revocare inviti e rimuovere membri ordinari. Un membro può cambiare il proprio nome visibile o uscire. Il proprietario deve prima trasferire la proprietà oppure eliminare la classe.
 
 Voti, assenze, medie, preferenze e completamento personale non vengono mostrati alla classe. I membri possono condividere compiti e verifiche; ciascuno sceglie quali aggiungere alla propria agenda. Titolo e data delle attività collegate seguono gli aggiornamenti della classe, mentre completamento, materia personale e avvisi restano privati. **Scollega dalla classe** conserva l’attività nell’agenda ma interrompe gli aggiornamenti.
+
+## Appunti personali e di classe
+
+In Home puoi riprendere gli appunti recenti oppure scegliere **Tutti gli appunti** e **Nuovo appunto**. **Appunti di {materia}** nella prossima scadenza, nell’Agenda e in Voti apre l’elenco personale filtrato. **Torna a…** riporta al contesto di partenza; nell’Agenda restano calendario/elenco e filtri scelti durante la sessione.
+
+I tuoi appunti sono privati e indipendenti dal semestre. Puoi iniziare a scrivere prima di scegliere la materia e aggiungerla dall’editor senza perdere il testo. Titolo e materia servono per sincronizzare nell’account; **Salvato sul dispositivo** conferma solo la copia locale. Gli appunti personali già disponibili sul dispositivo restano utilizzabili senza rete.
+
+Dentro una classe scegli **Appunti della classe → Scrivi un appunto**. Le materie di classe sono separate da quelle del diario: puoi aggiungerne una direttamente nell’editor. **Salva bozza e chiudi** mantiene il testo privato sul dispositivo; lo ritrovi in **Le tue bozze**. **Controlla e condividi** apre un’anteprima: solo confermando **Pubblica nella classe** il testo diventa visibile ai membri. Per leggere o condividere in classe serve la connessione.
+
+Le copie fra spazio personale e classe sono indipendenti. Da un appunto personale scegli la classe e **Prepara una copia in…**, poi la materia della classe e la conferma di condivisione. **Ritira dalla classe** rimuove il testo condiviso; eliminare una bozza privata non ritira un appunto già condiviso. Copie, gestione materie e **Bozze e classi passate** si aprono solo quando ti servono.
 
 ## Salvataggio, offline e conflitti
 

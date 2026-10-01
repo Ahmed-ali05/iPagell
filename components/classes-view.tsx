@@ -111,6 +111,11 @@ export function ClassesView({
   const [classes, setClasses] = useState<ClassSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<ClassDetail | null>(null);
+  const [classSection,setClassSection]=useState<"events"|"notes">("events");
+  useEffect(()=>{if(copyToClass)queueMicrotask(()=>setClassSection("notes"));},[copyToClass]);
+  const selectSection=async(section:"events"|"notes")=>{
+    try{await flushOpenNotes();setClassSection(section);}catch{toast.error(t("notes.saveFailed"));}
+  };
   const [invites, setInvites] = useState<ClassInvite[]>([]);
   const [invitesLoadedFor, setInvitesLoadedFor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -483,6 +488,7 @@ export function ClassesView({
           </button>
         </section>
       )}
+      {copyToClass&&<p className="notes-banner" role="status">{t("notes.chooseClassCopy")} <button className="soft-button" onClick={onCopyConsumed}>{t("common.cancel")}</button></p>}
 
       {!classes.length ? (
         <section className="panel class-empty">
@@ -536,7 +542,7 @@ export function ClassesView({
                   <div className="class-hero-actions">
                     {canManageInvites && (
                       <button
-                        className="primary-button"
+                        className="soft-button"
                         onClick={() => {
                           setCreatedInvite(null);
                           setInviteOpen(true);
@@ -545,20 +551,20 @@ export function ClassesView({
                         <Link2 /> {t("classes.createInvite")}
                       </button>
                     )}
-                    {detail.role === "owner" && (
-                      <button className="soft-button" onClick={() => setEditOpen(true)}>
-                        <Pencil /> {t("classes.edit")}
-                      </button>
-                    )}
                   </div>
                 </section>
 
-                <ClassEventsPanel active={active} cached={eventsCache.get(detail.id)} onLoaded={cacheEvents} onInvalidate={invalidateEvents} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} actions={actions} />
-                <ClassNotesPanel active={active} detail={detail} userId={currentUserId} controller={notes} copySeed={copyToClass} onCopyConsumed={onCopyConsumed} onCopyPersonal={onCopyPersonal} />
+                <div className="class-content-nav" aria-label={t("classes.content")}>
+                  <button aria-pressed={classSection==="events"} onClick={()=>void selectSection("events")}>{t("classes.activities")}</button>
+                  <button aria-pressed={classSection==="notes"} onClick={()=>void selectSection("notes")}>{t("notes.classTitle")}</button>
+                </div>
+                <div hidden={classSection!=="events"}><ClassEventsPanel active={active&&classSection==="events"} cached={eventsCache.get(detail.id)} onLoaded={cacheEvents} onInvalidate={invalidateEvents} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} actions={actions} /></div>
+                <div hidden={classSection!=="notes"}><ClassNotesPanel active={active&&classSection==="notes"} detail={detail} userId={currentUserId} controller={notes} copySeed={copyToClass} onCopyConsumed={onCopyConsumed} onCopyPersonal={onCopyPersonal} /></div>
 
                 <details className="class-administration" onToggle={event => { if (event.currentTarget.open && canManageInvites && invitesLoadedFor !== detail.id) void loadInvites(detail.id).catch(() => setError("classes.unavailable")); }}>
                   <summary>{t("classes.management")} <span>{detail.memberCount} {t(selectPlural(locale, detail.memberCount, "classes.member", "classes.members"))}</span></summary>
                   <div className="class-detail-stack">
+                    {detail.role === "owner" && <button className="soft-button" onClick={()=>setEditOpen(true)}><Pencil />{t("classes.edit")}</button>}
                 <section className="panel members-panel">
                   <div className="panel-title">
                     <div>
