@@ -184,7 +184,7 @@ export function IPagellApp({
         user={session.user}
         initialMode={initialAccountMode}
         onRegister={session.register}
-        onAuthenticated={session.reload}
+        onAuthenticated={session.authenticate}
         onLogout={session.logout}
       />
     );
@@ -1130,9 +1130,9 @@ function Dashboard({
   const countdown = nextTest ? getCountdown(nextTest.dueAt) : null;
   const subject = findSubject(data.subjects, nextTest?.subjectId);
   const gradedSubjects = data.subjects.filter((item) => subjectAverage(item, grades) !== null).length;
-  const emptyDiary = !agenda.length && !grades.length;
   const recent = recentNotes.filter(record=>record.draft?!record.draft.deleted:record.remote&&!record.remote.deletedAt)
     .sort((a,b)=>((b.draft?.localEditedAt??b.remote?.updatedAt)??0)-((a.draft?.localEditedAt??a.remote?.updatedAt)??0)).slice(0,3);
+  const emptyDiary = !agenda.length && !grades.length && !recent.length;
 
   return (
     <div className={`dashboard-grid ${emptyDiary ? "empty-dashboard" : ""}`}>
@@ -1157,6 +1157,7 @@ function Dashboard({
         ) : (
           <div className="empty-hero">
             <h2>{emptyDiary ? t("home.start") : t("home.noUpcoming")}</h2>
+            {emptyDiary && <p>{data.subjects.length ? t("home.firstValue") : t("home.firstSubjects")}</p>}
             <button onClick={() => data.subjects.length ? onAdd("agenda") : onManageSubjects()}><Plus size={18} /> {data.subjects.length ? t("home.addActivity") : t("home.addSubjects")}</button>
             {emptyDiary && data.subjects.length > 0 && <button className="secondary-action" onClick={() => onAdd("grade")}>{t("home.firstGrade")}</button>}
           </div>

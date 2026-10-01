@@ -5,7 +5,7 @@
   ],
   "name": "iPagell — Diario scolastico",
   "short_name": "iPagell",
-  "description": "Voti, agenda, assenze e statistiche scolastiche, con l’ultima copia del diario disponibile offline sul dispositivo.",
+  "description": "Voti, agenda, appunti per materia e assenze, con l’ultima copia del diario disponibile offline sul dispositivo.",
   "lang": "it-CH",
   "start_url": "/app?source=pwa",
   "scope": "/",

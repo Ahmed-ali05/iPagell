@@ -93,3 +93,10 @@ Gli aggiornamenti delle dipendenze sono verificati nella repository ma non ancor
 - Revisione umana delle traduzioni, sicurezza indipendente e metadati/redirect/cache live oltre ai controlli esplicitamente registrati.
 
 Per questi punti non dichiarare completamento usando soltanto build, unit test, viewport desktop o successo del deployment.
+
+
+## Ciclo ingresso, SEO e pianificazione account/periodi — 1 ottobre 2026
+
+Il [rapporto del ciclo](improvement-2026-10-01/VERIFICATION.md) registra le nuove prove: 106 test, 146 controlli API locali, metadata SSR delle otto route pubbliche, sitemap/robots/noindex, primo voto, setup progressivo e recovery con rete interrotta e retry. Browser a 320/390 px e desktop 1440×900, Home chiaro/scuro, account sintetici ripuliti. Tre regressioni di sessione proteggono la conferma dell’identità prima di smontare il form. Sono evidenze locali; la pubblicazione viene registrata solo dopo il successo Sites.
+
+Google/Apple/email e la vista della materia per anno/storico restano pianificati nel [programma e prompt](improvement-2026-10-01/PLAN.md), non sono nuove capacità runtime. La revisione dei semestri verifica che le materie sono già comuni ai periodi: il limite corrente è il filtro di Voti/Statistiche. Nessun dato migrato né voto ufficiale annuale inferito.

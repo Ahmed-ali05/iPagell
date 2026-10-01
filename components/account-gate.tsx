@@ -41,6 +41,7 @@ export function AccountGate({
     reset: boolean;
   } | null>(null);
   const [saved, setSaved] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const year = new Date().getFullYear() - (new Date().getMonth() < 7 ? 1 : 0);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -97,8 +98,22 @@ export function AccountGate({
   }
   const changeMode = (next: typeof mode) => {
     setMode(next);
+    setShowPassword(false);
     setError(null);
   };
+  async function continueAfterRecovery() {
+    if (!recovery || !saved || busyRef.current) return;
+    if (recovery.reset) { setRecovery(null); changeMode("login"); return; }
+    busyRef.current = true;
+    setBusy(true);
+    setError(null);
+    try {
+      await onAuthenticated();
+      setRecovery(null);
+    } catch (e) {
+      setError(e instanceof RequestError ? apiErrorKey(e.code, "error.generic") : e instanceof TypeError ? "auth.network" : "error.generic");
+    } finally { busyRef.current = false; setBusy(false); }
+  }
   function downloadRecovery() {
     if (!recovery) return;
     const blob = new Blob(
@@ -133,6 +148,13 @@ export function AccountGate({
                   ? t("auth.recoverTitle")
                   : t("auth.loginTitle")}
         </h1>
+        {(!recovery || !recovery.reset) && (user || mode === "register") && <ol className="account-progress">
+          {[t("auth.stepAccount"), t("auth.stepRecovery"), t("auth.stepDiary")].map((label, index) => {
+            const current = user ? 2 : recovery ? 1 : 0;
+            return <li key={label} aria-current={index === current ? "step" : undefined} data-complete={index < current ? "true" : undefined}><span aria-hidden="true">{index + 1}</span>{label}</li>;
+          })}
+        </ol>}
+        {!recovery && mode !== "recover" && <p className="account-note">{user ? t("auth.onboardingIntro") : mode === "register" ? t("auth.registerIntro") : t("auth.loginIntro")}</p>}
         {recovery ? (
           <div className="recovery-panel">
             <p>
@@ -155,16 +177,12 @@ export function AccountGate({
             </label>
             <button
               className="primary-button"
-              disabled={!saved}
-              onClick={async () => {
-                const reset = recovery.reset;
-                setRecovery(null);
-                if (reset) changeMode("login");
-                else await onAuthenticated();
-              }}
+              disabled={!saved || busy}
+              onClick={() => void continueAfterRecovery()}
             >
-              {t("common.continue")}
+              {busy ? t("common.wait") : t("common.continue")}
             </button>
+            {error && <p className="form-error" role="alert">{t(error)}</p>}
           </div>
         ) : (
           <form onSubmit={submit} key={user?.id ?? mode}>
@@ -174,7 +192,7 @@ export function AccountGate({
                   <p className="account-email full">
                     {t("auth.account", { username: user.username })}
                   </p>
-                  <label>
+                  <label className="full">
                     {t("auth.name")}
                     <input
                       name="name"
@@ -182,42 +200,6 @@ export function AccountGate({
                       maxLength={120}
                       required
                       placeholder={t("auth.namePlaceholder")}
-                    />
-                  </label>
-                  <label>
-                    {t("auth.firstTerm")}
-                    <input
-                      name="semester"
-                      defaultValue={`${t("common.semester")} 1`}
-                      maxLength={120}
-                      required
-                    />
-                  </label>
-                  <label>
-                    {t("auth.schoolYear")}
-                    <input
-                      name="schoolYear"
-                      defaultValue={year + "/" + String(year + 1).slice(-2)}
-                      maxLength={120}
-                      required
-                    />
-                  </label>
-                  <label>
-                    {t("auth.start")}
-                    <input
-                      name="startDate"
-                      type="date"
-                      defaultValue={year + "-08-24"}
-                      required
-                    />
-                  </label>
-                  <label>
-                    {t("auth.end")}
-                    <input
-                      name="endDate"
-                      type="date"
-                      defaultValue={year + 1 + "-01-31"}
-                      required
                     />
                   </label>
                   <label className="full">
@@ -231,6 +213,48 @@ export function AccountGate({
                       </NativeSelectOption>
                     </NativeSelect>
                   </label>
+                  <details className="full onboarding-optional">
+                    <summary>{t("auth.periodOptions")}</summary>
+                    <p className="account-note">{t("auth.periodHelp")}</p>
+                    <div className="form-grid">
+                      <label>
+                        {t("auth.firstTerm")}
+                        <input
+                          name="semester"
+                          defaultValue={`${t("common.semester")} 1`}
+                          maxLength={120}
+                          required
+                        />
+                      </label>
+                      <label>
+                        {t("auth.schoolYear")}
+                        <input
+                          name="schoolYear"
+                          defaultValue={year + "/" + String(year + 1).slice(-2)}
+                          maxLength={120}
+                          required
+                        />
+                      </label>
+                      <label>
+                        {t("auth.start")}
+                        <input
+                          name="startDate"
+                          type="date"
+                          defaultValue={year + "-08-24"}
+                          required
+                        />
+                      </label>
+                      <label>
+                        {t("auth.end")}
+                        <input
+                          name="endDate"
+                          type="date"
+                          defaultValue={year + 1 + "-01-31"}
+                          required
+                        />
+                      </label>
+                    </div>
+                  </details>
                   <details className="full onboarding-optional">
                     <summary>{t("auth.schoolOptional")}</summary>
                     <label>
@@ -254,8 +278,10 @@ export function AccountGate({
                       maxLength={32}
                       required
                       placeholder={t("auth.usernameExample")}
+                      aria-describedby={mode === "register" ? "username-help" : undefined}
                     />
                   </label>
+                  {mode === "register" && <small id="username-help" className="account-note full">{t("auth.usernameHint")}</small>}
                   {mode === "recover" && (
                     <label className="full">
                       {t("auth.recoveryCode")}
@@ -273,16 +299,18 @@ export function AccountGate({
                     {mode === "recover" ? t("auth.newPassword") : t("auth.password")}
                     <input
                       name="password"
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       autoComplete={
                         mode === "login" ? "current-password" : "new-password"
                       }
                       minLength={mode === "login" ? 1 : 12}
                       maxLength={128}
+                      aria-describedby={mode !== "login" ? "password-help" : undefined}
                       required
                     />
-                    {mode !== "login" && <small>{t("auth.passwordHint")}</small>}
+                    {mode !== "login" && <small id="password-help">{t("auth.passwordHint")}</small>}
                   </label>
+                  <button type="button" className="text-link password-toggle full" aria-pressed={showPassword} onClick={() => setShowPassword(value => !value)}>{showPassword ? t("auth.hidePassword") : t("auth.showPassword")}</button>
                   {mode === "register" && (
                     <p className="account-note full">
                       {t("auth.noEmail")}

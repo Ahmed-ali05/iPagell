@@ -10,6 +10,8 @@ Repository: `Ahmed-ali05/iPagell`, branch principale `main`. I metadati effettiv
 
 Sono stati letti manifest/lockfile, configurazioni, API, schema/migrazioni, sessione diario, storage e riconciliazione degli appunti, backup, componenti e script di verifica. Le guide non sostituiscono la lettura del codice. Stato remoto, dati utente e prove fisiche sono separati nella matrice.
 
+Il checkout comprende inoltre il [ciclo ingresso/SEO](improvement-2026-10-01/PLAN.md): landing più esplicita, setup progressivo e conferma identità che conserva il codice recupero se la rete fallisce. Google/Apple/email e consultazione annuale dei voti sono proposte distinte; il loro piano non attesta un’implementazione. Lo stato di pubblicazione del ciclo è nel relativo [rapporto](improvement-2026-10-01/VERIFICATION.md).
+
 ## Software implementato
 
 - Account interni username/password, sessione cookie, codice di recupero e sicurezza account.

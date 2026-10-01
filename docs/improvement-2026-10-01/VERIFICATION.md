@@ -1,0 +1,32 @@
+# Verifica del ciclo ingresso iPagell
+
+1 ottobre 2026. [Piano](PLAN.md) · [Prompt](PROMPTS.md)
+
+## Evidenze già disponibili
+
+- Tre audit specialistici in sola lettura, con file verificati e fonti primarie per SEO/identità. L’audit visivo iniziale deriva dal codice e dai contrasti misurati; le prove browser sono registrate separatamente sotto.
+- Connettore Sites: progetto corrente attivo, owner, accesso pubblico, URL live `https://ipagell.website`, versione precedente 27; domini canonico e www con stato/TLS `active`. Runtime `IPAGELL_CLASSES=enabled`. Non sono stati letti diari o note reali.
+- Riconciliazione GitHub/Sites con merge: file applicativi coincidenti, conservati documenti e dipendenze più recenti del checkout; nessuna storia riscritta.
+- Cataloghi delle quattro lingue: `npm run check:i18n` passato, 755 chiavi complete e referenziate.
+
+## Verifiche del rilascio
+
+| Verifica | Esito osservato |
+|---|---|
+| Preparazione completa | `npm run release:prepare` passato: lint, TypeScript, 106 test, 755 chiavi i18n, inventario e link, build/precache. Rimane l’avviso chunk oltre 500 kB. |
+| API locale | 146 verifiche passate nel Worker compilato con DB isolato e cleanup degli account sintetici. Prima esecuzione interrotta da connessione persa del runtime; riavviata l’istanza dopo bootstrap e ripetuta integralmente con esito positivo. |
+| HTML SSR pubblico | Otto route: 200, titolo e descrizione tradotti, lingua, canonical, cinque hreflang, OG coerenti e index sullo stesso Worker richiesto con host canonico. Root canonical normalizzato senza slash finale, equivalente all’URL con slash. |
+| Esclusioni SEO | `/app` noindex; robots esclude API e consente leggere il noindex; sitemap contiene otto URL pubblici. |
+| Landing mobile | Screenshot e DOM a 320/390 px e desktop 1440×900: CTA e scala presenti, nessun overflow. Calcolatore aperto dal link e voto sintetico 4,5 restituisce media 4,5 senza account. |
+| Registrazione | Username/password sintetici, mostra/nascondi password e passo recupero; Continua disabilitato prima della conferma. |
+| Setup | Nome e preset basic; dettagli periodo aperti, modificati e richiusi: valore «Periodo QA» conservato nella Home dopo invio. |
+| Primo valore | Primo voto sintetico 4,5 da CTA Home → form → media Home 4,5, un voto/una materia e stato salvato. |
+| Home chiaro/scuro | Screenshot e controllo DOM sul dato sintetico; 390 px senza overflow, testo/CTA leggibili a transizione terminata. |
+| Errore recovery | Bug precedente riprodotto interrompendo server: form smontato. Dopo fix, stesso errore conserva textarea da 64 caratteri, passo 2 e checkbox; errore di rete visibile e Continua disponibile. Dopo il riavvio, la stessa schermata Continua raggiunge il setup senza ricaricare la pagina. Tre test della sessione proteggono errore rete/cache, attivazione storage e caricamento identità verificata. |
+| Confronto codice/documenti | Diff controllato, nessuna nuova API/tabelle/migrazione; checker link esteso alle sottocartelle. Programma aggiornato con audit periodi e prompt 09 dopo la richiesta utente. |
+
+Gli account browser sono stati creati soltanto nei DB locali di prova; il primo account è stato eliminato tramite endpoint security con la sua password sintetica. Il secondo account è stato eliminato allo stesso modo dopo il retry riuscito. La copia locale di test non è un diario reale.
+
+## Limiti permanenti di questo ciclo
+
+Google/Apple/email e i filtri annuale/storico sono pianificati, non implementati. Nessuna migrazione database. Indicizzazione, ranking e conversione non misurati; Search Console non collegata in questo task. Prove browser con viewport non certificano telefoni fisici, tastiera virtuale, PWA o password manager di ogni sistema. Traduzioni senza revisione madrelingua. Il primo ciclo non conclude la roadmap delle altre schermate.

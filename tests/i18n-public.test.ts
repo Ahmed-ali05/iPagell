@@ -8,7 +8,7 @@ test("public landing metadata shares all four message catalogs and language URLs
   for (const locale of locales) {
     const messages = locale === defaultLocale ? defaultMessages : await loadMessages(locale);
     const metadata = await publicLandingMetadata(locale);
-    assert.equal(metadata.description, messages["landing.lead"]);
+    assert.equal(metadata.description, messages["landing.metaDescription"]);
     assert.deepEqual(metadata.alternates?.languages, {
       it: "https://ipagell.website/",
       de: "https://ipagell.website/de",
@@ -36,8 +36,8 @@ test("noncanonical preview hosts are noindex and JSON-LD escapes HTML delimiters
 
 test("the root landing stays Italian and localized pages omit duplicate /it canonical", async () => {
   const root = await publicLandingMetadata("it");
-  assert.equal(root.title, defaultMessages["landing.title"]);
-  assert.equal(root.openGraph?.title, `${defaultMessages["landing.title"]} | iPagell`);
+  assert.equal(root.title, defaultMessages["landing.metaTitle"]);
+  assert.equal(root.openGraph?.title, `${defaultMessages["landing.metaTitle"]} | iPagell`);
   assert.equal(root.alternates?.canonical, "/");
   assert.equal((await publicLandingMetadata("de")).alternates?.canonical, "/de");
 });

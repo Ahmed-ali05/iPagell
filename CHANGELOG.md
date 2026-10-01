@@ -4,6 +4,14 @@
 
 Versione npm, formato del diario, backup, revisione dati e numero Sites sono contatori distinti. Le voci di rilascio riportano solo pubblicazioni documentate; il [registro precedente](docs/CHANGELOG-HISTORY.md) conserva i passaggi storici.
 
+## Non rilasciato — ingresso, SEO e programma di miglioramento
+
+- Landing localizzata: diario scolastico esplicito, quattro benefici compresi Appunti, scala 1–6, prova del calcolatore, tre passi e privacy aggiornata. Titoli/descrizioni SEO dedicati.
+- Registrazione con progressione, aiuto username, mostra/nascondi password e setup progressivo; recupero conservato in caso di errore durante la continuazione. Home spiega la prima azione e riconosce appunti già presenti.
+- Contrasti e focus migliorati nell’ingresso e nei token di tema; audit specialistici, piano e otto prompt di lavoro riutilizzabili. Google/Apple/email restano pianificati.
+- Conferma identità prima di lasciare il form, senza fallback a un altro account offline; tre test di regressione. Token testo/fondo separati nel tema scuro per mantenere contrasto dei pulsanti. Verifica link documentali estesa anche alle sottocartelle dei prompt.
+- Nessuna nuova API o migrazione database. Verifiche e stato della pubblicazione nel [rapporto del ciclo](docs/improvement-2026-10-01/VERIFICATION.md).
+
 ## Non rilasciato — documentazione, repository e dipendenze
 
 - Allineate le guide correnti al codice applicativo Sites 27: architettura, API, appunti/editor, backup V3, materie di classe, sicurezza, lingua e flussi utente.

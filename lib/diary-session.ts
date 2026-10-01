@@ -104,13 +104,14 @@ export function createDiarySession(io: Dependencies = browser) {
       if (ticket === generation) fail(error);
     }
   }
-  async function load(ticket: number) {
+  async function load(ticket: number, resolved?: AccountResult) {
     update({ phase: state.diary ? "ready" : "loading", error: "" });
     let result: AccountResult;
     // Only failure of the identity request may use the offline pointer. Storage
     // failures after a successful identity response must never do so.
     try {
-      result = await account(ticket);
+      result = resolved ?? await account(ticket);
+      check(ticket);
     } catch (error) {
       if (ticket !== generation) return;
       if (error instanceof RequestError && error.status === 401) {
@@ -163,6 +164,15 @@ export function createDiarySession(io: Dependencies = browser) {
     getState: () => state,
     subscribe: (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener); }; },
     reload,
+    // Keep the entry form (and its one-time recovery code) mounted until the
+    // server confirms the new identity. Never fall back to another offline account.
+    authenticate: () => enqueue(async (ticket) => {
+      const result = await account(ticket);
+      if (!result.diary) {
+        io.activate(result.user.id);
+        update({ ...initial, phase: "onboarding", user: result.user });
+      } else await load(ticket, result);
+    }),
     retry: () => enqueue((ticket) => state.diary?.dirty ? sync(ticket) : load(ticket)),
     commit(recipe: (data: SchoolData) => SchoolData, patch?: Partial<Preferences>) {
       const userId = state.user?.id;

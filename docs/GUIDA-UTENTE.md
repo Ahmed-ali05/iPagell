@@ -8,7 +8,9 @@
 2. Scegli un nome utente di 3–32 caratteri: lettere, numeri, punto, trattino o underscore; il primo carattere deve essere una lettera o un numero. Maiuscole e minuscole non distinguono account diversi.
 3. Usa una password unica di 12–128 caratteri. Puoi usare il gestore password del dispositivo.
 4. Conserva il codice di recupero mostrato dopo la registrazione. È una chiave d’accesso: non inviarlo a nessuno e non inserirlo nelle segnalazioni di problemi.
-5. Indica il nome da mostrare, scuola facoltativa, anno e date del semestre. Parti senza materie oppure scegli le materie di base personalizzabili.
+5. Indica il nome da mostrare e scegli se partire senza materie o con le materie di base personalizzabili. **Personalizza semestre e date** apre i valori già compilati; la scuola resta facoltativa. Puoi cambiare queste impostazioni anche dopo.
+
+La registrazione mostra tre passi: Account, Recupero e Diario. **Mostra password** permette di controllare quello che hai scritto; non cambia né salva la password. Prima di registrarti puoi anche provare il calcolo pubblico della media dalla landing.
 
 Non viene richiesta un’email. Non esiste recupero via email. Nome utente, password e codice di recupero non sono intercambiabili.
 

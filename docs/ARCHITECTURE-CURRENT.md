@@ -12,7 +12,7 @@ Il sorgente segue Next App Router; `scripts/run-framework.mjs`, Vinext, Vite e i
 - `app/page.tsx` e `app/[locale]/page.tsx`: landing SSR italiana e localizzate.
 - `lib/i18n/public-routes.ts` e `app/[locale]/[tool]/page.tsx`: route pubbliche del calcolatore; calcoli solo nel browser.
 - `proxy.ts`: lingua iniziale SSR e redirect dagli alias previsti.
-- `app/app/page.tsx`: monta `IPagellApp`; `mode=register` apre registrazione.
+- `app/app/page.tsx`: monta `IPagellApp`; `mode=register` apre registrazione. L’ingresso mostra i passi account/recupero/diario; il setup conserva nome e materie in vista e semestre/date nella sezione espandibile dello stesso form. Google/Apple/email restano pianificati, non implementati.
 
 Dentro `/app`, `DiaryWorkspace` è identificato dall'account e gestisce viste Home, Agenda, Voti, Assenze, Statistiche e Classi. La barra contiene cinque voci; Statistiche si apre da Voti. Appunti è una vista del workspace, con ingresso da Home, Agenda e materia in Voti, non una route pubblica. Query `view=agenda`, `view=classes`, `action=grade` e hash `join=` sono ingressi client; `uiLocale` è un ponte temporaneo per la lingua.
 
@@ -40,6 +40,8 @@ Registrazione account e primo diario sono due operazioni: `POST /api/auth/regist
 Classi richiede `IPAGELL_CLASSES=enabled`, membership corrente e ruolo. `lib/server/note-http.ts` richiede anche contratto Appunti 2 su note personali, condivise, pin e archivio autore. Le route materie della classe usano gli stessi controlli di account/membership ma non richiedono l'header del formato note. [Contratto API](API.md) documenta corpi, eccezioni e codici.
 
 ## 4. Sessione e sincronizzazione del diario
+
+La conferma di accesso `authenticate()` verifica l’identità prima di lasciare il form: un errore di rete/attivazione conserva la schermata e il codice di recupero, senza aprire la copia offline di un altro account.
 
 `hooks/use-diary.ts` è un adattatore React di `createDiarySession()` in `lib/diary-session.ts`, sottoscritto con `useSyncExternalStore`. Il controller mantiene una coda unica per load, commit, sync e logout; ticket di generazione invalidano risultati pendenti dopo cambio account o smontaggio.
 
