@@ -4,15 +4,15 @@
 
 Versione npm, formato del diario, backup, revisione dati e numero Sites sono contatori distinti. Le voci di rilascio riportano solo pubblicazioni documentate; il [registro precedente](docs/CHANGELOG-HISTORY.md) conserva i passaggi storici.
 
-## Non rilasciato — ingresso, SEO e programma di miglioramento
+## 2026-10-01 — Sites 28, ingresso, SEO e programma di miglioramento
 
 - Landing localizzata: diario scolastico esplicito, quattro benefici compresi Appunti, scala 1–6, prova del calcolatore, tre passi e privacy aggiornata. Titoli/descrizioni SEO dedicati.
 - Registrazione con progressione, aiuto username, mostra/nascondi password e setup progressivo; recupero conservato in caso di errore durante la continuazione. Home spiega la prima azione e riconosce appunti già presenti.
-- Contrasti e focus migliorati nell’ingresso e nei token di tema; audit specialistici, piano e otto prompt di lavoro riutilizzabili. Google/Apple/email restano pianificati.
+- Contrasti e focus migliorati nell’ingresso e nei token di tema; audit specialistici, piano e nove prompt di lavoro riutilizzabili. Google/Apple/email restano pianificati.
 - Conferma identità prima di lasciare il form, senza fallback a un altro account offline; tre test di regressione. Token testo/fondo separati nel tema scuro per mantenere contrasto dei pulsanti. Verifica link documentali estesa anche alle sottocartelle dei prompt.
 - Nessuna nuova API o migrazione database. Verifiche e stato della pubblicazione nel [rapporto del ciclo](docs/improvement-2026-10-01/VERIFICATION.md).
 
-## Non rilasciato — documentazione, repository e dipendenze
+## 2026-10-01 — Sites 28, documentazione, repository e dipendenze
 
 - Allineate le guide correnti al codice applicativo Sites 27: architettura, API, appunti/editor, backup V3, materie di classe, sicurezza, lingua e flussi utente.
 - Aggiunto indice con guide, specifiche future e storico; conservati gli audit e design iniziali con riferimenti espliciti alla loro versione.
@@ -20,7 +20,7 @@ Versione npm, formato del diario, backup, revisione dati e numero Sites sono con
 - Output della ricerca e bytecode Python ignorati, sorgenti conservati.
 - Aggiornati Next ed eslint-config-next a 16.3.8, plugin Cloudflare a 1.62.3, Wrangler a 4.145.0 e workers-types a 5.20261001.1; lockfile aggiornato anche per fast-uri. L'audit completo passa da sei pacchetti segnalati a zero nel controllo del 1 ottobre. Questo esito non equivale a un audit di sicurezza dell'app.
 
-Queste modifiche aggiornano la repository, gli strumenti di verifica e le dipendenze. La versione applicativa pubblicata resta Sites 27; le correzioni successive delle dipendenze richiedono un nuovo rilascio Sites e il push GitHub non costituisce un deploy.
+Queste modifiche e le dipendenze aggiornate sono incluse nella versione Sites 28. Sorgente `8fee251e1b942d3392ca92ab9381be4c0a6ae1c8`, deployment `appgdep_6abe63d2394c8191a6ee91547a4e3008` con stato `succeeded`. Preparazione: 106 test, 146 controlli API locali e build; prove browser con account sintetici ripuliti. Google/Apple/email e vista annuale restano pianificati. Nessuna nuova migrazione o modifica a binding, accesso e domini.
 
 ## 2026-10-01 — Sites 27, affidabilità Appunti
 

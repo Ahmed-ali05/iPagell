@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Snapshot](REPO-SNAPSHOT.md) · [API](API.md) · [Verifiche](VERIFICATION-MATRIX.md)
 
-Aggiornamento: **1 ottobre 2026**. Descrive il sorgente applicativo pubblicato in Sites 27, confrontato con il checkout di rilascio; le evidenze e i limiti sono nella matrice. Le vecchie analisi sono conservate in [ARCHITECTURE-HISTORY](ARCHITECTURE-HISTORY.md). Il codice attuale prevale sempre sulla guida.
+Aggiornamento: **1 ottobre 2026**. Descrive il sorgente applicativo pubblicato in Sites 28, dopo il confronto iniziale con Sites 27 e il ciclo ingresso/SEO; le evidenze e i limiti sono nella matrice. Le vecchie analisi sono conservate in [ARCHITECTURE-HISTORY](ARCHITECTURE-HISTORY.md). Il codice attuale prevale sempre sulla guida.
 
 ## 1. Runtime, ingressi e navigazione
 

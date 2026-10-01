@@ -30,3 +30,13 @@ Gli account browser sono stati creati soltanto nei DB locali di prova; il primo 
 ## Limiti permanenti di questo ciclo
 
 Google/Apple/email e i filtri annuale/storico sono pianificati, non implementati. Nessuna migrazione database. Indicizzazione, ranking e conversione non misurati; Search Console non collegata in questo task. Prove browser con viewport non certificano telefoni fisici, tastiera virtuale, PWA o password manager di ogni sistema. Traduzioni senza revisione madrelingua. Il primo ciclo non conclude la roadmap delle altre schermate.
+
+
+## Pubblicazione confermata
+
+- Versione Sites **28**, ID `appgprj_6aa9bf5f9a00819189df944bf2d51850~appgver_e554be1f51a88191bf408d2d3f5fd5c7`.
+- Sorgente inviato e pacchetto locale: commit `8fee251e1b942d3392ca92ab9381be4c0a6ae1c8`; archivio salvato dalla piattaforma (241 file).
+- Deployment `appgdep_6abe63d2394c8191a6ee91547a4e3008`, risposta terminale `succeeded` del 1 ottobre 2026 alle 13:45 UTC.
+- URL restituito dal deployment: `https://ipagell.produc-ch.chatgpt.site`; dominio canonico di produzione **https://ipagell.website**. Progetto/domini/www/TLS verificati prima della pubblicazione; binding DB, accesso pubblico e domini conservati senza mutazioni di configurazione.
+- Nessuna ispezione dei contenuti utente, migrazione o prova con account sintetici in produzione. Il successo della piattaforma non certifica indicizzazione o QA su dispositivi fisici.
+- Questa registrazione documentale è successiva al commit applicativo pubblicato e non modifica il runtime.

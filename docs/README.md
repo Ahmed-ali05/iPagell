@@ -2,7 +2,7 @@
 
 [Repository](../README.md) · [Software pubblicato](https://ipagell.website)
 
-Aggiornamento: **1 ottobre 2026**. Le guide correnti descrivono le funzionalità della pubblicazione Sites 27 e gli aggiornamenti della repository. Documentazione, inventario e correzioni delle dipendenze successivi al rilascio sono nella sezione [Non rilasciato](../CHANGELOG.md#non-rilasciato--documentazione-repository-e-dipendenze). Codice, test locali, CI GitHub e produzione sono evidenze distinte; una build o un push non attestano un deploy.
+Aggiornamento: **1 ottobre 2026**. Le guide correnti descrivono la pubblicazione Sites **28**, compresi ingresso/SEO, documentazione, inventario e correzioni delle dipendenze. Esiti e limiti sono nel [changelog](../CHANGELOG.md) e nel [rapporto del ciclo](improvement-2026-10-01/VERIFICATION.md). Codice, test locali, CI GitHub e produzione sono evidenze distinte; una build o un push non attestano un deploy.
 
 ## Da dove iniziare
 

@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Snapshot](REPO-SNAPSHOT.md) · [Architettura](ARCHITECTURE-CURRENT.md) · [Pubblicazione](DEPLOYMENT.md)
 
-Aggiornamento: **1 ottobre 2026**. Riferimento applicativo: Sites 27, sorgente `9535676a53a75f9ff52cf90a501435e1bcee40db`. Il precedente audit `c780569…`, le contraddizioni allora presenti e i risultati dei rilasci precedenti sono in [VERIFICATION-HISTORY](VERIFICATION-HISTORY.md). Non vanno letti come affermazioni sul codice attuale.
+Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, sorgente `8fee251e1b942d3392ca92ab9381be4c0a6ae1c8`. Le prove dell’audit iniziale sotto fanno riferimento a Sites 27. Il precedente audit `c780569…`, le contraddizioni allora presenti e i risultati dei rilasci precedenti sono in [VERIFICATION-HISTORY](VERIFICATION-HISTORY.md). Non vanno letti come affermazioni sul codice attuale.
 
 ## Come leggere le evidenze
 
@@ -55,7 +55,7 @@ Le regressioni individuate sono riprodotte nel codice/test, ma non identificano 
 
 ## Stato della pubblicazione controllato
 
-Riletto dal connettore Sites il 1 ottobre 2026:
+Riletto dal connettore Sites il 1 ottobre 2026, prima del ciclo ingresso/SEO:
 
 | Proprietà | Evidenza esterna |
 |---|---|
@@ -63,7 +63,7 @@ Riletto dal connettore Sites il 1 ottobre 2026:
 | Versione salvata 27 | Sorgente `9535676a53a75f9ff52cf90a501435e1bcee40db`, archivio presente e deployment associato |
 | Deployment | `appgdep_6abe17938bf48191938483d415de60bf`, stato `succeeded` |
 | Domini | `ipagell.website` e `www.ipagell.website`, stato e TLS `active` |
-| Corrispondenza locale iniziale | 234 file applicativi/configurazioni/asset/manifest confrontati byte per byte con il checkout del rilascio, nessuna differenza prima di questo aggiornamento. Le successive correzioni delle dipendenze sono nel changelog e non sono ancora pubblicate. |
+| Corrispondenza locale iniziale | 234 file applicativi/configurazioni/asset/manifest confrontati byte per byte con il checkout del rilascio, nessuna differenza prima di questo aggiornamento. Le successive correzioni delle dipendenze sono nel changelog e sono state incluse in Sites 28. |
 
 Questa verifica non ha letto contenuti dei diari o delle note reali. La migrazione formato D1 è stata verificata nel rilascio 24, come registrato nello storico; non è una nuova ispezione completa del database nel task documentale. Flag runtime Classi, backup automatici, retention e restore non vengono dedotti dai nomi del binding. Il Worker sandbox non è una prova del DB Sites.
 
@@ -82,7 +82,7 @@ Il nuovo `docs:check` confronta inventario con manifest/lockfile, route, schema,
 
 La prima CI dell'allineamento, sul commit `c863844`, ha passato installazione, audit, lint/tipi, 103 test e i18n; si è fermata su un link del design storico a PDF non versionati. Il riferimento è stato convertito in un percorso testuale rigenerabile e il controllo locale ora rifiuta i link a destinazioni ignorate da Git. L'esito completo va letto nella CI del successivo commit.
 
-Gli aggiornamenti delle dipendenze sono verificati nella repository ma non ancora pubblicati; lo stato Sites rimane quello della versione 27 riportato sopra. I controlli remoti GitHub sono associati al commit, consultabili in Actions; non sono dedotti dall'esito locale.
+Gli aggiornamenti delle dipendenze sono verificati nella repository e inclusi nel successivo rilascio Sites 28. La tabella Sites 27 sopra registra lo stato dell’audit iniziale. I controlli remoti GitHub sono associati al commit, consultabili in Actions; non sono dedotti dall'esito locale.
 
 ## Ancora aperto
 
@@ -97,6 +97,6 @@ Per questi punti non dichiarare completamento usando soltanto build, unit test, 
 
 ## Ciclo ingresso, SEO e pianificazione account/periodi — 1 ottobre 2026
 
-Il [rapporto del ciclo](improvement-2026-10-01/VERIFICATION.md) registra le nuove prove: 106 test, 146 controlli API locali, metadata SSR delle otto route pubbliche, sitemap/robots/noindex, primo voto, setup progressivo e recovery con rete interrotta e retry. Browser a 320/390 px e desktop 1440×900, Home chiaro/scuro, account sintetici ripuliti. Tre regressioni di sessione proteggono la conferma dell’identità prima di smontare il form. Sono evidenze locali; la pubblicazione viene registrata solo dopo il successo Sites.
+Il [rapporto del ciclo](improvement-2026-10-01/VERIFICATION.md) registra le nuove prove: 106 test, 146 controlli API locali, metadata SSR delle otto route pubbliche, sitemap/robots/noindex, primo voto, setup progressivo e recovery con rete interrotta e retry. Browser a 320/390 px e desktop 1440×900, Home chiaro/scuro, account sintetici ripuliti. Tre regressioni di sessione proteggono la conferma dell’identità prima di smontare il form. Queste prove sono locali. Pubblicazione Sites **28** conclusa con stato `succeeded`, deployment `appgdep_6abe63d2394c8191a6ee91547a4e3008`; nessun cambio a binding, accesso e domini. Il report distingue verifiche locali e risposta della piattaforma.
 
 Google/Apple/email e la vista della materia per anno/storico restano pianificati nel [programma e prompt](improvement-2026-10-01/PLAN.md), non sono nuove capacità runtime. La revisione dei semestri verifica che le materie sono già comuni ai periodi: il limite corrente è il filtro di Voti/Statistiche. Nessun dato migrato né voto ufficiale annuale inferito.
