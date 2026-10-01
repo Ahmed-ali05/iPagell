@@ -100,3 +100,8 @@ Per questi punti non dichiarare completamento usando soltanto build, unit test, 
 Il [rapporto del ciclo](improvement-2026-10-01/VERIFICATION.md) registra le nuove prove: 106 test, 146 controlli API locali, metadata SSR delle otto route pubbliche, sitemap/robots/noindex, primo voto, setup progressivo e recovery con rete interrotta e retry. Browser a 320/390 px e desktop 1440×900, Home chiaro/scuro, account sintetici ripuliti. Tre regressioni di sessione proteggono la conferma dell’identità prima di smontare il form. Queste prove sono locali. Pubblicazione Sites **28** conclusa con stato `succeeded`, deployment `appgdep_6abe63d2394c8191a6ee91547a4e3008`; nessun cambio a binding, accesso e domini. Il report distingue verifiche locali e risposta della piattaforma.
 
 Google/Apple/email e la vista della materia per anno/storico restano pianificati nel [programma e prompt](improvement-2026-10-01/PLAN.md), non sono nuove capacità runtime. La revisione dei semestri verifica che le materie sono già comuni ai periodi: il limite corrente è il filtro di Voti/Statistiche. Nessun dato migrato né voto ufficiale annuale inferito.
+
+
+## Pianificazione multi-sistema — 1 ottobre 2026
+
+Aggiunta l’[analisi dedicata](improvement-2026-10-01/GRADING-EXTENSION-AUDIT.md), riutilizzando le ricerche iniziali e verificando tipi, calcoli, UI, schema strict, persistenza e backup. Fonti scolastiche primarie consultate per le famiglie candidate; cinque prompt (10–14) aggiunti al programma. Controlli documentali nel rapporto del ciclo. Non sono stati implementati nuovi preset, contratti o migrazioni; la produzione resta Sites 28 e `numeric-1-6`.

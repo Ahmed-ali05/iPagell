@@ -83,3 +83,8 @@ Implementa in iPagell una vista della materia continua fra periodi, con filtro d
 - Backup round-trip preserva originali IDs/semesterId e numeri; import/sync/CAS/account isolation invariati.
 - it/de/fr/en, tastiera/focus, 390px/320px, desktop, light/dark; nessun overflow per nomi periodi/anno lunghi.
 - Test helper scope/medie e check repository; prove browser reali prima di dichiarare complete UX. Non dichiarare device fisici da emulazione viewport.
+
+
+## Integrazione con altri metodi di valutazione
+
+Le formule sopra descrivono il runtime attuale con una sola scala. L’[estensione multi-sistema](GRADING-EXTENSION-AUDIT.md) aggiunge la futura precondizione di compatibilità: il filtro annuale raccoglie i risultati, ma medie/serie/confronti devono separarli per sistema/revisione e policy. Non rendere la media delle scale diverse possibile normalizzandole per massimo. Il contesto materia–periodo proposto per i dati non reintroduce una divisione della materia nella navigazione. Il prompt 09 può procedere prima dell’estensione, mantenendo la scala corrente; i prompt 10–14 coprono il lavoro successivo. Nessuna nuova capacità runtime aggiunta da questo paragrafo.

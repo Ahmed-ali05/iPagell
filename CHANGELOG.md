@@ -4,6 +4,12 @@
 
 Versione npm, formato del diario, backup, revisione dati e numero Sites sono contatori distinti. Le voci di rilascio riportano solo pubblicazioni documentate; il [registro precedente](docs/CHANGELOG-HISTORY.md) conserva i passaggi storici.
 
+## Non rilasciato — analisi dei sistemi di valutazione
+
+- Collegati GRADING-SYSTEM e ricerche iniziali multilingua/SEO/prodotto alla nuova analisi multi-sistema, con fonti primarie e vincoli verificati nel codice.
+- Aggiunti cinque prompt (10–14) per ricerca, modello/compatibilità, primo rilascio numerico, metodi qualitativi/complessi e QA; programma ora comprende 14 prompt.
+- Integrata la futura compatibilità dei sistemi nel piano annuale: registro continuo, aggregati separati se le scale non sono comparabili. Nessuna modifica a runtime, payload, database o produzione.
+
 ## 2026-10-01 — Sites 28, ingresso, SEO e programma di miglioramento
 
 - Landing localizzata: diario scolastico esplicito, quattro benefici compresi Appunti, scala 1–6, prova del calcolatore, tre passi e privacy aggiornata. Titoli/descrizioni SEO dedicati.

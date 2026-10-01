@@ -40,3 +40,10 @@ Google/Apple/email e i filtri annuale/storico sono pianificati, non implementati
 - URL restituito dal deployment: `https://ipagell.produc-ch.chatgpt.site`; dominio canonico di produzione **https://ipagell.website**. Progetto/domini/www/TLS verificati prima della pubblicazione; binding DB, accesso pubblico e domini conservati senza mutazioni di configurazione.
 - Nessuna ispezione dei contenuti utente, migrazione o prova con account sintetici in produzione. Il successo della piattaforma non certifica indicizzazione o QA su dispositivi fisici.
 - Questa registrazione documentale è successiva al commit applicativo pubblicato e non modifica il runtime.
+
+
+## Aggiunta documentale multi-sistema — 1 ottobre 2026
+
+Richiesta successiva al rilascio 28: [analisi dei metodi di valutazione](GRADING-EXTENSION-AUDIT.md), fonti primarie, collegamenti alle ricerche iniziali e cinque nuovi prompt (10–14). Audit codice delegato in sola lettura; aggiornati programma, prompt annuale e indice.
+
+`npm run docs:check` passato: inventario invariato, 46 documenti e 299 link locali. `git diff --check` senza errori. Nessun codice applicativo, nuovo test, migrazione o deploy in questa aggiunta. I risultati 106 test/146 API sopra restano evidenze del rilascio 28, senza attestare nuovi sistemi implementati.

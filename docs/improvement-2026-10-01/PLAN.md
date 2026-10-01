@@ -1,6 +1,6 @@
 # iPagell — programma di miglioramento dell’ingresso e del prodotto
 
-Piano del **1 ottobre 2026**. [Prompt operativi](PROMPTS.md) · [Audit SEO](SEO-AUDIT.md) · [Prodotto e account](AUTH-PRODUCT-AUDIT.md) · [UX visiva](UX-VISUAL-AUDIT.md) · [Verifiche](VERIFICATION.md) · [Materie e andamento annuale](PERIODS-AUDIT.md)
+Piano del **1 ottobre 2026**. [Prompt operativi](PROMPTS.md) · [Audit SEO](SEO-AUDIT.md) · [Prodotto e account](AUTH-PRODUCT-AUDIT.md) · [UX visiva](UX-VISUAL-AUDIT.md) · [Verifiche](VERIFICATION.md) · [Materie e andamento annuale](PERIODS-AUDIT.md) · [Altri sistemi di valutazione](GRADING-EXTENSION-AUDIT.md)
 
 ## Obiettivo e stato
 
@@ -10,7 +10,7 @@ Le analisi iniziali sono fotografie del codice prima di questo intervento, non g
 
 **Primo ciclo implementato e pubblicato in Sites 28:** landing e metadati in quattro lingue; Appunti visibili; calcolatore nel primo blocco; scala dichiarata; benefici e tre passi; privacy corretta; registrazione con progressione e aiuto; mostra/nascondi password; nome e materie nel setup, semestre/date in sezione espandibile; errore nel passaggio dal codice recupero senza scartare il codice; guida alla prima azione in Home, senza trattare chi ha già appunti come diario completamente vuoto. La conferma della sessione verifica l’identità prima di smontare il form. Sono mantenuti i default delle materie e delle date, le API, gli account e i dati esistenti. Migliorati alcuni contrasti e focus; nessun nuovo sistema grafico o schema DB.
 
-**Pianificato:** materia continua con filtri Periodo / Anno scolastico / Tutto lo storico; Google, Apple ed email verificata. L’accesso pubblicato continua a usare username/password e codice di recupero. I provider verranno mostrati soltanto quando funzionanti. Home, Agenda, Voti, Classi, Appunti e coerenza generale hanno prompt separati e criteri propri. L’audit non certifica indicizzazione Google, conversione o usabilità con persone reali.
+**Pianificato:** materia continua con filtri Periodo / Anno scolastico / Tutto lo storico; estensione dei metodi di valutazione con sistema indipendente dalla lingua e protezione dello storico; Google, Apple ed email verificata. L’accesso pubblicato continua a usare username/password e codice di recupero. I provider verranno mostrati soltanto quando funzionanti. Home, Agenda, Voti, Classi, Appunti e coerenza generale hanno prompt separati e criteri propri. L’audit non certifica indicizzazione Google, conversione o usabilità con persone reali.
 
 ## Mappa del prodotto e del primo percorso
 
@@ -40,6 +40,7 @@ Percorso attuale: landing → account → codice di recupero → setup → prima
 | SETUP-01 | P1: cinque campi prima del primo valore | Configurazione progressiva nel medesimo form | Campi richiesti nascosti invalidi; valori persi | Valori precompilati inviati; apertura/edit date funzionante; errore correggibile |
 | START-01 | P1: Home nuova non spiega risultato | Frase contestuale e rispetto appunti esistenti; `ipagell-app` | Falsi inviti a ricominciare e nessun dato sintetico come reale | Materia → primo voto/attività funziona; Home con sole note non dice di iniziare il diario |
 | PERIODS-01 | P1: voti e andamento spezzati nel solo semestre; statistiche vuote con storico presente | Filtro di lettura anno/storico separato dal periodo di inserimento; `ipagell-app`, `stats-view`, selettori dedicati | Media delle medie scorretta, ID fittizi, accorpamenti per nome, pesi storici reinterpretati | Materia continua su più periodi; media su tutti i voti pesati; dettaglio per periodo; nuovo voto con destinazione esplicita; nessuna migrazione |
+| GRADING-01 | P1: solo numeric-1-6, nessun contesto/schema persistito | Ricerca e modello multi-sistema con prompt 10–11; primo ciclo numerico 12, qualitativi 13 e QA 14; grading/domain/validation/calculations/storage/backup/UI | Reinterpretazione storico, vecchi client strict, medie di scale incompatibili, zero scartato e simulazioni inverse errate | Profili documentati; contesto/revisione espliciti; legacy identico; gate antidowngrade atomico; annuale separato per sistema; round-trip e journey verificati |
 | IDENTITY-01 | P1: recupero dipende dal codice e nessun accesso standard | Progetto Google/email/Apple; vedi audit e prompt 04–05 | Account takeover, perdita ID o accesso legacy | Migrazione additiva + linking verificato + prove provider reali; gate esterni risolti |
 | SETUP-02 | P2: default agosto–gennaio e preset italiani | Onboarding consapevole di periodo/lingua | Cambio dati storici o scala implicita | Nuovi default localizzati e scelti esplicitamente; diari esistenti invariati |
 | FLOW-01 | P2: primo ingresso materia apre impostazioni generali | Entrata diretta gestore materie nel contesto | Perdita stato/bozze | Primo dato creato senza ricerca in impostazioni; ritorno coerente |
@@ -66,10 +67,11 @@ Dipendenze concrete: client Google e consent screen, account/key/Services ID App
 
 1. Analisi codice/SEO, prodotto/account e UX visiva indipendenti; integrazione in questo piano.
 2. Primo ciclo ingresso e setup; verifica e pubblicazione sul Sites esistente.
-3. Identity architect + security reviewer: scelta adapter, schema additivo, recovery e linking. Backend engineer: implementazione isolata; QA: legacy/provider e migrazione. Owner: configurazioni esterne.
-4. Product designer + frontend engineer: Home/primo valore, poi Agenda/Voti, poi Appunti/Classi. Conservare flussi già corretti.
-5. Accessibility/QA: journey, mobile, tastiera, temi, testi lunghi e dati realistici.
-6. Release owner: check/build, sorgente esatto, Domains/Sites, deployment riuscito. Dopo: SEO con Search Console e test con nuovi utenti.
+3. Materia continua/anno: prompt 09 sulla scala corrente, senza migrazione. Ricerca e architettura multi-sistema con prompt 10–11 possono procedere prima o in parallelo alla vista annuale, senza bloccarla; numeric rollout 12 solo dopo contratto/compatibilità, poi cicli 13 e QA 14.
+4. Identity architect + security reviewer: scelta adapter, schema additivo, recovery e linking. Backend engineer: implementazione isolata; QA: legacy/provider e migrazione. Owner: configurazioni esterne.
+5. Product designer + frontend engineer: Home/primo valore, poi Agenda/Voti, poi Appunti/Classi. Conservare flussi già corretti.
+6. Accessibility/QA: journey, mobile, tastiera, temi, testi lunghi e dati realistici.
+7. Release owner: check/build, sorgente esatto, Domains/Sites, deployment riuscito. Dopo: SEO con Search Console e test con nuovi utenti.
 
 ## Misure da raccogliere senza inventare risultati
 
@@ -89,3 +91,12 @@ L’anno si ricava dai periodi con la stessa etichetta `schoolYear`, mostrando e
 Media annuale: aggregare i singoli voti con peso voto × peso tipo, usando le funzioni esistenti. Non fare la media delle medie dei semestri: con 6 di peso 1 e 4 di peso 3, il risultato è 4,5, non 5. È una media calcolata dei risultati registrati, non un voto ufficiale annuale. I pesi/tipi attuali ricalcolano anche il passato; non esistono snapshot storici da inventare. Il grafico deve dichiarare se mostra voto singolo o media cumulativa.
 
 Questo ciclo è **pianificato, non incluso nel primo rilascio dell’ingresso**. Audit e criteri completi in PERIODS-AUDIT.md; prompt 09 dedicato. Priorità successiva consigliata: PERIODS-01 prima di una rifinitura estetica delle viste quotidiane.
+
+
+## Estensione oltre la scala attuale
+
+L’[analisi dedicata](GRADING-EXTENSION-AUDIT.md) riprende GRADING-SYSTEM.md e le ricerche iniziali multilingua/SEO/prodotto. Non occorre ricominciare: i tipi numerici e ordinati sono già preparati, ma diario, UI e persistenza supportano soltanto `numeric-1-6`. Il catalogo candidato comprende decimi, su 20, percentuali/punti, scale inverse e successivamente giudizi, lettere e metodi di certificazione; priorità da validare con utenti, senza attribuire una scala automaticamente al paese o alla lingua.
+
+La materia resta continua. Un sistema/revisione appartiene al contesto valutativo; cambi futuri non riscrivono i risultati vecchi. Nella lettura annuale possono convivere più metodi, con registro unico e medie/grafici separati quando incompatibili. Nessuna media dei ranghi, GPA universale o conversione basata sul massimo della scala. Server, client offline/PWA e backup vanno progettati insieme: gli schemi attuali strict e il salvataggio dell’intero snapshot impediscono di trattare questa estensione come sola impostazione grafica.
+
+Cinque prompt aggiunti (10–14): ricerca delle regole, modello/compatibilità, primo rilascio numerico, cicli qualitativi/complessi e QA. Sono nuovi incarichi riutilizzabili, non implementazioni avviate o sistemi già disponibili in produzione. La vista annuale resta il prossimo ciclo pratico; la scelta architetturale multi-sistema viene preparata accanto a quel lavoro.
