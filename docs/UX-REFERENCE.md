@@ -2,9 +2,21 @@
 
 ## Presentazione del prodotto — 2 ottobre 2026
 
-La homepage mostra catture dell’interfaccia reale: Home, Voti e lettura di un appunto, con una cattura Home dedicata ai telefoni. I dati sono dimostrativi, generati soltanto nel browser locale tramite risposte API simulate; non provengono da account reali. Le schermate sono in italiano anche sulle landing localizzate, come dichiarato nella didascalia; testo alternativo e link di ingrandimento sono tradotti.
+### Obiettivo e decisione
 
-Gli asset WebP sono in `public/product-media/`. La prima immagine usa `picture` con una sorgente mobile; Voti e Appunti hanno caricamento differito. Le dimensioni riservano lo spazio prima del caricamento. I link aprono la cattura completa in una nuova scheda, senza caroselli o video automatici. Per aggiornare le immagini dopo modifiche dell’app, ripetere le catture con soli dati dimostrativi e controllare che tutti i contenuti siano caricati prima dell’esportazione.
+La presentazione deve far capire tre utilizzi quotidiani: sapere cosa preparare, leggere il proprio andamento e ritrovare gli appunti. La precedente disposizione distribuiva screenshot completi fra hero e funzionalità: ripeteva navigazione e barre, riduceva troppo il contenuto e non costruiva una sequenza. Questo è un giudizio progettuale sul layout, non un risultato di ricerca con utenti.
+
+La hero ora contiene un solo spazio di dimostrazione, in ordine **Scadenze → Voti → Appunti**. Le schede si cambiano esplicitamente, senza scorrimento automatico. Ogni vista ha una frase sul beneficio e una spiegazione breve direttamente legate al dettaglio mostrato. La sezione delle funzionalità rimane testuale, evitando doppioni. Le inquadrature catturano componenti effettivi dell’app: prossima consegna, registro della materia e lettura di una nota. Le varianti mobile mostrano gli stessi contenuti con l’impaginazione mobile reale.
+
+I dati sono dimostrativi e sono passati solo al browser locale tramite risposte API simulate. Non sono stati creati o modificati account reali. L’interfaccia delle immagini è italiana, dichiarata nella didascalia; testi, descrizioni alternative e controlli sono localizzati.
+
+### Clic e accessibilità
+
+Il clic non naviga più al file né apre una scheda: un pulsante apre una finestra interna con l’immagine effettivamente visualizzata. Nessun download o installazione è richiesto dal controllo. Il problema precedente è stato confermato sugli header live: il file WebP veniva servito come `application/octet-stream`, rendendo inappropriato un link di navigazione diretto. L’immagine rimane incorporata nel DOM.
+
+`Tabs` e `Dialog` riusano le primitive esistenti: schede navigabili da tastiera, focus contenuto nella finestra e ritorno al pulsante, chiusura tramite Escape o controllo visibile. Gli asset `*-detail.webp` e `*-detail-mobile.webp` sono in `public/product-media/`; `picture` sceglie l’inquadratura mobile. Una cornice stabile limita i cambi di altezza fra le viste. Non sono previsti autoplay, caroselli automatici o pulsanti di salvataggio.
+
+Verifica browser locale: sette combinazioni di pagina e viewport nelle quattro lingue a 320/390/768/1440 px; 21 ingrandimenti completati, con chiusura e ritorno del focus. Nessun download, popup, navigazione involontaria, errore JavaScript o overflow orizzontale registrato. Verificata anche la selezione delle schede con le frecce da tastiera. `npm run check` superato (lint, TypeScript, 114 test, i18n e documentazione). Queste prove non equivalgono a uno studio con persone o a una prova su smartphone fisici.
 
 
 > **Reference con sezioni cronologiche.** Per il comportamento attuale usare [Architettura](ARCHITECTURE-CURRENT.md) e [Guida](GUIDA-UTENTE.md); descrizioni e priorità delle revisioni precedenti non attestano automaticamente lavoro ancora aperto.
