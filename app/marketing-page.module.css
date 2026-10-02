@@ -46,8 +46,7 @@
   letter-spacing: -0.03em;
 }
 
-.logo,
-.previewBrand {
+.logo {
   width: 39px;
   height: 39px;
   border-radius: 10px;
@@ -212,153 +211,25 @@
   background: #f2f4f9;
 }
 
-.previewTopbar {
-  height: 54px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding: 0 6px 13px;
-  color: #5f6273;
-  font-size: 12px;
-  font-weight: 720;
-}
-
-.previewBrand {
-  width: 34px;
-  height: 34px;
-  border-radius: 11px;
-  font-size: 12px;
-}
-
-.previewHome {
-  justify-self: end;
-  padding: 7px 10px;
-  border-radius: 7px;
-  color: #5140cb;
-  background: #e9e6ff;
-  font-size: 11px;
-}
-
-.previewGrid {
-  display: grid;
-  grid-template-columns: 1.18fr 0.82fr;
-  gap: 13px;
-}
-
-.previewGrid article {
-  border: 1px solid rgba(21, 23, 41, 0.07);
-  border-radius: 12px;
-}
-
-.nextCard {
-  position: relative;
-  min-height: 235px;
-  overflow: hidden;
-  padding: 24px;
-  color: #fff;
-  background: #25283a;
-}
-
-.miniLabel {
-  color: #a7a9bb;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.nextCard p {
-  margin: 34px 0 7px;
-  color: #bbb9d2;
-  font-size: 12px;
-}
-
-.nextCard h2 {
-  max-width: 260px;
-  margin: 0 0 8px;
-  font-size: 24px;
-  line-height: 1.08;
-  letter-spacing: -0.04em;
-}
-
-.nextCard small {
-  color: #aaa9bd;
-}
-
-.averageCard {
-  position: relative;
-  padding: 24px;
-  background: #fff;
-}
-
-.averageCard strong {
+.screenshotLink,
+.featureScreenshotLink {
   display: block;
-  margin: 32px 0 37px;
-  font-size: 49px;
-  line-height: 1;
-  letter-spacing: -0.07em;
+  overflow: hidden;
+  border: 1px solid var(--marketing-line);
+  border-radius: 10px;
+  background: #f2f4f9;
 }
 
-.averageCard small { color: var(--marketing-muted); }
-
-.agendaCard {
-  grid-column: 1 / -1;
-  padding: 20px 23px 15px;
-  background: #fff;
-}
-
-.agendaCard > div {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 13px;
-}
-
-.agendaCard > div svg {
-  color: var(--marketing-purple);
-}
-
-.agendaCard ul {
-  margin: 12px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.agendaCard li {
-  min-height: 53px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 11px;
-  border-top: 1px solid #efeff4;
-}
-
-.agendaCard li > span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.purpleDot { background: var(--marketing-purple); }
-.orangeDot { background: #ee9d47; }
-
-.agendaCard li p {
-  margin: 0;
-  display: grid;
-  gap: 2px;
-  font-size: 11px;
-}
-
-.agendaCard li small,
-.previewDay {
-  color: #656879;
-  font-size: 11px;
-}
-
-.previewDay { font-weight: 700; }
+.screenshotLink { cursor: zoom-in; }
+.screenshotLink picture { display: block; }
+.heroScreenshot,
+.featureScreenshotLink img { display: block; width: 100%; height: auto; }
+.featureScreenshotLink { margin-top: 24px; cursor: zoom-in; }
 
 .productPreview figcaption {
   padding: 12px 3px 0;
-  color: #6b6d7d;
-  font-size: 11px;
+  color: var(--marketing-muted);
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -401,7 +272,7 @@
 
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0 30px;
 }
 
@@ -769,20 +640,14 @@
 
   .productPreview {
     width: 100%;
-    min-height: 420px;
+    min-height: 0;
     margin-left: 0;
     padding: 13px;
     border-radius: 14px;
   }
 
-  .previewGrid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 8px; }
-  .previewGrid article { border-radius: 10px; }
-  .nextCard { min-height: 205px; padding: 18px; }
-  .nextCard p { margin-top: 34px; }
-  .nextCard h2 { font-size: 19px; }
-  .averageCard { padding: 18px 14px; }
-  .averageCard strong { margin: 31px 0 35px; font-size: 38px; }
-  .agendaCard { padding: 17px; }
+  .screenshotLink { width: min(100%, 360px); margin-inline: auto; }
+  .productPreview { width: min(100%, 388px); margin-inline: auto; }
 
   .featureSection { padding-block: 64px; }
   .featureSection { padding-inline: 15px; }
@@ -826,4 +691,3 @@
 .page :is(a, button, summary):focus-visible { outline: 3px solid var(--marketing-purple); outline-offset: 4px; }
 .page :is(.featureSection, .stepsSection, .privacySection, .faqSection) { scroll-margin-top: 24px; }
 .featureCard > svg { color: var(--marketing-purple-dark); margin-bottom: 16px; }
-.averageCard .miniLabel { color: #656879; }

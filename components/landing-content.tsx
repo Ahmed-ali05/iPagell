@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { ArrowRight, BookOpen, CalendarCheck2, Check, GraduationCap, LockKeyhole, UsersRound } from "lucide-react";
 import { LegacyEntryRedirect } from "@/components/legacy-entry-redirect";
 import { InstallAppOffer } from "@/components/install-app";
-import { formatNumber } from "@/lib/i18n";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import type { Locale } from "@/lib/i18n/locale";
 import { publicAveragePaths } from "@/lib/i18n/public-routes";
@@ -25,9 +24,9 @@ export function LandingContent({ localePath, authenticated = false }: { localePa
   const appHref = localePath ? `/app?uiLocale=${localePath}` : "/app";
   const registerHref = localePath ? `/app?mode=register&uiLocale=${localePath}` : "/app?mode=register";
   const features = [
-    { icon: GraduationCap, title: t("landing.feature1Title"), text: t("landing.feature1Text") },
+    { icon: GraduationCap, title: t("landing.feature1Title"), text: t("landing.feature1Text"), image: "grades", alt: t("landing.gradesImageAlt") },
+    { icon: BookOpen, title: t("landing.feature4Title"), text: t("landing.feature4Text"), image: "notes", alt: t("landing.notesImageAlt") },
     { icon: CalendarCheck2, title: t("landing.feature2Title"), text: t("landing.feature2Text") },
-    { icon: BookOpen, title: t("landing.feature4Title"), text: t("landing.feature4Text") },
     { icon: UsersRound, title: t("landing.feature3Title"), text: t("landing.feature3Text") },
   ];
   const steps = [
@@ -72,21 +71,21 @@ export function LandingContent({ localePath, authenticated = false }: { localePa
           </ul>
           <InstallAppOffer placement="landing" />
         </div>
-        <figure className={styles.productPreview} aria-label={t("landing.preview")}>
-          <div className={styles.previewTopbar}><span className={styles.previewBrand}>iP</span><span>{t("landing.previewSemester")}</span><span className={styles.previewHome}>{t("landing.previewHome")}</span></div>
-          <div className={styles.previewGrid}>
-            <article className={styles.nextCard}><span className={styles.miniLabel}>{t("landing.previewNext")}</span><p>{t("landing.previewSubject")}</p><h2>{t("landing.previewTest")}</h2><small>{t("landing.previewDue")}</small></article>
-            <article className={styles.averageCard}><span className={styles.miniLabel}>{t("landing.previewAverage")}</span><strong>{formatNumber(locale, 4.75, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong><small>{t("landing.previewGradeCount")}<br />{t("landing.previewScale")}</small></article>
-            <article className={styles.agendaCard}><div><CalendarCheck2 size={19} aria-hidden="true" /><b>{t("landing.previewWeek")}</b></div><ul>
-              <li><span className={styles.purpleDot} /><p><b>{t("landing.previewPersonalTask")}</b><small>{t("workspace.private")}</small></p><span className={styles.previewDay}>{t("landing.previewPersonalDay")}</span></li>
-              <li><span className={styles.orangeDot} /><p><b>{t("landing.previewClassTask")}</b><small>{t("workspace.shared")}</small></p><span className={styles.previewDay}>{t("landing.previewClassDay")}</span></li>
-            </ul></article>
-          </div>
-          <figcaption>{t("landing.previewCaption")}</figcaption>
+        <figure className={styles.productPreview}>
+          <a className={styles.screenshotLink} href="/product-media/home.webp" target="_blank" rel="noopener noreferrer" aria-label={t("landing.openHomeImage")}>
+            <picture>
+              <source media="(max-width: 720px)" srcSet="/product-media/home-mobile.webp" width="390" height="844" />
+              <img className={styles.heroScreenshot} src="/product-media/home.webp" alt={t("landing.homeImageAlt")} width="1280" height="860" fetchPriority="high" decoding="async" />
+            </picture>
+          </a>
+          <figcaption>{t("landing.realScreensCaption")}</figcaption>
         </figure>
       </section>
       <section className={styles.featureSection} id="funzioni"><div className={styles.sectionHeading}><h2>{t("landing.featuresTitle")}</h2></div><div className={styles.featureGrid}>
-        {features.map(({ icon: Icon, title, text }) => <article className={styles.featureCard} key={title}><Icon size={24} aria-hidden="true" /><h3>{title}</h3><p>{text}</p></article>)}
+        {features.map(({ icon: Icon, title, text, image, alt }) => <article className={styles.featureCard} key={title}><Icon size={24} aria-hidden="true" /><h3>{title}</h3><p>{text}</p>{image && <a className={styles.featureScreenshotLink} href={`/product-media/${image}.webp`} target="_blank" rel="noopener noreferrer" aria-label={t("landing.openFeatureImage", { name: title })}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- Local lightweight product capture; no image runtime required. */}
+          <img src={`/product-media/${image}.webp`} alt={alt} width="1280" height="860" loading="lazy" decoding="async" />
+        </a>}</article>)}
       </div><a className={styles.toolLink} href={publicAveragePaths[locale]}>{t("landing.averageToolLink")} <ArrowRight size={16} aria-hidden="true" /></a></section>
       <section className={styles.stepsSection} id="inizia" aria-labelledby="start-title">
         <div className={styles.sectionHeading}><h2 id="start-title">{t("landing.stepsTitle")}</h2><p>{t("landing.stepsIntro")}</p></div>

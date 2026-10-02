@@ -1,5 +1,12 @@
 # iPagell — Riferimento UX, UI e contenuti
 
+## Presentazione del prodotto — 2 ottobre 2026
+
+La homepage mostra catture dell’interfaccia reale: Home, Voti e lettura di un appunto, con una cattura Home dedicata ai telefoni. I dati sono dimostrativi, generati soltanto nel browser locale tramite risposte API simulate; non provengono da account reali. Le schermate sono in italiano anche sulle landing localizzate, come dichiarato nella didascalia; testo alternativo e link di ingrandimento sono tradotti.
+
+Gli asset WebP sono in `public/product-media/`. La prima immagine usa `picture` con una sorgente mobile; Voti e Appunti hanno caricamento differito. Le dimensioni riservano lo spazio prima del caricamento. I link aprono la cattura completa in una nuova scheda, senza caroselli o video automatici. Per aggiornare le immagini dopo modifiche dell’app, ripetere le catture con soli dati dimostrativi e controllare che tutti i contenuti siano caricati prima dell’esportazione.
+
+
 > **Reference con sezioni cronologiche.** Per il comportamento attuale usare [Architettura](ARCHITECTURE-CURRENT.md) e [Guida](GUIDA-UTENTE.md); descrizioni e priorità delle revisioni precedenti non attestano automaticamente lavoro ancora aperto.
 
 
