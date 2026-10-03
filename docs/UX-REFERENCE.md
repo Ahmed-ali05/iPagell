@@ -1,6 +1,24 @@
 # iPagell — Riferimento UX, UI e contenuti
 
-## Presentazione del prodotto — 2 ottobre 2026
+## Homepage — 3 ottobre 2026
+
+La richiesta aggiorna l’intera composizione e aggiunge due vincoli: immagini nella lingua scelta e prima lettura semplice. La valutazione della versione 31 è progettuale: schede, cornici annidate, anteprime piccole e descrizioni ripetute davano troppo peso alla struttura. Non sono stati misurati risultati commerciali o conversioni.
+
+La nuova pagina ha un’apertura centrata con una sola azione principale, poi due righe alternate in cui testo e immagine descrivono lo stesso uso. Le immagini mostrano componenti reali essenziali: una consegna con materia/data, due medie e un appunto breve. L’inquadratura elimina la navigazione e i controlli non necessari; non ricostruisce interfacce ipotetiche. Le funzionalità di classe e privacy restano esposte, senza il precedente diagramma di riquadri sovrapposti. Passi iniziali, FAQ, calcolatore pubblico, ingresso e collegamento GitHub restano disponibili. Spaziature, gerarchia tipografica, palette e superfici sono comuni alla pagina; niente rotazione automatica delle immagini.
+
+Riferimenti consultati: [Things](https://culturedcode.com/things/) e [Craft](https://www.craft.do/). La composizione è una scelta per iPagell, non un risultato di ricerca con persone o una garanzia di efficacia marketing.
+
+### Immagini e lingue
+
+`ProductImage` legge il locale corrente e i percorsi/dimensioni in `lib/product-media.json`. Tutti i controlli, i testi dimostrativi, le materie e l’appunto delle catture sono localizzati in it/de/fr/en. `picture` sceglie l’inquadratura adatta al telefono; i dettagli compatti di medie e appunti vengono usati anche sul desktop per mantenerli leggibili. I file sono in `public/product-media/{locale}/`. Le tre immagini selezionate totalizzano circa 25–33 KB per lingua/viewport; le due prove sotto la hero sono caricate in modo differito.
+
+Le catture usano la vera app locale con risposte API simulate, una data fissa e dati sintetici. Nessun account reale è stato creato o modificato. Gli estratti non mostrano tutta la schermata dell’app e la didascalia dichiara i dati dimostrativi. Il clic apre un Dialog interno tramite un pulsante e il suo Trigger; non naviga al file. I media non hanno link di download né attivano l’installazione PWA.
+
+### Verifiche
+
+Verifica browser su dodici combinazioni di lingua/viewport/ingrandimento del testo: quattro lingue su desktop e mobile, 320/390/768/1440 px e due prove con font al 200%. Trenta-sei aperture delle immagini completate, con chiusura, focus contenuto e ritorno al pulsante. Nessun download, popup, navigazione involontaria, errore JavaScript o overflow orizzontale registrato. Controllati caricamento dei media, corrispondenza della lingua negli URL delle immagini, ordine del contenuto sui telefoni e apertura delle FAQ. Le verifiche avvengono in un browser locale, non su dispositivi fisici. Lint, TypeScript, cataloghi e controlli documentali superati; 114 test esistenti superati durante il task. La versione pubblicata è registrata in [Deployment](DEPLOYMENT.md).
+
+## Presentazione del prodotto — 2 ottobre 2026 (versione 31, storica)
 
 ### Obiettivo e decisione
 

@@ -1,0 +1,106 @@
+{
+  "it": {
+    "overview": {
+      "desktop": "/product-media/it/overview.webp",
+      "width": 1182,
+      "height": 261,
+      "mobile": "/product-media/it/overview-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 266
+    },
+    "grades": {
+      "desktop": "/product-media/it/grades-mobile.webp",
+      "width": 537,
+      "height": 135,
+      "mobile": "/product-media/it/grades-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 135
+    },
+    "notes": {
+      "desktop": "/product-media/it/notes-mobile.webp",
+      "width": 537,
+      "height": 389,
+      "mobile": "/product-media/it/notes-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 389
+    }
+  },
+  "de": {
+    "overview": {
+      "desktop": "/product-media/de/overview.webp",
+      "width": 1182,
+      "height": 261,
+      "mobile": "/product-media/de/overview-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 266
+    },
+    "grades": {
+      "desktop": "/product-media/de/grades-mobile.webp",
+      "width": 537,
+      "height": 135,
+      "mobile": "/product-media/de/grades-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 135
+    },
+    "notes": {
+      "desktop": "/product-media/de/notes-mobile.webp",
+      "width": 537,
+      "height": 389,
+      "mobile": "/product-media/de/notes-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 389
+    }
+  },
+  "fr": {
+    "overview": {
+      "desktop": "/product-media/fr/overview.webp",
+      "width": 1182,
+      "height": 261,
+      "mobile": "/product-media/fr/overview-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 266
+    },
+    "grades": {
+      "desktop": "/product-media/fr/grades-mobile.webp",
+      "width": 537,
+      "height": 135,
+      "mobile": "/product-media/fr/grades-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 135
+    },
+    "notes": {
+      "desktop": "/product-media/fr/notes-mobile.webp",
+      "width": 537,
+      "height": 389,
+      "mobile": "/product-media/fr/notes-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 389
+    }
+  },
+  "en": {
+    "overview": {
+      "desktop": "/product-media/en/overview.webp",
+      "width": 1182,
+      "height": 261,
+      "mobile": "/product-media/en/overview-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 266
+    },
+    "grades": {
+      "desktop": "/product-media/en/grades-mobile.webp",
+      "width": 537,
+      "height": 135,
+      "mobile": "/product-media/en/grades-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 135
+    },
+    "notes": {
+      "desktop": "/product-media/en/notes-mobile.webp",
+      "width": 537,
+      "height": 389,
+      "mobile": "/product-media/en/notes-mobile.webp",
+      "mobileWidth": 537,
+      "mobileHeight": 389
+    }
+  }
+}
