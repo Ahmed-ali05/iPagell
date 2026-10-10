@@ -31,7 +31,11 @@ Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, s
 
 ## Riduci movimento — correzione visibilità
 
-La verifica di Sites 34 ha rilevato il toggle presente ma pista/cursore trasparenti. Stile corretto e prove locali mirate sulla finestra reale con dati sintetici: acceso/spento chiaro/scuro, clic/etichetta/Space, focus 3 px, hit area 52×44 px, movimento ridotto con transizione 0s e desktop/390 px senza overflow. Route e export di prova esclusi dal sorgente finale. Nessuna preferenza reale cambiata. [Causa e soluzione](UX-SIMPLIFICATION-2026-10-10.md#correzione-riduci-movimento--10-ottobre); pubblicata in Sites **35**, deployment `appgdep_6aca7e78142c81918098b14a342fd8ba` succeeded, https://ipagell.website confermato pubblico. Dettagli nel [registro](DEPLOYMENT.md).
+La verifica di Sites 34 ha rilevato il toggle presente ma pista/cursore trasparenti. Stile corretto e prove locali in sviluppo sulla finestra reale con dati sintetici: acceso/spento chiaro/scuro, clic/etichetta/Space, focus 3 px, hit area 52×44 px, movimento ridotto con transizione 0s e desktop/390 px senza overflow. Route e export di prova esclusi dal sorgente finale. Nessuna preferenza reale cambiata. [Causa e soluzione](UX-SIMPLIFICATION-2026-10-10.md#correzione-riduci-movimento--10-ottobre); pubblicata in Sites **35**, deployment `appgdep_6aca7e78142c81918098b14a342fd8ba` succeeded, https://ipagell.website confermato pubblico. Dettagli nel [registro](DEPLOYMENT.md).
+
+## Riduci movimento — regressione del CSS compilato
+
+Le prove di Sites 35 sopra non coprivano lo stato acceso nella build compilata; lo screenshot dell’utente ha evidenziato il doppio spostamento. La nuova verifica usa il CSS minificato e il workspace reale con account sintetico: acceso/spento chiaro/scuro, etichetta/Space, due dimensioni, disabilitazione, direzione inversa, quattro lingue a 320 px e 390 px senza tagli. Verificati grafici senza variazioni animate con la preferenza attiva, note con `instant`/`none` e focus al titolo, offline/riconnessione e rimozione del dataset allo smontaggio. Due test mirati coprono persistenza per account e backup legacy/correnti. [Analisi e matrice dei casi](UX-SIMPLIFICATION-2026-10-10.md#regressione-del-toggle-e-copertura-del-movimento--10-ottobre). Il comportamento del sistema è verificato nel CSS e nel codice Recharts; OS, Safari, dispositivi fisici e lettori di schermo non sono stati provati.
 
 ## Come leggere le evidenze
 

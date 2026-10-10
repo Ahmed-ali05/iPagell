@@ -4,6 +4,7 @@ import { createDiarySession } from "../lib/diary-session";
 import { LocalConflictError, sameLocal, type LocalDiary } from "../lib/account-storage";
 import { requestJson, RequestError } from "../lib/client-http";
 import { createDiary } from "../lib/new-diary";
+import { backupSchema } from "../lib/validation";
 
 function fixture(id = "account-a"): LocalDiary {
   return { ...createDiary({ name: id, school: "", semester: "S1", schoolYear: "2026/27", startDate: "2026-08-01", endDate: "2027-01-31", preset: "basic" }), revision: 1, dirty: false, user: { id, username: id } };
@@ -336,4 +337,43 @@ test("entry authentication reuses the verified identity to open an existing diar
   assert.equal(requests, 1);
   assert.equal(session.getState().phase, "ready");
   assert.equal(session.getState().diary?.user.id, env.remote.user.id);
+});
+
+
+test("reduce motion persists offline, synchronizes and stays scoped to its account", async () => {
+  const { env, session, another } = harness();
+  await session.reload();
+  env.online = false;
+  await session.commit(d => d, { reduceMotion: true });
+  assert.equal(env.disk.get("account-a")?.preferences.reduceMotion, true);
+  env.getError = new TypeError("offline");
+  const reopened = another();
+  await reopened.reload();
+  assert.equal(reopened.getState().diary?.preferences.reduceMotion, true);
+  env.online = true;
+  env.getError = null;
+  await reopened.retry();
+  assert.equal(env.remote.preferences.reduceMotion, true);
+  env.remote = fixture("account-b");
+  await reopened.reload();
+  assert.equal(reopened.getState().diary?.preferences.reduceMotion, false);
+  assert.equal(env.disk.get("account-a")?.preferences.reduceMotion, true);
+  await reopened.commit(d => d, { reduceMotion: true });
+  await reopened.commit(d => d, { reduceMotion: false });
+  assert.equal(env.remote.preferences.reduceMotion, false);
+  const final = another();
+  await final.reload();
+  assert.equal(final.getState().diary?.preferences.reduceMotion, false);
+});
+
+test("reduce motion roundtrips in backups, including legacy diaries without the preference", () => {
+  for (const value of [undefined, false, true]) {
+    const diary = fixture();
+    if (value === undefined) delete diary.preferences.reduceMotion;
+    else diary.preferences.reduceMotion = value;
+    const backup = { app: "iPagell", exportedAt: new Date().toISOString(), data: diary.data, preferences: diary.preferences };
+    const restored = backupSchema.parse(JSON.parse(JSON.stringify(backup)));
+    assert.equal(restored.preferences.reduceMotion, value);
+    assert.deepEqual(restored.data, diary.data);
+  }
 });

@@ -1,5 +1,11 @@
 # Registro modifiche
 
+## 10 ottobre 2026 — Riduci movimento: geometria e comportamento
+
+- Eliminato il doppio spostamento del cursore nel CSS compilato; controllate dimensioni, stati, tastiera, temi e layout mobile nelle quattro lingue.
+- La preferenza ora disattiva anche le animazioni dei grafici e non resta sulla pagina dopo l’uscita dal diario. Note e sistema conservano il movimento ridotto previsto.
+- Corretti i tagli della finestra Impostazioni su schermi piccoli; aggiunta una descrizione operativa breve e due prove di persistenza/backup. [Evidenze e limiti](docs/UX-SIMPLIFICATION-2026-10-10.md#regressione-del-toggle-e-copertura-del-movimento--10-ottobre).
+
 ## 10 ottobre 2026 — Toggle Riduci movimento (Sites 35)
 
 - Ripristinata la visibilità dell’interruttore in Impostazioni: colori collegati ai token dell’app, focus visibile, etichetta cliccabile e area 52×44 px, affiancata al testo anche su mobile.
