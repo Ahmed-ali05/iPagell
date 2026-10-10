@@ -1,6 +1,6 @@
 # Registro modifiche
 
-## 10 ottobre 2026 — Riduci movimento: geometria e comportamento
+## 10 ottobre 2026 — Riduci movimento: geometria e comportamento (Sites 36)
 
 - Eliminato il doppio spostamento del cursore nel CSS compilato; controllate dimensioni, stati, tastiera, temi e layout mobile nelle quattro lingue.
 - La preferenza ora disattiva anche le animazioni dei grafici e non resta sulla pagina dopo l’uscita dal diario. Note e sistema conservano il movimento ridotto previsto.

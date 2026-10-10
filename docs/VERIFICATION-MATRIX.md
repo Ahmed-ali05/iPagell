@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Snapshot](REPO-SNAPSHOT.md) · [Architettura](ARCHITECTURE-CURRENT.md) · [Pubblicazione](DEPLOYMENT.md)
 
-Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, sorgente `8fee251e1b942d3392ca92ab9381be4c0a6ae1c8`. Le prove dell’audit iniziale sotto fanno riferimento a Sites 27. Il precedente audit `c780569…`, le contraddizioni allora presenti e i risultati dei rilasci precedenti sono in [VERIFICATION-HISTORY](VERIFICATION-HISTORY.md). Non vanno letti come affermazioni sul codice attuale.
+Aggiornamento: **10 ottobre 2026**. Pubblicazione corrente: Sites 36, sorgente `84abbf943b3c55c815aded00e545f7de12f28acb`. Le singole sezioni distinguono le verifiche dei diversi interventi. Le prove dell’audit iniziale sotto fanno riferimento a Sites 27. Il precedente audit `c780569…`, le contraddizioni allora presenti e i risultati dei rilasci precedenti sono in [VERIFICATION-HISTORY](VERIFICATION-HISTORY.md). Non vanno letti come affermazioni sul codice attuale.
 
 ## Semplificazione UI — 10 ottobre 2026
 
@@ -36,6 +36,8 @@ La verifica di Sites 34 ha rilevato il toggle presente ma pista/cursore traspare
 ## Riduci movimento — regressione del CSS compilato
 
 Le prove di Sites 35 sopra non coprivano lo stato acceso nella build compilata; lo screenshot dell’utente ha evidenziato il doppio spostamento. La nuova verifica usa il CSS minificato e il workspace reale con account sintetico: acceso/spento chiaro/scuro, etichetta/Space, due dimensioni, disabilitazione, direzione inversa, quattro lingue a 320 px e 390 px senza tagli. Verificati grafici senza variazioni animate con la preferenza attiva, note con `instant`/`none` e focus al titolo, offline/riconnessione e rimozione del dataset allo smontaggio. Due test mirati coprono persistenza per account e backup legacy/correnti. [Analisi e matrice dei casi](UX-SIMPLIFICATION-2026-10-10.md#regressione-del-toggle-e-copertura-del-movimento--10-ottobre). Il comportamento del sistema è verificato nel CSS e nel codice Recharts; OS, Safari, dispositivi fisici e lettori di schermo non sono stati provati.
+
+Pubblicazione: Sites **36**, deployment `appgdep_6aca8811d9948191ba63063a489d5099` succeeded; dominio canonico/www e TLS attivi, audience pubblica. [CI del sorgente](https://github.com/Ahmed-ali05/iPagell/actions/runs/38077027637) riuscita.
 
 ## Come leggere le evidenze
 

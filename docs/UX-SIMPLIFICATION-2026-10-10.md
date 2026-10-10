@@ -97,3 +97,5 @@ Fixture temporanea con `DiaryWorkspace` e `createDiarySession` reali, account si
 | Persistenza e backup | Due regressioni automatiche verificano offline/riapertura/sync/account distinto, acceso/spento e backup con preferenza assente/false/true. |
 
 Lint mirato, TypeScript e cataloghi con 760 chiavi superati. La verifica del sistema combina il CSS `prefers-reduced-motion` e l’implementazione Recharts installata; non è stata cambiata l’impostazione del sistema operativo durante le prove. Nessuna nota o preferenza reale modificata. Non copre telefoni fisici, Safari o lettori di schermo; non sono state ripetute manualmente le suite generali/API non coinvolte. La CI ordinaria resta attiva.
+
+Pubblicata come Sites **36**, sorgente `84abbf943b3c55c815aded00e545f7de12f28acb`, deployment `appgdep_6aca8811d9948191ba63063a489d5099` succeeded; [CI](https://github.com/Ahmed-ali05/iPagell/actions/runs/38077027637) verde. [Registro](DEPLOYMENT.md).
