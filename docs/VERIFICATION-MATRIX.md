@@ -23,6 +23,8 @@ Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, s
 
 | Pubblicazione | Sites 33, deployment `appgdep_6aca102fca3081918ea6c6cd6c4ab082` succeeded; URL canonico, audience e domini/TLS attivi riconfermati. Nessuna nuova migrazione o modifica ai dati. |
 
+| GitHub | Sorgente e documenti nella [PR 5](https://github.com/Ahmed-ali05/iPagell/pull/5). CI del 10 ottobre ferma prima di release:prepare: audit npm segnala 13 vulnerabilità high nelle catene braces, sharp e source-map-js. Main non integrato; dipendenze non cambiate in questo intervento UI. |
+
 ## Come leggere le evidenze
 
 - **Codice:** comportamento osservato nell'implementazione; non certifica l'ambiente esterno.
