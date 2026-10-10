@@ -1,9 +1,9 @@
 # Registro modifiche
 
-## 10 ottobre 2026 — Correzione audit dipendenze
+## 10 ottobre 2026 — Correzione audit dipendenze (Sites 34)
 
 - Corrette le tre cause delle 13 segnalazioni high che bloccavano la CI: sharp 0.35.5, source-map-js 1.2.2 e patch locale braces a profondità limitata, con licenza/provenienza conservate.
-- Sette regressioni sulle dipendenze eseguite prima dell’audit completo; mantenute toolchain e soglia audit. [Analisi, verifiche e manutenzione](docs/DEPENDENCY-SECURITY-2026-10-10.md). Stato CI/pubblicazione in [DEPLOYMENT](docs/DEPLOYMENT.md).
+- Sette regressioni sulle dipendenze eseguite prima dell’audit completo; mantenute toolchain e soglia audit. [Analisi, verifiche e manutenzione](docs/DEPENDENCY-SECURITY-2026-10-10.md). CI verde con 121 test e audit del registro a zero; pubblicazione Sites 34 succeeded il 10 ottobre, sorgente `f2200a94f72ce7c7d49081ea4229b9af0a5ac386`. [Registro](docs/DEPLOYMENT.md).
 
 ## 10 ottobre 2026 — Lettura e gerarchia dell’app (Sites 33)
 

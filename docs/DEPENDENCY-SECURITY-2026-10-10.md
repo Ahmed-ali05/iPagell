@@ -16,7 +16,7 @@ La PR [5](https://github.com/Ahmed-ali05/iPagell/pull/5), che conserva il sorgen
 
 ## Patch braces
 
-È il sorgente originale 3.0.3 con una modifica circoscritta: limite fisso di 128 livelli sullo stack del parser e sui tre attraversamenti ricorsivi dell’AST. Copre parentesi graffe, tonde, input incompleti e AST forniti direttamente, compresi cicli. Le opzioni del chiamante non possono disattivarlo. L’input eccessivo produce `SyntaxError` prima dell’esaurimento dello stack; restano i limiti originali su lunghezza ed espansione.
+È il sorgente originale 3.0.3 con una modifica circoscritta: limite fisso di 128 livelli sullo stack del parser e sui tre attraversamenti ricorsivi dell’AST. Copre parentesi graffe, tonde, input incompleti e AST forniti direttamente, compresi cicli dei nodi figli. Le opzioni del chiamante non possono disattivarlo. L’input eccessivo produce `SyntaxError` prima dell’esaurimento dello stack; restano i limiti originali su lunghezza ed espansione.
 
 Prima della patch, 4.000 graffe annidate riproducevano `RangeError: Maximum call stack size exceeded`. Ora i percorsi pubblici rifiutano intenzionalmente quell’input. L’override `$braces` fa risolvere la copia locale sia alla catena ESLint/fast-glob/micromatch sia a quella Vinext/vite-plugin-dynamic-import.
 
@@ -28,7 +28,8 @@ Prima della patch, 4.000 graffe annidate riproducevano `RangeError: Maximum call
 - Source map con offset enorme: rifiuto immediato oltre il limite upstream; conversione con offset grande ammesso completa entro la scadenza del processo di prova.
 - Entrambe le copie sharp 0.35.5 caricano il decoder nativo e completano un round-trip PNG sintetico.
 - Lint del test e TypeScript superati. `npm audit --audit-level=low`: **0 vulnerabilità segnalate** nel registro.
-- La CI esegue i controlli della patch dopo l’installazione da lockfile e prima dell’audit completo. Esito remoto e pubblicazione vengono registrati in [DEPLOYMENT](DEPLOYMENT.md).
+- La CI esegue i controlli della patch dopo l’installazione da lockfile e prima dell’audit completo. [CI sul commit f2200a9](https://github.com/Ahmed-ali05/iPagell/actions/runs/38073051270) **riuscita**: installazione pulita Node 22, sette controlli prima dell’audit, audit a zero, lint/tipi, 121 test, i18n/documentazione e build.
+- Pubblicata come **Sites 34**, deployment `appgdep_6aca7a42f8bc819184aaa0f9b87e7436` succeeded; dominio canonico/pubblico e TLS riconfermati. Homepage e `/app` HTTP 200. [Registro di pubblicazione](DEPLOYMENT.md).
 
 Le prove browser della modifica UI non vengono ripetute: questa correzione riguarda le dipendenze, senza nuovi componenti, API o migrazioni.
 

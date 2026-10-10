@@ -23,11 +23,11 @@ Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, s
 
 | Pubblicazione | Sites 33, deployment `appgdep_6aca102fca3081918ea6c6cd6c4ab082` succeeded; URL canonico, audience e domini/TLS attivi riconfermati. Nessuna nuova migrazione o modifica ai dati. |
 
-| GitHub | Sorgente e documenti nella [PR 5](https://github.com/Ahmed-ali05/iPagell/pull/5). CI del 10 ottobre ferma prima di release:prepare: audit npm segnala 13 vulnerabilità high nelle catene braces, sharp e source-map-js. Main non integrato; dipendenze non cambiate in questo intervento UI. |
+| GitHub | Sorgente e documenti nella [PR 5](https://github.com/Ahmed-ali05/iPagell/pull/5). La prima CI del 10 ottobre si era fermata all’audit con 13 segnalazioni high. Dopo la correzione dipendenze, [CI sul commit f2200a9](https://github.com/Ahmed-ali05/iPagell/actions/runs/38073051270) riuscita: audit a zero, 121 test e build. La correzione è pubblicata in Sites 34; le prove UI sopra restano riferite a Sites 33. |
 
 ## Dipendenze — 10 ottobre 2026
 
-[Analisi e prove](DEPENDENCY-SECURITY-2026-10-10.md): sette regressioni mirate passate, lint/tipi superati, audit completo del registro a zero. Il codice locale braces è verificato dai test prima dell’audit; l’audit npm non certifica la patch locale. CI e successivo deployment sono registrati in [DEPLOYMENT](DEPLOYMENT.md). Nessuna prova browser UI o API ripetuta per questo intervento sulle dipendenze.
+[Analisi e prove](DEPENDENCY-SECURITY-2026-10-10.md): sette regressioni mirate passate, lint/tipi superati, audit completo del registro a zero. Il codice locale braces è verificato dai test prima dell’audit; l’audit npm non certifica la patch locale. [CI sul commit f2200a9](https://github.com/Ahmed-ali05/iPagell/actions/runs/38073051270) riuscita su installazione pulita Node 22: sette controlli prima dell’audit, audit completo a zero, lint/tipi, 121 test, 759 chiavi i18n, documentazione e build. Pubblicata in Sites 34, deployment `appgdep_6aca7a42f8bc819184aaa0f9b87e7436` succeeded; dettagli in [DEPLOYMENT](DEPLOYMENT.md). Nessuna prova browser UI o API ripetuta per questo intervento sulle dipendenze.
 
 ## Come leggere le evidenze
 

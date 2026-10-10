@@ -71,4 +71,4 @@ Riferimento del rilascio UI: Sites **33**, sorgente `0288de5aa0419f8d7a1d59a69f5
 
 ## Correzione dipendenze del 10 ottobre 2026
 
-Il blocco CI della PR 5 è riprodotto e corretto con sharp 0.35.5, source-map-js 1.2.2 e la patch locale braces a profondità limitata. L’audit del registro torna a zero; sette prove mirate verificano il codice locale e i consumatori reali. [Analisi, provenienza e manutenzione](DEPENDENCY-SECURITY-2026-10-10.md). Stato remoto in [DEPLOYMENT](DEPLOYMENT.md).
+Il blocco CI della PR 5 è riprodotto e corretto con sharp 0.35.5, source-map-js 1.2.2 e la patch locale braces a profondità limitata. L’audit del registro torna a zero; sette prove mirate verificano il codice locale e i consumatori reali. [Analisi, provenienza e manutenzione](DEPENDENCY-SECURITY-2026-10-10.md). CI GitHub verde sul sorgente `f2200a94f72ce7c7d49081ea4229b9af0a5ac386`; correzione pubblicata come Sites **34**, deployment `appgdep_6aca7a42f8bc819184aaa0f9b87e7436` succeeded. [Registro](DEPLOYMENT.md).

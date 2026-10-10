@@ -53,3 +53,5 @@ Sono conservati lo [snapshot storico](REPO-SNAPSHOT-HISTORY.md), l'[architettura
 - [Semplificazione dell’interfaccia, 10 ottobre 2026](UX-SIMPLIFICATION-2026-10-10.md): gerarchia delle viste, lettura e appunti della stessa materia.
 
 - [Correzione del blocco CI delle dipendenze, 10 ottobre 2026](DEPENDENCY-SECURITY-2026-10-10.md): tre cause, patch verificata e manutenzione.
+
+Ultimo aggiornamento delle dipendenze: **Sites 34**, 10 ottobre 2026; [analisi e manutenzione](DEPENDENCY-SECURITY-2026-10-10.md), [CI e registro di pubblicazione](DEPLOYMENT.md).
