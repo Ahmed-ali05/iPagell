@@ -1,6 +1,6 @@
 # Registro modifiche
 
-## 10 ottobre 2026 — Toggle Riduci movimento
+## 10 ottobre 2026 — Toggle Riduci movimento (Sites 35)
 
 - Ripristinata la visibilità dell’interruttore in Impostazioni: colori collegati ai token dell’app, focus visibile, etichetta cliccabile e area 52×44 px, affiancata al testo anche su mobile.
 - Prove mirate in chiaro/scuro con mouse e tastiera; [causa e soluzione](docs/UX-SIMPLIFICATION-2026-10-10.md#correzione-riduci-movimento--10-ottobre). Pubblicazione nel [registro](docs/DEPLOYMENT.md).

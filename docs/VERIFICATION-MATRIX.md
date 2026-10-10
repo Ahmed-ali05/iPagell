@@ -31,7 +31,7 @@ Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, s
 
 ## Riduci movimento — correzione visibilità
 
-La verifica di Sites 34 ha rilevato il toggle presente ma pista/cursore trasparenti. Stile corretto e prove locali mirate sulla finestra reale con dati sintetici: acceso/spento chiaro/scuro, clic/etichetta/Space, focus 3 px, hit area 52×44 px, movimento ridotto con transizione 0s e desktop/390 px senza overflow. Route e export di prova esclusi dal sorgente finale. Nessuna preferenza reale cambiata. [Causa e soluzione](UX-SIMPLIFICATION-2026-10-10.md#correzione-riduci-movimento--10-ottobre); pubblicazione nel [registro](DEPLOYMENT.md).
+La verifica di Sites 34 ha rilevato il toggle presente ma pista/cursore trasparenti. Stile corretto e prove locali mirate sulla finestra reale con dati sintetici: acceso/spento chiaro/scuro, clic/etichetta/Space, focus 3 px, hit area 52×44 px, movimento ridotto con transizione 0s e desktop/390 px senza overflow. Route e export di prova esclusi dal sorgente finale. Nessuna preferenza reale cambiata. [Causa e soluzione](UX-SIMPLIFICATION-2026-10-10.md#correzione-riduci-movimento--10-ottobre); pubblicata in Sites **35**, deployment `appgdep_6aca7e78142c81918098b14a342fd8ba` succeeded, https://ipagell.website confermato pubblico. Dettagli nel [registro](DEPLOYMENT.md).
 
 ## Come leggere le evidenze
 
