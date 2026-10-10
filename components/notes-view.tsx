@@ -1,6 +1,6 @@
 "use client";
 import { lazy,Suspense,useEffect,useMemo,useRef,useState } from "react";
-import { BookOpen,ChevronLeft,Download,Plus,Search,Star,Trash2 } from "lucide-react";
+import { BookOpen,ChevronLeft,Download,Pencil,Plus,Search,Star,Trash2,UsersRound } from "lucide-react";
 import { useI18n } from "@/components/i18n-provider";
 import { formatDate } from "@/lib/i18n";
 import { searchKey } from "@/lib/notes/validation";
@@ -11,7 +11,9 @@ import type { PersonalRecord } from "@/lib/notes/storage";
 import { NoteDeviceConflict } from "@/lib/notes/storage";
 import { useNoteAutosave } from "@/hooks/use-note-autosave";
 import { NoteContent } from "@/components/note-content";
-import { NoteExport } from "@/components/note-export";
+import { NoteExportDialog } from "@/components/note-export-dialog";
+import { ActionMenu } from "@/components/action-menu";
+import { RelatedNotes,useReadingNavigation } from "@/components/related-notes";
 import { noteVisibleText } from "@/lib/notes/format";
 const NoteEditor=lazy(()=>import("@/components/note-editor"));
 
@@ -39,11 +41,15 @@ function pinDraft(record:PersonalRecord):NoteDraft|null{
 export function PersonalNotesView({controller,userId,data,initialSubjectId="",initialNew=false,initialOpenId="",onBackToContext,contextLabel,onAddSubject,onCopyToClass}:{controller:NotesController;userId:string;data:SchoolData;initialSubjectId?:string;initialNew?:boolean;initialOpenId?:string;onBackToContext:()=>void;contextLabel:string;onAddSubject:()=>void;onCopyToClass:(note:NoteCopySeed)=>void}){
   const {t,locale}=useI18n();
   const [selection,setSelection]=useState<Selection>(null),[query,setQuery]=useState(""),[filter,setFilter]=useState(initialSubjectId),[error,setError]=useState("");
+  const [exportOpen,setExportOpen]=useState(false);
   const [archiveOpen,setArchiveOpen]=useState(false),[archive,setArchive]=useState<import("@/types/notes").ClassNote[]>([]),[archiveStatus,setArchiveStatus]=useState<"idle"|"loading"|"ready"|"error">("idle");
   const openedInitial=useRef(false);
   const records=useMemo(()=>controller.records.filter(r=>(r.draft&&!r.draft.deleted)||(!r.draft&&r.remote&&!r.remote.deletedAt)).sort(sortRecords),[controller.records]);
   const visible=useMemo(()=>records.filter(r=>{const value=currentText(r)!;const haystack=searchKey(`${value.title} ${noteVisibleText(value.contentFormat,value.content)}`);const matches=filter==="missing"?!data.subjects.some(s=>s.id===value.subjectId):!filter||value.subjectId===filter;return matches&&haystack.includes(searchKey(query));}),[records,filter,query,data.subjects]);
   const selected=selection?controller.records.find(r=>r.id===selection.id)??null:null;
+  const selectedText=selected?currentText(selected):null;
+  const related=selectedText?.subjectId?records.filter(r=>r.id!==selected?.id&&currentText(r)?.subjectId===selectedText.subjectId).map(r=>({id:r.id,title:currentText(r)!.title,updatedAt:editedAt(currentText(r)!)})):[];
+  const {readerRef,prepareSwitch}=useReadingNavigation(selection?.kind==="read"?selection.id:undefined);
   const subjectName=(id:string,fallback:string)=>data.subjects.find(s=>s.id===id)?.name??(id?`${t("notes.missingSubject")} · ${fallback}`:fallback||t("notes.importUnclassified"));
   const newNote=()=>{setSelection({kind:"edit",id:crypto.randomUUID()});setError("");};
   useEffect(()=>{if(!initialNew||openedInitial.current)return;openedInitial.current=true;queueMicrotask(()=>setSelection({kind:"edit",id:crypto.randomUUID()}));},[initialNew]);
@@ -78,9 +84,13 @@ export function PersonalNotesView({controller,userId,data,initialSubjectId="",in
   const pinSelected=async(record:PersonalRecord)=>{const draft=pinDraft(record);if(!draft)return;
     try{await controller.savePersonalDraft(draft,record.draft);}catch{setError(t("notes.saveFailed"));}
   };
+  const deleteSelected=(record:PersonalRecord)=>{
+    if(!window.confirm(t("notes.deleteConfirm")))return;
+    const task=record.remote?controller.deletePersonal(record.remote,record.draft):record.draft?controller.discardPersonalDraft(record.id,record.draft):Promise.resolve();
+    void task.then(()=>setSelection(null)).catch(()=>setError(t("notes.saveFailed")));
+  };
   return <section className="notes-space" aria-label={t("notes.my")}>
-    <button className="text-link notes-context-back" onClick={onBackToContext}><ChevronLeft size={18}/>{t("notes.backToContext",{name:contextLabel})}</button>
-    {selection?.kind!=="edit"&&<header className="notes-heading"><div><h2>{t("notes.my")}</h2><p>{t("notes.personalHelp")}</p></div>{selection?.kind==="read"&&<button className="soft-button" onClick={()=>setSelection(null)}><ChevronLeft size={18}/>{t("notes.viewAll")}</button>}</header>}
+    <button className="text-link notes-context-back" onClick={()=>selection?.kind==="read"?setSelection(null):onBackToContext()}><ChevronLeft size={18}/>{selection?.kind==="read"?t("notes.viewAll"):t("notes.backToContext",{name:contextLabel})}</button>
     {selection?.kind!=="edit"&&controller.records.some(r=>r.draft)&&<p className="notes-banner" role="status">{t("notes.pending",{count:controller.records.filter(r=>r.draft).length})}</p>}
     {controller.phase==="expired"&&<p className="notes-banner error" role="alert">{t("notes.expired")}</p>}
     {controller.phase==="offline"&&<p className="notes-banner" role="status">{t("notes.offline")}</p>}
@@ -89,17 +99,24 @@ export function PersonalNotesView({controller,userId,data,initialSubjectId="",in
     {controller.phase==="error"&&<p className="notes-banner error" role="alert">{t("notes.error")} <button onClick={()=>void controller.refresh()}>{t("notes.retry")}</button></p>}
     {error&&<p className="notes-banner error" role="alert">{error}</p>}
     {selection?.kind==="edit"?<PersonalEditor key={selection.id} id={selection.id} userId={userId} record={selected} controller={controller} data={data} initialSubjectId={data.subjects.some(s=>s.id===filter)?filter:""} onDone={()=>setSelection({kind:"read",id:selection.id})} onCancel={()=>setSelection(null)} onAddSubject={onAddSubject}/>
-    :selection?.kind==="read"&&selected&&currentText(selected)?<article className="notes-reader panel">
-      <div className="notes-reader-actions"><button className="soft-button" onClick={()=>setSelection({kind:"edit",id:selected.id})}>{t("notes.edit")}</button>
+    :selection?.kind==="read"&&selected&&currentText(selected)?<><article key={selected.id} ref={readerRef} className="notes-reader panel note-swap">
+      <div className="notes-reader-actions">
+        <h2 tabIndex={-1}>{currentText(selected)!.title||t("notes.untitled")}</h2>
+        <div className="reader-tools">
         <button className="soft-button" aria-label={currentText(selected)!.pinned?t("notes.unpin"):t("notes.pin")} onClick={()=>void pinSelected(selected)}><Star size={18} fill={currentText(selected)!.pinned?"currentColor":"none"}/></button>
-      </div><h2>{currentText(selected)!.title||t("notes.untitled")}</h2><p className="notes-meta">{subjectName(currentText(selected)!.subjectId,currentText(selected)!.subjectName)} · {formatDate(locale,new Date(editedAt(currentText(selected)!)),dateOptions)}</p>
+        <ActionMenu label={t("common.moreFor",{name:currentText(selected)!.title||t("notes.untitled")})} items={[
+          {label:t("notes.edit"),icon:Pencil,onSelect:()=>setSelection({kind:"edit",id:selected.id})},
+          {label:t("notes.export"),icon:Download,onSelect:()=>setExportOpen(true)},
+          {label:t("notes.copyClass"),icon:UsersRound,onSelect:()=>{const note=currentText(selected)!;onCopyToClass({id:selected.id,title:note.title,content:note.content,contentFormat:note.contentFormat});}},
+          {label:t("notes.delete"),icon:Trash2,danger:true,onSelect:()=>deleteSelected(selected)},
+        ]}/>
+        </div>
+      </div><p className="notes-meta">{subjectName(currentText(selected)!.subjectId,currentText(selected)!.subjectName)} · {formatDate(locale,new Date(editedAt(currentText(selected)!)),dateOptions)}</p>
       <NoteContent contentFormat={currentText(selected)!.contentFormat} content={currentText(selected)!.content}/>
-      <NoteExport note={{...currentText(selected)!,subjectName:subjectName(currentText(selected)!.subjectId,currentText(selected)!.subjectName),updatedAt:editedAt(currentText(selected)!)}}/>
-      <p className="notes-meta" role="status">{t(selected.draft?(selected.draft.conflict?"notes.conflict":"notes.savedDevice"):"notes.synced")}</p>
+      <NoteExportDialog key={selected.id} open={exportOpen} onOpenChange={setExportOpen} note={{...currentText(selected)!,subjectName:subjectName(currentText(selected)!.subjectId,currentText(selected)!.subjectName),updatedAt:editedAt(currentText(selected)!)}}/>
       {selected.draft?.conflict&&<div className="notes-conflict" role="alert"><h3>{t("notes.conflict")}</h3><div className="notes-conflict-grid"><section><h4>{t("notes.localVersion")}</h4><pre>{selected.draft.title}{"\n\n"}{selected.draft.content}</pre></section><section><h4>{t("notes.accountVersion")}</h4><pre>{selected.draft.conflict.title}{"\n\n"}{selected.draft.conflict.content}</pre></section></div><div className="notes-actions"><button onClick={()=>void resolveCopy(selected)}>{t("notes.keepCopy")}</button><button onClick={()=>void chooseAccountVersion(selected)}>{t("notes.useAccount")}</button><button onClick={()=>downloadText(selected.draft!.title,selected.draft!.content)}>{t("notes.downloadRecovery")}</button></div></div>}
-      <div className="notes-actions"><button className="soft-button" onClick={()=>{const note=currentText(selected);if(note)onCopyToClass({id:selected.id,title:note.title,content:note.content,contentFormat:note.contentFormat});}}>{t("notes.copyClass")}</button><button className="soft-button danger-text" onClick={()=>{if(!window.confirm(t("notes.deleteConfirm")))return;const task=selected.remote?controller.deletePersonal(selected.remote,selected.draft):selected.draft?controller.discardPersonalDraft(selected.id,selected.draft):Promise.resolve();void task.then(()=>setSelection(null)).catch(()=>setError(t("notes.saveFailed")));}}><Trash2 size={17}/>{t("notes.delete")}</button></div>
-    </article>:<>
-      <div className="notes-primary-action"><p>{t("notes.semesterIndependent")}</p><button className="primary-button" onClick={newNote}><Plus size={18}/>{t("notes.new")}</button></div>
+    </article><RelatedNotes notes={related} subjectName={subjectName(selectedText!.subjectId,selectedText!.subjectName)} onOpen={id=>{prepareSwitch(id);setSelection({kind:"read",id});}}/></>:<>
+      <div className="notes-primary-action"><button className="primary-button" onClick={newNote}><Plus size={18}/>{t("notes.new")}</button></div>
       <div className="notes-toolbar"><label className="notes-search"><Search size={18}/><span className="sr-only">{t("notes.search")}</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("notes.search")}/></label><label className="sr-only" htmlFor="notes-subject-filter">{t("notes.filter")}</label><select id="notes-subject-filter" value={filter} onChange={e=>setFilter(e.target.value)}><option value="">{t("notes.allSubjects")}</option>{data.subjects.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}{records.some(r=>!data.subjects.some(s=>s.id===currentText(r)?.subjectId))&&<option value="missing">{t("notes.unassignedSubjects")}</option>}</select></div>
       {controller.phase==="loading"?<p role="status">{t("notes.loading")}</p>:visible.length?<div className="notes-list">{visible.map(r=>{const value=currentText(r)!;return <button className="notes-row" key={r.id} onClick={()=>setSelection({kind:"read",id:r.id})}><span className="notes-row-title">{value.pinned&&<Star size={16} fill="currentColor"/>}{value.title||t("notes.untitled")}</span><small>{subjectName(value.subjectId,value.subjectName)} · {formatDate(locale,new Date(editedAt(value)),dateOptions)}</small><span>{noteVisibleText(value.contentFormat,value.content).slice(0,160)}</span>{r.draft&&<small>{r.draft.conflict?t("notes.conflict"):t("notes.savedDevice")}</small>}</button>;})}</div>:<div className="notes-empty"><BookOpen size={28}/><h3>{records.length?t("notes.noResults"):t("notes.empty")}</h3><p>{records.length?t("notes.adjustSearch"):t("notes.emptyHelp")}</p></div>}
       <details className="notes-archive panel" open={archiveOpen} onToggle={e=>{setArchiveOpen(e.currentTarget.open);if(e.currentTarget.open&&archiveStatus==="idle")void archiveLoad();}}><summary>{t("notes.archive")}</summary><p>{t("notes.archiveHelp")}</p>{archiveOpen&&<div>

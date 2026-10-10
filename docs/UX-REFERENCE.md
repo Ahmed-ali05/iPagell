@@ -396,3 +396,7 @@ Accessibilità da verificare al rilascio: tastiera, nomi accessibili, annuncio d
 - Secondo passaggio: layout desktop iniziale e layout stretto con larghezza DOM verificata di 569 px. Il tentativo di override a 390 px non ha modificato la larghezza effettiva; non è contato come nuova verifica a 390 px. La precedente analisi includeva una vista a 390 px. Nessuna prova su telefono fisico.
 - La seconda apertura locale senza sessione tramite 127.0.0.1 non era raggiungibile; nessun logout della sessione esistente per forzare l'onboarding.
 - Nessuna misura di conversione, nessun test con studenti e nessuna certificazione di accessibilità. I rischi comportamentali descritti sono ipotesi motivate da verificare.
+
+## Lettura e appunti collegati — 10 ottobre 2026
+
+La lettura ha una superficie principale; gli altri appunti della materia stanno sotto una separazione, in riquadri neutri con titolo/data e senza estratti. Il clic sostituisce il lettore e porta il focus al titolo. Dissolvenza breve, disattivata con movimento ridotto. Navigazione visibile e operazioni nei menu contestuali, senza un pulsante generale Azioni. [Analisi e verifiche](UX-SIMPLIFICATION-2026-10-10.md).

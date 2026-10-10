@@ -109,3 +109,9 @@ L'uscita rimuove la copia attiva del diario su quel browser. Se ci sono note o b
 ## Segnalare un problema
 
 Descrivi cosa volevi fare, i passaggi, il risultato atteso e quello ottenuto. Aggiungi versione browser/iOS, uso da Safari o icona Home e stato di sincronizzazione. Oscura nomi, voti e identificativi negli screenshot. Non allegare password, codici, cookie o backup completi. I problemi di sicurezza vanno comunicati privatamente: [Sicurezza](../SECURITY.md).
+
+### Lettura degli appunti
+
+Nel lettore personale restano titolo, materia/data, testo, pin e Tutti gli appunti; la descrizione introduttiva e lo stato normale di sincronizzazione della singola nota non occupano spazio nella lettura. Il ritorno all’elenco è sempre visibile; dall’elenco Torna a… riporta alla vista di origine. Il menu dei tre punti raccoglie Modifica, Esporta appunto, Copia in una classe ed Elimina. Nel lettore di classe lo stesso menu offre export, copia personale e i comandi consentiti dal ruolo. Esporta appunto apre una finestra con PDF e altri formati. Avvisi di errore, offline e conflitto rimangono visibili; conferme distruttive e controlli dei permessi sono conservati.
+
+Sotto il testo trovi gli altri appunti della stessa materia, in riquadri con titolo e data. Scegli un riquadro per sostituire la nota aperta. Le note personali e quelle delle classi restano separate.

@@ -81,6 +81,8 @@ export function AbsencesView({
           </h3>
           <p>{thresholdMessage && `${thresholdMessage} `}{t("absence.notOfficialLimit")}</p>
         </div>
+        <details className="reference-options">
+          <summary>{t("absence.editReference")}</summary>
         <label>
           {t("absence.referenceHours")}
           <input
@@ -95,6 +97,7 @@ export function AbsencesView({
             }}
           />
         </label>
+        </details>
       </section>}
       <div className={`absence-layout ${bySubject.length ? "" : "single"}`}>
         <section className="panel absence-list">
@@ -131,13 +134,7 @@ export function AbsencesView({
                     </small>
                   </div>
                   <strong>{formatNumber(locale, item.durationHours, { maximumFractionDigits: 1 })} {t("common.hoursShort")}</strong>
-                  <button
-                    className="icon-button subtle"
-                    onClick={() => onDelete(item.id)}
-                    aria-label={t("absence.delete")}
-                  >
-                    <Trash2 size={17} />
-                  </button>
+                  <button className="icon-button subtle" onClick={()=>onDelete(item.id)} aria-label={t("absence.delete")}><Trash2 size={17}/></button>
                 </article>
               ))
           ) : (

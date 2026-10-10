@@ -46,6 +46,6 @@ export function GradeScopeFilter({ scope, semesters, currentSemesterId, onChange
         {years.map((year) => <NativeSelectOption key={year} value={year}>{year}</NativeSelectOption>)}
       </NativeSelect>
     </label>}
-    {years.length > 1 && <p className="scope-note">{t("scope.exactYears")}</p>}
+    {years.length > 1 && <details className="scope-help"><summary>{t("common.details")}</summary><p className="scope-note">{t("scope.exactYears")}</p></details>}
   </div>;
 }

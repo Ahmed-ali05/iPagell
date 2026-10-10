@@ -1,5 +1,12 @@
 # Registro modifiche
 
+## 10 ottobre 2026 — Lettura e gerarchia dell’app
+
+- Lettore appunti con ritorno all’elenco visibile e operazioni occasionali nei tre punti; export in finestra dedicata.
+- Altri appunti della stessa materia sotto il testo, in riquadri discreti; sostituzione del lettore, focus al titolo e transizione breve con movimento ridotto rispettato.
+- Semplificati controlli e testi di Home, Agenda, Voti, Assenze, Classi e Impostazioni.
+- Nessuna modifica a schema, contratti API, formule o permessi. Verifiche incrementali e limiti in [analisi UX](docs/UX-SIMPLIFICATION-2026-10-10.md).
+
 [Documentazione](docs/README.md) · [Pubblicazione](docs/DEPLOYMENT.md) · [Verifiche](docs/VERIFICATION-MATRIX.md)
 
 Versione npm, formato del diario, backup, revisione dati e numero Sites sono contatori distinti. Le voci di rilascio riportano solo pubblicazioni documentate; il [registro precedente](docs/CHANGELOG-HISTORY.md) conserva i passaggi storici.

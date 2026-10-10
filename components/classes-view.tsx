@@ -466,19 +466,14 @@ export function ClassesView({
 
   return (
     <>
-      <div className="classes-toolbar">
+      {!!classes.length&&<div className="classes-toolbar">
+        <span className="section-label">{t("classes.title")}</span>
         <div>
-          <span className="section-label">{t("classes.title")}</span>
+          <button className="text-link" onClick={()=>setJoinOpen(true)}><DoorOpen size={18}/>{t("classes.enterCode")}</button>
+          <button className="soft-button" onClick={()=>setCreateOpen(true)}><Plus size={18}/>{t("classes.new")}</button>
         </div>
-        <div>
-          <button className="soft-button" onClick={() => setJoinOpen(true)}>
-            <DoorOpen /> {t("classes.enterCode")}
-          </button>
-          <button className="primary-button" onClick={() => setCreateOpen(true)}>
-            <Plus /> {t("classes.new")}
-          </button>
-        </div>
-      </div>
+      </div>}
+
 
       {error && (
         <section className="sync-banner" role="alert">
@@ -514,6 +509,7 @@ export function ClassesView({
                 <button
                   key={item.id}
                   className={item.id === selectedId ? "active" : ""}
+                  aria-pressed={item.id===selectedId}
                   onClick={() => void selectClass(item.id)}
                 >
                   <span>{item.name.slice(0, 2).toUpperCase()}</span>
@@ -538,19 +534,6 @@ export function ClassesView({
                     <span className="class-role">{t(`classes.role.${detail.role}` as "classes.role.owner" | "classes.role.moderator" | "classes.role.member")}</span>
                     <h2>{detail.name}</h2>
                     {detail.description && <p>{detail.description}</p>}
-                  </div>
-                  <div className="class-hero-actions">
-                    {canManageInvites && (
-                      <button
-                        className="soft-button"
-                        onClick={() => {
-                          setCreatedInvite(null);
-                          setInviteOpen(true);
-                        }}
-                      >
-                        <Link2 /> {t("classes.createInvite")}
-                      </button>
-                    )}
                   </div>
                 </section>
 
@@ -677,7 +660,7 @@ export function ClassesView({
                           setInviteOpen(true);
                         }}
                       >
-                        {t("classes.newInvite")}
+                        <Link2 size={17}/> {t("classes.createInvite")}
                       </button>
                     </div>
                     {invitesLoadedFor !== detail.id ? (

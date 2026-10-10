@@ -20,6 +20,13 @@ Agenda viene montata al primo accesso e conservata quando nascosta: calendario/e
 
 Voti e Statistiche condividono `GradeScope` nel workspace: Periodo / Anno / Storico, default anno del periodo corrente. `lib/grade-scope.ts` filtra per appartenenza `semesterId` ed etichetta `schoolYear` esatta, include archiviati e risolve ID rimossi/importati senza mutare dati. Scope e materia selezionata sono UI, esclusi da schema/backup; il ritorno ai voti conserva anche la posizione. Il filtro non modifica `currentSemesterId`, Home, Agenda, Assenze o tool browser. `EntryDialog` seleziona un periodo reale solo per il nuovo voto. Media/trend usano i singoli voti inclusi e i pesi correnti; nessuna media delle medie dei periodi.
 
+### Gerarchia UI del 10 ottobre
+
+
+`components/action-menu.tsx` riusa DropdownMenu Radix: operazioni secondarie del singolo elemento nei menu contestuali, navigazione e comandi frequenti visibili. Non esiste un pulsante generale Azioni. La chiusura del menu restituisce il focus al trigger prima di aprire una finestra. Agenda ha una barra unica per vista/origine/azioni/inserimento; Classi mantiene creazione e ingresso visibili, con inviti nella sezione di gestione. Voti usa un selettore materia, confronto medie espandibile e simulatore chiuso inizialmente; il filtro di ambito resta visibile. Assenze espande il riferimento solo su richiesta. Lingua e tema sono in Impostazioni; il normale salvataggio ha un indicatore compatto, mentre problemi e conflitti mantengono i percorsi di recupero esistenti. Nessuna modifica a payload, formule o permessi. [Analisi e decisioni](UX-SIMPLIFICATION-2026-10-10.md).
+
+`components/related-notes.tsx` condivide i riquadri della stessa materia e il ritorno del focus al titolo nei due lettori. Selezione e transizione sono stato UI; nessun endpoint, payload o dato persistente aggiunto.
+
 ## 2. Quattro percorsi dei dati
 
 | Percorso | Stato locale | Stato remoto | Regola di scrittura |

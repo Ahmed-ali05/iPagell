@@ -49,3 +49,5 @@ Sono conservati lo [snapshot storico](REPO-SNAPSHOT-HISTORY.md), l'[architettura
 3. Se cambiano route, schema, migrazioni, script npm o dipendenze, eseguire `npm run docs:generate` e includere l'inventario nel commit.
 4. Eseguire `npm run docs:check` e `git diff --check`. Il controllo verifica inventario e collegamenti locali, rifiutando anche destinazioni ignorate da Git; non certifica prosa, infrastruttura o compatibilità su telefono.
 5. Registrare l'esito reale in changelog e matrice; aggiornare i riferimenti di pubblicazione soltanto dopo un deploy riuscito.
+
+- [Semplificazione dell’interfaccia, 10 ottobre 2026](UX-SIMPLIFICATION-2026-10-10.md): gerarchia delle viste, lettura e appunti della stessa materia.

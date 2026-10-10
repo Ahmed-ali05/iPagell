@@ -67,3 +67,7 @@ Le API dei testi richiedono contratto 2 e, per update/delete, formato atteso olt
 Test del parser: escape, literal plain, canonicalità, newline/grassetto in tutti i blocchi, testo visibile; selezione: titoli/liste/Select all/bookmark; autosave/storage: chiamate concorrenti, modifiche durante write, risposta persa, errore quota e retry. API: formato personale/classe, contratto, permessi e CAS.
 
 Le prove locali del rilascio verificano riapertura, anteprima e salvataggio di a-capo formattati, e rifiuto del grassetto oltre limite con editing successivo riuscito. La [matrice](VERIFICATION-MATRIX.md) conserva evidenze e conteggi. Per completare la QA mobile servono dispositivi iOS/Android fisici, tastiera virtuale/IME, focus con selezione nativa, download/condivisione PDF, PWA aggiornata e accessibilità. Non dichiararli verificati sulla base di un viewport desktop.
+
+## Export dal lettore
+
+Il menu dei tre punti apre Esporta appunto, una finestra dedicata con PDF e altri formati. Il corpo della nota resta al centro della vista di lettura; formati, serializzazione ed esportazione non cambiano.
