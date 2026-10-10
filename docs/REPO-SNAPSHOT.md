@@ -57,7 +57,7 @@ Il diario usa CAS sulla revisione. Gli appunti personali usano revisione, format
 
 Convenzioni Next App Router, runtime/build **Vinext + Vite + Cloudflare Workers**, React 19 e TypeScript. Non è un server Next standard. Versioni esatte, script e Node dichiarato sono nell'inventario generato dal lockfile. La CI usa Node 22.
 
-`npm run check`: lint, tipi, unit test, i18n, inventario e link documentali. `release:prepare` aggiunge build e precache. La CI esegue installazione da lockfile, audit di tutte le dipendenze e preparazione; non esegue automaticamente suite API o prove browser e non pubblica.
+`npm run check`: lint, tipi, unit test, i18n, inventario e link documentali. `release:prepare` aggiunge build e precache. La CI esegue installazione da lockfile, prove della patch locale braces, audit di tutte le dipendenze e preparazione; non esegue automaticamente suite API o prove browser e non pubblica.
 
 Produzione: **https://ipagell.website**, progetto Sites esistente e binding `DB`; nessun R2. `wrangler.jsonc` è il Worker sandbox separato. Il push GitHub conserva il codice ma non aggiorna Sites. La pubblicazione e le verifiche esterne del rilascio sono in [DEPLOYMENT](DEPLOYMENT.md).
 
@@ -68,3 +68,7 @@ Gli output PDF della ricerca e il bytecode Python sono ignorati; i sorgenti dell
 Lettura essenziale, ritorno all’elenco visibile, comandi contestuali e riquadri discreti degli altri appunti della materia. Voti, Agenda, Assenze, Classi e Impostazioni riducono i controlli simultanei senza cambiare formule, storage o permessi. [Decisioni e verifiche](UX-SIMPLIFICATION-2026-10-10.md).
 
 Riferimento del rilascio UI: Sites **33**, sorgente `0288de5aa0419f8d7a1d59a69f5cb728c95dda55`, pubblicato il 10 ottobre 2026 su https://ipagell.website.
+
+## Correzione dipendenze del 10 ottobre 2026
+
+Il blocco CI della PR 5 è riprodotto e corretto con sharp 0.35.5, source-map-js 1.2.2 e la patch locale braces a profondità limitata. L’audit del registro torna a zero; sette prove mirate verificano il codice locale e i consumatori reali. [Analisi, provenienza e manutenzione](DEPENDENCY-SECURITY-2026-10-10.md). Stato remoto in [DEPLOYMENT](DEPLOYMENT.md).

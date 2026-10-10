@@ -1,5 +1,10 @@
 # Registro modifiche
 
+## 10 ottobre 2026 — Correzione audit dipendenze
+
+- Corrette le tre cause delle 13 segnalazioni high che bloccavano la CI: sharp 0.35.5, source-map-js 1.2.2 e patch locale braces a profondità limitata, con licenza/provenienza conservate.
+- Sette regressioni sulle dipendenze eseguite prima dell’audit completo; mantenute toolchain e soglia audit. [Analisi, verifiche e manutenzione](docs/DEPENDENCY-SECURITY-2026-10-10.md). Stato CI/pubblicazione in [DEPLOYMENT](docs/DEPLOYMENT.md).
+
 ## 10 ottobre 2026 — Lettura e gerarchia dell’app (Sites 33)
 
 - Lettore appunti con ritorno all’elenco visibile e operazioni occasionali nei tre punti; export in finestra dedicata.

@@ -97,6 +97,7 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 | `check:i18n` | `node scripts/check-i18n.mjs` |
 | `start` | `node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0` |
 | `lint` | `eslint . --ignore-pattern dist --ignore-pattern .next` |
+| `check:dependency-security` | `node --import tsx --test tests/dependency-security.test.ts` |
 
 ## Dipendenze dirette
 
@@ -149,6 +150,7 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `@types/react-dom` | tooling/test | `19.2.3` | `19.2.3` |
 | `@vitejs/plugin-react` | tooling/test | `6.0.2` | `6.0.2` |
 | `@vitejs/plugin-rsc` | tooling/test | `^0.5.35` | `0.5.35` |
+| `braces` | tooling/test | `file:vendor/braces` | `3.0.3-ipagell.1` |
 | `drizzle-kit` | tooling/test | `0.31.10` | `0.31.10` |
 | `eslint` | tooling/test | `9.39.4` | `9.39.4` |
 | `eslint-config-next` | tooling/test | `16.3.8` | `16.3.8` |

@@ -51,3 +51,5 @@ Sono conservati lo [snapshot storico](REPO-SNAPSHOT-HISTORY.md), l'[architettura
 5. Registrare l'esito reale in changelog e matrice; aggiornare i riferimenti di pubblicazione soltanto dopo un deploy riuscito.
 
 - [Semplificazione dell’interfaccia, 10 ottobre 2026](UX-SIMPLIFICATION-2026-10-10.md): gerarchia delle viste, lettura e appunti della stessa materia.
+
+- [Correzione del blocco CI delle dipendenze, 10 ottobre 2026](DEPENDENCY-SECURITY-2026-10-10.md): tre cause, patch verificata e manutenzione.

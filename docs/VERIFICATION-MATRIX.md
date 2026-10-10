@@ -25,6 +25,10 @@ Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, s
 
 | GitHub | Sorgente e documenti nella [PR 5](https://github.com/Ahmed-ali05/iPagell/pull/5). CI del 10 ottobre ferma prima di release:prepare: audit npm segnala 13 vulnerabilità high nelle catene braces, sharp e source-map-js. Main non integrato; dipendenze non cambiate in questo intervento UI. |
 
+## Dipendenze — 10 ottobre 2026
+
+[Analisi e prove](DEPENDENCY-SECURITY-2026-10-10.md): sette regressioni mirate passate, lint/tipi superati, audit completo del registro a zero. Il codice locale braces è verificato dai test prima dell’audit; l’audit npm non certifica la patch locale. CI e successivo deployment sono registrati in [DEPLOYMENT](DEPLOYMENT.md). Nessuna prova browser UI o API ripetuta per questo intervento sulle dipendenze.
+
 ## Come leggere le evidenze
 
 - **Codice:** comportamento osservato nell'implementazione; non certifica l'ambiente esterno.
