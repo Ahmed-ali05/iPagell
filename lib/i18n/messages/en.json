@@ -286,6 +286,7 @@
   "settings.light": "Light",
   "settings.dark": "Dark",
   "settings.reduceMotion": "Reduce motion",
+  "settings.reduceMotionHint": "Turns off animations and smooth scrolling.",
   "settings.localBackup": "Local backup",
   "settings.export": "Export",
   "settings.import": "Import",

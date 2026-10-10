@@ -301,13 +301,15 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             ? "dark"
             : "light"
           : preferences.theme);
-    document.documentElement.dataset.reduceMotion = String(
-      !!preferences.reduceMotion,
-    );
     apply();
     media.addEventListener("change", apply);
     return () => media.removeEventListener("change", apply);
   }, [preferences]);
+
+  useEffect(() => {
+    document.documentElement.dataset.reduceMotion = String(!!preferences?.reduceMotion);
+    return () => { delete document.documentElement.dataset.reduceMotion; };
+  }, [preferences?.reduceMotion]);
 
   const commitDiary = session.commit;
   const updateData = useCallback((recipe: (current: SchoolData) => SchoolData) =>
@@ -793,6 +795,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onShowHistory={() => setGradeScope({ kind: "all" })}
               historyAvailable={data.grades.length > visibleGrades.length}
               goal={preferences.gradeGoal}
+              reduceMotion={preferences.reduceMotion}
               onAddGrade={() => setModal("grade")}
               onBackToGrades={() => navigate("grades")}
             />
@@ -1929,10 +1932,13 @@ function SettingsDialog({
               </NativeSelect>
             </div>
             <div className="preference-row preference-toggle-row">
-              <label htmlFor="reduce-motion"><b>{t("settings.reduceMotion")}</b></label>
+              <div>
+                <label htmlFor="reduce-motion"><b>{t("settings.reduceMotion")}</b></label>
+                <small id="reduce-motion-hint">{t("settings.reduceMotionHint")}</small>
+              </div>
               <Switch
                 id="reduce-motion"
-                aria-label={t("settings.reduceMotion")}
+                aria-describedby="reduce-motion-hint"
                 checked={!!preferences.reduceMotion}
                 onCheckedChange={(reduceMotion) =>
                   onPreferences({ reduceMotion })

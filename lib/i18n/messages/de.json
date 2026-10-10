@@ -286,6 +286,7 @@
   "settings.light": "Hell",
   "settings.dark": "Dunkel",
   "settings.reduceMotion": "Bewegung reduzieren",
+  "settings.reduceMotionHint": "Deaktiviert Animationen und sanftes Scrollen.",
   "settings.localBackup": "Lokale Sicherung",
   "settings.export": "Exportieren",
   "settings.import": "Importieren",

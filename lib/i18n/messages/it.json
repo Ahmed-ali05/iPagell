@@ -286,6 +286,7 @@
   "settings.light": "Chiaro",
   "settings.dark": "Scuro",
   "settings.reduceMotion": "Riduci movimento",
+  "settings.reduceMotionHint": "Disattiva animazioni e scorrimento fluido.",
   "settings.localBackup": "Backup locale",
   "settings.export": "Esporta",
   "settings.import": "Importa",

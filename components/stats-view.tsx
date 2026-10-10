@@ -18,6 +18,7 @@ export function StatsView({
   historyAvailable,
   grades,
   goal,
+  reduceMotion = false,
   onAddGrade,
   onBackToGrades,
 }: {
@@ -28,6 +29,7 @@ export function StatsView({
   historyAvailable: boolean;
   grades: Grade[];
   goal: number;
+  reduceMotion?: boolean;
   onAddGrade: () => void;
   onBackToGrades: () => void;
 }) {
@@ -115,6 +117,7 @@ export function StatsView({
                 />
                 <ReferenceLine y={CURRENT_GRADING_SYSTEM.passingValue} stroke="#e45c67" strokeDasharray="5 5" />
                 <Tooltip
+                  isAnimationActive={reduceMotion ? false : "auto"}
                   cursor={{ fill: "var(--accent-soft)" }}
                   contentStyle={{
                     borderRadius: 14,
@@ -123,7 +126,7 @@ export function StatsView({
                     color: "var(--ink)",
                   }}
                 />
-                <Bar dataKey="media" radius={[8, 8, 3, 3]} fill="#6655e6" />
+                <Bar isAnimationActive={reduceMotion ? false : "auto"} dataKey="media" radius={[8, 8, 3, 3]} fill="#6655e6" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -191,6 +194,7 @@ export function StatsView({
                 />
                 <ReferenceLine y={CURRENT_GRADING_SYSTEM.passingValue} stroke="#e45c67" strokeDasharray="5 5" />
                 <Tooltip
+                  isAnimationActive={reduceMotion ? false : "auto"}
                   labelFormatter={(value) => formatDate(locale, String(value), { day: "numeric", month: "long", year: "numeric" })}
                   contentStyle={{
                     borderRadius: 14,
@@ -200,6 +204,7 @@ export function StatsView({
                   }}
                 />
                 <Line
+                  isAnimationActive={reduceMotion ? false : "auto"}
                   type="monotone"
                   dataKey="media"
                   name={t("stats.weightedAverage")}

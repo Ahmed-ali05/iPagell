@@ -66,6 +66,36 @@ In Sites 34 il controllo Radix esisteva e aveva lo stato accessibile corretto, m
 
 Lo stile condiviso in `app/globals-new.css` ora usa direttamente i token dell’app per pista e cursore, con stati acceso/spento, focus visibile e area cliccabile 52×44 px. L’etichetta è associata al controllo; la riga mantiene testo e toggle affiancati anche sotto il breakpoint mobile. Radix, callback e persistenza della preferenza restano quelli esistenti.
 
-Verifica mirata sulla finestra Impostazioni reale con dati sintetici in una route locale temporanea: stati acceso/spento in chiaro/scuro, clic sul controllo e sull’etichetta, Space, focus da tastiera, `data-reduce-motion=true` con transizione 0s e viewport desktop/390 px senza overflow. La route e l’export temporaneo per la prova vengono rimossi prima della build. Le preferenze dell’account reale non sono state cambiate.
+Verifica in sviluppo sulla finestra Impostazioni reale con dati sintetici in una route locale temporanea: stati acceso/spento in chiaro/scuro, clic sul controllo e sull’etichetta, Space, focus da tastiera, `data-reduce-motion=true` con transizione 0s e viewport desktop/390 px senza overflow. La route e l’export temporaneo per la prova vengono rimossi prima della build. Le preferenze dell’account reale non sono state cambiate.
 
 Correzione pubblicata come Sites **35**, sorgente `140c56f6d2dcfbed9d8413c6e5bcd81f7379f6af`, deployment `appgdep_6aca7e78142c81918098b14a342fd8ba` succeeded. [Registro di pubblicazione](DEPLOYMENT.md).
+
+
+## Regressione del toggle e copertura del movimento — 10 ottobre
+
+La verifica precedente non copriva lo stato acceso nel CSS compilato: il controllo era stato provato acceso/spento nel server di sviluppo, mentre in produzione era stato osservato spento. Il CSS minificato di Sites 35 eliminava il reset `translate: none`; la classe Tailwind del cursore applicava quindi una traslazione oltre al `transform` aggiunto dal foglio dell’app. L’accumulo dei due spostamenti produceva il cursore fuori dalla pista segnalato dall’utente. Le [utility Tailwind](https://tailwindcss.com/docs/translate) usano la proprietà individuale `translate`, distinta da `transform`.
+
+Il componente Switch ora usa soltanto due classi proprie, senza dimensioni, colori o traslazioni concorrenti. Il cursore ha posizione assoluta e `inset-inline-start`: 3 px quando spento, `100% − dimensione cursore − 3 px` quando acceso. La geometria segue la larghezza effettiva, entrambe le dimensioni e la direzione del testo, senza sommare trasformazioni. Radix conserva semantica, controllo dello stato, etichetta, tastiera e disabilitazione.
+
+La funzione è mantenuta perché serve a disattivare il movimento non essenziale, secondo il criterio [W3C sulle animazioni da interazione](https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions). Non viene dichiarata una conformità WCAG complessiva. Il controllo copre CSS, grafici JavaScript e scorrimento delle note; l’impostazione del sistema continua a prevalere anche con il toggle spento. Recharts 3.8 già rispetta il sistema con `isAnimationActive="auto"`, ma ignorava la preferenza dell’app: barre, linea e tooltip ora ricevono `false` quando la preferenza è attiva. La pressione dei pulsanti non applica una scala quando il movimento è ridotto. Il dataset sul documento viene rimosso allo smontaggio del diario, evitando di trasferire la preferenza a login o a un altro account.
+
+L’etichetta ha una spiegazione operativa breve e localizzata: «Disattiva animazioni e scorrimento fluido». Le colonne della finestra e dei tab possono restringersi; su telefono i tab conservano il testo e i comandi del backup vanno su righe separate. Questo elimina il taglio del toggle causato dal contenuto più largo della finestra in alcune traduzioni.
+
+### Verifica sulla build compilata
+
+Fixture temporanea con `DiaryWorkspace` e `createDiarySession` reali, account sintetico e IO in memoria; componente condiviso e lettore separato per osservare geometria e scorrimento. Servita con Wrangler locale dalla build Sites, usando origini nuove per escludere cache service worker pregresse. La fixture e l’export temporaneo non sono nel sorgente pubblicabile.
+
+| Caso | Risultato osservato |
+|---|---|
+| Acceso/spento, chiaro/scuro | Cursore contenuto con margine 3 px; nessun `translate` o `transform` sul cursore. Pista distinguibile, area dichiarata 52×44 px; focus 3 px. |
+| Componente condiviso | `default` 52×44 e `sm` 44×44; controllato/autonomo, acceso/spento, disabilitato e direzione inversa. Tutti i cursori restano contenuti. |
+| Mouse, etichetta e Space | Stato e dataset si aggiornano; etichetta associata e descrizione accessibile. |
+| Mobile e lingue | 320 px: it/de/fr/en, finestra e pagina senza overflow orizzontale e controllo completamente visibile. 390 px: tema chiaro e layout affiancato verificati. |
+| Grafici | Con tre voti sintetici: barre e linea visibili subito con preferenza attiva, zero variazioni successive di geometria rilevate; disattiva e sistema ordinario, 149 variazioni rilevate nell’ingresso animato. È una prova del comportamento, non una misura di prestazioni. |
+| Note correlate | Enter cambia nota e focalizza il titolo; preferenza attiva → chiamata `instant`, animazione `none`; disattiva → `smooth`, `note-swap`. |
+| Offline e uscita | Modifica offline conservata dopo ricarica della sessione; riconnessione → Salvato. Smontaggio del diario elimina il dataset; rimontaggio ripristina la scelta. |
+| Persistenza e backup | Due regressioni automatiche verificano offline/riapertura/sync/account distinto, acceso/spento e backup con preferenza assente/false/true. |
+
+Lint mirato, TypeScript e cataloghi con 760 chiavi superati. La verifica del sistema combina il CSS `prefers-reduced-motion` e l’implementazione Recharts installata; non è stata cambiata l’impostazione del sistema operativo durante le prove. Nessuna nota o preferenza reale modificata. Non copre telefoni fisici, Safari o lettori di schermo; non sono state ripetute manualmente le suite generali/API non coinvolte. La CI ordinaria resta attiva.
+
+Pubblicata come Sites **36**, sorgente `84abbf943b3c55c815aded00e545f7de12f28acb`, deployment `appgdep_6aca8811d9948191ba63063a489d5099` succeeded; [CI](https://github.com/Ahmed-ali05/iPagell/actions/runs/38077027637) verde. [Registro](DEPLOYMENT.md).

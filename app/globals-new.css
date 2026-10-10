@@ -557,7 +557,7 @@ button {
       opacity 0.18s ease,
       background 0.2s ease;
   }
-  button:active {
+  :where(:root:not([data-reduce-motion="true"])) button:active {
     transform: scale(0.96);
   }
   .hero-card,
@@ -1436,6 +1436,7 @@ button {
   max-height: min(82dvh, 720px);
   overflow: auto;
   padding: 26px !important;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto;
   align-content: start;
 }
@@ -1514,17 +1515,19 @@ button {
   accent-color: var(--accent);
 }
 .settings-tabs {
+  min-width: 0;
   min-height: 0;
 }
 .settings-tablist {
   width: 100% !important;
   height: 42px !important;
   display: grid !important;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   background: var(--line) !important;
   border-radius: 14px !important;
 }
 .settings-section {
+  min-width: 0;
   padding: 18px 3px 4px;
 }
 .settings-section-head {
@@ -1596,8 +1599,8 @@ button {
   width: 100%;
 }
 
-/* Switch colors use the app tokens directly, without Tailwind theme aliases. */
-[data-slot="switch"] {
+/* Switch geometry has one owner: no utility translates or size overrides. */
+.app-switch {
   --switch-width: 52px;
   --switch-track-height: 28px;
   --switch-thumb-size: 22px;
@@ -1617,12 +1620,12 @@ button {
   outline: none;
   transition: none;
 }
-[data-slot="switch"][data-size="sm"] {
+.app-switch[data-size="sm"] {
   --switch-width: 44px;
   --switch-track-height: 24px;
   --switch-thumb-size: 18px;
 }
-[data-slot="switch"]::before {
+.app-switch::before {
   content: "";
   position: absolute;
   left: 0;
@@ -1635,31 +1638,32 @@ button {
   background: var(--input);
   transition: background-color 140ms ease, border-color 140ms ease;
 }
-[data-slot="switch"][data-state="checked"]::before {
+.app-switch[data-state="checked"]::before {
   background: var(--accent-fill);
   border-color: var(--accent-fill);
 }
-[data-slot="switch"] > [data-slot="switch-thumb"] {
-  position: relative;
-  flex: 0 0 var(--switch-thumb-size);
+.app-switch > .app-switch-thumb {
+  position: absolute;
+  inset-inline-start: 3px;
+  top: calc(50% - var(--switch-thumb-size) / 2);
+  pointer-events: none;
   width: var(--switch-thumb-size);
   height: var(--switch-thumb-size);
   border-radius: 50%;
   background: var(--primary-foreground);
   box-shadow: 0 1px 3px #0003;
-  translate: none;
-  transform: translateX(0);
-  transition: transform 140ms ease;
+  transition: inset-inline-start 140ms ease;
 }
-[data-slot="switch"][data-state="checked"] > [data-slot="switch-thumb"] {
-  transform: translateX(calc(var(--switch-width) - var(--switch-thumb-size) - 6px));
+.app-switch[data-state="checked"] > .app-switch-thumb {
+  inset-inline-start: calc(100% - var(--switch-thumb-size) - 3px);
 }
-[data-slot="switch"]:focus-visible {
+.app-switch:disabled { cursor: not-allowed; opacity: .5; }
+.app-switch:focus-visible {
   outline: 3px solid var(--ring);
   outline-offset: 3px;
 }
-[data-slot="switch"]:hover,
-[data-slot="switch"]:active {
+.app-switch:hover,
+.app-switch:active {
   transform: none;
 }
 .backup-card {
@@ -1682,8 +1686,10 @@ button {
   color: var(--subtle);
   font-size: 14px;
 }
+.backup-card > div { min-width: 0; }
 .backup-card > div > div {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 .legacy-backup { margin-top:10px; }
@@ -1931,7 +1937,7 @@ button {
   }
   .backup-card > div > div {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .absence-list {
     padding: 20px 16px;
@@ -2066,7 +2072,7 @@ fieldset { padding:0; border:0; min-width:0; }
 @media(prefers-reduced-motion:reduce) {
   *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
 }
-[data-reduce-motion="true"] *,[data-reduce-motion="true"] *::before,[data-reduce-motion="true"] *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
+[data-reduce-motion="true"],[data-reduce-motion="true"] *,[data-reduce-motion="true"] *::before,[data-reduce-motion="true"] *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; }
 
 /* Class collaboration */
 .classes-toolbar {
@@ -2722,3 +2728,16 @@ button.agenda-origin { min-height:32px; text-align:left; }
 
 .preference-toggle-row { grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; }
 .preference-toggle-row label { cursor: pointer; }
+
+.preference-toggle-row small { display: block; margin-top: 4px; color: var(--subtle); font-size: .8125rem; line-height: 1.5; }
+
+@media (max-width: 640px) {
+  .settings-tablist svg { display: none; }
+  .settings-tablist [data-slot="tabs-trigger"] {
+    min-width: 0;
+    padding-inline: 4px;
+    white-space: normal;
+    font-size: .8125rem;
+    gap: 0;
+  }
+}
