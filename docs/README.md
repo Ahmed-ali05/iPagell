@@ -2,7 +2,7 @@
 
 [Repository](../README.md) · [Software pubblicato](https://ipagell.website)
 
-Aggiornamento: **1 ottobre 2026**. Le guide correnti descrivono le funzionalità della pubblicazione Sites 27 e gli aggiornamenti della repository. Documentazione, inventario e correzioni delle dipendenze successivi al rilascio sono nella sezione [Non rilasciato](../CHANGELOG.md#non-rilasciato--documentazione-repository-e-dipendenze). Codice, test locali, CI GitHub e produzione sono evidenze distinte; una build o un push non attestano un deploy.
+Aggiornamento: **1 ottobre 2026**. Le guide correnti descrivono la pubblicazione Sites **28**, compresi ingresso/SEO, documentazione, inventario e correzioni delle dipendenze. Esiti e limiti sono nel [changelog](../CHANGELOG.md) e nel [rapporto del ciclo](improvement-2026-10-01/VERIFICATION.md). Codice, test locali, CI GitHub e produzione sono evidenze distinte; una build o un push non attestano un deploy.
 
 ## Da dove iniziare
 
@@ -30,6 +30,9 @@ Aggiornamento: **1 ottobre 2026**. Le guide correnti descrivono le funzionalità
 | [Sistema voti](GRADING-SYSTEM.md) | Scala implementata, calcoli e utility pubblica; sistemi alternativi proposti |
 | [Affidabilità diario](RELIABILITY.md) | Analisi e correzioni della sessione del 23 settembre |
 | [Prestazioni Classi](CLASSI-PERFORMANCE.md) | Cache della vista e misure locali con relativi limiti |
+| [Altri sistemi di valutazione](improvement-2026-10-01/GRADING-EXTENSION-AUDIT.md) | Analisi aggiornata, fonti e prompt 10–14; estensione pianificata |
+| [Programma ingresso, SEO e account standard](improvement-2026-10-01/PLAN.md) | Audit specialistici, primo ciclo e prompt per i cicli successivi |
+| [Workflow completo e modelli](improvement-2026-10-01/WORKFLOW-MODELS.md) | Modello per ogni prompt, sequenza, dipendenze, stime e costi API distinti da Codex |
 | [Piano prodotto](PRODOTTO.md) | Lavoro aperto e criteri di rilascio |
 | [Reference UX](UX-REFERENCE.md) | Direzione di progetto, non lista di funzioni già consegnate |
 
@@ -46,3 +49,9 @@ Sono conservati lo [snapshot storico](REPO-SNAPSHOT-HISTORY.md), l'[architettura
 3. Se cambiano route, schema, migrazioni, script npm o dipendenze, eseguire `npm run docs:generate` e includere l'inventario nel commit.
 4. Eseguire `npm run docs:check` e `git diff --check`. Il controllo verifica inventario e collegamenti locali, rifiutando anche destinazioni ignorate da Git; non certifica prosa, infrastruttura o compatibilità su telefono.
 5. Registrare l'esito reale in changelog e matrice; aggiornare i riferimenti di pubblicazione soltanto dopo un deploy riuscito.
+
+- [Semplificazione dell’interfaccia, 10 ottobre 2026](UX-SIMPLIFICATION-2026-10-10.md): gerarchia delle viste, lettura e appunti della stessa materia.
+
+- [Correzione del blocco CI delle dipendenze, 10 ottobre 2026](DEPENDENCY-SECURITY-2026-10-10.md): tre cause, patch verificata e manutenzione.
+
+Ultimo aggiornamento delle dipendenze: **Sites 34**, 10 ottobre 2026; [analisi e manutenzione](DEPENDENCY-SECURITY-2026-10-10.md), [CI e registro di pubblicazione](DEPLOYMENT.md).

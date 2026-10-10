@@ -1,5 +1,42 @@
 # iPagell — Riferimento UX, UI e contenuti
 
+## Homepage — 3 ottobre 2026
+
+La richiesta aggiorna l’intera composizione e aggiunge due vincoli: immagini nella lingua scelta e prima lettura semplice. La valutazione della versione 31 è progettuale: schede, cornici annidate, anteprime piccole e descrizioni ripetute davano troppo peso alla struttura. Non sono stati misurati risultati commerciali o conversioni.
+
+La nuova pagina ha un’apertura centrata con una sola azione principale, poi due righe alternate in cui testo e immagine descrivono lo stesso uso. Le immagini mostrano componenti reali essenziali: una consegna con materia/data, due medie e un appunto breve. L’inquadratura elimina la navigazione e i controlli non necessari; non ricostruisce interfacce ipotetiche. Le funzionalità di classe e privacy restano esposte, senza il precedente diagramma di riquadri sovrapposti. Passi iniziali, FAQ, calcolatore pubblico, ingresso e collegamento GitHub restano disponibili. Spaziature, gerarchia tipografica, palette e superfici sono comuni alla pagina; niente rotazione automatica delle immagini.
+
+Riferimenti consultati: [Things](https://culturedcode.com/things/) e [Craft](https://www.craft.do/). La composizione è una scelta per iPagell, non un risultato di ricerca con persone o una garanzia di efficacia marketing.
+
+### Immagini e lingue
+
+`ProductImage` legge il locale corrente e i percorsi/dimensioni in `lib/product-media.json`. Tutti i controlli, i testi dimostrativi, le materie e l’appunto delle catture sono localizzati in it/de/fr/en. `picture` sceglie l’inquadratura adatta al telefono; i dettagli compatti di medie e appunti vengono usati anche sul desktop per mantenerli leggibili. I file sono in `public/product-media/{locale}/`. Le tre immagini selezionate totalizzano circa 25–33 KB per lingua/viewport; le due prove sotto la hero sono caricate in modo differito.
+
+Le catture usano la vera app locale con risposte API simulate, una data fissa e dati sintetici. Nessun account reale è stato creato o modificato. Gli estratti non mostrano tutta la schermata dell’app e la didascalia dichiara i dati dimostrativi. Il clic apre un Dialog interno tramite un pulsante e il suo Trigger; non naviga al file. I media non hanno link di download né attivano l’installazione PWA.
+
+### Verifiche
+
+Verifica browser su dodici combinazioni di lingua/viewport/ingrandimento del testo: quattro lingue su desktop e mobile, 320/390/768/1440 px e due prove con font al 200%. Trenta-sei aperture delle immagini completate, con chiusura, focus contenuto e ritorno al pulsante. Nessun download, popup, navigazione involontaria, errore JavaScript o overflow orizzontale registrato. Controllati caricamento dei media, corrispondenza della lingua negli URL delle immagini, ordine del contenuto sui telefoni e apertura delle FAQ. Le verifiche avvengono in un browser locale, non su dispositivi fisici. Lint, TypeScript, cataloghi e controlli documentali superati; 114 test esistenti superati durante il task. La versione pubblicata è registrata in [Deployment](DEPLOYMENT.md).
+
+## Presentazione del prodotto — 2 ottobre 2026 (versione 31, storica)
+
+### Obiettivo e decisione
+
+La presentazione deve far capire tre utilizzi quotidiani: sapere cosa preparare, leggere il proprio andamento e ritrovare gli appunti. La precedente disposizione distribuiva screenshot completi fra hero e funzionalità: ripeteva navigazione e barre, riduceva troppo il contenuto e non costruiva una sequenza. Questo è un giudizio progettuale sul layout, non un risultato di ricerca con utenti.
+
+La hero ora contiene un solo spazio di dimostrazione, in ordine **Scadenze → Voti → Appunti**. Le schede si cambiano esplicitamente, senza scorrimento automatico. Ogni vista ha una frase sul beneficio e una spiegazione breve direttamente legate al dettaglio mostrato. La sezione delle funzionalità rimane testuale, evitando doppioni. Le inquadrature catturano componenti effettivi dell’app: prossima consegna, registro della materia e lettura di una nota. Le varianti mobile mostrano gli stessi contenuti con l’impaginazione mobile reale.
+
+I dati sono dimostrativi e sono passati solo al browser locale tramite risposte API simulate. Non sono stati creati o modificati account reali. L’interfaccia delle immagini è italiana, dichiarata nella didascalia; testi, descrizioni alternative e controlli sono localizzati.
+
+### Clic e accessibilità
+
+Il clic non naviga più al file né apre una scheda: un pulsante apre una finestra interna con l’immagine effettivamente visualizzata. Nessun download o installazione è richiesto dal controllo. Il problema precedente è stato confermato sugli header live: il file WebP veniva servito come `application/octet-stream`, rendendo inappropriato un link di navigazione diretto. L’immagine rimane incorporata nel DOM.
+
+`Tabs` e `Dialog` riusano le primitive esistenti: schede navigabili da tastiera, focus contenuto nella finestra e ritorno al pulsante, chiusura tramite Escape o controllo visibile. Gli asset `*-detail.webp` e `*-detail-mobile.webp` sono in `public/product-media/`; `picture` sceglie l’inquadratura mobile. Una cornice stabile limita i cambi di altezza fra le viste. Non sono previsti autoplay, caroselli automatici o pulsanti di salvataggio.
+
+Verifica browser locale: sette combinazioni di pagina e viewport nelle quattro lingue a 320/390/768/1440 px; 21 ingrandimenti completati, con chiusura e ritorno del focus. Nessun download, popup, navigazione involontaria, errore JavaScript o overflow orizzontale registrato. Verificata anche la selezione delle schede con le frecce da tastiera. `npm run check` superato (lint, TypeScript, 114 test, i18n e documentazione). Queste prove non equivalgono a uno studio con persone o a una prova su smartphone fisici.
+
+
 > **Reference con sezioni cronologiche.** Per il comportamento attuale usare [Architettura](ARCHITECTURE-CURRENT.md) e [Guida](GUIDA-UTENTE.md); descrizioni e priorità delle revisioni precedenti non attestano automaticamente lavoro ancora aperto.
 
 
@@ -359,3 +396,7 @@ Accessibilità da verificare al rilascio: tastiera, nomi accessibili, annuncio d
 - Secondo passaggio: layout desktop iniziale e layout stretto con larghezza DOM verificata di 569 px. Il tentativo di override a 390 px non ha modificato la larghezza effettiva; non è contato come nuova verifica a 390 px. La precedente analisi includeva una vista a 390 px. Nessuna prova su telefono fisico.
 - La seconda apertura locale senza sessione tramite 127.0.0.1 non era raggiungibile; nessun logout della sessione esistente per forzare l'onboarding.
 - Nessuna misura di conversione, nessun test con studenti e nessuna certificazione di accessibilità. I rischi comportamentali descritti sono ipotesi motivate da verificare.
+
+## Lettura e appunti collegati — 10 ottobre 2026
+
+La lettura ha una superficie principale; gli altri appunti della materia stanno sotto una separazione, in riquadri neutri con titolo/data e senza estratti. Il clic sostituisce il lettore e porta il focus al titolo. Dissolvenza breve, disattivata con movimento ridotto. Navigazione visibile e operazioni nei menu contestuali, senza un pulsante generale Azioni. [Analisi e verifiche](UX-SIMPLIFICATION-2026-10-10.md).

@@ -8,7 +8,9 @@
 2. Scegli un nome utente di 3–32 caratteri: lettere, numeri, punto, trattino o underscore; il primo carattere deve essere una lettera o un numero. Maiuscole e minuscole non distinguono account diversi.
 3. Usa una password unica di 12–128 caratteri. Puoi usare il gestore password del dispositivo.
 4. Conserva il codice di recupero mostrato dopo la registrazione. È una chiave d’accesso: non inviarlo a nessuno e non inserirlo nelle segnalazioni di problemi.
-5. Indica il nome da mostrare, scuola facoltativa, anno e date del semestre. Parti senza materie oppure scegli le materie di base personalizzabili.
+5. Indica il nome da mostrare e scegli se partire senza materie o con le materie di base personalizzabili. **Personalizza semestre e date** apre i valori già compilati; la scuola resta facoltativa. Puoi cambiare queste impostazioni anche dopo.
+
+La registrazione mostra tre passi: Account, Recupero e Diario. **Mostra password** permette di controllare quello che hai scritto; non cambia né salva la password. Prima di registrarti puoi anche provare il calcolo pubblico della media dalla landing.
 
 Non viene richiesta un’email. Non esiste recupero via email. Nome utente, password e codice di recupero non sono intercambiabili.
 
@@ -30,7 +32,9 @@ La prima apertura online serve a preparare la copia offline. L’installazione s
 | Classi | Consultare attività e appunti condivisi; creare o raggiungere un gruppo privato |
 | Impostazioni | Gestire materie e semestri, tema, movimento, backup e account |
 
-Il selettore del periodo cambia i voti, le attività e le assenze visualizzati. Le materie sono condivise tra i periodi dello stesso diario. Archiviare un semestre non lo rende immutabile.
+Il periodo del diario resta il contesto di Home, Agenda, Assenze e della registrazione dei nuovi dati. Voti e Statistiche hanno un filtro di consultazione condiviso **Periodo / Anno scolastico / Tutto lo storico**, inizialmente sull’anno del periodo corrente. Le materie sono condivise fra periodi: non occorre ricrearle. Anni con etichette diverse restano separati; le etichette si possono correggere nelle impostazioni. I periodi archiviati restano consultabili e non sono immutabili.
+
+Il nuovo voto mostra **Registra nel periodo**: puoi scegliere un periodo reale senza cambiare quello del diario. La data non riassegna il voto. Il filtro e la materia restano selezionati tornando dalle statistiche o annullando il form; il filtro è stato di questa sessione, non una preferenza sincronizzata. Il registro mostra provenienza e medie per periodo; la media annuale usa tutti i singoli voti con i loro pesi, non la media delle medie dei periodi. L’andamento è la media generale cumulativa dei risultati visualizzati; il simulatore usa lo stesso ambito ed è disponibile in Periodo/Anno, non nello storico multiennale.
 
 ### Come leggere le medie
 
@@ -105,3 +109,9 @@ L'uscita rimuove la copia attiva del diario su quel browser. Se ci sono note o b
 ## Segnalare un problema
 
 Descrivi cosa volevi fare, i passaggi, il risultato atteso e quello ottenuto. Aggiungi versione browser/iOS, uso da Safari o icona Home e stato di sincronizzazione. Oscura nomi, voti e identificativi negli screenshot. Non allegare password, codici, cookie o backup completi. I problemi di sicurezza vanno comunicati privatamente: [Sicurezza](../SECURITY.md).
+
+### Lettura degli appunti
+
+Nel lettore personale restano titolo, materia/data, testo, pin e Tutti gli appunti; la descrizione introduttiva e lo stato normale di sincronizzazione della singola nota non occupano spazio nella lettura. Il ritorno all’elenco è sempre visibile; dall’elenco Torna a… riporta alla vista di origine. Il menu dei tre punti raccoglie Modifica, Esporta appunto, Copia in una classe ed Elimina. Nel lettore di classe lo stesso menu offre export, copia personale e i comandi consentiti dal ruolo. Esporta appunto apre una finestra con PDF e altri formati. Avvisi di errore, offline e conflitto rimangono visibili; conferme distruttive e controlli dei permessi sono conservati.
+
+Sotto il testo trovi gli altri appunti della stessa materia, in riquadri con titolo e data. Scegli un riquadro per sostituire la nota aperta. Le note personali e quelle delle classi restano separate.

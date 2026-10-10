@@ -4,11 +4,13 @@
 
 ## Riferimento e metodo
 
-Audit del **1 ottobre 2026**. All'inizio dell'allineamento, 234 file applicativi, configurazioni, asset e manifest coincidevano byte per byte con la pubblicazione Sites **27**, sorgente `9535676a53a75f9ff52cf90a501435e1bcee40db`. La repository ora comprende anche documentazione aggiornata, inventario automatico, regole per artefatti locali e correzioni delle dipendenze rilevate dall'audit CI. Questi aggiornamenti successivi non sono ancora pubblicati su Sites; sono distinti nel [changelog](../CHANGELOG.md). Lo SHA Sites è il riferimento del rilascio, non uno SHA GitHub intercambiabile.
+Audit del **1 ottobre 2026**. All'inizio dell'allineamento, 234 file applicativi, configurazioni, asset e manifest coincidevano byte per byte con la pubblicazione Sites **27**, sorgente `9535676a53a75f9ff52cf90a501435e1bcee40db`. La repository ora comprende anche documentazione aggiornata, inventario automatico, regole per artefatti locali e correzioni delle dipendenze rilevate dall'audit CI. Questi aggiornamenti, le dipendenze corrette e il primo ciclo ingresso/SEO sono stati pubblicati nella versione Sites **28**, sorgente `8fee251e1b942d3392ca92ab9381be4c0a6ae1c8`, come registrato nel [changelog](../CHANGELOG.md). Lo SHA Sites è il riferimento del rilascio, non uno SHA GitHub intercambiabile.
 
 Repository: `Ahmed-ali05/iPagell`, branch principale `main`. I metadati effettivi del checkout si leggono con `git status -sb` e `git log -1`; non mantenere uno SHA autoreferenziale nel testo. Il precedente audit e le sue aggiunte sono in [REPO-SNAPSHOT-HISTORY](REPO-SNAPSHOT-HISTORY.md).
 
 Sono stati letti manifest/lockfile, configurazioni, API, schema/migrazioni, sessione diario, storage e riconciliazione degli appunti, backup, componenti e script di verifica. Le guide non sostituiscono la lettura del codice. Stato remoto, dati utente e prove fisiche sono separati nella matrice.
+
+Il checkout comprende inoltre il [ciclo ingresso/SEO](improvement-2026-10-01/PLAN.md): landing più esplicita, setup progressivo e conferma identità che conserva il codice recupero se la rete fallisce. Google/Apple/email restano proposte; la consultazione annuale/storico è implementata e pubblicata da Sites 29 con prompt 09. Il rapporto distingue la patch dal rilascio Sites 28. Lo stato di pubblicazione del ciclo è nel relativo [rapporto](improvement-2026-10-01/VERIFICATION.md).
 
 ## Software implementato
 
@@ -47,7 +49,7 @@ Le viste dell'app sono stato client dentro `/app`, non route autonome. Appunti s
 
 Quattro percorsi persistenti: snapshot diario, attività/sottoscrizioni di classe, appunti personali, appunti di classe. D1 contiene **15 tabelle** versionate; **7 migrazioni** `0000`–`0006`. L'[inventario](REPO-INVENTORY.md) elenca tutti i nomi e le API esportate e ne verifica automaticamente l'allineamento.
 
-Non confondere `SchoolData.version=1`, IndexedDB `ipagell-db`/`ipagell-notes-db` versione 2, backup V3, contratto Appunti 2, revisione dei dati, versione npm `0.1.0` e numero Sites 27. `inFlight` è metadato locale per retry, escluso dal backup.
+Non confondere `SchoolData.version=1`, IndexedDB `ipagell-db`/`ipagell-notes-db` versione 2, backup V3, contratto Appunti 2, revisione dei dati, versione npm `0.1.0` e numero Sites 28. `inFlight` è metadato locale per retry, escluso dal backup.
 
 Il diario usa CAS sulla revisione. Gli appunti personali usano revisione, formato atteso, ID di mutazione, cursore e transizioni atomiche locali; una conferma della propria scrittura non scarta le modifiche successive. Classe richiede membership e pubblicazione esplicita online. Quote: 500 note/8 MiB personali, 200 note/4 MiB per classe; creazione limitata a 60 nuove materie attive, escluse le etichette legacy seminate. Per nota: 20.000 code point serializzati e 64 KiB. Le liste note sono paginate. Per regole complete vedere [Appunti](APPUNTI-SPEC.md) e [API](API.md).
 
@@ -55,8 +57,18 @@ Il diario usa CAS sulla revisione. Gli appunti personali usano revisione, format
 
 Convenzioni Next App Router, runtime/build **Vinext + Vite + Cloudflare Workers**, React 19 e TypeScript. Non è un server Next standard. Versioni esatte, script e Node dichiarato sono nell'inventario generato dal lockfile. La CI usa Node 22.
 
-`npm run check`: lint, tipi, unit test, i18n, inventario e link documentali. `release:prepare` aggiunge build e precache. La CI esegue installazione da lockfile, audit di tutte le dipendenze e preparazione; non esegue automaticamente suite API o prove browser e non pubblica.
+`npm run check`: lint, tipi, unit test, i18n, inventario e link documentali. `release:prepare` aggiunge build e precache. La CI esegue installazione da lockfile, prove della patch locale braces, audit di tutte le dipendenze e preparazione; non esegue automaticamente suite API o prove browser e non pubblica.
 
 Produzione: **https://ipagell.website**, progetto Sites esistente e binding `DB`; nessun R2. `wrangler.jsonc` è il Worker sandbox separato. Il push GitHub conserva il codice ma non aggiorna Sites. La pubblicazione e le verifiche esterne del rilascio sono in [DEPLOYMENT](DEPLOYMENT.md).
 
 Gli output PDF della ricerca e il bytecode Python sono ignorati; i sorgenti della ricerca restano versionati. Non caricare `.env`, database locali, credenziali, cookie o backup utente. Non risultano più nel tree i vecchi duplicati `db/schema 2.ts` e `drizzle.config 2.ts` citati dall'audit storico.
+
+## Revisione UI del 10 ottobre 2026
+
+Lettura essenziale, ritorno all’elenco visibile, comandi contestuali e riquadri discreti degli altri appunti della materia. Voti, Agenda, Assenze, Classi e Impostazioni riducono i controlli simultanei senza cambiare formule, storage o permessi. [Decisioni e verifiche](UX-SIMPLIFICATION-2026-10-10.md).
+
+Riferimento del rilascio UI: Sites **33**, sorgente `0288de5aa0419f8d7a1d59a69f5cb728c95dda55`, pubblicato il 10 ottobre 2026 su https://ipagell.website.
+
+## Correzione dipendenze del 10 ottobre 2026
+
+Il blocco CI della PR 5 è riprodotto e corretto con sharp 0.35.5, source-map-js 1.2.2 e la patch locale braces a profondità limitata. L’audit del registro torna a zero; sette prove mirate verificano il codice locale e i consumatori reali. [Analisi, provenienza e manutenzione](DEPENDENCY-SECURITY-2026-10-10.md). CI GitHub verde sul sorgente `f2200a94f72ce7c7d49081ea4229b9af0a5ac386`; correzione pubblicata come Sites **34**, deployment `appgdep_6aca7a42f8bc819184aaa0f9b87e7436` succeeded. [Registro](DEPLOYMENT.md).

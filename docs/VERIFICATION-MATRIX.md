@@ -2,7 +2,32 @@
 
 [Indice](README.md) · [Snapshot](REPO-SNAPSHOT.md) · [Architettura](ARCHITECTURE-CURRENT.md) · [Pubblicazione](DEPLOYMENT.md)
 
-Aggiornamento: **1 ottobre 2026**. Riferimento applicativo: Sites 27, sorgente `9535676a53a75f9ff52cf90a501435e1bcee40db`. Il precedente audit `c780569…`, le contraddizioni allora presenti e i risultati dei rilasci precedenti sono in [VERIFICATION-HISTORY](VERIFICATION-HISTORY.md). Non vanno letti come affermazioni sul codice attuale.
+Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, sorgente `8fee251e1b942d3392ca92ab9381be4c0a6ae1c8`. Le prove dell’audit iniziale sotto fanno riferimento a Sites 27. Il precedente audit `c780569…`, le contraddizioni allora presenti e i risultati dei rilasci precedenti sono in [VERIFICATION-HISTORY](VERIFICATION-HISTORY.md). Non vanno letti come affermazioni sul codice attuale.
+
+## Semplificazione UI — 10 ottobre 2026
+
+
+[Analisi e decisioni](UX-SIMPLIFICATION-2026-10-10.md). Pubblicata come Sites 33, sorgente `0288de5aa0419f8d7a1d59a69f5cb728c95dda55`; le evidenze seguenti distinguono le prove locali dalla conferma Sites.
+
+| Verifica | Esito e limite |
+|---|---|
+| Lint, TypeScript e test | Superati; 114 test passati. Nessuna modifica a contratti API, formule o persistenza. Suite API esterna non rieseguita per questo intervento UI. |
+| i18n e documentazione | 759 chiavi referenziate coerenti in it/de/fr/en; inventario rigenerato dopo la rimozione delle chiavi inutilizzate. Link verificati. |
+| Build Sites | Completata; resta l’avviso di chunk oltre 500 kB. La route di prova sintetica è esclusa dal sorgente consegnato. |
+| Browser con dati sintetici | Navigazione fra le viste, ritorno visibile all’elenco appunti, materia/precompilazione nuovo voto, simulatore, disclosure Assenze, lettura condivisa e invito nella gestione verificati. Nessun dato reale modificato. |
+| Tastiera/focus | Frecce/Escape nel menu e ritorno al trigger dopo export; invito chiuso con ritorno a Crea invito. Non è una verifica con lettore di schermo. |
+| Layout | 1440 px desktop, 390 px per lettura/Agenda/Voti, 320 px in tedesco scuro per Voti/Assenze. Nessun overflow nei casi misurati; revisione finale riprovata a 390 px. Non copre device fisici, IME, tastiera virtuale o ogni lingua/viewport. |
+| Ambiente di sviluppo | Errori transitori I18nProvider/InstallAppProvider durante aggiornamento a caldo dei cataloghi; ricarica completa ha ripristinato la demo. La fixture conserva le proprie revisioni fra ricariche, separata dai dati reali. |
+
+| Appunti correlati | Personale/classe: stessa materia, esclusione del corrente, altra materia e note eliminate, sezione assente se vuota; clic/Enter sostituiscono il lettore e focalizzano il titolo. 1440/390 px, nessun overflow; Riduci movimento → animation none. Verifica incrementale, 114 test generali non ripetuti. |
+
+| Pubblicazione | Sites 33, deployment `appgdep_6aca102fca3081918ea6c6cd6c4ab082` succeeded; URL canonico, audience e domini/TLS attivi riconfermati. Nessuna nuova migrazione o modifica ai dati. |
+
+| GitHub | Sorgente e documenti nella [PR 5](https://github.com/Ahmed-ali05/iPagell/pull/5). La prima CI del 10 ottobre si era fermata all’audit con 13 segnalazioni high. Dopo la correzione dipendenze, [CI sul commit f2200a9](https://github.com/Ahmed-ali05/iPagell/actions/runs/38073051270) riuscita: audit a zero, 121 test e build. La correzione è pubblicata in Sites 34; le prove UI sopra restano riferite a Sites 33. |
+
+## Dipendenze — 10 ottobre 2026
+
+[Analisi e prove](DEPENDENCY-SECURITY-2026-10-10.md): sette regressioni mirate passate, lint/tipi superati, audit completo del registro a zero. Il codice locale braces è verificato dai test prima dell’audit; l’audit npm non certifica la patch locale. [CI sul commit f2200a9](https://github.com/Ahmed-ali05/iPagell/actions/runs/38073051270) riuscita su installazione pulita Node 22: sette controlli prima dell’audit, audit completo a zero, lint/tipi, 121 test, 759 chiavi i18n, documentazione e build. Pubblicata in Sites 34, deployment `appgdep_6aca7a42f8bc819184aaa0f9b87e7436` succeeded; dettagli in [DEPLOYMENT](DEPLOYMENT.md). Nessuna prova browser UI o API ripetuta per questo intervento sulle dipendenze.
 
 ## Come leggere le evidenze
 
@@ -55,7 +80,7 @@ Le regressioni individuate sono riprodotte nel codice/test, ma non identificano 
 
 ## Stato della pubblicazione controllato
 
-Riletto dal connettore Sites il 1 ottobre 2026:
+Riletto dal connettore Sites il 1 ottobre 2026, prima del ciclo ingresso/SEO:
 
 | Proprietà | Evidenza esterna |
 |---|---|
@@ -63,7 +88,7 @@ Riletto dal connettore Sites il 1 ottobre 2026:
 | Versione salvata 27 | Sorgente `9535676a53a75f9ff52cf90a501435e1bcee40db`, archivio presente e deployment associato |
 | Deployment | `appgdep_6abe17938bf48191938483d415de60bf`, stato `succeeded` |
 | Domini | `ipagell.website` e `www.ipagell.website`, stato e TLS `active` |
-| Corrispondenza locale iniziale | 234 file applicativi/configurazioni/asset/manifest confrontati byte per byte con il checkout del rilascio, nessuna differenza prima di questo aggiornamento. Le successive correzioni delle dipendenze sono nel changelog e non sono ancora pubblicate. |
+| Corrispondenza locale iniziale | 234 file applicativi/configurazioni/asset/manifest confrontati byte per byte con il checkout del rilascio, nessuna differenza prima di questo aggiornamento. Le successive correzioni delle dipendenze sono nel changelog e sono state incluse in Sites 28. |
 
 Questa verifica non ha letto contenuti dei diari o delle note reali. La migrazione formato D1 è stata verificata nel rilascio 24, come registrato nello storico; non è una nuova ispezione completa del database nel task documentale. Flag runtime Classi, backup automatici, retention e restore non vengono dedotti dai nomi del binding. Il Worker sandbox non è una prova del DB Sites.
 
@@ -82,7 +107,7 @@ Il nuovo `docs:check` confronta inventario con manifest/lockfile, route, schema,
 
 La prima CI dell'allineamento, sul commit `c863844`, ha passato installazione, audit, lint/tipi, 103 test e i18n; si è fermata su un link del design storico a PDF non versionati. Il riferimento è stato convertito in un percorso testuale rigenerabile e il controllo locale ora rifiuta i link a destinazioni ignorate da Git. L'esito completo va letto nella CI del successivo commit.
 
-Gli aggiornamenti delle dipendenze sono verificati nella repository ma non ancora pubblicati; lo stato Sites rimane quello della versione 27 riportato sopra. I controlli remoti GitHub sono associati al commit, consultabili in Actions; non sono dedotti dall'esito locale.
+Gli aggiornamenti delle dipendenze sono verificati nella repository e inclusi nel successivo rilascio Sites 28. La tabella Sites 27 sopra registra lo stato dell’audit iniziale. I controlli remoti GitHub sono associati al commit, consultabili in Actions; non sono dedotti dall'esito locale.
 
 ## Ancora aperto
 
@@ -93,3 +118,20 @@ Gli aggiornamenti delle dipendenze sono verificati nella repository ma non ancor
 - Revisione umana delle traduzioni, sicurezza indipendente e metadati/redirect/cache live oltre ai controlli esplicitamente registrati.
 
 Per questi punti non dichiarare completamento usando soltanto build, unit test, viewport desktop o successo del deployment.
+
+
+## Ciclo ingresso, SEO e pianificazione account/periodi — 1 ottobre 2026
+
+Il [rapporto del ciclo](improvement-2026-10-01/VERIFICATION.md) registra le nuove prove: 106 test, 146 controlli API locali, metadata SSR delle otto route pubbliche, sitemap/robots/noindex, primo voto, setup progressivo e recovery con rete interrotta e retry. Browser a 320/390 px e desktop 1440×900, Home chiaro/scuro, account sintetici ripuliti. Tre regressioni di sessione proteggono la conferma dell’identità prima di smontare il form. Queste prove sono locali. Pubblicazione Sites **28** conclusa con stato `succeeded`, deployment `appgdep_6abe63d2394c8191a6ee91547a4e3008`; nessun cambio a binding, accesso e domini. Il report distingue verifiche locali e risposta della piattaforma.
+
+Google/Apple/email e la vista della materia per anno/storico restano pianificati nel [programma e prompt](improvement-2026-10-01/PLAN.md), non sono nuove capacità runtime. La revisione dei semestri verifica che le materie sono già comuni ai periodi: il limite corrente è il filtro di Voti/Statistiche. Nessun dato migrato né voto ufficiale annuale inferito.
+
+
+## Pianificazione multi-sistema — 1 ottobre 2026
+
+Aggiunta l’[analisi dedicata](improvement-2026-10-01/GRADING-EXTENSION-AUDIT.md), riutilizzando le ricerche iniziali e verificando tipi, calcoli, UI, schema strict, persistenza e backup. Fonti scolastiche primarie consultate per le famiglie candidate; cinque prompt (10–14) aggiunti al programma. Controlli documentali nel rapporto del ciclo. Non sono stati implementati nuovi preset, contratti o migrazioni; la produzione resta Sites 28 e `numeric-1-6`.
+
+
+## PERIODS-01 — consultazione annuale e storico
+
+Il [rapporto del programma](improvement-2026-10-01/VERIFICATION.md) distingue la nuova patch da Sites 28: 114 test, 146 verifiche API locali, journey annuale/storico con corrente vuoto, omonimi/archiviati, destinazione esplicita e annullamento, quattro lingue, desktop e 320/390 px chiaro/scuro. Nessuna migrazione o nuova scala. Stato pubblicazione nel rapporto; non dedurlo dalla build. Residui device fisici e verifica utenti restano aperti.

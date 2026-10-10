@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Editor](APPUNTI-EDITOR-SPEC.md) · [API](API.md) · [Architettura](ARCHITECTURE-CURRENT.md)
 
-Aggiornamento: **1 ottobre 2026**, codice applicativo Sites 27. La [specifica iniziale](APPUNTI-DESIGN-2026-09-30.md) conserva le decisioni del primo progetto; non è la descrizione corrente. Questo documento distingue comportamento implementato e limiti ancora da verificare.
+Aggiornamento UI: **10 ottobre 2026**. Contratti di persistenza invariati rispetto a Sites 27. La [specifica iniziale](APPUNTI-DESIGN-2026-09-30.md) conserva le decisioni del primo progetto; non è la descrizione corrente. Questo documento distingue comportamento implementato e limiti ancora da verificare.
 
 ## Due spazi e copie indipendenti
 
@@ -25,6 +25,10 @@ Home mostra fino a tre appunti recenti, Tutti gli appunti e Nuovo appunto. La ma
 In Classe il selettore separa Attività e Appunti della classe; il cambio attende il flush della nota aperta. Le bozze personali compaiono prima dei testi condivisi. Copie, gestione materie e archivio autore sono sezioni secondarie.
 
 Elenco: ricerca per titolo/testo visibile normalizzati per maiuscole e accenti, filtro materia, anteprime, data, pin; in classe anche autore. I risultati dipendono dall'archivio effettivamente caricato. La UI distingue caricamento parziale e completo; la paginazione non è una ricerca full-text sul server.
+
+Nel lettore personale restano titolo, materia/data, testo, pin e Tutti gli appunti; la descrizione introduttiva e lo stato normale di sincronizzazione della singola nota non occupano spazio nella lettura. Il ritorno all’elenco è sempre visibile; dall’elenco Torna a… riporta alla vista di origine. Il menu dei tre punti raccoglie Modifica, Esporta appunto, Copia in una classe ed Elimina. Nel lettore di classe lo stesso menu offre export, copia personale e i comandi consentiti dal ruolo. Esporta appunto apre una finestra con PDF e altri formati. Avvisi di errore, offline e conflitto rimangono visibili; conferme distruttive e controlli dei permessi sono conservati.
+
+Sotto il testo, una sezione separata mostra gli altri appunti caricati dello stesso spazio e con lo stesso ID materia, escludendo quello aperto e le note eliminate. Le note senza materia non vengono raggruppate per nome. I riquadri quadrati mostrano solo titolo e data, senza anteprime o colori di richiamo. Se non ci sono altre note, la sezione non compare. Un clic sostituisce il lettore, porta il focus al nuovo titolo e, se necessario, risale al lettore. Dissolvenza di 160 ms, senza spostamenti del testo; la preferenza di sistema e Riduci movimento disattivano animazione e scorrimento fluido. La sezione non viene stampata.
 
 ## Materie e note incomplete
 

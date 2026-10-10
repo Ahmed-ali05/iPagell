@@ -1,6 +1,6 @@
 "use client";
 import { lazy,Suspense,useCallback,useEffect,useMemo,useRef,useState } from "react";
-import { BookOpen,ChevronLeft,Plus,Star,Trash2 } from "lucide-react";
+import { BookOpen,ChevronLeft,Download,Pencil,Plus,Star,Trash2 } from "lucide-react";
 import { useI18n } from "@/components/i18n-provider";
 import { formatDate } from "@/lib/i18n";
 import { searchKey } from "@/lib/notes/validation";
@@ -10,7 +10,9 @@ import { NoteDeviceConflict } from "@/lib/notes/storage";
 import { downloadRecovery } from "@/lib/notes/recovery";
 import { classWriteBody } from "@/lib/notes/request-body";
 import { NoteContent } from "@/components/note-content";
-import { NoteExport } from "@/components/note-export";
+import { NoteExportDialog } from "@/components/note-export-dialog";
+import { ActionMenu } from "@/components/action-menu";
+import { RelatedNotes,useReadingNavigation } from "@/components/related-notes";
 import { noteVisibleText } from "@/lib/notes/format";
 const NoteEditor=lazy(()=>import("@/components/note-editor"));
 import type { ClassDetail } from "@/types/classes";
@@ -23,6 +25,7 @@ export function ClassNotesPanel({active,detail,userId,controller,copySeed,onCopy
   const {t,locale}=useI18n();const [subjects,setSubjects]=useState<ClassSubject[]>([]),[notes,setNotes]=useState<ClassNote[]>([]),[loaded,setLoaded]=useState(false),[error,setError]=useState("");
   const [selection,setSelection]=useState<Selection>(null),[query,setQuery]=useState(""),[filter,setFilter]=useState(""),[newSubject,setNewSubject]=useState(""),[managing,setManaging]=useState(false);
   const [copyPersonalId,setCopyPersonalId]=useState("");
+  const [exportOpen,setExportOpen]=useState(false);
   const [preparingCopy,setPreparingCopy]=useState(false);
   const generation=useRef(0);
   const copying=useRef(false);
@@ -45,6 +48,8 @@ export function ClassNotesPanel({active,detail,userId,controller,copySeed,onCopy
   const drafts=controller.classDrafts.filter(d=>d.classId===detail.id);
   const rows=useMemo(()=>notes.filter(n=>(!filter||n.subjectId===filter)&&searchKey(`${n.title} ${noteVisibleText(n.contentFormat,n.content)}`).includes(searchKey(query))).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||b.updatedAt-a.updatedAt||a.id.localeCompare(b.id)),[notes,query,filter]);
   const selected=selection?.kind==="read"?notes.find(n=>n.id===selection.id):null;
+  const related=selected?.subjectId?notes.filter(n=>n.id!==selected.id&&!n.deletedAt&&n.subjectId===selected.subjectId).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||b.updatedAt-a.updatedAt||a.id.localeCompare(b.id)):[];
+  const {readerRef,prepareSwitch}=useReadingNavigation(selected?.id);
   const editing=selection?.kind==="edit"?notes.find(n=>n.id===selection.id):null;
   const editingDraft=selection?.kind==="edit"?drafts.find(d=>d.id===selection.id):null;
   const nameOf=(id:string,fallback:string)=>subjects.find(s=>s.id===id)?.name??`${t("notes.missingSubject")} · ${fallback}`;
@@ -74,9 +79,22 @@ export function ClassNotesPanel({active,detail,userId,controller,copySeed,onCopy
   return <section className="panel class-notes-panel" aria-label={t("notes.classTitle")}><div className="panel-title"><div><h3>{t("notes.classTitle")}</h3><p>{t(selection?.kind==="edit"?"notes.draftHelp":"notes.visibleMembers",{name:detail.name})}</p></div>{selection?.kind==="read"&&<button className="soft-button" onClick={()=>setSelection(null)}><ChevronLeft size={18}/>{t("notes.viewAll")}</button>}</div>
     {error&&<p className="notes-banner error" role="alert">{error} <button onClick={()=>void load()}>{t("notes.retry")}</button></p>}
     {!loaded&&!error?<p role="status">{t("notes.loading")}</p>:selection?.kind==="edit"?<ClassEditor key={selection.id} id={selection.id} detail={detail} userId={userId} subjects={subjects} note={editing??null} draft={editingDraft??null} controller={controller} request={request} onDone={()=>{setSelection(null);void load();}} onBack={()=>setSelection(null)} onCopyPersonal={onCopyPersonal} onCreateSubject={createSubject}/>
-    :selection?.kind==="read"&&selected?<article className="notes-reader"><div className="notes-reader-actions"><button onClick={()=>void pin(selected)} aria-label={selected.pinned?t("notes.unpin"):t("notes.pin")}><Star size={18} fill={selected.pinned?"currentColor":"none"}/></button>{selected.authorId===userId&&<button className="soft-button" onClick={()=>setSelection({kind:"edit",id:selected.id})}>{t("notes.edit")}</button>}</div><h3>{selected.title}</h3><p className="notes-meta">{nameOf(selected.subjectId,selected.subjectName)} · {t("notes.byAuthor",{name:selected.authorName})} · {formatDate(locale,new Date(selected.updatedAt),{day:"numeric",month:"short",year:"numeric"})}</p><NoteContent contentFormat={selected.contentFormat} content={selected.content}/><NoteExport note={{...selected,subjectName:nameOf(selected.subjectId,selected.subjectName)}}/><div className="notes-actions"><button className="soft-button" onClick={()=>onCopyPersonal(selected)}>{t("notes.copyPersonal")}</button>{(selected.authorId===userId||detail.role!=="member")&&<button className="soft-button danger-text" onClick={()=>void deleteNote(selected)}><Trash2 size={16}/>{selected.authorId===userId?t("notes.withdrawClass"):t("notes.moderateDelete")}</button>}</div></article>
+    :selection?.kind==="read"&&selected?<><article key={selected.id} ref={readerRef} className="notes-reader note-swap">
+      <div className="notes-reader-actions"><h3 tabIndex={-1}>{selected.title}</h3><div className="reader-tools">
+        <button className="soft-button" onClick={()=>void pin(selected)} aria-label={selected.pinned?t("notes.unpin"):t("notes.pin")}><Star size={18} fill={selected.pinned?"currentColor":"none"}/></button>
+        <ActionMenu label={t("common.moreFor",{name:selected.title})} items={[
+          ...(selected.authorId===userId?[{label:t("notes.edit"),icon:Pencil,onSelect:()=>setSelection({kind:"edit",id:selected.id})}]:[]),
+          {label:t("notes.export"),icon:Download,onSelect:()=>setExportOpen(true)},
+          {label:t("notes.copyPersonal"),icon:BookOpen,onSelect:()=>onCopyPersonal(selected)},
+          ...((selected.authorId===userId||detail.role!=="member")?[{label:selected.authorId===userId?t("notes.withdrawClass"):t("notes.moderateDelete"),icon:Trash2,danger:true,onSelect:()=>void deleteNote(selected)}]:[]),
+        ]}/>
+      </div></div>
+      <p className="notes-meta">{nameOf(selected.subjectId,selected.subjectName)} · {t("notes.byAuthor",{name:selected.authorName})} · {formatDate(locale,new Date(selected.updatedAt),{day:"numeric",month:"short",year:"numeric"})}</p>
+      <NoteContent contentFormat={selected.contentFormat} content={selected.content}/>
+      <NoteExportDialog key={selected.id} open={exportOpen} onOpenChange={setExportOpen} note={{...selected,subjectName:nameOf(selected.subjectId,selected.subjectName)}}/>
+    </article><RelatedNotes notes={related} subjectName={nameOf(selected.subjectId,selected.subjectName)} headingLevel={4} onOpen={id=>{prepareSwitch(id);setSelection({kind:"read",id});}}/></>
     :<>{copySeed&&<div className="notes-banner"><p>{copySeed.title||t("notes.untitled")}</p><button className="primary-button" disabled={!loaded||preparingCopy} onClick={()=>void prepareCopy()}>{t("notes.prepareClassCopy",{name:detail.name})}</button></div>}
-      <div className="notes-primary-action"><p>{t("notes.classListHelp")}</p><button className="primary-button" disabled={!loaded} onClick={create}><Plus size={17}/>{t("notes.classNew")}</button></div>
+      <div className="notes-primary-action"><button className="primary-button" disabled={!loaded} onClick={create}><Plus size={17}/>{t("notes.classNew")}</button></div>
       {drafts.length>0&&<div className="notes-drafts"><h4>{t("notes.yourDrafts")}</h4><p className="notes-meta">{t("notes.draftHelp")}</p>{drafts.map(d=><div className="notes-draft-row" key={d.id}><button className="notes-row" onClick={()=>setSelection({kind:"edit",id:d.id})}><b>{d.title||t("notes.untitled")}</b><small>{t("notes.classDraftSaved")}</small></button><button className="soft-button danger-text" aria-label={t("notes.discardDraftTitle",{title:d.title||t("notes.untitled")})} onClick={()=>{if(window.confirm(t("notes.discardDraftConfirm")))void controller.deleteClassDraft(d.id,d).catch(()=>setError(t("notes.saveFailed")));}}><Trash2 size={17}/></button></div>)}</div>}
       <div className="notes-toolbar"><label className="notes-search"><span className="sr-only">{t("notes.search")}</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={t("notes.search")}/></label><label className="sr-only" htmlFor={`class-note-filter-${detail.id}`}>{t("notes.filter")}</label><select id={`class-note-filter-${detail.id}`} value={filter} onChange={e=>setFilter(e.target.value)}><option value="">{t("notes.allSubjects")}</option>{subjects.map(s=><option key={s.id} value={s.id}>{s.name}{s.archivedAt?` · ${t("notes.classSubjectArchived")}`:""}</option>)}</select></div>
       {!loaded?<p>{t("notes.loading")}</p>:rows.length?<div className="notes-list">{rows.map(n=><button className="notes-row" key={n.id} onClick={()=>setSelection({kind:"read",id:n.id})}><b>{n.pinned&&<Star size={15} fill="currentColor"/>}{n.title}</b><small>{nameOf(n.subjectId,n.subjectName)} · {t("notes.byAuthor",{name:n.authorName})}</small><span>{noteVisibleText(n.contentFormat,n.content).slice(0,160)}</span></button>)}</div>:<div className="notes-empty"><BookOpen size={24}/><h4>{notes.length?t("notes.noResults"):t("notes.classEmpty")}</h4><p>{notes.length?t("notes.adjustSearch"):t("notes.classEmptyHelp")}</p></div>}

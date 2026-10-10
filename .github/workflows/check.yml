@@ -23,6 +23,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm run install:ci
+      - name: Verifica patch delle dipendenze
+        run: npm run check:dependency-security
       - name: Audit dipendenze
         run: npm audit --audit-level=low
       - run: npm run release:prepare

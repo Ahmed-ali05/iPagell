@@ -8,9 +8,9 @@ const ogLocales: Record<Locale, string> = { it: "it_CH", de: "de_CH", fr: "fr_CH
 
 export async function publicLandingMetadata(locale: Locale, indexable = true): Promise<Metadata> {
   const messages = await getServerMessages(locale);
-  const title = messages["landing.title"];
+  const title = messages["landing.metaTitle"];
   const socialTitle = `${title} | iPagell`;
-  const description = messages["landing.lead"];
+  const description = messages["landing.metaDescription"];
   const socialImage = `/og${locale === "it" ? "" : `-${locale}`}.png`;
   return {
     title,

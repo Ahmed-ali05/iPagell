@@ -54,3 +54,13 @@ For a later task, prefer an explicit course offering/enrolment context for a sub
 ## Suggested next task
 
 Before adding a selectable system, decide the course-offering and assessment-context model, how legacy grades map to the `numeric-1-6` preset, and how each supported scheme defines validation, display, comparisons, and statistical operations. Add a scheme only when its input and reporting rules are explicit. Define any conversion as a separately sourced, contextual rule; do not infer one from numeric resemblance.
+
+
+## Extension programme — 1 October 2026
+
+The [multi-system analysis](improvement-2026-10-01/GRADING-EXTENSION-AUDIT.md) builds on this note and the earlier language/SEO discovery. It records primary sources, numeric and qualitative families, current code dependencies, annual views with incompatible systems, versioned assessment contexts, old-client write protection, and backup/import requirements. [Prompts 10–14](improvement-2026-10-01/PROMPTS.md) cover research, architecture, numeric implementation, qualitative/complex methods, and QA. This is planning only: the implemented preset, persisted schema and production behavior above remain unchanged.
+
+
+## Annual consultation (1 October 2026)
+
+The workspace shares a UI-only Period / School year / All history scope across grades and statistics. Years use exact existing schoolYear labels and period membership, including archived periods. No data format or identity changes. Subject means aggregate individual assessment weights across periods; overall means still use subject coefficients. The trend is the cumulative overall mean and keeps ISO dates, with years shown in the chart. Current type weights and coefficients recalculate history. This is not an official annual result. The simulator uses the selected Period/Year, preserves positive effective weights such as 0.1 × 0.1 = 0.01, and is unavailable in All history. Release evidence is recorded in [the programme report](improvement-2026-10-01/VERIFICATION.md).

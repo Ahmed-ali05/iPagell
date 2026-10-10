@@ -45,7 +45,9 @@ const lock = JSON.parse(await read("package-lock.json"));
 const it = JSON.parse(await read("lib/i18n/messages/it.json"));
 const dependencyRows = [];
 for (const group of ["dependencies", "devDependencies"]) for (const [name, version] of Object.entries(pkg[group] ?? {}).sort(([a], [b]) => a.localeCompare(b, "en"))) {
-  const resolved = lock.packages[`node_modules/${name}`]?.version;
+  const entry = lock.packages[`node_modules/${name}`];
+  // npm records file dependencies as links to a second lockfile entry.
+  const resolved = (entry?.link ? lock.packages[entry.resolved] : entry)?.version;
   if (!resolved) throw new Error(`Dipendenza ${name} assente dal lockfile.`);
   if (lock.packages[""][group]?.[name] !== version) throw new Error(`package.json e lockfile divergono per ${name}.`);
   dependencyRows.push(`| \`${name}\` | ${group === "dependencies" ? "app" : "tooling/test"} | \`${version}\` | \`${resolved}\` |`);

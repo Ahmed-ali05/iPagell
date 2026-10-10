@@ -38,6 +38,7 @@ type Props = {
   onClose: () => void;
   data: SchoolData;
   semesterId: string;
+  initialSubjectId?: string;
   editingSubject: Subject | null;
   editingSemester: Semester | null;
   onRefresh?: () => Promise<void>;
@@ -70,13 +71,14 @@ function EntryForm({
   onClose,
   data,
   semesterId,
+  initialSubjectId,
   editingSubject,
   editingSemester,
   onSave,
   onRefresh,
 }: Props) {
   const { t } = useI18n();
-  const [selected, setSelected] = useState(data.subjects[0]?.id ?? "");
+  const [selected, setSelected] = useState(data.subjects.find((subject) => subject.id === initialSubjectId)?.id ?? data.subjects[0]?.id ?? "");
   const [types, setTypes] = useState(
     editingSubject?.gradeTypes ?? [
       { id: uid(), name: t("entry.written"), weight: 1 },
@@ -112,7 +114,7 @@ function EntryForm({
         const grade: Grade = {
           id: uid(),
           subjectId: str("subjectId"),
-          semesterId,
+          semesterId: str("semesterId"),
           typeId: str("typeId"),
           value,
           weight: num("weight"),
@@ -264,6 +266,13 @@ function EntryForm({
         )}
         {type === "grade" && (
           <>
+            <label className="full">
+              {t("scope.recordIn")}
+              <NativeSelect name="semesterId" aria-label={t("scope.recordIn")} aria-describedby="grade-period-hint" defaultValue={semesterId} required>
+                {data.semesters.map((period) => <NativeSelectOption key={period.id} value={period.id}>{period.name} · {period.schoolYear}{period.archived ? ` · ${t("scope.archived")}` : ""}</NativeSelectOption>)}
+              </NativeSelect>
+              <small id="grade-period-hint">{t("scope.writeHint")}</small>
+            </label>
             <label>
               {t("common.grade")}
               <input

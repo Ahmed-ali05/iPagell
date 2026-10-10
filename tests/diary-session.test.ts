@@ -17,7 +17,7 @@ function harness() {
   const a = fixture();
   const env = {
     remote: structuredClone(a), disk: new Map<string, LocalDiary>(), active: null as string | null,
-    online: true, getError: null as Error | null, saveError: null as Error | null,
+    online: true, noDiary: false, getError: null as Error | null, saveError: null as Error | null,
     readError: null as Error | null, activateError: null as Error | null,
     putError: null as Error | null, loseAck: false, puts: 0, logouts: 0,
     beforeGet: async () => {}, beforePut: async () => {}, beforeSave: async () => {},
@@ -28,7 +28,7 @@ function harness() {
         const remote = structuredClone(env.remote);
         await env.beforeGet();
         if (env.getError) throw env.getError;
-        return { user: remote.user, diary: { data: remote.data, preferences: remote.preferences, revision: remote.revision } };
+        return { user: remote.user, diary: env.noDiary ? null : { data: remote.data, preferences: remote.preferences, revision: remote.revision } };
       }
       if (path === "/api/auth/logout") { env.logouts++; return {}; }
       assert.equal(path, "/api/diary");
@@ -295,4 +295,45 @@ test("unmount invalidates a pending load and cannot reactivate its account", asy
   await loading;
   assert.equal(env.active, "account-b");
   assert.equal(session.getState().diary, null);
+});
+
+
+test("entry authentication keeps the form on network failure and never opens a cached account", async () => {
+  const { env, session } = harness();
+  env.getError = new RequestError(401, "anonymous");
+  await session.reload();
+  const previous = fixture("previous-account");
+  env.disk.set(previous.user.id, previous);
+  env.active = previous.user.id;
+  env.getError = new TypeError("offline");
+  await assert.rejects(session.authenticate(), TypeError);
+  assert.equal(session.getState().phase, "anonymous");
+  assert.equal(session.getState().user, null);
+  assert.equal(env.active, previous.user.id);
+  env.getError = null;
+  env.noDiary = true;
+  await session.authenticate();
+  assert.equal(session.getState().phase, "onboarding");
+  assert.equal(session.getState().user?.id, env.remote.user.id);
+  assert.equal(env.active, env.remote.user.id);
+});
+
+test("entry authentication keeps its current phase if activation fails", async () => {
+  const { env, session } = harness();
+  env.noDiary = true;
+  await session.reload();
+  env.activateError = new Error("storage blocked");
+  await assert.rejects(session.authenticate(), /storage blocked/);
+  assert.equal(session.getState().phase, "onboarding");
+  assert.equal(session.getState().diary, null);
+});
+
+test("entry authentication reuses the verified identity to open an existing diary", async () => {
+  const { env, session } = harness();
+  let requests = 0;
+  env.beforeGet = async () => { requests++; };
+  await session.authenticate();
+  assert.equal(requests, 1);
+  assert.equal(session.getState().phase, "ready");
+  assert.equal(session.getState().diary?.user.id, env.remote.user.id);
 });

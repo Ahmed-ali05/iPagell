@@ -17,11 +17,9 @@ import {
   Home,
   Layers3,
   ListFilter,
-  Moon,
   Pencil,
   Plus,
   Settings2,
-  Sun,
   Trash2,
   Upload,
   UserRoundCheck,
@@ -50,8 +48,11 @@ import {
   NativeSelectOption,
 } from "@/components/ui/native-select";
 import { Switch } from "@/components/ui/switch";
+import { ActionMenu } from "@/components/action-menu";
 import { AbsencesView } from "@/components/absences-view";
 import { StatsView } from "@/components/stats-view";
+import { GradeScopeFilter } from "@/components/grade-scope-filter";
+import { initialGradeScope, resolveGradeScope, scopeGrades, scopePeriods, type GradeScope } from "@/lib/grade-scope";
 import { EmptyState } from "@/components/diary-empty-state";
 import { AccountGate } from "@/components/account-gate";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
@@ -184,7 +185,7 @@ export function IPagellApp({
         user={session.user}
         initialMode={initialAccountMode}
         onRegister={session.register}
-        onAuthenticated={session.reload}
+        onAuthenticated={session.authenticate}
         onLogout={session.logout}
       />
     );
@@ -207,6 +208,13 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const [agendaVisited,setAgendaVisited]=useState(false);
   const [agendaFocusId, setAgendaFocusId] = useState<string | null>(null);
   const [selectedGradeSubjectId, setSelectedGradeSubjectId] = useState("");
+  const gradeScroll = useRef(0);
+  useEffect(() => {
+    if (activeTab !== "grades" && activeTab !== "stats") return;
+    const frame = requestAnimationFrame(() => window.scrollTo(0, activeTab === "grades" ? gradeScroll.current : 0));
+    return () => cancelAnimationFrame(frame);
+  }, [activeTab]);
+  const [gradeScope, setGradeScope] = useState<GradeScope>(() => initialGradeScope(data.semesters, preferences.currentSemesterId));
   const [modal, setModal] = useState<ModalType>(null);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [editingSemester, setEditingSemester] = useState<Semester | null>(null);
@@ -414,6 +422,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const semesterGrades = data.grades.filter(
     (grade) => grade.semesterId === currentSemester.id,
   );
+  const readingScope = useMemo(() => resolveGradeScope(gradeScope, data.semesters, currentSemester.id), [gradeScope, data.semesters, currentSemester.id]);
+  const visibleGrades = useMemo(() => scopeGrades(data.grades, data.semesters, readingScope), [data.grades, data.semesters, readingScope]);
+  const visiblePeriods = scopePeriods(data.semesters, readingScope);
+  const scopeLabel = readingScope.kind === "all" ? t("scope.all") : readingScope.kind === "year"
+    ? `${t("scope.year")} · ${readingScope.schoolYear}`
+    : `${visiblePeriods[0]?.name ?? ""} · ${visiblePeriods[0]?.schoolYear ?? ""}`;
   const semesterAgenda: AgendaDisplayItem[] = useMemo(() => allAgenda.filter(
     (item) => item.semesterId === currentSemester.id || ((item as AgendaDisplayItem).shared && !data.semesters.some(s => s.id === item.semesterId)),
   ), [allAgenda, currentSemester.id, data.semesters]);
@@ -427,6 +441,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     else if(tab !== "notes")setAgendaFocusId(null);
     if (tab === "classes") setClassesVisited(true);
     if (tab === "agenda")setAgendaVisited(true);
+    if (activeTab === "grades" && tab !== "grades") gradeScroll.current = window.scrollY;
     setActiveTab(tab);
     return true;
   };
@@ -441,14 +456,6 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     const draft:NoteDraft={userId:session.user!.id,id,space:"personal",subjectId:"",subjectName:note.subjectName,title:note.title,content:note.content,contentFormat:note.contentFormat,pinned:false,baseRevision:0,mutationId:crypto.randomUUID(),localVersion:0,localEditedAt:Date.now()};
     try{await notes.savePersonalDraft(draft,null);openNotes("",false,id);}catch{toast.error(t("notes.saveFailed"));}
   };
-  const toggleTheme = () =>
-    savePreference({
-      theme:
-        document.documentElement.dataset.theme === "dark" ? "light" : "dark",
-    });
-  const isDark =
-    typeof document !== "undefined" &&
-    document.documentElement.dataset.theme === "dark";
   const openSubjectEditor = (subject?: Subject) => {
     setEditingSubject(subject ?? null);
     setModal("subject");
@@ -584,6 +591,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             <button
               className={activeTab === id ? "nav-item active" : "nav-item"}
               key={id}
+              aria-current={activeTab === id ? "page" : undefined}
               onClick={() => navigate(id)}
             >
               <Icon size={20} strokeWidth={2.1} />
@@ -617,26 +625,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             {activeTab !== "home" && activeTab !== "agenda" && <span className="space-context">{activeTab === "classes" ? t("workspace.shared") : t("workspace.private")}</span>}
           </div>
           <div className="top-actions">
-            <LanguageSelect className="language-select" />
-            {activeTab !== "classes" && activeTab !== "notes" && (
-              <NativeSelect
-                aria-label={t("workspace.currentSemester")}
-                value={currentSemester.id}
-                onChange={(event) =>
-                  savePreference({ currentSemesterId: event.target.value })
-                }
-                className="semester-select"
-              >
-                {data.semesters.map((semester) => (
-                  <NativeSelectOption key={semester.id} value={semester.id}>
-                    {semester.name}
-                  </NativeSelectOption>
-                ))}
-              </NativeSelect>
-            )}
-            <button aria-label={t("workspace.theme")} onClick={toggleTheme}>
-              {isDark ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
+          <span className={`sync-status ${session.status}`} role="status" title={session.status === "saved" ? t("sync.saved") : undefined} aria-label={session.status === "saved" ? t("sync.saved") : undefined}>
+            {session.status === "saved" ? <><Check size={14} aria-hidden="true"/><span>{t("sync.savedShort")}</span></> : t(({ saved: "sync.saved", saving: "sync.saving", offline: "sync.offline", conflict: "sync.conflict", "device-conflict": "sync.deviceConflict", error: "sync.error", expired: "sync.expired" } as const)[session.status])}
+          </span>
             <button
               aria-label={t("common.settings")}
               onClick={() => setSettingsOpen(true)}
@@ -646,9 +637,9 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           </div>
         </header>
 
-        <div className="account-toolbar">
+        {(importPlanExists||!["classes", "notes", "grades", "stats"].includes(activeTab))&&<div className="account-toolbar">
           {importPlanExists&&<button className="soft-button" onClick={()=>void resumeImport().catch(reportError)}>{t("notes.retry")} · {t("notes.backupImport")}</button>}
-          {activeTab !== "classes" && activeTab !== "notes" && (
+          {!["classes", "notes", "grades", "stats"].includes(activeTab) && (
             <NativeSelect
               aria-label={t("workspace.diaryPeriod")}
               value={currentSemester.id}
@@ -663,10 +654,8 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               ))}
             </NativeSelect>
           )}
-          <span className={`sync-status ${session.status}`} role="status">
-            {t(({ saved: "sync.saved", saving: "sync.saving", offline: "sync.offline", conflict: "sync.conflict", "device-conflict": "sync.deviceConflict", error: "sync.error", expired: "sync.expired" } as const)[session.status])}
-          </span>
-        </div>
+
+        </div>}
         {(["offline", "error", "expired", "conflict", "device-conflict"] as string[]).includes(
           session.status,
         ) && (
@@ -718,6 +707,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         )}
 
         {["home","agenda","classes"].includes(activeTab) && classAgenda.status && <div className="class-sync-status" role="status"><span>{t(classAgenda.status === "loading" ? "classEvents.agendaLoading" : classAgenda.status === "expired" ? "classEvents.sessionExpired" : "classEvents.agendaStale")}</span><button onClick={() => void classAgenda.refresh()}>{t("common.refresh")}</button></div>}
+        {["grades", "stats"].includes(activeTab) && <GradeScopeFilter scope={readingScope} semesters={data.semesters} currentSemesterId={currentSemester.id} onChange={setGradeScope} />}
         <div className="view-stage" key={activeTab}>
           {activeTab === "home" && (
             <>
@@ -741,7 +731,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           {activeTab === "grades" && (
             <GradesView
               subjects={data.subjects}
-              grades={semesterGrades}
+              grades={visibleGrades}
+              semesters={data.semesters}
+              periods={visiblePeriods}
+              scopeLabel={scopeLabel}
+              history={readingScope.kind === "all"}
+              onShowHistory={() => setGradeScope({ kind: "all" })}
               goal={preferences.gradeGoal}
               onGoal={(gradeGoal) => savePreference({ gradeGoal })}
               onAdd={() => data.subjects.length ? setModal("grade") : openSubjectEditor()}
@@ -792,8 +787,11 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           {activeTab === "stats" && (
             <StatsView
               data={data}
-              semester={currentSemester}
-              grades={semesterGrades}
+              periods={visiblePeriods}
+              scopeLabel={scopeLabel}
+              grades={visibleGrades}
+              onShowHistory={() => setGradeScope({ kind: "all" })}
+              historyAvailable={data.grades.length > visibleGrades.length}
               goal={preferences.gradeGoal}
               onAddGrade={() => setModal("grade")}
               onBackToGrades={() => navigate("grades")}
@@ -807,7 +805,6 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               focusItemId={agendaFocusId}
               subjects={data.subjects}
               onAdd={() => data.subjects.length ? setModal("agenda") : openSubjectEditor()}
-              onClasses={() => navigate("classes")}
               onOpenNotes={(item)=>openNotes(item.subjectId,false,"",item.id)}
               onPersonal={setPersonalEvent}
               onToggle={(id) => {
@@ -891,6 +888,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
         }}
         data={data}
         semesterId={currentSemester.id}
+        initialSubjectId={activeTab === "grades" || activeTab === "stats" ? selectedGradeSubjectId : undefined}
         editingSubject={editingSubject}
         editingSemester={editingSemester}
         onRefresh={session.status === "device-conflict" ? async () => {
@@ -1130,9 +1128,9 @@ function Dashboard({
   const countdown = nextTest ? getCountdown(nextTest.dueAt) : null;
   const subject = findSubject(data.subjects, nextTest?.subjectId);
   const gradedSubjects = data.subjects.filter((item) => subjectAverage(item, grades) !== null).length;
-  const emptyDiary = !agenda.length && !grades.length;
   const recent = recentNotes.filter(record=>record.draft?!record.draft.deleted:record.remote&&!record.remote.deletedAt)
     .sort((a,b)=>((b.draft?.localEditedAt??b.remote?.updatedAt)??0)-((a.draft?.localEditedAt??a.remote?.updatedAt)??0)).slice(0,3);
+  const emptyDiary = !agenda.length && !grades.length && !recent.length;
 
   return (
     <div className={`dashboard-grid ${emptyDiary ? "empty-dashboard" : ""}`}>
@@ -1157,6 +1155,7 @@ function Dashboard({
         ) : (
           <div className="empty-hero">
             <h2>{emptyDiary ? t("home.start") : t("home.noUpcoming")}</h2>
+            {emptyDiary && <p>{data.subjects.length ? t("home.firstValue") : t("home.firstSubjects")}</p>}
             <button onClick={() => data.subjects.length ? onAdd("agenda") : onManageSubjects()}><Plus size={18} /> {data.subjects.length ? t("home.addActivity") : t("home.addSubjects")}</button>
             {emptyDiary && data.subjects.length > 0 && <button className="secondary-action" onClick={() => onAdd("grade")}>{t("home.firstGrade")}</button>}
           </div>
@@ -1181,7 +1180,7 @@ function Dashboard({
       </section>}
 
       {grades.length > 0 ? <button className="grade-summary" onClick={() => onNavigate("grades")}><span>{t("home.gradeSituation")}</span><strong>{t("home.average", { value: gradeText(locale, average) })}</strong><small>{selectPlural(locale, grades.length, t("home.gradeCountOne"), t("home.gradeCount", { count: grades.length }))} · {selectPlural(locale, gradedSubjects, t("home.subjectCountOne"), t("home.subjectCount", { count: gradedSubjects }))}</small><ChevronRight size={18} /></button> : !emptyDiary && <section className="grade-prompt"><div><b>{t("home.noGrades")}</b></div><button onClick={() => data.subjects.length ? onAdd("grade") : onManageSubjects()}>{data.subjects.length ? t("grades.add") : t("home.addSubject")}</button></section>}
-      <section className="panel notes-home-card"><div className="panel-title"><div><h3>{t("notes.my")}</h3><p>{t(recent.length?"notes.resumeHelp":"notes.personalHelp")}</p></div><BookOpen size={22}/></div>{recent.length>0&&<div className="notes-recent-list">{recent.map(record=>{const note=(record.draft??record.remote)!;return <button className="notes-recent-row" key={record.id} onClick={()=>onResumeNote(record.id)}><div><b>{note.title||t("notes.untitled")}</b><small>{data.subjects.find(s=>s.id===note.subjectId)?.name||note.subjectName||t("notes.chooseSubject")}</small></div><ChevronRight size={18}/></button>;})}</div>}<div className="notes-actions"><button className="soft-button" onClick={onOpenNotes}>{t("notes.viewAll")}</button><button className="primary-button" onClick={onNewNote}><Plus size={17}/>{t("notes.new")}</button></div></section>
+      <section className="panel notes-home-card"><div className="panel-title"><div><h3>{t("notes.my")}</h3></div><BookOpen size={22}/></div>{recent.length>0&&<div className="notes-recent-list">{recent.map(record=>{const note=(record.draft??record.remote)!;return <button className="notes-recent-row" key={record.id} onClick={()=>onResumeNote(record.id)}><div><b>{note.title||t("notes.untitled")}</b><small>{data.subjects.find(s=>s.id===note.subjectId)?.name||note.subjectName||t("notes.chooseSubject")}</small></div><ChevronRight size={18}/></button>;})}</div>}<div className="notes-actions"><button className="soft-button" onClick={onOpenNotes}>{t("notes.viewAll")}</button><button className="primary-button" onClick={onNewNote}><Plus size={17}/>{t("notes.new")}</button></div></section>
     </div>
   );
 }
@@ -1194,7 +1193,6 @@ function AgendaView({
   onToggle,
   onDelete,
   onNotifications,
-  onClasses,
   onOpenNotes,
   onPersonal,
   pendingShared,
@@ -1207,7 +1205,6 @@ function AgendaView({
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onNotifications: () => void;
-  onClasses: () => void;
   onOpenNotes: (item:AgendaDisplayItem) => void;
   onPersonal: (item: ClassSubscription) => void;
   pendingShared: (id: string) => boolean;
@@ -1243,27 +1240,24 @@ function AgendaView({
   );
   return (
     <section className="module-view">
-      <div className="module-toolbar">
-        <div>
-          <button className="soft-button" onClick={onClasses}><UsersRound size={18} /> {t("agenda.openClasses")}</button>
-          <button className="soft-button" onClick={onNotifications}>
-            <Bell size={18} /> {t("agenda.reminders")}
-          </button>
-          <button className="primary-button" onClick={onAdd}>
-            <Plus size={18} /> {subjects.length ? t("entry.newActivity") : t("home.addSubject")}
-          </button>
-        </div>
-      </div>
-      <div className="agenda-scope" aria-label={t("agenda.activitySource")}>{[["all",t("agenda.all")],["private",t("agenda.personal")],["class",t("agenda.fromClasses")]].map(([id,label]) => <button key={id} aria-pressed={scope === id} onClick={() => setScope(id)}>{label}</button>)}</div>
       <Tabs defaultValue="calendar" className="agenda-tabs">
-        <TabsList className="segmented">
-          <TabsTrigger value="calendar">
-            <CalendarDays /> {t("agenda.calendar")}
-          </TabsTrigger>
-          <TabsTrigger value="list">
-            <ListFilter /> {t("agenda.list")}
-          </TabsTrigger>
-        </TabsList>
+        <div className="view-controls">
+          <div className="view-controls-filters">
+            <TabsList className="segmented">
+              <TabsTrigger value="calendar"><CalendarDays /> {t("agenda.calendar")}</TabsTrigger>
+              <TabsTrigger value="list"><ListFilter /> {t("agenda.list")}</TabsTrigger>
+            </TabsList>
+            <NativeSelect aria-label={t("agenda.activitySource")} value={scope} onChange={event=>setScope(event.target.value)}>
+              <NativeSelectOption value="all">{t("agenda.all")}</NativeSelectOption>
+              <NativeSelectOption value="private">{t("agenda.personal")}</NativeSelectOption>
+              <NativeSelectOption value="class">{t("agenda.fromClasses")}</NativeSelectOption>
+            </NativeSelect>
+          </div>
+          <div className="view-controls-actions">
+            <button className="text-link" onClick={onNotifications} title={t("agenda.reminders")}><Bell size={18}/>{t("agenda.remindersShort")}</button>
+            <button className="primary-button" onClick={onAdd}><Plus size={18}/>{subjects.length?t("entry.newActivity"):t("home.addSubject")}</button>
+          </div>
+        </div>
         <TabsContent value="calendar">
           <div className="agenda-layout">
             <section className="panel calendar-card">
@@ -1496,21 +1490,14 @@ function AgendaList({
                 <h4>{item.title}</h4>
                 {item.shared && <button className="agenda-origin" onClick={() => onPersonal(item.shared!)}>{item.shared.event.status === "cancelled" ? `${t("classEvents.cancelled")} · ` : ""}{item.shared.detachedAt ? `${t("agenda.personalOrigin")} · ` : `${t("agenda.classOrigin")} · `}{item.shared.event.className} <Settings2 size={12} /></button>}
                 {item.description && <p className="agenda-description">{item.description}</p>}
-                {subject&&<button className="text-link agenda-notes-link" onClick={()=>onOpenNotes(item)}><BookOpen size={15}/>{t("notes.forSubject",{name:subject.name})}</button>}
+                {subject&&<button className="text-link agenda-notes-link" aria-label={t("notes.forSubject",{name:subject.name})} onClick={()=>onOpenNotes(item)}><BookOpen size={15}/>{t("notes.shortLabel")}</button>}
                 <small>
                   {item.kind === "test" ? t("entry.test") : t("entry.task")} ·{" "}
                   {intlDate(locale, item.dueAt, { hour: "2-digit", minute: "2-digit" })}
                   {item.reminder ? ` · ${t("agenda.reminderOpen")}` : ""}
                 </small>
               </div>
-              <button
-                className="icon-button subtle"
-                disabled={!!item.shared && (pendingShared(item.shared.id) || blockedShared(item.shared.id))}
-                aria-label={t("common.delete")}
-                onClick={() => onDelete(item.id)}
-              >
-                <Trash2 size={17} />
-              </button>
+              <button className="icon-button subtle" disabled={!!item.shared&&(pendingShared(item.shared.id)||blockedShared(item.shared.id))} aria-label={t("common.delete")} onClick={()=>onDelete(item.id)}><Trash2 size={17}/></button>
             </article>
           );
         })
@@ -1527,6 +1514,11 @@ function AgendaList({
 function GradesView({
   subjects,
   grades,
+  semesters,
+  periods,
+  scopeLabel,
+  history,
+  onShowHistory,
   goal,
   selectedId,
   onSelectSubject,
@@ -1538,6 +1530,11 @@ function GradesView({
 }: {
   subjects: Subject[];
   grades: Grade[];
+  semesters: Semester[];
+  periods: Semester[];
+  scopeLabel: string;
+  history: boolean;
+  onShowHistory: () => void;
   goal: number;
   selectedId: string;
   onSelectSubject: (id: string) => void;
@@ -1557,6 +1554,7 @@ function GradesView({
   const [target, setTarget] = useState(goal);
   const [nextType, setNextType] = useState("");
   const [nextWeight, setNextWeight] = useState(1);
+  const [simulatorOpen, setSimulatorOpen] = useState(false);
   const type =
     subject?.gradeTypes.find((t) => t.id === nextType) ??
     subject?.gradeTypes[0];
@@ -1568,11 +1566,22 @@ function GradesView({
       <div className="module-toolbar">
         <p>{t("grades.scale")}</p>
         <div className="grades-actions">
-          {!!subjects.length && <button className="grades-stats-link" onClick={()=>subject&&onOpenNotes(subject.id)}><BookOpen size={17}/>{t("notes.forSubject",{name:subject?.name??t("common.subject")})}</button>}
-          {!!subjects.length && <button className="grades-stats-link" onClick={onOpenStats}><BarChart3 size={17} /> {t("grades.stats")}</button>}
+          {!!subjects.length && <button className="text-link" onClick={onOpenStats}><BarChart3 size={17}/>{t("nav.stats")}</button>}
           <button className="primary-button" onClick={onAdd}><Plus size={18} /> {subjects.length ? t("grades.add") : t("home.addSubject")}</button>
         </div>
       </div>
+      {!!subjects.length && <div className="subject-navigation">
+        <div>
+          <label htmlFor="grade-subject">{t("grades.chooseSubject")}</label>
+          <div className="subject-picker">
+            <NativeSelect id="grade-subject" value={subject?.id??""} onChange={event=>onSelectSubject(event.target.value)}>
+              {subjects.map(item=><NativeSelectOption key={item.id} value={item.id}>{item.name} · {gradeText(locale,subjectAverage(item,grades))}</NativeSelectOption>)}
+            </NativeSelect>
+            <button className="text-link" aria-label={t("notes.forSubject",{name:subject?.name??t("common.subject")})} onClick={()=>subject&&onOpenNotes(subject.id)}><BookOpen size={17}/>{t("notes.shortLabel")}</button>
+          </div>
+        </div>
+        <details className="subject-averages">
+          <summary>{t("grades.allAverages")}</summary>
       <div className="grade-overview">
         {subjects.map((item) => {
           const value = subjectAverage(item, grades);
@@ -1599,18 +1608,28 @@ function GradesView({
           );
         })}
       </div>
+        </details>
+      </div>}
       {subject ? (
-        <div className="grades-layout">
+        <div className={`grades-layout${simulatorOpen?" with-simulator":""}`}>
           <section className="panel grades-register">
             <div className="panel-title">
               <div>
                 <span className="eyebrow">{subject.name}</span>
                 <h3>{t("grades.register")}</h3>
+                <p className="scope-note">{scopeLabel} · {t("scope.count", { count: intlNumber(locale, subjectGrades.length) })}</p>
               </div>
               <div className="big-average" style={{ color: subject.color }}>
                 {gradeText(locale, average)}
               </div>
             </div>
+            <p className="scope-note">{t("scope.calculated")}</p>
+            {periods.length > 1 && <div className="grade-period-summary" aria-label={t("scope.byPeriod")}>
+              {periods.map((period) => {
+                const values = subjectGrades.filter((grade) => grade.semesterId === period.id);
+                return <div key={period.id}><span>{period.name} · {period.schoolYear}</span><b>{gradeText(locale, subjectAverage(subject, values))}</b><small>{t("scope.count", { count: intlNumber(locale, values.length) })}</small></div>;
+              })}
+            </div>}
             {subjectGrades.length ? (
               subjectGrades.map((grade) => (
                 <article key={grade.id}>
@@ -1626,7 +1645,10 @@ function GradesView({
                         t("common.grade")}
                     </b>
                     <small>
-                      {formatDate(locale, grade.date)} · {t("grades.weight", { value: gradeText(locale, grade.weight) })}
+                      {formatDate(locale, grade.date, { day: "numeric", month: "short", year: "numeric" })} · {t("grades.weight", { value: gradeText(locale, grade.weight) })}
+                    </small>
+                    <small>
+                      {semesters.find((period) => period.id === grade.semesterId)?.name} · {semesters.find((period) => period.id === grade.semesterId)?.schoolYear}
                     </small>
                   </div>
                   <span>
@@ -1636,24 +1658,23 @@ function GradesView({
                       )?.name
                     }
                   </span>
-                  <button
-                    className="icon-button subtle"
-                    onClick={() => onDelete(grade.id)}
-                    aria-label={t("grades.delete")}
-                  >
-                    <Trash2 size={17} />
-                  </button>
+                  <button className="icon-button subtle" onClick={()=>onDelete(grade.id)} aria-label={t("grades.delete")}><Trash2 size={17}/></button>
                 </article>
               ))
             ) : (
               <EmptyState
                 icon={GraduationCap}
                 title={t("home.noGrades")}
+                actionLabel={!history ? t("scope.showHistory") : undefined}
+                onAction={!history ? onShowHistory : undefined}
               />
             )}
           </section>
-          <aside className="panel simulator-card">
-            <h3>{t("grades.needed")}</h3>
+          <details className="panel simulator-card" open={simulatorOpen} onToggle={event=>setSimulatorOpen(event.currentTarget.open)}>
+            <summary>{t("grades.needed")}</summary>
+            <div className="simulator-body">
+            {history ? <><p className="scope-note">{t("scope.historySimulation")}</p></> : <>
+            <p className="scope-note">{t("scope.simulation")}</p>
             <label>
               {t("grades.target")} <b>{gradeText(locale, target)}</b>
               <input
@@ -1713,7 +1734,9 @@ function GradesView({
             <small className="sim-note">
               {t("grades.simNote", { weight: intlNumber(locale, nextWeight * (type?.weight ?? 1), { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })}
             </small>
-          </aside>
+            </>}
+            </div>
+          </details>
         </div>
       ) : (
         <EmptyState
@@ -1810,20 +1833,10 @@ function SettingsDialog({
                       {[subject.teacher, subject.coefficient !== 1 ? t("settings.coefficient", { value: intlNumber(locale, subject.coefficient) }) : null].filter(Boolean).join(" · ")}
                     </small>}
                   </div>
-                  <button
-                    className="icon-button"
-                    onClick={() => onEditSubject(subject)}
-                    aria-label={t("settings.editSubject", { name: subject.name })}
-                  >
-                    <Pencil />
-                  </button>
-                  <button
-                    className="icon-button danger"
-                    onClick={() => onDeleteSubject(subject.id)}
-                    aria-label={t("settings.deleteSubject", { name: subject.name })}
-                  >
-                    <Trash2 />
-                  </button>
+                  <ActionMenu label={t("common.moreFor",{name:subject.name})} items={[
+                    {label:t("settings.editSubject",{name:subject.name}),icon:Pencil,onSelect:()=>onEditSubject(subject)},
+                    {label:t("settings.deleteSubject",{name:subject.name}),icon:Trash2,danger:true,onSelect:()=>onDeleteSubject(subject.id)},
+                  ]}/>
                 </article>
               ))}
             </div>

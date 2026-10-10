@@ -12,14 +12,20 @@ import { formatDate, formatNumber, selectPlural } from "@/lib/i18n";
 
 export function StatsView({
   data,
-  semester,
+  periods,
+  scopeLabel,
+  onShowHistory,
+  historyAvailable,
   grades,
   goal,
   onAddGrade,
   onBackToGrades,
 }: {
   data: SchoolData;
-  semester: Semester;
+  periods: Semester[];
+  scopeLabel: string;
+  onShowHistory: () => void;
+  historyAvailable: boolean;
   grades: Grade[];
   goal: number;
   onAddGrade: () => void;
@@ -37,16 +43,18 @@ export function StatsView({
       fill: subject.color,
     }))
     .filter((item) => item.media > 0);
-  const trendData = gradeTrend(data.subjects, grades).map((item) => ({ ...item, date: formatDate(locale, item.date, { day: "numeric", month: "short" }) }));
+  const trendData = gradeTrend(data.subjects, grades);
   const average = generalAverage(data.subjects, grades);
   const strongest = [...subjectData].sort((a, b) => compareGradeValues(b.media, a.media))[0];
   const weakest = [...subjectData].sort((a, b) => compareGradeValues(a.media, b.media))[0];
-  const oldSemesters = data.semesters.filter((item) => item.id !== semester.id);
+  const oldSemesters = periods;
   if (!grades.length) {
     return (
       <section className="module-view">
         <div className="module-toolbar"><button className="soft-button" onClick={onBackToGrades}><ChevronLeft size={18} /> {t("stats.backToGrades")}</button></div>
         <section className="panel">
+          <p className="scope-note">{scopeLabel}</p>
+          {historyAvailable && <button className="soft-button" onClick={onShowHistory}>{t("scope.showHistory")}</button>}
           <EmptyState
             icon={GraduationCap}
             title={t("stats.emptyTitle")}
@@ -62,9 +70,10 @@ export function StatsView({
       <div className="module-toolbar"><button className="soft-button" onClick={onBackToGrades}><ChevronLeft size={18} /> {t("stats.backToGrades")}</button></div>
       <div className="stats-hero">
         <div>
-          <span className="section-label">{semester.name}</span>
+          <span className="section-label">{scopeLabel}</span>
           <h2>{average === null ? "—" : formatNumber(locale, average, { minimumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits, maximumFractionDigits: CURRENT_GRADING_SYSTEM.formatting.displayFractionDigits })}</h2>
           <p>{t("stats.weightedAverage")}</p>
+          <small className="scope-note">{t("scope.calculated")}</small>
         </div>
         <div>
           <b>{formatNumber(locale, grades.length)} {t(selectPlural(locale, grades.length, "stats.gradeOne", "stats.gradeMany"))}</b>
@@ -150,6 +159,7 @@ export function StatsView({
           <div className="panel-title">
             <div>
               <h3>{t("stats.trend")}</h3>
+              <p className="scope-note">{t("scope.cumulative")}</p>
             </div>
           </div>
           <div className="chart-wrap">
@@ -167,6 +177,7 @@ export function StatsView({
                 <CartesianGrid stroke="var(--line)" vertical={false} />
                 <XAxis
                   dataKey="date"
+                  tickFormatter={(value: string) => formatDate(locale, value, { day: "numeric", month: "short", year: "2-digit" })}
                   tick={{ fill: "var(--subtle)", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
@@ -180,6 +191,7 @@ export function StatsView({
                 />
                 <ReferenceLine y={CURRENT_GRADING_SYSTEM.passingValue} stroke="#e45c67" strokeDasharray="5 5" />
                 <Tooltip
+                  labelFormatter={(value) => formatDate(locale, String(value), { day: "numeric", month: "long", year: "numeric" })}
                   contentStyle={{
                     borderRadius: 14,
                     border: "1px solid var(--line)",
@@ -190,6 +202,7 @@ export function StatsView({
                 <Line
                   type="monotone"
                   dataKey="media"
+                  name={t("stats.weightedAverage")}
                   stroke="#6655e6"
                   strokeWidth={3}
                   dot={{
