@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Snapshot](REPO-SNAPSHOT.md) · [API](API.md) · [Verifiche](VERIFICATION-MATRIX.md)
 
-Aggiornamento: **1 ottobre 2026**. Descrive Sites 28 e la patch annuale nel checkout, in verifica/pubblicazione, dopo il confronto iniziale con Sites 27 e il ciclo ingresso/SEO; le evidenze e i limiti sono nella matrice. Le vecchie analisi sono conservate in [ARCHITECTURE-HISTORY](ARCHITECTURE-HISTORY.md). Il codice attuale prevale sempre sulla guida.
+Aggiornamento: **10 ottobre 2026**. Descrive il runtime pubblicato in Sites **33**, con consultazione annuale, homepage localizzata e semplificazione delle viste. Evidenze e limiti sono nella matrice; la cronologia resta in [ARCHITECTURE-HISTORY](ARCHITECTURE-HISTORY.md). Il codice attuale prevale sempre sulla guida.
 
 ## 1. Runtime, ingressi e navigazione
 

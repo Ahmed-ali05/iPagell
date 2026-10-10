@@ -7,7 +7,7 @@ Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, s
 ## Semplificazione UI — 10 ottobre 2026
 
 
-[Analisi e decisioni](UX-SIMPLIFICATION-2026-10-10.md). Nessun deploy; le evidenze seguenti riguardano il working tree.
+[Analisi e decisioni](UX-SIMPLIFICATION-2026-10-10.md). Pubblicata come Sites 33, sorgente `0288de5aa0419f8d7a1d59a69f5cb728c95dda55`; le evidenze seguenti distinguono le prove locali dalla conferma Sites.
 
 | Verifica | Esito e limite |
 |---|---|
@@ -17,9 +17,11 @@ Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, s
 | Browser con dati sintetici | Navigazione fra le viste, ritorno visibile all’elenco appunti, materia/precompilazione nuovo voto, simulatore, disclosure Assenze, lettura condivisa e invito nella gestione verificati. Nessun dato reale modificato. |
 | Tastiera/focus | Frecce/Escape nel menu e ritorno al trigger dopo export; invito chiuso con ritorno a Crea invito. Non è una verifica con lettore di schermo. |
 | Layout | 1440 px desktop, 390 px per lettura/Agenda/Voti, 320 px in tedesco scuro per Voti/Assenze. Nessun overflow nei casi misurati; revisione finale riprovata a 390 px. Non copre device fisici, IME, tastiera virtuale o ogni lingua/viewport. |
-| Ambiente di sviluppo | Errore transitorio I18nProvider durante aggiornamento a caldo dei cataloghi; ricarica completa ha ripristinato la demo. La fixture conserva le proprie revisioni fra ricariche, separata dai dati reali. |
+| Ambiente di sviluppo | Errori transitori I18nProvider/InstallAppProvider durante aggiornamento a caldo dei cataloghi; ricarica completa ha ripristinato la demo. La fixture conserva le proprie revisioni fra ricariche, separata dai dati reali. |
 
 | Appunti correlati | Personale/classe: stessa materia, esclusione del corrente, altra materia e note eliminate, sezione assente se vuota; clic/Enter sostituiscono il lettore e focalizzano il titolo. 1440/390 px, nessun overflow; Riduci movimento → animation none. Verifica incrementale, 114 test generali non ripetuti. |
+
+| Pubblicazione | Sites 33, deployment `appgdep_6aca102fca3081918ea6c6cd6c4ab082` succeeded; URL canonico, audience e domini/TLS attivi riconfermati. Nessuna nuova migrazione o modifica ai dati. |
 
 ## Come leggere le evidenze
 

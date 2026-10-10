@@ -1,6 +1,6 @@
 # Registro modifiche
 
-## 10 ottobre 2026 — Lettura e gerarchia dell’app
+## 10 ottobre 2026 — Lettura e gerarchia dell’app (Sites 33)
 
 - Lettore appunti con ritorno all’elenco visibile e operazioni occasionali nei tre punti; export in finestra dedicata.
 - Altri appunti della stessa materia sotto il testo, in riquadri discreti; sostituzione del lettore, focus al titolo e transizione breve con movimento ridotto rispettato.

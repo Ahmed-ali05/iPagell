@@ -10,7 +10,7 @@ Repository: `Ahmed-ali05/iPagell`, branch principale `main`. I metadati effettiv
 
 Sono stati letti manifest/lockfile, configurazioni, API, schema/migrazioni, sessione diario, storage e riconciliazione degli appunti, backup, componenti e script di verifica. Le guide non sostituiscono la lettura del codice. Stato remoto, dati utente e prove fisiche sono separati nella matrice.
 
-Il checkout comprende inoltre il [ciclo ingresso/SEO](improvement-2026-10-01/PLAN.md): landing più esplicita, setup progressivo e conferma identità che conserva il codice recupero se la rete fallisce. Google/Apple/email restano proposte; la consultazione annuale/storico è ora implementata nel checkout, in verifica/pubblicazione con prompt 09. Il rapporto distingue la patch dal rilascio Sites 28. Lo stato di pubblicazione del ciclo è nel relativo [rapporto](improvement-2026-10-01/VERIFICATION.md).
+Il checkout comprende inoltre il [ciclo ingresso/SEO](improvement-2026-10-01/PLAN.md): landing più esplicita, setup progressivo e conferma identità che conserva il codice recupero se la rete fallisce. Google/Apple/email restano proposte; la consultazione annuale/storico è implementata e pubblicata da Sites 29 con prompt 09. Il rapporto distingue la patch dal rilascio Sites 28. Lo stato di pubblicazione del ciclo è nel relativo [rapporto](improvement-2026-10-01/VERIFICATION.md).
 
 ## Software implementato
 
@@ -66,3 +66,5 @@ Gli output PDF della ricerca e il bytecode Python sono ignorati; i sorgenti dell
 ## Revisione UI del 10 ottobre 2026
 
 Lettura essenziale, ritorno all’elenco visibile, comandi contestuali e riquadri discreti degli altri appunti della materia. Voti, Agenda, Assenze, Classi e Impostazioni riducono i controlli simultanei senza cambiare formule, storage o permessi. [Decisioni e verifiche](UX-SIMPLIFICATION-2026-10-10.md).
+
+Riferimento del rilascio UI: Sites **33**, sorgente `0288de5aa0419f8d7a1d59a69f5cb728c95dda55`, pubblicato il 10 ottobre 2026 su https://ipagell.website.
