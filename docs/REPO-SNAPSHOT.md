@@ -15,7 +15,7 @@ Il checkout comprende inoltre il [ciclo ingresso/SEO](improvement-2026-10-01/PLA
 ## Software implementato
 
 - Account interni username/password, sessione cookie, codice di recupero e sicurezza account.
-- Diario con materie/semestri, voti, pesi, agenda personale, assenze, statistiche e preferenze sincronizzate.
+- Diario con materie/semestri, voti, pesi, agenda personale, assenze, statistiche e preferenze sincronizzate. L’elenco Agenda distingue lavoro aperto e storico richiudibile; [analisi e limiti](AGENDA-LIST-2026-10-10.md).
 - Appunti personali per materia, distinti dal semestre e dal JSON del diario, con bozze locali e sincronizzazione per nota.
 - Classi private: appartenenze, ruoli, inviti, attività condivise e sottoscrizioni personali all'agenda.
 - Materie e appunti della classe, bozza privata, anteprima e conferma di pubblicazione; copie indipendenti fra spazi.

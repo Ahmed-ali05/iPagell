@@ -39,6 +39,10 @@ Le prove di Sites 35 sopra non coprivano lo stato acceso nella build compilata; 
 
 Pubblicazione: Sites **36**, deployment `appgdep_6aca8811d9948191ba63063a489d5099` succeeded; dominio canonico/www e TLS attivi, audience pubblica. [CI del sorgente](https://github.com/Ahmed-ali05/iPagell/actions/runs/38077027637) riuscita.
 
+## Agenda — elenco delle attività, 10 ottobre 2026
+
+[Analisi e casi](AGENDA-LIST-2026-10-10.md). Cinque test mirati passati: stati personali/classe/scollegati/annullati, giorno locale e ora legale, ordine per istante/parità, completamento/riapertura e 1.500 record di storico senza perdita delle aperte. Browser sulla build compilata: 30 completate separate, 17 aperte raggiungibili dal riepilogo calendario, stati vuoti, filtro origine, ritorno dagli appunti, storico da Home, descrizione lunga, tastiera/focus e attesa/errore di classe simulati. Desktop 1.440 px, mobile 390/320 px, quattro cataloghi renderizzati senza overflow nei casi misurati; nessuna attività reale cambiata. Telefoni fisici, Safari, screen reader e dataset con migliaia di aperte restano fuori dalla verifica. Suite API non ripetuta perché callback e contratti non cambiano.
+
 ## Come leggere le evidenze
 
 - **Codice:** comportamento osservato nell'implementazione; non certifica l'ambiente esterno.

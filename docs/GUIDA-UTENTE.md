@@ -36,6 +36,12 @@ Il periodo del diario resta il contesto di Home, Agenda, Assenze e della registr
 
 Il nuovo voto mostra **Registra nel periodo**: puoi scegliere un periodo reale senza cambiare quello del diario. La data non riassegna il voto. Il filtro e la materia restano selezionati tornando dalle statistiche o annullando il form; il filtro è stato di questa sessione, non una preferenza sincronizzata. Il registro mostra provenienza e medie per periodo; la media annuale usa tutti i singoli voti con i loro pesi, non la media delle medie dei periodi. L’andamento è la media generale cumulativa dei risultati visualizzati; il simulatore usa lo stesso ambito ed è disponibile in Periodo/Anno, non nello storico multiennale.
 
+### Elenco delle attività
+
+In **Agenda → Elenco**, **Da fare** distingue Scadute, Oggi e Prossime attività. Una scadenza passata resta aperta finché non la completi. Le attività Completate e Annullate sono in sezioni richiudibili con conteggio; da Completate puoi segnare un’attività nuovamente come da fare. Le annullate non rientrano nel lavoro aperto.
+
+**Dettagli** apre la descrizione completa. **Appunti** resta accessibile dalla riga; i tre puntini contengono preferenze personali per le attività di classe e rimozione/eliminazione. Il filtro Tutte/Personali/Dalle classi e il periodo del diario continuano a delimitare l’elenco. Nel calendario, **Mostra tutte le attività** apre l’elenco completo se il riepilogo supera sei aperte; selezionare un giorno ne mostra le attività anche su telefono.
+
 ### Come leggere le medie
 
 La sufficienza è 4 su 6. Puoi scrivere `4.5`, `4,5` oppure `4-5`.

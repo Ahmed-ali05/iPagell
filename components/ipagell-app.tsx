@@ -77,7 +77,8 @@ import type { ClassNote, NoteCopySeed, NoteDraft, NotesBackupV3 } from "@/types/
 import { PersonalEventDialog } from "@/components/class-events-panel";
 import { useClassAgenda } from "@/hooks/use-class-agenda";
 import { usePendingActions } from "@/hooks/use-pending-actions";
-import { Spinner } from "@/components/ui/spinner";
+import { AgendaList } from "@/components/agenda-list";
+import { isOpenActivity, orderAgendaItems } from "@/lib/agenda-list";
 import { subscriptionAgenda, type AgendaDisplayItem, type ClassSubscription } from "@/lib/classes/events";
 import { makeNotesBackup,parseAnyBackup,remapDiaryForImport,estimatedImportUsage,planNotesImport } from "@/lib/notes/backup";
 import { listPersonal,listClassDrafts,readMeta,readImportPlan,writeImportPlan,readPersonal,forgetNotes,type ImportPlan } from "@/lib/notes/storage";
@@ -1228,9 +1229,11 @@ function AgendaView({
     if(lastFocused.current===focusedItem.id)return;
     lastFocused.current=focusedItem.id;
     const date=new Date(focusedItem.dueAt);
-    queueMicrotask(()=>{setMonth(new Date(date.getFullYear(),date.getMonth(),1));setSelectedDay(localDayKey(date));});
+    queueMicrotask(()=>{setMonth(new Date(date.getFullYear(),date.getMonth(),1));setSelectedDay(localDayKey(date));setScope(current=> current === "all" || (current === "private" ? !focusedItem.shared || !!focusedItem.shared.detachedAt : !!focusedItem.shared && !focusedItem.shared.detachedAt) ? current : "all");});
   },[focusedItem]);
-  const sorted = [...items].sort((a, b) => a.dueAt.localeCompare(b.dueAt));
+  const sorted = orderAgendaItems(items);
+  const openItems = sorted.filter(isOpenActivity);
+  const [view, setView] = useState("calendar");
   const firstOffset =
     (new Date(month.getFullYear(), month.getMonth(), 1).getDay() + 6) % 7;
   const days = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
@@ -1243,7 +1246,7 @@ function AgendaView({
   );
   return (
     <section className="module-view">
-      <Tabs defaultValue="calendar" className="agenda-tabs">
+      <Tabs value={view} onValueChange={setView} className="agenda-tabs">
         <div className="view-controls">
           <div className="view-controls-filters">
             <TabsList className="segmented">
@@ -1382,7 +1385,7 @@ function AgendaView({
                         (item) =>
                           localDayKey(new Date(item.dueAt)) === selectedDay,
                       )
-                    : sorted.filter((item) => !item.completed).slice(0, 6)
+                    : openItems.slice(0, 6)
                 }
                 subjects={subjects}
                 onToggle={onToggle}
@@ -1393,6 +1396,10 @@ function AgendaView({
                 blockedShared={blockedShared}
                 focusItemId={focusItemId}
                 compact
+                heading={selectedDay ? formatDate(locale, selectedDay) : t("agenda.todo")}
+                totalOpen={selectedDay ? undefined : openItems.length}
+                truncated={!selectedDay && openItems.length > 6}
+                onShowAll={() => setView("list")}
                 emptyTitle={selectedDay ? t("agenda.emptyDay") : !allItems.length ? t("agenda.emptyTitle") : scope !== "all" && !items.length ? t("agenda.emptyFilter") : t("agenda.noOpen")}
               />
             </div>
@@ -1413,103 +1420,6 @@ function AgendaView({
           />
         </TabsContent>
       </Tabs>
-    </section>
-  );
-}
-
-function AgendaList({
-  items,
-  subjects,
-  onToggle,
-  onDelete,
-  onPersonal,
-  onOpenNotes,
-  pendingShared,
-  blockedShared,
-  focusItemId,
-  compact = false,
-  emptyTitle,
-}: {
-  items: AgendaDisplayItem[];
-  subjects: Subject[];
-  onToggle: (id: string) => void;
-  onDelete: (id: string) => void;
-  onPersonal: (item: ClassSubscription) => void;
-  onOpenNotes: (item:AgendaDisplayItem) => void;
-  pendingShared: (id: string) => boolean;
-  blockedShared: (id: string) => boolean;
-  focusItemId?: string | null;
-  compact?: boolean;
-  emptyTitle: string;
-}) {
-  const { locale, t } = useI18n();
-  return (
-    <section className={`panel agenda-list ${compact ? "compact" : ""}`}>
-      <div className="panel-title">
-        <div>
-          <span className="eyebrow">{t("agenda.deadlines")}</span>
-          <h3>{compact ? t("agenda.upcoming") : `${intlNumber(locale, items.length)} ${t(selectPlural(locale, items.length, "agenda.itemOne", "agenda.itemMany"))}`}</h3>
-        </div>
-      </div>
-      {items.length ? (
-        items.map((item) => {
-          const subject = findSubject(subjects, item.subjectId);
-          return (
-            <article
-              className={`${item.completed ? "completed" : ""} ${item.shared?.event.status === "cancelled" ? "cancelled" : ""} ${item.id === focusItemId ? "home-focus" : ""}`}
-              id={item.id === focusItemId ? "home-focused-agenda-item" : undefined}
-              aria-current={item.id === focusItemId ? "location" : undefined}
-              key={item.id}
-            >
-              <button
-                className="round-check"
-                disabled={!!item.shared && (pendingShared(item.shared.id) || blockedShared(item.shared.id))}
-                aria-busy={!!item.shared && pendingShared(item.shared.id)}
-                aria-label={
-                  item.shared && pendingShared(item.shared.id)
-                    ? t("common.saving")
-                    : item.completed
-                    ? t("agenda.markTodo")
-                    : t("agenda.markDone")
-                }
-                onClick={() => onToggle(item.id)}
-              >
-                {item.shared && pendingShared(item.shared.id) ? <Spinner aria-label={t("common.saving")} /> : item.completed && <Check size={15} />}
-              </button>
-              <div className="date-block">
-                <b>{new Date(item.dueAt).getDate()}</b>
-                <small>
-                  {intlDate(locale, item.dueAt, { month: "short" })}
-                </small>
-              </div>
-              <div className="agenda-copy">
-                <div>
-                  <span
-                    className="subject-dot"
-                    style={{ background: subject?.color }}
-                  />
-                  {subject?.name ?? item.shared?.event.subject}
-                </div>
-                <h4>{item.title}</h4>
-                {item.shared && <button className="agenda-origin" onClick={() => onPersonal(item.shared!)}>{item.shared.event.status === "cancelled" ? `${t("classEvents.cancelled")} · ` : ""}{item.shared.detachedAt ? `${t("agenda.personalOrigin")} · ` : `${t("agenda.classOrigin")} · `}{item.shared.event.className} <Settings2 size={12} /></button>}
-                {item.description && <p className="agenda-description">{item.description}</p>}
-                {subject&&<button className="text-link agenda-notes-link" aria-label={t("notes.forSubject",{name:subject.name})} onClick={()=>onOpenNotes(item)}><BookOpen size={15}/>{t("notes.shortLabel")}</button>}
-                <small>
-                  {item.kind === "test" ? t("entry.test") : t("entry.task")} ·{" "}
-                  {intlDate(locale, item.dueAt, { hour: "2-digit", minute: "2-digit" })}
-                  {item.reminder ? ` · ${t("agenda.reminderOpen")}` : ""}
-                </small>
-              </div>
-              <button className="icon-button subtle" disabled={!!item.shared&&(pendingShared(item.shared.id)||blockedShared(item.shared.id))} aria-label={t("common.delete")} onClick={()=>onDelete(item.id)}><Trash2 size={17}/></button>
-            </article>
-          );
-        })
-      ) : (
-        <EmptyState
-          icon={CalendarDays}
-          title={emptyTitle}
-        />
-      )}
     </section>
   );
 }

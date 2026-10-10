@@ -34,6 +34,7 @@ Aggiornamento: **1 ottobre 2026**. Le guide correnti descrivono la pubblicazione
 | [Programma ingresso, SEO e account standard](improvement-2026-10-01/PLAN.md) | Audit specialistici, primo ciclo e prompt per i cicli successivi |
 | [Workflow completo e modelli](improvement-2026-10-01/WORKFLOW-MODELS.md) | Modello per ogni prompt, sequenza, dipendenze, stime e costi API distinti da Codex |
 | [Piano prodotto](PRODOTTO.md) | Lavoro aperto e criteri di rilascio |
+| [Elenco Agenda](AGENDA-LIST-2026-10-10.md) | Analisi, stati, ordinamento e limiti della revisione del 10 ottobre |
 | [Reference UX](UX-REFERENCE.md) | Direzione di progetto, non lista di funzioni già consegnate |
 
 ## Materiale di progetto e storico
