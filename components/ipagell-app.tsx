@@ -1928,11 +1928,10 @@ function SettingsDialog({
                 <NativeSelectOption value="dark">{t("settings.dark")}</NativeSelectOption>
               </NativeSelect>
             </div>
-            <div className="preference-row">
-              <div>
-                <b>{t("settings.reduceMotion")}</b>
-              </div>
+            <div className="preference-row preference-toggle-row">
+              <label htmlFor="reduce-motion"><b>{t("settings.reduceMotion")}</b></label>
               <Switch
+                id="reduce-motion"
                 aria-label={t("settings.reduceMotion")}
                 checked={!!preferences.reduceMotion}
                 onCheckedChange={(reduceMotion) =>
