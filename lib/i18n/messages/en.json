@@ -458,8 +458,7 @@
   "agenda.list": "List",
   "agenda.previousMonth": "Previous month",
   "agenda.nextMonth": "Next month",
-  "agenda.showUpcoming": "Show upcoming",
-  "agenda.deadlines": "Due dates",
+  "agenda.showUpcoming": "Show to do",
   "agenda.upcoming": "Upcoming activities",
   "agenda.markTodo": "Mark as to do",
   "agenda.markDone": "Mark as complete",
@@ -758,5 +757,14 @@
   "common.moreFor": "More options for {name}",
   "notes.shortLabel": "Notes",
   "agenda.remindersShort": "Alerts",
-  "notes.relatedSubject": "Other notes for {name}"
+  "notes.relatedSubject": "Other notes for {name}",
+  "agenda.overdue": "Overdue",
+  "agenda.today": "Today",
+  "agenda.completed": "Completed",
+  "agenda.cancelled": "Cancelled",
+  "agenda.todo": "To do",
+  "agenda.personalSettings": "Personal settings",
+  "agenda.showAllActivities": "Show all activities",
+  "agenda.groupCount": "{name}: {count} {unit}",
+  "agenda.visibleCount": "{shown} of {total}"
 }

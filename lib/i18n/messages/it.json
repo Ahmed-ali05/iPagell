@@ -458,8 +458,7 @@
   "agenda.list": "Elenco",
   "agenda.previousMonth": "Mese precedente",
   "agenda.nextMonth": "Mese successivo",
-  "agenda.showUpcoming": "Mostra prossime",
-  "agenda.deadlines": "Scadenze",
+  "agenda.showUpcoming": "Mostra da fare",
   "agenda.upcoming": "Prossime attività",
   "agenda.markTodo": "Segna come da fare",
   "agenda.markDone": "Segna come completata",
@@ -758,5 +757,14 @@
   "common.moreFor": "Altre opzioni per {name}",
   "notes.shortLabel": "Appunti",
   "agenda.remindersShort": "Avvisi",
-  "notes.relatedSubject": "Altri appunti di {name}"
+  "notes.relatedSubject": "Altri appunti di {name}",
+  "agenda.overdue": "Scadute",
+  "agenda.today": "Oggi",
+  "agenda.completed": "Completate",
+  "agenda.cancelled": "Annullate",
+  "agenda.todo": "Da fare",
+  "agenda.personalSettings": "Preferenze personali",
+  "agenda.showAllActivities": "Mostra tutte le attività",
+  "agenda.groupCount": "{name}: {count} {unit}",
+  "agenda.visibleCount": "{shown} di {total}"
 }
