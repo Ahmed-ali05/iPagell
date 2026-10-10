@@ -1,11 +1,11 @@
 # Registro modifiche
 
-## Agenda — 10 ottobre 2026
+## Agenda — 10 ottobre 2026 (Sites 37)
 
 - Elenco con attività da fare in testa, gruppi per giorno locale e storico Completate/Annullate richiudibile; scadenze passate mai completate automaticamente.
 - Righe con titolo e data leggibili, descrizioni nei Dettagli, Appunti diretto e menu contestuale per comandi secondari. Focus conservato dopo completamento/riapertura.
 - Riepilogo calendario con conteggio parziale e ingresso all’elenco completo; dettaglio del giorno visibile mobile, annullate escluse dalle aperte.
-- Cinque regressioni mirate e prove sulla build compilata desktop/mobile; [analisi e limiti](docs/AGENDA-LIST-2026-10-10.md). Nessuna nuova API, migrazione o preferenza persistente.
+- Pubblicata in Sites 37, confermata in produzione desktop/mobile. Cinque regressioni mirate e prove sulla build compilata; [analisi e limiti](docs/AGENDA-LIST-2026-10-10.md). Nessuna nuova API, migrazione o preferenza persistente.
 
 ## 10 ottobre 2026 — Riduci movimento: geometria e comportamento (Sites 36)
 

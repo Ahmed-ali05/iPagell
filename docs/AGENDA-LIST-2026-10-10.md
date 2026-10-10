@@ -39,3 +39,12 @@ File: `components/agenda-list.tsx`, `lib/agenda-list.ts`, integrazione in `compo
 Schermate iniziali e prove sintetiche restano nel fascicolo locale di audit, fuori dal sorgente pubblicato. Una schermata chiara catturata durante la transizione del tema è stata scartata e ripresa dopo stabilizzazione. Un disallineamento della griglia mobile è stato trovato e corretto nella build compilata prima del rilascio.
 
 Le prove browser simulano esito/attesa/errore delle callback esistenti, non ripetono la suite API o certificano un nuovo protocollo di sincronizzazione. Restano da provare telefoni fisici/Safari, lettori di schermo, zoom completo e prestazioni con migliaia di attività tutte aperte. Il test con 1.500 record copre raggruppamento e conservazione dei dati, non un benchmark browser. Le evidenze non attestano conformità WCAG completa.
+
+## Rilascio e riscontro in produzione
+
+Sites **37**, sorgente `bf295652402cc3018fba46a5b8ec91ed55cfcdb5`, deployment `appgdep_6aca90049350819189acde5a20f974a2` succeeded il 10 ottobre alle 21:20 Europe/Zurich. [CI del sorgente](https://github.com/Ahmed-ali05/iPagell/actions/runs/38079164366): audit a zero, 128 test, 768 chiavi e build riusciti. Progetto, pubblico, dominio canonico e www/TLS conservati.
+
+4. **Produzione mobile, 390×844.** Unica attività aperta subito visibile, prima riga a 406,2 px rispetto ai 2.110,8 px iniziali. Le sette completate sono in una sezione chiusa con conteggio. Titolo, data, materia e Appunti leggibili; nessun overflow nel caso misurato.
+5. **Produzione desktop, 1.440×900.** Stesso ordine/stato, unica aperta prima dello storico chiuso. Verifica read-only della sessione disponibile; nessuna attività o preferenza modificata. Viewport temporaneo ripristinato.
+
+Questo controllo dimostra l’elenco servito dalla pubblicazione, non sostituisce le prove sintetiche di tutti gli stati o quelle fisiche ancora aperte.
