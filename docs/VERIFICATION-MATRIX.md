@@ -29,6 +29,10 @@ Aggiornamento: **1 ottobre 2026**. Riferimento applicativo corrente: Sites 28, s
 
 [Analisi e prove](DEPENDENCY-SECURITY-2026-10-10.md): sette regressioni mirate passate, lint/tipi superati, audit completo del registro a zero. Il codice locale braces è verificato dai test prima dell’audit; l’audit npm non certifica la patch locale. [CI sul commit f2200a9](https://github.com/Ahmed-ali05/iPagell/actions/runs/38073051270) riuscita su installazione pulita Node 22: sette controlli prima dell’audit, audit completo a zero, lint/tipi, 121 test, 759 chiavi i18n, documentazione e build. Pubblicata in Sites 34, deployment `appgdep_6aca7a42f8bc819184aaa0f9b87e7436` succeeded; dettagli in [DEPLOYMENT](DEPLOYMENT.md). Nessuna prova browser UI o API ripetuta per questo intervento sulle dipendenze.
 
+## Riduci movimento — correzione visibilità
+
+La verifica di Sites 34 ha rilevato il toggle presente ma pista/cursore trasparenti. Stile corretto e prove locali mirate sulla finestra reale con dati sintetici: acceso/spento chiaro/scuro, clic/etichetta/Space, focus 3 px, hit area 52×44 px, movimento ridotto con transizione 0s e desktop/390 px senza overflow. Route e export di prova esclusi dal sorgente finale. Nessuna preferenza reale cambiata. [Causa e soluzione](UX-SIMPLIFICATION-2026-10-10.md#correzione-riduci-movimento--10-ottobre); pubblicazione nel [registro](DEPLOYMENT.md).
+
 ## Come leggere le evidenze
 
 - **Codice:** comportamento osservato nell'implementazione; non certifica l'ambiente esterno.

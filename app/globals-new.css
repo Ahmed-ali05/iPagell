@@ -1595,6 +1595,73 @@ button {
 .preference-row [data-slot="native-select-wrapper"] {
   width: 100%;
 }
+
+/* Switch colors use the app tokens directly, without Tailwind theme aliases. */
+[data-slot="switch"] {
+  --switch-width: 52px;
+  --switch-track-height: 28px;
+  --switch-thumb-size: 22px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  justify-self: end;
+  flex-shrink: 0;
+  width: var(--switch-width);
+  height: 44px;
+  padding: 3px;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+  transition: none;
+}
+[data-slot="switch"][data-size="sm"] {
+  --switch-width: 44px;
+  --switch-track-height: 24px;
+  --switch-thumb-size: 18px;
+}
+[data-slot="switch"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: var(--switch-track-height);
+  transform: translateY(-50%);
+  border: 1px solid var(--subtle);
+  border-radius: 999px;
+  background: var(--input);
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+[data-slot="switch"][data-state="checked"]::before {
+  background: var(--accent-fill);
+  border-color: var(--accent-fill);
+}
+[data-slot="switch"] > [data-slot="switch-thumb"] {
+  position: relative;
+  flex: 0 0 var(--switch-thumb-size);
+  width: var(--switch-thumb-size);
+  height: var(--switch-thumb-size);
+  border-radius: 50%;
+  background: var(--primary-foreground);
+  box-shadow: 0 1px 3px #0003;
+  translate: none;
+  transform: translateX(0);
+  transition: transform 140ms ease;
+}
+[data-slot="switch"][data-state="checked"] > [data-slot="switch-thumb"] {
+  transform: translateX(calc(var(--switch-width) - var(--switch-thumb-size) - 6px));
+}
+[data-slot="switch"]:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 3px;
+}
+[data-slot="switch"]:hover,
+[data-slot="switch"]:active {
+  transform: none;
+}
 .backup-card {
   display: flex;
   gap: 14px;
@@ -2652,3 +2719,6 @@ button.agenda-origin { min-height:32px; text-align:left; }
   .classes-toolbar > div:last-child { width:auto; margin-left:auto; }
   .classes-toolbar button { flex:initial; }
 }
+
+.preference-toggle-row { grid-template-columns: minmax(0, 1fr) auto; column-gap: 16px; }
+.preference-toggle-row label { cursor: pointer; }

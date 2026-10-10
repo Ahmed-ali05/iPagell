@@ -59,3 +59,11 @@ I risultati delle verifiche automatiche finali sono registrati nella [matrice](V
 ## Pubblicazione
 
 Sites 33 pubblicato il 10 ottobre 2026, sorgente `0288de5aa0419f8d7a1d59a69f5cb728c95dda55`, deployment succeeded. URL canonico https://ipagell.website, accesso pubblico e domini/TLS attivi. Dettagli in [Pubblicazione](DEPLOYMENT.md).
+
+## Correzione Riduci movimento — 10 ottobre
+
+In Sites 34 il controllo Radix esisteva e aveva lo stato accessibile corretto, ma pista e cursore erano trasparenti: le classi `bg-input`/`bg-background` del componente richiedevano alias Tailwind assenti dal tema corrente. Osservati 32×18,4 px e `rgba(0,0,0,0)` su entrambe le parti.
+
+Lo stile condiviso in `app/globals-new.css` ora usa direttamente i token dell’app per pista e cursore, con stati acceso/spento, focus visibile e area cliccabile 52×44 px. L’etichetta è associata al controllo; la riga mantiene testo e toggle affiancati anche sotto il breakpoint mobile. Radix, callback e persistenza della preferenza restano quelli esistenti.
+
+Verifica mirata sulla finestra Impostazioni reale con dati sintetici in una route locale temporanea: stati acceso/spento in chiaro/scuro, clic sul controllo e sull’etichetta, Space, focus da tastiera, `data-reduce-motion=true` con transizione 0s e viewport desktop/390 px senza overflow. La route e l’export temporaneo per la prova vengono rimossi prima della build. Le preferenze dell’account reale non sono state cambiate.
