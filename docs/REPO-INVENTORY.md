@@ -10,8 +10,8 @@ Generato da `scripts/repo-inventory.mjs` leggendo il sorgente, senza rete o dati
 | Node dichiarato | `^22.23.4 || ^24.22.1 || ^26.12.1` |
 | Lockfile | 3 |
 | Cataloghi | it, de, fr, en; 850 chiavi nel riferimento italiano |
-| Schema D1 versionato | 23 tabelle |
-| Migrazioni | 8, SQL e journal concordanti |
+| Schema D1 versionato | 15 tabelle |
+| Migrazioni | 7, SQL e journal concordanti |
 | File route API | 27 |
 
 ## API esportate
@@ -67,14 +67,6 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 - `class_subjects`
 - `class_notes`
 - `class_note_pins`
-- `auth_schema_state`
-- `account_credentials`
-- `account_identities`
-- `account_emails`
-- `auth_browser_epochs`
-- `auth_transactions`
-- `auth_challenges`
-- `auth_grants`
 
 ## Migrazioni
 
@@ -85,7 +77,6 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 - [0004_glossy_stranger.sql](../drizzle/0004_glossy_stranger.sql)
 - [0005_heavy_elektra.sql](../drizzle/0005_heavy_elektra.sql)
 - [0006_daily_stranger.sql](../drizzle/0006_daily_stranger.sql)
-- [0007_auth_compatibility.sql](../drizzle/0007_auth_compatibility.sql)
 
 ## Script npm
 
@@ -105,6 +96,7 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 | `release:prepare` | `npm run check && npm run build` |
 | `test` | `node --import tsx --test tests/*.test.ts` |
 | `test:auth-d1` | `node --import tsx --test tests/auth-d1.integration.ts` |
+| `test:auth-restore` | `node --import tsx scripts/w8a-restore-rehearsal.ts` |
 | `test:api` | `node tests/api-smoke.mjs` |
 | `docs:generate` | `node scripts/repo-inventory.mjs` |
 | `docs:check` | `node scripts/repo-inventory.mjs --check && node scripts/check-docs.mjs` |

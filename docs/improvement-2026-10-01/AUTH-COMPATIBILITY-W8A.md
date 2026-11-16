@@ -2,6 +2,10 @@
 
 17 ottobre 2026. [Piano](PLAN.md) · [Architettura account](AUTH-PRODUCT-AUDIT.md) · [Verifiche](VERIFICATION.md).
 
+## Separazione successiva del rilascio security
+
+Il candidato corrente supporta lo schema Sites 39 invariato senza bootstrap; 0007 e snapshot sono conservati in `operations/w8a/deferred-expansion/`, fuori dal runner. Le correzioni security restano, con modalità server esplicita `legacy-unexpanded` e verifica dello schema anche nelle scritture finali. Le sezioni seguenti documentano la precedente implementazione con espansione; stato attuale e prova gestita nel [rapporto di preparazione](W8A-RELEASE-PREPARATION.md). Non confondere rollback del Worker e restore DB.
+
 ## Risultato e perimetro
 
 Implementazione locale di **W8-A / prompt 05**: espansione 0007, adattatore compatibile e correzioni security indipendenti dai provider. Nessuna migrazione remota, configurazione esterna o pubblicazione. **W8 complessivo non è completato**; W8-A non è ancora la release intermedia pubblicata richiesta prima della contrazione.
@@ -12,7 +16,7 @@ Un solo writer; revisione separata in sola lettura con **gpt-6.1-sol / high**, c
 
 ## Comportamento implementato
 
-- [0007](../../drizzle/0007_auth_compatibility.sql) aggiunge otto tabelle auth e `accounts.auth_operation_id`, senza modificare 0000–0006 o ricreare accounts. Copia byte per byte gli hash legacy in account_credentials. Schema e snapshot Drizzle aggiornati; 23 tabelle e 8 migrazioni nel sorgente, non una dichiarazione sul DB remoto.
+- [0007](../../operations/w8a/deferred-expansion/0007_auth_compatibility.sql) aggiunge otto tabelle auth e `accounts.auth_operation_id`, senza modificare 0000–0006 o ricreare accounts. La revisione operativa successiva rende la 0007 solo schema: inizializzazione separata e backfill esplicito opzionale fuori dalle migrazioni, come descritto nel [runbook](../../operations/w8a/RUNBOOK.md). La copia preserva gli hash byte per byte e non serve per autenticare in legacy. Schema e snapshot Drizzle aggiornati; 23 tabelle e 8 migrazioni nel sorgente, non una dichiarazione sul DB remoto.
 - [AuthRepository](../../lib/server/auth-repository.ts) riconosce solo schema 7/legacy o 8/credentials. Stato assente, ignoto o paused fallisce chiuso. In legacy tutte le operazioni usano esclusivamente accounts: nuove registrazioni/reset/password possono rendere la copia obsoleta e non la rendono mai autorevole. Non esistono writer bidirezionali.
 - In credentials le query non citano le colonne segrete di accounts. Registrazione account+credenziale è atomica; credenziale assente non abilita password né recovery. Il KDF dummy rimane sul login e sulla verifica security senza password.
 - I trigger DB fermano anche writer già oltre il controllo applicativo quando auth è paused. Sono inclusi DELETE di inviti e diari, perché il vecchio security handler poteva aver già avviato quel batch. La pausa può quindi impedire anche la cancellazione di una classe con inviti: è una finestra operativa da pianificare.
@@ -24,7 +28,7 @@ Riferimenti del modello SQL: [batch D1](https://developers.cloudflare.com/d1/wor
 
 Le strutture identity/email/transaction/challenge/grant/browser sono **riservate e inattive**. Non sono un protocollo OAuth completato, non espongono nuove route e non creano metodi utilizzabili. Flag provider, coordinatore browser epoch e callback sono lavoro successivo prima di abilitare provider. Nessuna dipendenza OAuth aggiunta in W8-A.
 
-## Verifiche eseguite
+## Verifiche iniziali eseguite (prima della revisione operativa)
 
 | Prova | Esito e limite |
 |---|---|
@@ -50,7 +54,7 @@ Screenshot locale di fine prova: `outputs/w8a/browser-logout.png` (ignorato da G
 ## Prima del rollout e di W8-B
 
 1. Preparare un ambiente D1/HTTPS isolato gestito tramite Sites, provare restore e attribuirne la responsabilità operativa. Confermare il percorso reale delle migrazioni Sites. I test locali non lo certificano.
-2. Pubblicare e verificare la release intermedia W8-A con 0007 in legacy soltanto secondo prompt 08, preservando DB/domini/accesso. Questo rapporto **non autorizza né dichiara un deploy**. Il vecchio runtime può convivere con l’espansione legacy; il nuovo richiede 0007 già applicata.
+2. Pubblicare e verificare la release intermedia W8-A con 0007 in legacy soltanto secondo prompt 08, preservando DB/domini/accesso. Questo rapporto **non autorizza né dichiara un deploy**. Il vecchio runtime può convivere con l’espansione legacy solo dopo inizializzazione; tra schema e bootstrap anche i vecchi writer auth sono bloccati dai trigger. Il nuovo richiede 0007 e singleton 7/legacy inizializzato.
 3. Preparare 0008 in un sottociclo separato: pausa/fencing, richieste in volo, backfill finale verificato, conteggi/hash/FK/trigger, DROP delle sole colonne, stato coerente e riapertura. Le guardie che impediscono anche il backfill durante paused vanno gestite nella medesima unità transazionale verificata, senza lasciare una finestra ai writer. Non portare in produzione il SQL della fixture test.
 4. Provare restore e rollback a **W8-A compatibile**, non alla vecchia pubblicazione dopo DROP. L’esistenza del ramo credentials non certifica da sola quel rollback. Prima dei provider, coordinare tutti i login/register/logout con browser epoch e provare cookie tardivi/switch, atomicità della creazione con prova e sessione, grant e ultimo metodo.
 5. Solo dopo cutover: linking legacy, poi Google/email reali. Mancano client test/production Google, secret nel vault, redirect/origine HTTPS, consent/test users e prova reauth fresca; servizio email/sender/SPF/DKIM/DMARC/supporto. Non incollare segreti nella chat. Apple resta W9 con Developer/app primaria/Services ID/key/relay e callback/revoca provate.

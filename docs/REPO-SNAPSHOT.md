@@ -55,7 +55,7 @@ Le viste dell'app sono stato client dentro `/app`, non route autonome. Appunti s
 
 ## Dati, versioni e limiti
 
-Quattro percorsi persistenti dell’account: snapshot diario, attività/sottoscrizioni di classe, appunti personali, appunti di classe. La revisione locale del 19 ottobre aggiunge una bozza pubblica separata in IndexedDB e lo stato temporaneo del calcolatore in sessionStorage; nessuno dei due viene sincronizzato con l’account. [Perimetro e verifiche](PUBLIC-SPACE-2026-10-19.md). Lo schema sorgente contiene **23 tabelle** e **8 migrazioni** `0000`–`0007`. L’espansione auth 0007 è verificata solo sul D1 locale sintetico: questo conteggio non attesta l’applicazione remota. L'[inventario](REPO-INVENTORY.md) elenca tutti i nomi e le API esportate e ne verifica automaticamente l'allineamento.
+Quattro percorsi persistenti dell’account: snapshot diario, attività/sottoscrizioni di classe, appunti personali, appunti di classe. La revisione locale del 19 ottobre aggiunge una bozza pubblica separata in IndexedDB e lo stato temporaneo del calcolatore in sessionStorage; nessuno dei due viene sincronizzato con l’account. [Perimetro e verifiche](PUBLIC-SPACE-2026-10-19.md). Lo schema sorgente contiene **15 tabelle** e le **7 migrazioni** `0000`–`0006`, identiche a Sites 39. La 0007 mai pubblicata è rinviata in `operations/w8a/deferred-expansion/`, fuori dal runner Sites; non viene applicata dal sorgente corrente. L'[inventario](REPO-INVENTORY.md) elenca tutti i nomi e le API esportate e ne verifica automaticamente l'allineamento.
 
 Non confondere `SchoolData.version=1`, IndexedDB `ipagell-db`/`ipagell-notes-db` versione 2, backup V3, contratto Appunti 2, revisione dei dati, versione npm `0.1.0` e numero Sites di rilascio. `inFlight` è metadato locale per retry, escluso dal backup.
 
@@ -65,7 +65,7 @@ Il diario usa CAS sulla revisione. Gli appunti personali usano revisione, format
 
 Convenzioni Next App Router, runtime/build **Vinext + Vite + Cloudflare Workers**, React 19 e TypeScript. Non è un server Next standard. Versioni esatte, script e Node dichiarato sono nell'inventario generato dal lockfile. La CI legge `.nvmrc` (Node 22.23.4). Installazione, sviluppo, build e controlli rifiutano runtime non corretti o fuori supporto; [analisi del 22 ottobre](RUNTIME-SECURITY-2026-10-22.md).
 
-`npm run check`: lint, tipi, unit test, i18n, inventario e link documentali. `release:prepare` aggiunge build e precache. La CI esegue installazione da lockfile, prove della patch locale braces, audit di tutte le dipendenze e preparazione; non esegue automaticamente suite API o prove browser e non pubblica.
+`npm run check`: lint, tipi, unit test, i18n, inventario e link documentali. `release:prepare` aggiunge build e precache. La CI esegue installazione da lockfile, prove della patch locale braces, audit di tutte le dipendenze e preparazione; esegue anche le prove auth e di export/restore su D1 locale sintetico; non esegue automaticamente suite API o prove browser e non pubblica.
 
 Produzione: **https://ipagell.website**, progetto Sites esistente e binding `DB`; nessun R2. `wrangler.jsonc` è il Worker sandbox separato. Il push GitHub conserva il codice ma non aggiorna Sites. La pubblicazione e le verifiche esterne del rilascio sono in [DEPLOYMENT](DEPLOYMENT.md).
 
@@ -86,4 +86,4 @@ Sites **35** ha ripristinato la visibilità del toggle Riduci movimento, ma la b
 
 ## Account W8-A — 17 ottobre 2026, solo locale
 
-L’[adattatore credenziali](improvement-2026-10-01/AUTH-COMPATIBILITY-W8A.md) implementa l’espansione 0007 e le correzioni security. `auth_schema_state` sceglie una sola fonte autorevole; in legacy la copia `account_credentials` non autentica. La modalità credenziali è provata su un DB sintetico con colonne segrete fisicamente rimosse, senza consegnare una migrazione 0008 di produzione. Tabelle provider/challenge/grant/browser predisposte ma inattive; Google/email/Apple restano indisponibili. Nessun deploy né accesso ai DB remoti.
+[Implementazione](improvement-2026-10-01/AUTH-COMPATIBILITY-W8A.md) e [preparazione](improvement-2026-10-01/W8A-RELEASE-PREPARATION.md): il candidato corrente separa le correzioni security dall’espansione 0007 rinviata, supporta lo schema Sites 39 senza bootstrap e conserva compatibilità con l’espansione solo nelle prove. Nessun provider o cutover operativo. La versione Sites 39, sorgente `a8cf046fe2cbe804cebdb80957e1ffa2c88893f1`, è stata riconfermata succeeded; questo candidato non è pubblicato.

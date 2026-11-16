@@ -43,7 +43,7 @@ L'[inventario generato](REPO-INVENTORY.md#api-esportate) verifica i metodi espor
 
 `user = { id, username }`. Registrazione account e creazione diario sono due passaggi distinti: dopo la prima, `GET /api/account` può restituire `diary: null`. Un username duplicato restituisce 409; non esiste idempotency key per registrazione o recupero.
 
-Il sorgente W8-A richiede prima l’espansione auth 0007. La fonte delle credenziali è scelta soltanto dallo stato schema server, senza fallback sulla copia iniziale. Pausa/stato non supportato impediscono nuove autenticazioni e operazioni security; gli errori inattesi restano 503 generici. Nessun endpoint Google/Apple/email è disponibile. [Stato locale e rollout](improvement-2026-10-01/AUTH-COMPATIBILITY-W8A.md).
+Il candidato security W8-A supporta lo schema invariato Sites 39 senza bootstrap. Il server riconosce esattamente le sei colonne legacy di accounts e l’assenza di tutti gli oggetti auth dell’espansione; ripete questa verifica nelle scritture finali. Schema parziale, stato espanso assente/ignoto o paused falliscono chiusi, senza fallback. La 0007 resta fuori dal pacchetto attivo. In un futuro schema espanso la fonte delle credenziali è scelta soltanto dallo stato schema server, senza fallback sulla copia iniziale. Pausa/stato non supportato impediscono nuove autenticazioni e operazioni security; gli errori inattesi restano 503 generici. Nessun endpoint Google/Apple/email è disponibile. [Stato locale e rollout](improvement-2026-10-01/AUTH-COMPATIBILITY-W8A.md).
 
 ### Profilo iniziale
 

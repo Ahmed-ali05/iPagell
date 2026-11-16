@@ -25,6 +25,8 @@ npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-
 npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0006_daily_stranger.sql
 ```
 
+Il candidato security funziona dopo 0000–0006 senza bootstrap né backfill. Non applicare la 0007 rinviata in `operations/w8a/deferred-expansion/` per avviare l’app. Il [runbook espansione](../operations/w8a/RUNBOOK.md) e la rehearsal locale restano prove del futuro ciclo, non prerequisiti del rilascio senza migrazioni.
+
 Questi comandi non sono idempotenti e non registrano una cronologia Wrangler delle migrazioni: sono il bootstrap manuale dello schema locale iniziale. Non rieseguirli su un database già inizializzato. Il percorso assoluto di persistenza evita di creare accidentalmente un database sotto `dist/server/`. Le migrazioni remote sono gestite dal flusso descritto in [Distribuzione](DEPLOYMENT.md).
 
 Avvio sviluppo:

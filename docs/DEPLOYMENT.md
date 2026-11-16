@@ -14,6 +14,10 @@ Prima di pubblicare modifiche alla landing, verificare i metadati nel bundle, la
 
 Il Worker indipendente configurato in `wrangler.jsonc` ha un **database separato**. Il suo nome storico `ipagell-production` non significa che contenga i dati di ipagell.website. Pubblicarlo non aggiorna il sito pubblico. Non cambiare DNS o database per un normale rilascio.
 
+## Candidato W8-A — 17 ottobre 2026
+
+[Preparazione al rilascio](improvement-2026-10-01/W8A-RELEASE-PREPARATION.md): ramo isolato dalla sorgente Sites 39, gate CI D1 e verifiche locali. Nessuna pubblicazione del candidato. Il candidato corrente pubblica soltanto le correzioni security sullo schema Sites 39 invariato. La 0007 mai pubblicata e il suo snapshot sono rinviati in `operations/w8a/deferred-expansion/`, fuori dal runner Sites; bootstrap/backfill non sono necessari per questo candidato. Il [runbook](../operations/w8a/RUNBOOK.md) riguarda la futura espansione, ancora bloccata sul canale amministrativo e restore gestito. Il rollback del Worker sul medesimo DB è una prova distinta dal restore DB. Nessuna 0008 o provider inclusi.
+
 ## Quando modifichi tu il codice
 
 1. Crea un ramo dal `main` aggiornato e modifica il progetto.

@@ -6,6 +6,15 @@
 - Vite 8.0.16 → 8.1.6 e lockfile aggiornato per cinque advisory del server di sviluppo; preservate le correzioni precedenti.
 - [Analisi, fonti e verifiche](docs/RUNTIME-SECURITY-2026-10-22.md). Nessuna modifica a dati, autenticazione, schema o domini.
 
+## W8-A security — candidato privato, 17 ottobre 2026
+
+Correzioni security compatibili con lo schema Sites 39 senza bootstrap; espansione 0007 rinviata fuori dalle migrazioni attive. Nessuna modifica alla produzione. Prova HTTPS e rollback del Worker nel solo ambiente privato sintetico; [rapporto](docs/improvement-2026-10-01/W8A-RELEASE-PREPARATION.md). Restore DB gestito e provider restano fuori dal risultato.
+
+## 17 ottobre 2026 — W8-A, operazioni e prova di recupero locale
+
+0007 solo schema; bootstrap esplicito e backfill opzionale limitato fuori dalle migrazioni. Verificati export/restore sintetici locali prima/dopo espansione, preservando dati, FK, sequenze e fencing. [Runbook e limiti gestiti](operations/w8a/RUNBOOK.md). Nessun deploy o dato remoto modificato.
+
+
 ## 17 ottobre 2026 — W8-A, preparazione locale account
 
 Espansione auth 0007, adattatore legacy/credenziali e guardie DB per sospendere le scritture durante un futuro cutover. Cancellazione account con versione/sessione ricontrollate su tutti gli effetti; flush appunti prima della richiesta e pulizia locale limitata all’ID catturato. Eccezioni server senza testo sensibile nei log. [Evidenze e gate](docs/improvement-2026-10-01/AUTH-COMPATIBILITY-W8A.md). Verificato soltanto in ambiente locale sintetico; nessuna migrazione remota, provider o pubblicazione.

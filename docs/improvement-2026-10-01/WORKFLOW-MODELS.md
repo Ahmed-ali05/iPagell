@@ -165,3 +165,11 @@ Prossima sessione **W8-A / prompt 05**: compatibilità credenziali e guardie/cor
 ## Consuntivo W8-A locale — 17 ottobre 2026
 
 [Implementazione, QA e gate residui](AUTH-COMPATIBILITY-W8A.md). Responsabile unico writer; reviewer distinto `gpt-6.1-sol` high in sola lettura. Nessun Astra, cambio impostazioni globali o deploy. Espansione 0007 e compatibilità credentials verificate su D1 locale con dati sintetici; 0008 operativa non consegnata. Nessun provider o coordinatore epoch attivo. Prima del sottociclo W8-B servono ambiente/restore e rilascio intermedio; se non disponibili vale il passaggio a W2 sul checkout stabile. Il lavoro locale non chiude W8/05 né i gate 07/08 del rollout.
+
+## Preparazione W8-A salvata — 17 ottobre 2026
+
+[Registro della preparazione](W8A-RELEASE-PREPARATION.md): modifiche preesistenti conservate in baseline separata, W8-A isolato in commit e worktree dedicato, suite locali ripetute e gate D1 aggiunto alla CI. Nessun deploy o avvio W8-B. Candidato finale `codex/w8a-release-sites39-20261017` basato sulla sorgente live Sites 39 riconciliata; prima del rilascio restano risoluzione del backfill 0007 rispetto al flusso Sites supportato e restore isolato gestito. Il checkout originale resta intatto.
+
+## W8-A — gate operativi, ripresa da 77beff9
+
+[Rapporto](W8A-RELEASE-PREPARATION.md): 0007 resa schema-only, init esplicita e backfill opzionale separati, test/bootstrap/restore locali verificati e CI estesa. La versione Sites 39 è invariata. Resta da qualificare un canale amministrativo Sites per init/backup/restore e un ambiente D1/HTTPS privato distinto, non disponibile né pubblicato sotto il divieto corrente di deploy. Richiesta di capacità pronta nel [runbook](../../operations/w8a/RUNBOOK.md), senza invio esterno. Non ripetere prove locali per dichiarare chiuso il gate gestito, non pubblicare la sola 0007. W8-B e provider restano fuori perimetro.

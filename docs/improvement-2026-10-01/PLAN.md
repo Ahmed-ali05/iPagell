@@ -131,3 +131,7 @@ Il [workflow operativo](WORKFLOW-MODELS.md) assegna modelli/effort e revisione a
 ## Ripresa W8-A — 17 ottobre 2026
 
 Implementazione e QA **locali completati** per espansione 0007, adattatore legacy/credentials e correzioni security; [rapporto dedicato](AUTH-COMPATIBILITY-W8A.md). W8 complessivo resta aperto: nessun rilascio intermedio, cutover operativo, restore o provider reale. 135 test app, 8 test D1 dedicati, 146 controlli API e build locale; browser login/settings/logout sintetico. Il checkout trovato era già ampiamente modificato dopo W7: preservato, nessun commit complessivo o deploy. Non usare la consegna storica Sites 29 come stato live corrente. Prossimo: gate operativi/restore e release W8-A prima di W8-B; configurazioni provider soltanto nel relativo sottociclo.
+
+## Separazione W8-A security — 17 ottobre 2026
+
+Il [candidato corrente](W8A-RELEASE-PREPARATION.md) separa le correzioni security dall’espansione 0007 rinviata fuori dal runner Sites. Schema/journal/migrazioni attive identici a Sites 39, nessun bootstrap necessario; modalità non espansa riconosciuta esplicitamente, espansione parziale/paused ancora fail-closed. Prova reale su nuovo Site privato: HTTPS/account/recupero e rollback Worker 1 → 2 → 1 → 2 con dati sintetici preservati e poi rimossi. Produzione non modificata. Prossimo passo separato: decisione sul rilascio security; non altro ciclo di qualifica identico. Backup/restore gestiti e provider restano gate del successivo ciclo con migrazioni.
