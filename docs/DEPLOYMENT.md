@@ -2,7 +2,39 @@
 
 [Indice](../README.md) · [Manutenzione](MANUTENZIONE.md)
 
-## Una produzione: ipagell.website
+## Migrazione a Cloudflare — 16 novembre 2026
+
+L'abbonamento OpenAI non è più attivo, quindi i rilasci via Sites/Codex non sono più possibili. La nuova produzione è sull'account Cloudflare del proprietario:
+
+- Worker **`ipagell`**, configurato in `wrangler.jsonc`, versione `25189828-de20-44da-b04f-fbf5f7e32ee2` pubblicata dal ramo `sync/checkout-20261116`.
+- D1 **`ipagell-live`** (`588e7605-60a5-4bdf-8b1f-b1f8ce2df28b`, giurisdizione UE), binding `DB`, migrazioni `0000`–`0006` applicate. Database nuovo e vuoto.
+- Indirizzo provvisorio: https://ipagell.ahmedbasto59.workers.dev.
+- Il vecchio D1 di prova `ipagell-production` (2 account sintetici, migrazioni fino a `0004`) non è più collegato al Worker; si può eliminare.
+
+Prima della pubblicazione: `npm run check` con 147 test, lint/tipi/i18n/documentazione superati (Node 24.22.3) e 146 controlli API superati in locale sulla stessa build compilata, con account sintetici rimossi. Dopo: homepage, `/de`, `/app`, sitemap, robots e service worker rispondono 200; `/api/account` senza sessione risponde 401. Nessun account creato sul D1 remoto.
+
+**Dati.** Il D1 di Sites si trova sull'account Cloudflare di OpenAI e l'app non ha un export di massa, per cui i dati non sono stati trasferiti. Ogni utente esporta il backup JSON da Impostazioni sul vecchio sito, si registra di nuovo sul nuovo sito e importa il file. Password, classi, membri e inviti non vengono trasferiti; gli appunti di classe scritti dall'utente sono nel suo backup.
+
+**Dominio (da fare).** `ipagell.website` è registrato su GoDaddy e oggi punta a Sites (www → `custom-domains.chatgpt.site`). Dopo il passaggio del dominio il vecchio sito non sarà più raggiungibile, anche dall'alias `*.chatgpt.site` che reindirizza al dominio: gli utenti devono quindi esportare il backup prima. Passi:
+
+1. Aggiungere `ipagell.website` come sito (zona) sul piano Free di Cloudflare e conservare i record TXT di verifica Google e `_dmarc`. Non ci sono record MX.
+2. Su GoDaddy sostituire i nameserver con quelli indicati da Cloudflare.
+3. A zona attiva, collegare `ipagell.website` e `www.ipagell.website` al Worker come Custom Domains (`routes` con `custom_domain: true` in `wrangler.jsonc`), poi `npm run deploy:cloudflare`.
+4. Verificare HTTPS su entrambi gli host, poi rimuovere da `proxy.ts` gli alias Sites ormai inutili.
+
+### Pubblicare un aggiornamento
+
+```bash
+npx wrangler login
+npm run release:prepare
+npm run deploy:cloudflare
+```
+
+`deploy:cloudflare` compila con `IPAGELL_DEPLOY_TARGET=cloudflare`, esegue un dry run, applica al D1 remoto le migrazioni non ancora applicate e pubblica il Worker. Una migrazione applicata non si annulla con un rollback del codice. Richiede Node 22.23.4+ / 24.22.1+ / 26.12.1+; su questo Mac si usa `/opt/homebrew/opt/node@24/bin`.
+
+Le sezioni seguenti descrivono il periodo Sites e restano come registro storico.
+
+## Una produzione: ipagell.website (periodo Sites, fino al 16 novembre 2026)
 
 La produzione è **https://ipagell.website**, ospitata da Sites con il database esistente. Il progetto da aggiornare è quello in `.openai/hosting.json`. `www.ipagell.website` è collegato allo stesso sito e `ipagell.produc-ch.chatgpt.site` è l'alias generato corrente. L'alias storico `ipagell.ahmed-2005-taverbe.chatgpt.site` non risulta più instradato al progetto Sites nella verifica post-deploy della versione 17: restituisce un 404 di piattaforma prima di raggiungere l'app e va considerato dismesso. `proxy.ts` reindirizza solo gli host ancora collegati con HTTP 308 al dominio principale, conservando percorso e query. La protezione nel browser in `app/layout.tsx` copre il proxy Sites quando non espone il nome originale al redirect server e conserva anche il frammento dell'invito. Gli alias tecnici restano gestiti da Sites e non costituiscono produzioni separate. Per ripristinare l'alias storico occorre un intervento esplicito nella configurazione domini di Sites, non una modifica al proxy.
 
@@ -69,17 +101,10 @@ Il 10 ottobre 2026 è stata pubblicata la versione Sites **36**, sorgente `84abb
 
 Il 10 ottobre 2026 è stata pubblicata la versione Sites **37**, sorgente `bf295652402cc3018fba46a5b8ec91ed55cfcdb5`, deployment `appgdep_6aca90049350819189acde5a20f974a2`, concluso **succeeded** alle 21:20 Europe/Zurich. Riorganizza l’elenco Agenda con lavoro aperto in testa, storico richiudibile e righe compatte; dettaglio calendario mobile e ingresso all’elenco completo. [CI sul sorgente](https://github.com/Ahmed-ali05/iPagell/actions/runs/38079164366) riuscita: audit a zero, 128 test, tipi/lint, 768 chiavi i18n, documentazione e build. Pacchetto senza fixture costruito dal medesimo commit inviato a Sites; il riferimento iniziale del workflow è stato riaperto e riallineato prima del confezionamento. Dopo: URL live https://ipagell.website, pubblico, domini canonico/www e TLS attivi. Browser autenticato in sola lettura a 390/1440 px: unica aperta in testa, sette completate chiuse, nessun overflow; prima aperta mobile a 406,2 px contro 2.110,8 px prima. Nessuna migrazione, modifica a database/binding/accesso o attività reali. [Analisi e limiti](AGENDA-LIST-2026-10-10.md).
 
-## Worker sperimentale separato
+## Worker sperimentale separato (storico)
 
-Solo per prove esplicitamente richieste, dopo `npx wrangler login`:
+Fino al 16 novembre 2026 `wrangler.jsonc` indicava un Worker sperimentale con il D1 di prova `ipagell-production`, pubblicato con `npm run deploy:sandbox`. Lo stesso Worker è ora la produzione con il D1 `ipagell-live`, e lo script sandbox è stato rimosso.
 
-```bash
-npm run deploy:sandbox
-```
-
-Questo compila, verifica e pubblica il Worker `workers.dev`, applicando le migrazioni al suo D1 separato. Il vecchio `npm run deploy:cloudflare` si ferma con un messaggio per evitare pubblicazioni nel posto sbagliato. Il workflow GitHub di deploy Cloudflare è stato sostituito dai controlli.
-
-Un'eventuale migrazione futura fuori da Sites richiede trasferimento verificato dei dati e del dominio come attività dedicata.
 
 
 ## Rifinitura delle interazioni — Sites 38, 15 ottobre 2026

@@ -11,8 +11,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "ipagell-production",
-      "database_id": "a45281d4-7fea-4ba1-8f04-439aab8d1b93",
+      "database_name": "ipagell-live",
+      "database_id": "588e7605-60a5-4bdf-8b1f-b1f8ce2df28b",
       "migrations_dir": "drizzle"
     }
   ],

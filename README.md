@@ -90,7 +90,7 @@ Le prove API creano dati sintetici e devono essere eseguite soltanto contro un a
 
 ## Documentazione
 
-Per lavorare sul codice e pubblicarlo segui [Sviluppo e pubblicazione](docs/DEPLOYMENT.md). `npm run release:prepare` esegue controlli e build; la pubblicazione su **ipagell.website** passa dal progetto Sites esistente. GitHub esegue i controlli sulle pull request e su `main`.
+Per lavorare sul codice e pubblicarlo segui [Sviluppo e pubblicazione](docs/DEPLOYMENT.md). `npm run release:prepare` esegue controlli e build; la pubblicazione su **ipagell.website** usa `npm run deploy:cloudflare` sull'account Cloudflare del proprietario. GitHub esegue i controlli sulle pull request e su `main`.
 
 L'[indice della documentazione](docs/README.md) separa guide correnti, specifiche future e storico. L'[inventario](docs/REPO-INVENTORY.md) deriva da route, schema, migrazioni, script e lockfile: `npm run docs:generate` lo aggiorna, `docs:check` ne rileva il disallineamento.
 

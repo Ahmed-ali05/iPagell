@@ -91,7 +91,6 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 | `build` | `node scripts/run-framework.mjs build && node scripts/generate-precache.mjs` |
 | `build:cloudflare` | `node scripts/build-cloudflare.mjs` |
 | `deploy:cloudflare` | `node scripts/deploy-cloudflare.mjs` |
-| `deploy:sandbox` | `node scripts/deploy-cloudflare.mjs --sandbox` |
 | `check` | `npm run check:runtime && npm run lint && tsc --noEmit && npm test && npm run check:i18n && npm run docs:check` |
 | `release:prepare` | `npm run check && npm run build` |
 | `test` | `node --import tsx --test tests/*.test.ts` |

@@ -67,7 +67,7 @@ Convenzioni Next App Router, runtime/build **Vinext + Vite + Cloudflare Workers*
 
 `npm run check`: lint, tipi, unit test, i18n, inventario e link documentali. `release:prepare` aggiunge build e precache. La CI esegue installazione da lockfile, prove della patch locale braces, audit di tutte le dipendenze e preparazione; esegue anche le prove auth e di export/restore su D1 locale sintetico; non esegue automaticamente suite API o prove browser e non pubblica.
 
-Produzione: **https://ipagell.website**, progetto Sites esistente e binding `DB`; nessun R2. `wrangler.jsonc` è il Worker sandbox separato. Il push GitHub conserva il codice ma non aggiorna Sites. La pubblicazione e le verifiche esterne del rilascio sono in [DEPLOYMENT](DEPLOYMENT.md).
+Produzione: **https://ipagell.website**, in migrazione da Sites al Worker Cloudflare `ipagell` di `wrangler.jsonc` (D1 `ipagell-live`, binding `DB`); nessun R2. Il push GitHub conserva il codice ma non pubblica. Pubblicazione e stato della migrazione in [DEPLOYMENT](DEPLOYMENT.md).
 
 Gli output PDF della ricerca e il bytecode Python sono ignorati; i sorgenti della ricerca restano versionati. Non caricare `.env`, database locali, credenziali, cookie o backup utente. Non risultano più nel tree i vecchi duplicati `db/schema 2.ts` e `drizzle.config 2.ts` citati dall'audit storico.
 

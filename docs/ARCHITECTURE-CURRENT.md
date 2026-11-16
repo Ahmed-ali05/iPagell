@@ -150,7 +150,7 @@ it/de/fr/en: cataloghi con chiavi e placeholder verificati, scelta interfaccia i
 
 `npm run check` comprende lint, TypeScript, test, cataloghi, inventario e link documentali. `release:prepare` aggiunge build/precache. La CI include audit dipendenze e prove auth/restore su D1 locale sintetico; non esegue le suite API/browser e non pubblica. Risultati reali e lacune: [Matrice di verifica](VERIFICATION-MATRIX.md).
 
-La produzione usa il progetto Sites in `.openai/hosting.json`, binding `DB`, accesso e domini esistenti. `.openai/hosting.json` non contiene segreti runtime. Il Worker di `wrangler.jsonc` e `deploy:sandbox` è distinto. Pubblicazione richiede commit sorgente inviato a Sites, versione salvata e deploy `succeeded`; push GitHub non pubblica. [Procedura](DEPLOYMENT.md).
+Dal 16 novembre 2026 la produzione è il Worker `ipagell` di `wrangler.jsonc` sull'account Cloudflare del proprietario, con D1 `ipagell-live` (binding `DB`, UE) e pubblicazione tramite `npm run deploy:cloudflare` (build, migrazioni remote, deploy). Il progetto Sites in `.openai/hosting.json` resta solo come riferimento storico finché il dominio non viene spostato; i suoi dati non sono stati trasferiti. Push GitHub non pubblica. [Procedura e stato della migrazione](DEPLOYMENT.md).
 
 Questa architettura non certifica dati reali, restore infrastrutturale, performance massime, accessibilità completa, sicurezza indipendente o tutti i device. AI, file/R2, annunci, chat e co-scrittura restano fuori dal runtime attuale.
 

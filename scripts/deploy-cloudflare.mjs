@@ -1,11 +1,8 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-if (!process.argv.includes("--sandbox")) {
-  console.error("Questo comando non pubblica su ipagell.website. La produzione usa Sites: vedi docs/DEPLOYMENT.md. Per il Worker sperimentale separato usa npm run deploy:sandbox.");
-  process.exit(1);
-}
-
+// Produzione: Worker "ipagell" e D1 "ipagell-live" (binding DB) sull'account
+// Cloudflare del proprietario. Vedi docs/DEPLOYMENT.md.
 const root = process.cwd();
 const wrangler = resolve(root, "node_modules/wrangler/bin/wrangler.js");
 const env = {
@@ -27,7 +24,7 @@ run(process.execPath, [
   "d1",
   "migrations",
   "apply",
-  "ipagell-production",
+  "DB",
   "--remote",
   "--config",
   "wrangler.jsonc",
