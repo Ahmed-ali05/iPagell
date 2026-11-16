@@ -1,0 +1,15 @@
+Verifica del 17 ottobre 2026 — qualifica canale Sites da cd38d40
+
+PASS npm run docs:check
+Inventario allineato: 27 route API, 23 tabelle, 8 migrazioni.
+54 documenti, 423 collegamenti locali verificati.
+PASS collegamenti locali operations/w8a verificati separatamente.
+PASS git diff --check.
+PASS observations.json parseabile, SHA-256 corrisponde a SHA256SUMS.
+PASS inventario: 25 strumenti Sites unici; overview: 15 tabelle, zero omissioni/troncamenti.
+PASS osservazioni selezionate prive di credenziali effettive, token, cookie, URL firmati o identità personali.
+PASS delta limitato a documentazione e prove; nessun codice, SQL, manifest o journal modificato.
+
+I controlli sopra non attestano bootstrap SQL, backup, restore o HTTPS gestiti isolati.
+Non rieseguiti test applicativi, build, API, D1 locale o rehearsal locale.
+Nessuna CI remota, pubblicazione, source push o richiesta inviata alla piattaforma.

@@ -76,7 +76,7 @@ export function errorResponse(error: unknown) {
     console.error(
       "iPagell server failure",
       error instanceof Error
-        ? { name: error.name, message: error.message }
+        ? { name: error.name }
         : "unknown",
     );
   return error instanceof HttpError

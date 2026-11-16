@@ -7,8 +7,9 @@ import {
   json,
   readJson,
 } from "@/lib/server/http";
-import { hashPassword, verifyPassword } from "@/lib/server/password";
-import { identity, rateLimit, sessionCookie } from "@/lib/server/auth";
+import { DUMMY_HASH, hashPassword, verifyPassword } from "@/lib/server/password";
+import { identity, rateLimit, sessionCookie, sessionTokenHash } from "@/lib/server/auth";
+import { AuthRepository } from "@/lib/server/auth-repository";
 export const dynamic = "force-dynamic";
 const schema = z.discriminatedUnion("operation", [
   z
@@ -48,24 +49,17 @@ export async function POST(request: Request) {
       return json({ error: "Account cambiato. Ricarica la pagina.", code: "ACCOUNT_CHANGED" }, 401);
     await rateLimit(request, user.username, "security");
     const db = database();
-    const account = await db
-      .prepare("SELECT password_hash,auth_version FROM accounts WHERE id=?")
-      .bind(user.id)
-      .first<{ password_hash: string; auth_version: number }>();
-    if (
-      !account ||
-      !(await verifyPassword(input.currentPassword, account.password_hash))
-    )
+    const auth = new AuthRepository(db);
+    const mode = await auth.mode();
+    const account = await auth.find(user.username, mode);
+    const sessionHash = sessionTokenHash(request);
+    const valid = await verifyPassword(input.currentPassword, account?.password_hash ?? DUMMY_HASH);
+    if (!account || !account.password_hash || !sessionHash || !valid)
       return json({ error: "Password non valida.", code: "SECURITY_INVALID_PASSWORD" }, 401);
     if (input.operation === "password") {
       const hash = await hashPassword(input.newPassword);
-      const result = await db
-        .prepare(
-          "UPDATE accounts SET password_hash=?,auth_version=auth_version+1 WHERE id=? AND auth_version=?",
-        )
-        .bind(hash, user.id, account.auth_version)
-        .run();
-      if (result.meta.changes !== 1)
+      const changed = await auth.replacePassword(account, hash, account.recovery_hash, mode, sessionHash);
+      if (!changed)
         return json(
           { error: "Credenziali già cambiate. Accedi di nuovo.", code: "SECURITY_CREDENTIALS_CHANGED" },
           409,
@@ -88,22 +82,8 @@ export async function POST(request: Request) {
           },
           409,
         );
-      // D1 batch is transactional. Both deletes use the reauthenticated version.
-      const results = await db.batch([
-        db
-          .prepare("DELETE FROM class_invites WHERE created_by=?")
-          .bind(user.id),
-        db
-          .prepare(
-            "DELETE FROM diaries WHERE user_id=? AND EXISTS(SELECT 1 FROM accounts WHERE id=? AND auth_version=?)",
-          )
-          .bind(user.id, user.id, account.auth_version),
-        db
-          .prepare("DELETE FROM accounts WHERE id=? AND auth_version=?")
-          .bind(user.id, account.auth_version),
-      ]);
-      // D1 changes may include cascading session deletions.
-      if (results[2].meta.changes < 1)
+      const deleted = await auth.deleteAccount(account, mode, sessionHash);
+      if (!deleted)
         return json({ error: "Account cambiato. Accedi di nuovo.", code: "ACCOUNT_CHANGED" }, 409);
     }
     const response = json({ ok: true });

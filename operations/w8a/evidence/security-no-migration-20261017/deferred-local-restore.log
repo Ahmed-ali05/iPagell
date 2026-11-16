@@ -1,0 +1,48 @@
+
+> ipagell@0.1.0 test:auth-restore
+> node --import tsx scripts/w8a-restore-rehearsal.ts
+
+{
+  "local_only": true,
+  "managed_https_verified": false,
+  "remote_commands": 0,
+  "checkpoints": [
+    {
+      "checkpoint": "legacy-restore",
+      "tables": 15,
+      "schema_objects": 45,
+      "content_sha256": "83be3a37ac891a2f474c74f67fb3fe2a9754d42ee0fe52895ea1bd8f69277d3a",
+      "backup_files_sha256": {
+        "schema.sql": "7e377afbeecc7bfd7f65ddf53987feb810583d0449ccd6d159d9213f7a7c0f02",
+        "data.sql": "b0fd960ab4c018a7640eb95705fc6569e20c278c57bae427eb835dd799e2771f",
+        "triggers.sql": "3a756ace08196e1541889471fc459b9ed8ba76791ddfb1db2ddfb4163ff334a5"
+      },
+      "backup_manifest_sha256": "2d6936b88417cf94e113ced335fc8a8a9d668a3550d4b9d458551873d0bb7ac7",
+      "corrupted_backup_rejected": true,
+      "full_data_schema_equal": true,
+      "foreign_keys_valid": true,
+      "password_verified": true,
+      "note_trigger_verified": true,
+      "source_unchanged": true
+    },
+    {
+      "checkpoint": "expanded-restore",
+      "tables": 23,
+      "schema_objects": 89,
+      "content_sha256": "185891e52468c9270533ccccd9e2887fb3b24a07eadba3d841671ca8f5b4546f",
+      "backup_files_sha256": {
+        "schema.sql": "5eb17f6fb26f8f196dcc60a61369feade9869a7146ba450125bdac93617c986c",
+        "data.sql": "3802c31a9f22cf250ff9b275734870db23e9151ad68cc7b698916b79ac4617db",
+        "triggers.sql": "db46caf5e7b6a32c63ea6159d659dccf7ecb25d47259d4668cdeb04273fa77b2"
+      },
+      "backup_manifest_sha256": "8c6aabbb731e01328e2ac12f96d594110dcd59cd6c9609590aa14a5390058e66",
+      "corrupted_backup_rejected": true,
+      "full_data_schema_equal": true,
+      "foreign_keys_valid": true,
+      "password_verified": true,
+      "note_trigger_verified": true,
+      "source_unchanged": true
+    }
+  ],
+  "temporary_files_removed": true
+}

@@ -1,0 +1,151 @@
+
+> ipagell@0.1.0 test:api
+> node tests/api-smoke.mjs
+
+PASS anonymous denied
+PASS ChatGPT/forged headers do not authenticate
+PASS short passwords rejected
+PASS signup error has a stable code
+PASS cross-origin login blocked
+PASS register a
+PASS register b
+PASS client account header cannot override session identity
+PASS password login
+PASS HttpOnly session cookie
+PASS SameSite session cookie
+PASS no-store authentication response
+PASS new session token on login
+PASS wrong password denied
+PASS login error has a stable code
+PASS onboarding cannot create a diary after account switch
+PASS stale tab cannot log out another account
+PASS other account session survives stale logout
+PASS create own diary
+PASS another account cannot read diary A
+PASS foreign expected identity blocked
+PASS own update accepted
+PASS numeric grade survives API persistence roundtrip
+PASS grade value update accepted
+PASS updated grade survives API persistence roundtrip
+PASS stale revision cannot overwrite newer data
+PASS invalid weight cannot reach storage
+PASS grade outside current scale cannot reach storage
+PASS auth request size limit
+PASS session remains valid after oversized request
+PASS class owner creates a class
+PASS owner creates shared event
+PASS outsider cannot list shared events
+PASS non-member cannot read class
+PASS owner creates invite
+PASS second account joins with code
+PASS joined class lists two members
+PASS member has separate private diary
+PASS create private note separately from diary
+PASS old note client receives typed upgrade error
+PASS lost private create response retries by mutation ID
+PASS other account cannot read private note by ID
+PASS private changes isolated by account
+PASS account switch cannot edit private note
+PASS private note edit uses own revision
+PASS stale private edit cannot overwrite another version
+PASS incremental private sync returns current content
+PASS explicit personal conversion stores format with revision
+PASS stale expected format cannot overwrite converted note
+PASS old client cannot read converted note as plain
+PASS rejected old client leaves formatted content intact
+PASS delete without expected format requires upgrade
+PASS member creates a separate class subject
+PASS private formatted line break accepted
+PASS private formatted line break preserved
+PASS class formatted line break accepted
+PASS class formatted line break preserved
+PASS private formatted line break accepted
+PASS private formatted line break preserved
+PASS class formatted line break accepted
+PASS class formatted line break preserved
+PASS private formatted line break accepted
+PASS private formatted line break preserved
+PASS class formatted line break accepted
+PASS class formatted line break preserved
+PASS private formatted line break accepted
+PASS private formatted line break preserved
+PASS class formatted line break accepted
+PASS class formatted line break preserved
+PASS member publishes a class note directly
+PASS lost class create response is idempotent
+PASS other member reads shared note
+PASS owner cannot rewrite member's class note
+PASS class pin is per member
+PASS pin visible to its owner
+PASS class pin does not affect another member
+PASS author archive lists own class note
+PASS author archive excludes others' text
+PASS author can update a published class note
+PASS old client cannot mutate a class pin
+PASS stale class edit cannot overwrite published text
+PASS owner can rename class subject without changing note ID
+PASS class subject can be archived
+PASS archiving subject preserves class note
+PASS class subject can be deleted without deleting its notes
+PASS deleted subject leaves historical name on note
+PASS subscribe to event with private subject and reminder
+PASS another member subscribes independently
+PASS duplicate subscription rejected
+PASS member cannot modify another private subscription
+PASS private subject cannot reference another diary
+PASS completion is personal
+PASS completion not shared
+PASS stale personal revision rejected
+PASS member cannot edit another member's event
+PASS event update accepted
+PASS stale shared revision rejected
+PASS linked snapshot follows class revision
+PASS shared update preserves private reminder
+PASS class response excludes personal data
+PASS ordinary member cannot create invite
+PASS owner promotes moderator
+PASS moderator creates invite
+PASS member can contribute events
+PASS event can be cancelled
+PASS cancellation reaches linked personal agenda
+PASS linked event cannot be privately overwritten
+PASS explicit make personal works
+PASS manual detach has persistent timestamp
+PASS cancelled event can be restored
+PASS manual copy stops receiving updates
+PASS manual copy removal leaves shared event
+PASS shared event can be deleted
+PASS deleting event preserves cancelled personal snapshot
+PASS deleted event copy is detached
+PASS moderator revokes invite
+PASS owner transfers class
+PASS former owner leaves class
+PASS former member loses access
+PASS leaving detaches subscription atomically
+PASS leaving keeps latest snapshot
+PASS leaving preserves private completion
+PASS former member cannot edit shared event
+PASS current owner can moderate event
+PASS detached snapshot no longer follows class
+PASS departure requires newly issued invitation
+PASS revoked invite cannot be reused
+PASS new owner deletes class
+PASS deleted class leaves no membership
+PASS deleting class preserves detached personal copy
+PASS deleting class preserves latest version
+PASS deleting class preserves author's text
+PASS deleted class no longer grants class access to its note
+PASS detached copy can be edited privately
+PASS private copy can be removed
+PASS recovery code resets password
+PASS reset invalidates old sessions
+PASS recovery code cannot be reused
+PASS new password works
+PASS logout succeeds
+PASS logout revokes server session
+PASS distributed attempt limit
+PASS security error has a stable code
+PASS security error keeps a compatible message
+PASS deleted account session denied
+PASS deleted account session denied
+146 API checks passed; synthetic accounts removed.

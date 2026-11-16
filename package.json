@@ -18,6 +18,8 @@
     "check": "npm run check:runtime && npm run lint && tsc --noEmit && npm test && npm run check:i18n && npm run docs:check",
     "release:prepare": "npm run check && npm run build",
     "test": "node --import tsx --test tests/*.test.ts",
+    "test:auth-d1": "node --import tsx --test tests/auth-d1.integration.ts",
+    "test:auth-restore": "node --import tsx scripts/w8a-restore-rehearsal.ts",
     "test:api": "node tests/api-smoke.mjs",
     "docs:generate": "node scripts/repo-inventory.mjs",
     "docs:check": "node scripts/repo-inventory.mjs --check && node scripts/check-docs.mjs",

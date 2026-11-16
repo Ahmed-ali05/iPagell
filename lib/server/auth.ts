@@ -1,6 +1,7 @@
 import { database } from "./db";
 import { HttpError } from "./http";
 import { randomToken, tokenHash } from "./password";
+import { AuthRepository, authWriteGate, type AuthMode } from "./auth-repository";
 import type { AccountIdentity } from "@/types/domain";
 
 const TTL = 14 * 24 * 60 * 60;
@@ -24,6 +25,10 @@ export function sessionCookie(request: Request, token: string, maxAge = TTL) {
   // Production always uses HTTPS + the __Host- prefix (no Domain attribute).
   return `${cookieName(request)}=${token}; HttpOnly; ${secure ? "Secure; " : ""}SameSite=Lax; Path=/; Max-Age=${maxAge}`;
 }
+export function sessionTokenHash(request: Request) {
+  const token = readToken(request);
+  return token ? tokenHash(token) : null;
+}
 export async function identity(
   request: Request,
 ): Promise<AccountIdentity | null> {
@@ -40,12 +45,15 @@ export async function issueSession(
   request: Request,
   userId: string,
   version: number,
+  expectedMode: AuthMode,
 ) {
-  const token = randomToken();
   const db = database();
+  const mode = await new AuthRepository(db).mode();
+  if (mode !== expectedMode) throw new HttpError(503, "Accesso temporaneamente sospeso. Riprova.", "AUTH_UNAVAILABLE");
+  const token = randomToken();
   const result = await db
     .prepare(
-      `INSERT INTO sessions (token_hash,user_id,auth_version,expires_at) SELECT ?,id,auth_version,? FROM accounts WHERE id=? AND auth_version=?`,
+      `INSERT INTO sessions (token_hash,user_id,auth_version,expires_at) SELECT ?,id,auth_version,? FROM accounts WHERE id=? AND auth_version=? AND ${authWriteGate(mode)}`,
     )
     .bind(tokenHash(token), Date.now() + TTL * 1000, userId, version)
     .run();

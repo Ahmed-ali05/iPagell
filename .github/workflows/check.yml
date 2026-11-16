@@ -28,6 +28,10 @@ jobs:
       - name: Audit dipendenze
         run: npm audit --audit-level=low
       - run: npm run release:prepare
+      - name: Compatibilità auth su D1 locale sintetico
+        run: npm run test:auth-d1
+      - name: Export e restore D1 locale sintetico
+        run: npm run test:auth-restore
       - name: Riepilogo
         run: |
           echo 'Controlli e build superati. Per pubblicare su https://ipagell.website seguire docs/DEPLOYMENT.md. Questo workflow non effettua deploy.' >> "$GITHUB_STEP_SUMMARY"

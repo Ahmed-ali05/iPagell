@@ -8,6 +8,7 @@ import {
 } from "@/lib/server/http";
 import { hashPassword, randomToken, tokenHash } from "@/lib/server/password";
 import { rateLimit, sessionCookie } from "@/lib/server/auth";
+import { AuthRepository } from "@/lib/server/auth-repository";
 export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
@@ -24,15 +25,13 @@ export async function POST(request: Request) {
       );
     const { username, password, recoveryCode } = parsed.data;
     await rateLimit(request, username, "recover");
-    const nextCode = randomToken(),
-      nextHash = await hashPassword(password);
-    const result = await database()
-      .prepare(
-        `UPDATE accounts SET password_hash=?,recovery_hash=?,auth_version=auth_version+1 WHERE username=? AND recovery_hash=?`,
-      )
-      .bind(nextHash, tokenHash(nextCode), username, tokenHash(recoveryCode))
-      .run();
-    if (result.meta.changes !== 1)
+    const auth = new AuthRepository(database());
+    const mode = await auth.mode();
+    const account = await auth.find(username, mode);
+    const nextCode = randomToken(), nextHash = await hashPassword(password);
+    const valid = account?.password_hash && account.recovery_hash === tokenHash(recoveryCode);
+    const changed = valid && await auth.replacePassword(account, nextHash, tokenHash(nextCode), mode);
+    if (!changed)
       return json({ error: "Nome utente o codice non validi.", code: "AUTH_INVALID_RECOVERY" }, 401);
     const response = json({ recoveryCode: nextCode });
     response.headers.set("Set-Cookie", sessionCookie(request, "", 0));
