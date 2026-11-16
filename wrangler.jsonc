@@ -5,6 +5,10 @@
   "compatibility_date": "2026-09-16",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  "routes": [
+    { "pattern": "ipagell.website", "custom_domain": true },
+    { "pattern": "www.ipagell.website", "custom_domain": true }
+  ],
   "vars": {
     "IPAGELL_CLASSES": "enabled"
   },

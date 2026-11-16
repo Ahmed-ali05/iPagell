@@ -27,6 +27,6 @@ Per progettare o rifinire UI e interazioni, leggere la skill locale [apple-desig
 
 - La produzione richiesta con «deploy» o «pubblica» è **https://ipagell.website**.
 - Dal 16 novembre 2026 la produzione passa da OpenAI Sites (abbonamento non più attivo) all'account Cloudflare del proprietario: Worker `ipagell` con D1 `ipagell-live` (binding `DB`, giurisdizione UE), configurati in `wrangler.jsonc`. Si pubblica con `npm run deploy:cloudflare` dopo `npx wrangler login`. Non usare più il flusso Sites né `.openai/hosting.json` per i rilasci.
-- Finché il dominio non è collegato al Worker, il nuovo sito risponde solo su `https://ipagell.ahmedbasto59.workers.dev`; ipagell.website serve ancora la vecchia versione Sites. Stato della migrazione in `docs/DEPLOYMENT.md`.
+- `ipagell.website` e `www` sono Custom Domains del Worker (zona Cloudflare del proprietario; dominio registrato su GoDaddy). Indirizzo tecnico: `https://ipagell.ahmedbasto59.workers.dev`. Dettagli in `docs/DEPLOYMENT.md`.
 - I dati del D1 Sites non sono esportabili da qui: gli utenti li trasferiscono con il backup JSON dell'app (esporta sul vecchio sito, importa sul nuovo dopo una nuova registrazione).
 - Flusso per sviluppatori e pubblicazione: `docs/DEPLOYMENT.md`. Non dichiarare pubblicato il sito dopo una sola build o un push GitHub.

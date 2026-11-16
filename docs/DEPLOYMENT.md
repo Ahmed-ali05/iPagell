@@ -15,12 +15,7 @@ Prima della pubblicazione: `npm run check` con 147 test, lint/tipi/i18n/document
 
 **Dati.** Il D1 di Sites si trova sull'account Cloudflare di OpenAI e l'app non ha un export di massa, per cui i dati non sono stati trasferiti. Ogni utente esporta il backup JSON da Impostazioni sul vecchio sito, si registra di nuovo sul nuovo sito e importa il file. Password, classi, membri e inviti non vengono trasferiti; gli appunti di classe scritti dall'utente sono nel suo backup.
 
-**Dominio (da fare).** `ipagell.website` è registrato su GoDaddy e oggi punta a Sites (www → `custom-domains.chatgpt.site`). Dopo il passaggio del dominio il vecchio sito non sarà più raggiungibile, anche dall'alias `*.chatgpt.site` che reindirizza al dominio: gli utenti devono quindi esportare il backup prima. Passi:
-
-1. Aggiungere `ipagell.website` come sito (zona) sul piano Free di Cloudflare e conservare i record TXT di verifica Google e `_dmarc`. Non ci sono record MX.
-2. Su GoDaddy sostituire i nameserver con quelli indicati da Cloudflare.
-3. A zona attiva, collegare `ipagell.website` e `www.ipagell.website` al Worker come Custom Domains (`routes` con `custom_domain: true` in `wrangler.jsonc`), poi `npm run deploy:cloudflare`.
-4. Verificare HTTPS su entrambi gli host, poi rimuovere da `proxy.ts` gli alias Sites ormai inutili.
+**Dominio (completato il 16 novembre 2026).** `ipagell.website` resta registrato su GoDaddy, ma i nameserver ora sono quelli di Cloudflare (`mark`/`saanvi.ns.cloudflare.com`, zona Free, DNSSEC non attivo). `ipagell.website` e `www.ipagell.website` sono Custom Domains del Worker (`routes` in `wrangler.jsonc`), versione `f78d7a92-3106-461e-b485-c6d2f999ee9e`, con certificato TLS valido. Verificato con `wrangler tail` che le richieste di entrambi gli host arrivano al Worker. Homepage, `/de`, `/app`, sitemap, robots e service worker rispondono 200, `/api/account` senza sessione risponde 401, e `www` reindirizza con 308 a `ipagell.website` mantenendo percorso e query. Nei primi minuti dopo il collegamento il dominio era ancora servito da Sites. Finché le cache DNS pubbliche non scadono, alcuni utenti possono ancora vedere il vecchio sito. Restano invariati i record TXT di Google e `_dmarc`. Gli alias `*.chatgpt.site` in `proxy.ts` e `app/layout.tsx` non servono più e si possono rimuovere in un rilascio successivo.
 
 ### Pubblicare un aggiornamento
 
