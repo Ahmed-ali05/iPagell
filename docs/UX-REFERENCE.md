@@ -1,5 +1,10 @@
 # iPagell — Riferimento UX, UI e contenuti
 
+
+## Gerarchia delle viste — 10 ottobre 2026 (locale)
+
+Applicata la [semplificazione analizzata](UX-SIMPLIFICATION-2026-10-10.md): lettori con ritorno all’elenco visibile e comandi secondari nei tre punti, Agenda con barra unica, Voti con materia compatta e simulatore espandibile, Classi con creazione e ingresso visibili e inviti nella gestione, riferimento Assenze su richiesta e preferenze nella finestra Impostazioni. Supera le descrizioni cronologiche che lasciavano tutti questi comandi sempre esposti. Avvisi e recupero restano visibili; formule, permessi e dati non cambiano. Risultati e limiti locali nella matrice; non ancora pubblicato.
+
 ## Homepage — 3 ottobre 2026
 
 La richiesta aggiorna l’intera composizione e aggiunge due vincoli: immagini nella lingua scelta e prima lettura semplice. La valutazione della versione 31 è progettuale: schede, cornici annidate, anteprime piccole e descrizioni ripetute davano troppo peso alla struttura. Non sono stati misurati risultati commerciali o conversioni.
@@ -44,7 +49,7 @@ Aggiornato: 27 settembre 2026. Pulizia mirata di copy e gerarchia informativa.
 
 ## Pulizia UX e copy — 27 settembre 2026
 
-Il [report P0/P1/P2](UX-COPY-AUDIT-2026-09-27.md) registra il passaggio su landing, ingresso, viste del diario e moduli. Sono stati tolti i blocchi ripetuti della landing, helper ovvi e metriche a zero nell'assenza di dati; la nuova materia parte dal solo nome e lascia colore, docente e pesi in un dettaglio espandibile. È stato corretto il lessico del backup precedente e precisato il comportamento delle attività di classe collegate. Le date del semestre, il recupero account, gli stati di sincronizzazione e le conseguenze delle azioni distruttive restano esposti nel contesto pertinente. Le sezioni cronologiche sottostanti descrivono gli interventi precedenti.
+Il [report P0/P1/P2](archive/UX-COPY-AUDIT-2026-09-27.md) registra il passaggio su landing, ingresso, viste del diario e moduli. Sono stati tolti i blocchi ripetuti della landing, helper ovvi e metriche a zero nell'assenza di dati; la nuova materia parte dal solo nome e lascia colore, docente e pesi in un dettaglio espandibile. È stato corretto il lessico del backup precedente e precisato il comportamento delle attività di classe collegate. Le date del semestre, il recupero account, gli stati di sincronizzazione e le conseguenze delle azioni distruttive restano esposti nel contesto pertinente. Le sezioni cronologiche sottostanti descrivono gli interventi precedenti.
 
 Questo documento conserva contesto, evidenze e proposte. Non certifica un rilascio e non autorizza automaticamente interventi futuri.
 
@@ -98,7 +103,7 @@ Il prossimo ciclo dovrebbe concentrarsi sulla struttura di Agenda e Classi, come
 
 ## Affidabilità — 23 settembre 2026
 
-Distinti il conflitto remoto e l'aggiornamento da un'altra scheda del dispositivo. Quest'ultimo blocca la scrittura obsoleta e propone «Aggiorna copia del dispositivo», conservando i valori del modulo. I problemi di storage non vengono più descritti automaticamente come offline; un refresh fallito mantiene consultabile il diario aperto. Una conferma remota persa viene riconosciuta quando tutti i dati coincidono. Il recupero dei conflitti reali resta esplicito, senza merge automatico. Evidenze e limiti in [Affidabilità](RELIABILITY.md); UX10 non è dichiarato completato.
+Distinti il conflitto remoto e l'aggiornamento da un'altra scheda del dispositivo. Quest'ultimo blocca la scrittura obsoleta e propone «Aggiorna copia del dispositivo», conservando i valori del modulo. I problemi di storage non vengono più descritti automaticamente come offline; un refresh fallito mantiene consultabile il diario aperto. Una conferma remota persa viene riconosciuta quando tutti i dati coincidono. Il recupero dei conflitti reali resta esplicito, senza merge automatico. Evidenze e limiti in [Affidabilità](archive/RELIABILITY.md); UX10 non è dichiarato completato.
 
 ## Installazione dalla Home — 23 settembre 2026
 
@@ -120,7 +125,7 @@ La CTA «Installa» usa `beforeinstallprompt` soltanto se emesso dal browser. Sa
 8. Interfaccia leggibile, focus visibile, movimento riducibile; target tattili di almeno 44 px come obiettivo già documentato.
 9. Privilegiare interventi piccoli e coerenti. Nessun redesign, nuova sezione o nuova funzione solo per sembrare più moderni.
 
-Fonti: `PRODOTTO.md`, `USABILITA.md`, `CLASSI.md` e istruzioni dell'utente in questa conversazione.
+Fonti: `PRODOTTO.md`, [usabilità storica](archive/USABILITA.md), `CLASSI.md` e istruzioni dell'utente in questa conversazione.
 
 ## Perché dovrebbe servire a uno studente
 

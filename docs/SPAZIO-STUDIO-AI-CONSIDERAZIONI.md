@@ -6,6 +6,8 @@ Non descrive necessariamente l'implementazione attuale del progetto e non presum
 
 Le decisioni definitive devono essere adattate all'architettura effettiva di iPagell e, quando necessario, verificate professionalmente dal punto di vista legale.
 
+**7 ottobre 2026:** l'[analisi locale](SPAZIO-STUDIO-AI-LOCALE.md) applica questi principi alla nuova priorità di esecuzione sul dispositivo. Le parti su provider, upload, URL firmati e validazione server si applicano quando esiste un percorso remoto; fonti, validazione applicativa, versioni, isolamento degli account, cancellazione e ripristino restano necessari anche in locale. Nessun fallback cloud automatico.
+
 ---
 
 ## 1. Principio generale

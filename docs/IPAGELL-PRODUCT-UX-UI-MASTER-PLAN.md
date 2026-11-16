@@ -2,6 +2,8 @@
 
 > **Piano di progetto, non stato del software.** Alcune proposte sono state implementate in interventi successivi; il perimetro corrente e le evidenze sono in [Snapshot](REPO-SNAPSHOT.md), [Roadmap](PRODOTTO.md) e [Verifiche](VERIFICATION-MATRIX.md).
 
+> **Nuovo mandato del 2 ottobre 2026:** il [programma next gen](NEXTGEN-2026-10-02.md) guida il cambio di volto richiesto dall'utente: più deciso e grafico, piacevole e accessibile, con pianificazione prima delle modifiche. Journey e vincoli di questo master plan restano riferimenti; la cautela sul redesign totale non limita il nuovo perimetro esplicitamente richiesto.
+
 
 > Documento di lavoro per preparare, in un secondo momento, prompt specifici per agenti che lavorano su iPagell.
 >

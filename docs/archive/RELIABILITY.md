@@ -1,6 +1,8 @@
 # Affidabilità del diario — intervento del 23 settembre 2026
 
-[Architettura](ARCHITETTURA.md) · [API](API.md) · [Manutenzione](MANUTENZIONE.md)
+> **Rapporto storico.** Il delta, le verifiche e i problemi residui sotto sono quelli del 23 settembre. Il controller e i limiti correnti sono descritti in [Architettura](../ARCHITECTURE-CURRENT.md) e [Matrice](../VERIFICATION-MATRIX.md); vedere anche l'[indice dell'archivio](README.md).
+
+[Architettura](../ARCHITETTURA.md) · [API](../API.md) · [Manutenzione](../MANUTENZIONE.md)
 
 Analisi e correzioni sul working tree, che conteneva già modifiche precedenti. Nessuna pubblicazione, modifica ai dati reali, nuova dipendenza o migrazione. Gli audit `REPO-SNAPSHOT`, `ARCHITECTURE-CURRENT` e `VERIFICATION-MATRIX` restano fotografie del commit indicato nei rispettivi documenti; questo documento registra il delta verificato.
 

@@ -45,9 +45,9 @@
 
 La versione iniziale è pubblicata e utilizzabile. L'app ha un backend su Cloudflare Workers e D1; IndexedDB conserva una copia del diario per l'uso offline. Le preferenze fanno parte del diario sincronizzato.
 
-Il riferimento applicativo documentato è la pubblicazione Sites **27** del 1 ottobre 2026. Gli appunti hanno persistenza e revisioni separate dal diario; la bozza di classe diventa condivisa solo dopo anteprima e conferma. [Rilasci ed evidenze](docs/DEPLOYMENT.md), [snapshot corrente](docs/REPO-SNAPSHOT.md) e [matrice di verifica](docs/VERIFICATION-MATRIX.md) distinguono codice, prove e produzione.
+Il [registro di pubblicazione](docs/DEPLOYMENT.md) riporta Sites **30** del 2 ottobre 2026, con catture reali sulla homepage. La consultazione Periodo/Anno/Storico in Voti e Statistiche è stata introdotta in Sites **29**. Gli appunti hanno persistenza e revisioni separate dal diario; la bozza di classe diventa condivisa solo dopo anteprima e conferma. [Snapshot corrente](docs/REPO-SNAPSHOT.md) e [matrice di verifica](docs/VERIFICATION-MATRIX.md) distinguono codice, prove e produzione.
 
-Gli aggiornamenti della documentazione, dell'inventario e delle dipendenze successivi a questo rilascio sono registrati nel [changelog](CHANGELOG.md); non sono ancora pubblicati su Sites.
+Ingresso/SEO e le correzioni documentali e delle dipendenze del ciclo precedente sono stati inclusi in Sites 28, come registrato nel [changelog](CHANGELOG.md). Le successive modifiche locali non sono automaticamente pubblicate: il riordino documentale del 2 ottobre non verifica nuovamente lo stato remoto.
 
 Sono ancora aperte verifiche operative e di qualità elencate nel [piano prodotto](docs/PRODOTTO.md). In particolare, il progetto non dichiara cifratura end-to-end, notifiche programmate ad app chiusa o installazione iOS certificata.
 
@@ -57,13 +57,13 @@ Sono ancora aperte verifiche operative e di qualità elencate nel [piano prodott
 |---|---|
 | Interfaccia | React 19, TypeScript, Tailwind CSS, componenti Radix/Shadcn |
 | Framework | Next.js 16 con build Vinext/Vite |
-| Grafici e validazione | Recharts, Zod, React Hook Form |
+| Grafici e validazione | Recharts, Zod |
 | Backend | Cloudflare Workers, D1, Drizzle ORM |
 | Offline | Service worker, IndexedDB, manifest PWA |
 
 ## Avvio locale
 
-Requisiti: Node.js `>=22.13.0` e npm. Da un clone pulito:
+Requisiti: Node.js 22.23.4 (selezionato in `.nvmrc`) o una release corretta ammessa da `package.json`, e npm. Con nvm: `nvm install && nvm use`. [Motivo e versioni ammesse](docs/RUNTIME-SECURITY-2026-10-22.md). Da un clone pulito:
 
 ```bash
 npm run install:ci

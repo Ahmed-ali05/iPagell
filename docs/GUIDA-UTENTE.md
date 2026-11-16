@@ -36,6 +36,8 @@ Il periodo del diario resta il contesto di Home, Agenda, Assenze e della registr
 
 Il nuovo voto mostra **Registra nel periodo**: puoi scegliere un periodo reale senza cambiare quello del diario. La data non riassegna il voto. Il filtro e la materia restano selezionati tornando dalle statistiche o annullando il form; il filtro è stato di questa sessione, non una preferenza sincronizzata. Il registro mostra provenienza e medie per periodo; la media annuale usa tutti i singoli voti con i loro pesi, non la media delle medie dei periodi. L’andamento è la media generale cumulativa dei risultati visualizzati; il simulatore usa lo stesso ambito ed è disponibile in Periodo/Anno, non nello storico multiennale.
 
+Lingua e tema si cambiano in **Impostazioni**: la lingua è in cima alla finestra, il tema in **Preferenze**. In Agenda calendario/elenco, origine delle attività, **Avvisi** e **Nuova attività** sono raccolti in una barra. In Voti scegli la **Materia** dal selettore; **Medie di tutte le materie** apre il confronto completo. Le righe di voti, assenze e agenda mantengono il pulsante di eliminazione; attività di classe e materie hanno i tre punti per modifica e rimozione. In Assenze **Modifica riferimento** apre il campo della soglia personale.
+
 ### Elenco delle attività
 
 In **Agenda → Elenco**, **Da fare** distingue Scadute, Oggi e Prossime attività. Una scadenza passata resta aperta finché non la completi. Le attività Completate e Annullate sono in sezioni richiudibili con conteggio; da Completate puoi segnare un’attività nuovamente come da fare. Le annullate non rientrano nel lavoro aperto.
@@ -50,7 +52,7 @@ Ogni voto pesa **peso del voto × peso del tipo di prova**. Esempio: uno scritto
 
 Le cifre visualizzate possono essere arrotondate; non sono un voto ufficiale di pagella. Cambiare pesi o coefficienti ricalcola anche i periodi passati. Non sono implementate medie separate teoria/pratica a percentuale fissa.
 
-Nel simulatore scegli obiettivo, tipo e peso della prossima prova. Il risultato è arrotondato al mezzo voto superiore. Se una sola prova con quel peso non basta, il simulatore lo indica esplicitamente.
+Apri **Che voto mi serve?** e scegli obiettivo, tipo e peso della prossima prova. Il risultato è arrotondato al mezzo voto superiore. Se una sola prova con quel peso non basta, il simulatore lo indica esplicitamente.
 
 ### Assenze e avvisi
 
@@ -60,7 +62,7 @@ Gli avvisi attuali funzionano ad app aperta, previo consenso. Non sono una svegl
 
 ## Classi private
 
-Apri **Classi** e scegli **Nuova classe** per creare un gruppo. Diventi proprietario e puoi generare un link o un codice con scadenza e numero massimo di ingressi. Chi riceve il link accede al proprio account iPagell e sceglie il nome da mostrare nella classe.
+Apri **Classi** e scegli **Nuova classe** per creare un gruppo; se appartieni già a una classe, i comandi **Nuova classe** e **Inserisci codice** restano visibili in cima. **Crea invito** è in **Membri e gestione della classe → Inviti attivi**, se il tuo ruolo lo permette. Diventi proprietario e puoi generare un link o un codice con scadenza e numero massimo di ingressi. Chi riceve il link accede al proprio account iPagell e sceglie il nome da mostrare nella classe.
 
 Il proprietario può nominare o revocare moderatori, rimuovere membri, modificare la classe, trasferire la proprietà ed eliminarla. I moderatori possono creare o revocare inviti e rimuovere membri ordinari. Un membro può cambiare il proprio nome visibile o uscire. Il proprietario deve prima trasferire la proprietà oppure eliminare la classe.
 
@@ -68,23 +70,25 @@ Voti, assenze, medie, preferenze e completamento personale non vengono mostrati 
 
 ## Appunti personali e di classe
 
-In Home puoi riprendere gli appunti recenti oppure scegliere **Tutti gli appunti** e **Nuovo appunto**. **Appunti di {materia}** nella prossima scadenza, nell’Agenda e in Voti apre l’elenco personale filtrato. **Torna a…** riporta al contesto di partenza; nell’Agenda restano calendario/elenco e filtri scelti durante la sessione.
+In Home puoi riprendere gli appunti recenti oppure scegliere **Tutti gli appunti** e **Nuovo appunto**. **Appunti** nella prossima scadenza, nella riga di un’attività in Agenda o accanto alla materia in Voti apre l’elenco personale filtrato. **Torna a…** riporta al contesto di partenza; nell’Agenda restano calendario/elenco e filtri scelti durante la sessione.
 
 I tuoi appunti sono privati e indipendenti dal semestre. Puoi iniziare a scrivere prima di scegliere la materia e aggiungerla dall’editor senza perdere il testo. Titolo e materia servono per sincronizzare nell’account; **Salvato sul dispositivo** conferma solo la copia locale. Gli appunti personali già disponibili sul dispositivo restano utilizzabili senza rete.
 
 Dentro una classe scegli **Appunti della classe → Scrivi un appunto**. Le materie di classe sono separate da quelle del diario: puoi aggiungerne una direttamente nell’editor. **Salva bozza e chiudi** mantiene il testo privato sul dispositivo; lo ritrovi in **Le tue bozze**. **Controlla e condividi** apre un’anteprima: solo confermando **Pubblica nella classe** il testo diventa visibile ai membri. Per leggere o condividere in classe serve la connessione.
 
-Le copie fra spazio personale e classe sono indipendenti. Da un appunto personale scegli la classe e **Prepara una copia in…**, poi la materia della classe e la conferma di condivisione. **Ritira dalla classe** rimuove il testo condiviso; eliminare una bozza privata non ritira un appunto già condiviso. Copie, gestione materie e **Bozze e classi passate** si aprono solo quando ti servono.
+Le copie fra spazio personale e classe sono indipendenti. Nel lettore personale trovi **Copia in una classe** nel menu dei **tre punti**. **Ritira dalla classe** rimuove il testo condiviso; eliminare una bozza privata non ritira un appunto già condiviso. Gestione materie e **Bozze e classi passate** si aprono solo quando ti servono.
 
 La barra dell'editor offre **Grassetto**, **Titolo di sezione**, elenchi puntati o numerati e **Annulla/Ripeti**. Seleziona il testo o posiziona il cursore nel blocco da cambiare; non occorre scrivere Markdown. Il limite include i marcatori del formato: una formattazione può raggiungerlo anche se il testo visibile sembra più corto. Il comando viene rifiutato conservando il testo.
 
-Dal lettore scegli **Esporta PDF**, poi **Salva PDF**, **Apri PDF** o **Condividi** se il dispositivo lo consente. **Altri formati** offre Markdown e copia del testo; per note semplici anche `.txt`. Il PDF è una copia leggibile della nota; il backup JSON serve a ripristinare i dati nell'app.
+Il lettore personale mostra titolo, materia, data, testo e stella; **Tutti gli appunti** è sempre visibile sopra la nota e riporta all’elenco. Dall’elenco **Torna a…** riporta al contesto di partenza. La descrizione e il normale stato di sincronizzazione della nota non sono ripetuti. Il menu dei **tre punti** contiene **Modifica**, **Esporta appunto**, **Copia in una classe** ed **Elimina**. Gli avvisi restano visibili.
+
+Nel lettore personale o di classe scegli **Tre punti → Esporta appunto → Esporta PDF**, poi **Salva PDF**, **Apri PDF** o **Condividi** se il dispositivo lo consente. **Altri formati** offre Markdown e copia del testo; per note semplici anche `.txt`. Il PDF è una copia leggibile della nota; il backup JSON serve a ripristinare i dati nell'app.
 
 Se compare **Salvataggio non riuscito**, il testo ancora aperto permette **Riprova**, **Copia testo** e download di recupero. Conservalo prima di chiudere o aggiornare l'app. Un conflitto vero richiede di confrontare le copie; la riconnessione non deve pubblicare da sola una bozza di classe.
 
 ## Salvataggio, offline e conflitti
 
-- **Diario personale salvato:** il server ha confermato la copia del diario. Un backup indipendente resta utile.
+- **Salvato** (segno di spunta su mobile): il server ha confermato la copia del diario personale. Un backup indipendente resta utile.
 - **Copia sul dispositivo / offline:** ci sono dati disponibili localmente; non è una conferma di sincronizzazione.
 - **Sincronizzazione non riuscita:** controlla connessione e messaggio; esporta prima di fare tentativi distruttivi.
 - **Accedi di nuovo:** rientra nello stesso account. Le modifiche in attesa non vanno attribuite a un altro utente.
@@ -115,9 +119,3 @@ L'uscita rimuove la copia attiva del diario su quel browser. Se ci sono note o b
 ## Segnalare un problema
 
 Descrivi cosa volevi fare, i passaggi, il risultato atteso e quello ottenuto. Aggiungi versione browser/iOS, uso da Safari o icona Home e stato di sincronizzazione. Oscura nomi, voti e identificativi negli screenshot. Non allegare password, codici, cookie o backup completi. I problemi di sicurezza vanno comunicati privatamente: [Sicurezza](../SECURITY.md).
-
-### Lettura degli appunti
-
-Nel lettore personale restano titolo, materia/data, testo, pin e Tutti gli appunti; la descrizione introduttiva e lo stato normale di sincronizzazione della singola nota non occupano spazio nella lettura. Il ritorno all’elenco è sempre visibile; dall’elenco Torna a… riporta alla vista di origine. Il menu dei tre punti raccoglie Modifica, Esporta appunto, Copia in una classe ed Elimina. Nel lettore di classe lo stesso menu offre export, copia personale e i comandi consentiti dal ruolo. Esporta appunto apre una finestra con PDF e altri formati. Avvisi di errore, offline e conflitto rimangono visibili; conferme distruttive e controlli dei permessi sono conservati.
-
-Sotto il testo trovi gli altri appunti della stessa materia, in riquadri con titolo e data. Scegli un riquadro per sostituire la nota aperta. Le note personali e quelle delle classi restano separate.

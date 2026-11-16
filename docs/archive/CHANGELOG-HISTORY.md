@@ -1,4 +1,4 @@
-> **Registro precedente conservato il 1 ottobre 2026.** Alcune voci Non rilasciato sono state implementate successivamente. Per lo stato corrente vedere [Changelog](../CHANGELOG.md) e [Pubblicazione](DEPLOYMENT.md).
+> **Registro precedente conservato il 1 ottobre 2026.** Alcune voci Non rilasciato sono state implementate successivamente. Per lo stato corrente vedere [Changelog](../../CHANGELOG.md) e [Pubblicazione](../DEPLOYMENT.md).
 
 # Registro modifiche
 
@@ -61,4 +61,4 @@ Le date sono quelle del progetto. Versione npm, formato del diario e numero di p
 - Tipologie voto con ID stabili, supporto notazione `4-5`, simulatore con pesi espliciti e rimozione della proiezione artificiale.
 - Service worker con asset consentiti e API escluse dalla cache.
 
-Dettagli e limiti della verifica: [REVIEW](REVIEW.md). Le funzioni avanzate non completate restano nella [roadmap](PRODOTTO.md), non nelle note di consegna.
+Dettagli e limiti della verifica: [REVIEW](REVIEW.md). Le funzioni avanzate non completate restano nella [roadmap](../PRODOTTO.md), non nelle note di consegna.

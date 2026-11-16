@@ -2,7 +2,7 @@
 
 **Stato:** preparazione alla ricerca con utenti; nessuna modifica al codice applicativo.<br>
 **Lingue richieste:** italiano, tedesco standard per la Svizzera, francese per la Svizzera, inglese.<br>
-**Fonte:** working tree locale del 24 settembre 2026. Lo stato del sito pubblicato non è stato verificato. I documenti `docs/REPO-SNAPSHOT.md`, `docs/ARCHITECTURE-CURRENT.md`, `docs/VERIFICATION-MATRIX.md` sono stati letti come mappa e confrontati con i file sotto. Le correzioni successive allo snapshot sono descritte in `docs/RELIABILITY.md`.
+**Fonte:** working tree locale del 24 settembre 2026. Lo stato del sito pubblicato non è stato verificato. I documenti `docs/REPO-SNAPSHOT.md`, `docs/ARCHITECTURE-CURRENT.md`, `docs/VERIFICATION-MATRIX.md` sono stati letti come mappa e confrontati con i file sotto. Le correzioni successive allo snapshot sono descritte in `docs/archive/RELIABILITY.md`.
 
 ## Decisione da verificare
 

@@ -1,6 +1,8 @@
 # Revisione iPagell — 16 settembre 2026
 
-[Indice](../README.md) · [Guida utente](GUIDA-UTENTE.md) · [Priorità e verifiche ancora aperte](PRODOTTO.md)
+> **Rapporto storico.** Per le evidenze correnti vedere la [matrice](../VERIFICATION-MATRIX.md); ruolo e provenienza sono nell'[indice dell'archivio](README.md).
+
+[Indice](../../README.md) · [Guida utente](../GUIDA-UTENTE.md) · [Priorità e verifiche ancora aperte](../PRODOTTO.md)
 
 Questo documento conserva l’esito della revisione iniziale. Le verifiche riportate sono storiche, non vengono ripetute automaticamente a ogni modifica della documentazione.
 

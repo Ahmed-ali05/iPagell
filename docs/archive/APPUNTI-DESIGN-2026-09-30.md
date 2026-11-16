@@ -1,8 +1,8 @@
-> **Archivio storico conservato il 1 ottobre 2026.** Il testo seguente registra analisi e decisioni di quel periodo, incluse eventuali aggiunte successive. Non usarlo come descrizione corrente. Vedere [APPUNTI-SPEC.md](APPUNTI-SPEC.md) e [indice documentazione](README.md). I collegamenti ai file del codice puntano al tree attuale, non al commit storico.
+> **Archivio storico conservato il 1 ottobre 2026.** Il testo seguente registra analisi e decisioni di quel periodo, incluse eventuali aggiunte successive. Non usarlo come descrizione corrente. Vedere [APPUNTI-SPEC.md](../APPUNTI-SPEC.md) e [indice documentazione](../README.md). I collegamenti ai file del codice puntano al tree attuale, non al commit storico.
 
 # Appunti per materia — specifica e decisioni
 
-Stato: **implementazione verificata localmente** · 30 settembre 2026. La descrizione seguente conserva le decisioni di prodotto; per il comportamento effettivo del sorgente vedere anche [ARCHITECTURE-CURRENT](ARCHITECTURE-CURRENT.md). Lo stato della pubblicazione e della migrazione del D1 va verificato sul progetto Sites esistente.
+Stato: **implementazione verificata localmente** · 30 settembre 2026. La descrizione seguente conserva le decisioni di prodotto; per il comportamento effettivo del sorgente vedere anche [ARCHITECTURE-CURRENT](../ARCHITECTURE-CURRENT.md). Lo stato della pubblicazione e della migrazione del D1 va verificato sul progetto Sites esistente.
 
 ## Proposta raccomandata
 
@@ -12,7 +12,7 @@ Assunzioni di prodotto: l'appunto di classe è visibile **solo ai membri attuali
 
 ## Evidenza dal codice corrente
 
-Lettura effettuata su working tree al commit `44ae5eac0086dc6460e9ca2e7436ba2894326522`, che contiene modifiche preesistenti non toccate da questa specifica. [REPO-SNAPSHOT](REPO-SNAPSHOT.md), [ARCHITECTURE-CURRENT](ARCHITECTURE-CURRENT.md) e [VERIFICATION-MATRIX](VERIFICATION-MATRIX.md) fotografano principalmente `c780569...`; per questa proposta prevalgono i file attuali. [DEPLOYMENT](DEPLOYMENT.md) identifica Sites e `ipagell.website` come percorso di pubblicazione, qui fuori perimetro.
+Lettura effettuata su working tree al commit `44ae5eac0086dc6460e9ca2e7436ba2894326522`, che contiene modifiche preesistenti non toccate da questa specifica. [REPO-SNAPSHOT](../REPO-SNAPSHOT.md), [ARCHITECTURE-CURRENT](../ARCHITECTURE-CURRENT.md) e [VERIFICATION-MATRIX](../VERIFICATION-MATRIX.md) fotografano principalmente `c780569...`; per questa proposta prevalgono i file attuali. [DEPLOYMENT](../DEPLOYMENT.md) identifica Sites e `ipagell.website` come percorso di pubblicazione, qui fuori perimetro.
 
 | Aspetto verificato | Codice corrente e conseguenza |
 | --- | --- |
@@ -225,7 +225,7 @@ Solo dopo aver misurato uso e prestazioni: accesso offline in sola lettura alle 
 3. **Offline e account:** nuovi `lib/notes/storage.ts`, `lib/notes/session.ts`, `hooks/use-notes.ts`; bozze di classe locali senza pubblicazione automatica. Integrare logout/cambio account in `lib/diary-session.ts`, `lib/account-storage.ts` e `components/ipagell-app.tsx` senza alterare `SchoolData.version`. Testare storage cross-tab e revoca membership.
 4. **UI:** nuovo `components/notes-view.tsx` per elenco, lettura/editor e confronto nelle due modalità; ingressi in `components/ipagell-app.tsx` e `components/classes-view.tsx`, lista materie di classe e suggerimenti in `components/class-events-panel.tsx`, stile in `app/globals-new.css`. Chiavi in tutti i `lib/i18n/messages/*.json`; verificare `scripts/check-i18n.mjs`. Nessuna nuova voce nella barra mobile.
 5. **Backup/PWA:** estendere `lib/account-storage.ts` o nuovo `lib/notes/backup.ts` con schema V2, parser V1/V2, export di note personali, bozze e proprie note di classe, import con journal; aggiornare dialog in `components/ipagell-app.tsx` e copy account. Rivedere `public/sw.js` solo se cambia la shell; nessun dato di classe in cache. Aggiornare `docs/ARCHITECTURE-CURRENT.md`, `docs/VERIFICATION-MATRIX.md`, `docs/CLASSI.md`, `docs/DEPLOYMENT.md` solo nelle sezioni rese obsolete dall'implementazione.
-6. **Verifica prima di un futuro rilascio:** unità su validazione, quote e conflitti; API su account/membri diversi, ruoli, CSRF, body limit, retry e rimozione classe; browser su offline, due schede, IndexedDB negato, logout, import interrotto; QA mobile e accessibilità; `npm run check`, build e procedura separata di [DEPLOYMENT](DEPLOYMENT.md). Nessun deploy è parte di questa specifica.
+6. **Verifica prima di un futuro rilascio:** unità su validazione, quote e conflitti; API su account/membri diversi, ruoli, CSRF, body limit, retry e rimozione classe; browser su offline, due schede, IndexedDB negato, logout, import interrotto; QA mobile e accessibilità; `npm run check`, build e procedura separata di [DEPLOYMENT](../DEPLOYMENT.md). Nessun deploy è parte di questa specifica.
 
 ## Criteri di accettazione verificabili
 
@@ -247,4 +247,4 @@ Solo dopo aver misurato uso e prestazioni: accesso offline in sola lettura alle 
 
 ## Punti ancora da validare prima dello sviluppo
 
-I limiti 500/20.000/8 MiB personali, 200/4 MiB per classe e il tempo di caricamento degli archivi richiedono una prova con dataset massimo su telefono e D1 locale; se la misura non regge, ridurre quote o aggiungere indicizzazione/paginazione mantenendo esplicita l'incompletezza della ricerca. Il protocollo esatto della quota atomica, del `changeSeq`, dei riferimenti a classi eliminate e del journal d'import va verificato con i vincoli transazionali del runtime usato. La migrazione delle etichette eventi esistenti deve essere provata su un campione che includa duplicati, nomi con accenti e classi senza eventi. Prima di pubblicare, verificare migrazioni applicate, backup di dati reali, comportamento PWA su dispositivi e dominio Sites secondo [DEPLOYMENT](DEPLOYMENT.md). Non restano scelte di prodotto che impediscano di valutare questa proposta; le soglie possono essere tarate con misure.
+I limiti 500/20.000/8 MiB personali, 200/4 MiB per classe e il tempo di caricamento degli archivi richiedono una prova con dataset massimo su telefono e D1 locale; se la misura non regge, ridurre quote o aggiungere indicizzazione/paginazione mantenendo esplicita l'incompletezza della ricerca. Il protocollo esatto della quota atomica, del `changeSeq`, dei riferimenti a classi eliminate e del journal d'import va verificato con i vincoli transazionali del runtime usato. La migrazione delle etichette eventi esistenti deve essere provata su un campione che includa duplicati, nomi con accenti e classi senza eventi. Prima di pubblicare, verificare migrazioni applicate, backup di dati reali, comportamento PWA su dispositivi e dominio Sites secondo [DEPLOYMENT](../DEPLOYMENT.md). Non restano scelte di prodotto che impediscano di valutare questa proposta; le soglie possono essere tarate con misure.

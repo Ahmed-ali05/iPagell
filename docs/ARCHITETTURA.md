@@ -2,7 +2,7 @@
 
 [Indice](../README.md) · [API](API.md) · [Manutenzione](MANUTENZIONE.md)
 
-Sintesi aggiornata al **1 ottobre 2026**. La descrizione completa è in [Architettura corrente](ARCHITECTURE-CURRENT.md), con [inventario generato](REPO-INVENTORY.md) e [verifiche](VERIFICATION-MATRIX.md). [Affidabilità](RELIABILITY.md) conserva l’intervento sul diario del 23 settembre; [Spazio studio AI](SPAZIO-STUDIO-AI.md) resta futuro.
+Sintesi aggiornata al **1 ottobre 2026**. La descrizione completa è in [Architettura corrente](ARCHITECTURE-CURRENT.md), con [inventario generato](REPO-INVENTORY.md) e [verifiche](VERIFICATION-MATRIX.md). [Affidabilità](archive/RELIABILITY.md) conserva l’intervento sul diario del 23 settembre; [Spazio studio AI](SPAZIO-STUDIO-AI.md) resta futuro.
 
 ## Componenti e responsabilità
 
@@ -121,4 +121,4 @@ Il service worker non forza `skipWaiting`: un aggiornamento può attendere la ch
 
 Classi, appartenenze, inviti, eventi, sottoscrizioni, materie e appunti condivisi usano tabelle normalizzate separate da `diaries.payload`: una classe non può leggere o dedurre voti, assenze o preferenze private. Ogni endpoint verifica sessione, appartenenza e ruolo; i segreti degli inviti sono conservati soltanto come digest e i link usano il frammento URL, che non viene inviato al server. C1 (classi e inviti), C2 (eventi condivisi) e C3 (agenda personale collegata) sono implementati nel codice; l'attivazione del flag nell'ambiente Sites live non è verificabile dalla repository. Annunci, materiali e spazio studio AI restano futuri.
 
-I documenti dello spazio studio AI richiederanno object storage, coda di elaborazione e indice di ricerca separati. Non inserire file, testo estratto o embedding nel payload del diario e non eseguire analisi AI nella richiesta HTTP di upload.
+Nella variante remota proposta, i documenti dello spazio studio AI richiederebbero object storage, coda di elaborazione e indice di ricerca separati. L'[analisi del 7 ottobre](SPAZIO-STUDIO-AI-LOCALE.md) dà priorità a estrazione, ricerca e generazione sul dispositivo, con alternativa manuale: quella prova non richiede questa infrastruttura server. In entrambi i casi non inserire file, testo estratto o embedding nel payload del diario; nella variante remota non eseguire analisi AI nella richiesta HTTP di upload.

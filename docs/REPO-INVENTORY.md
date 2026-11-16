@@ -7,11 +7,11 @@ Generato da `scripts/repo-inventory.mjs` leggendo il sorgente, senza rete o dati
 | Campo | Valore |
 |---|---|
 | Pacchetto | `ipagell@0.1.0` |
-| Node dichiarato | `>=22.13.0` |
+| Node dichiarato | `^22.23.4 || ^24.22.1 || ^26.12.1` |
 | Lockfile | 3 |
-| Cataloghi | it, de, fr, en; 768 chiavi nel riferimento italiano |
-| Schema D1 versionato | 15 tabelle |
-| Migrazioni | 7, SQL e journal concordanti |
+| Cataloghi | it, de, fr, en; 850 chiavi nel riferimento italiano |
+| Schema D1 versionato | 23 tabelle |
+| Migrazioni | 8, SQL e journal concordanti |
 | File route API | 27 |
 
 ## API esportate
@@ -67,6 +67,14 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 - `class_subjects`
 - `class_notes`
 - `class_note_pins`
+- `auth_schema_state`
+- `account_credentials`
+- `account_identities`
+- `account_emails`
+- `auth_browser_epochs`
+- `auth_transactions`
+- `auth_challenges`
+- `auth_grants`
 
 ## Migrazioni
 
@@ -77,6 +85,7 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 - [0004_glossy_stranger.sql](../drizzle/0004_glossy_stranger.sql)
 - [0005_heavy_elektra.sql](../drizzle/0005_heavy_elektra.sql)
 - [0006_daily_stranger.sql](../drizzle/0006_daily_stranger.sql)
+- [0007_auth_compatibility.sql](../drizzle/0007_auth_compatibility.sql)
 
 ## Script npm
 
@@ -84,13 +93,18 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 |---|---|
 | `install:ci` | `node scripts/install-ci.mjs` |
 | `dev` | `node scripts/run-framework.mjs dev` |
+| `study:dev` | `npm --prefix experiments/study-local run dev` |
+| `study:check` | `npm --prefix experiments/study-local run check` |
+| `study:build` | `npm --prefix experiments/study-local run build` |
+| `study:evaluate` | `npm --prefix experiments/study-local run evaluate` |
 | `build` | `node scripts/run-framework.mjs build && node scripts/generate-precache.mjs` |
 | `build:cloudflare` | `node scripts/build-cloudflare.mjs` |
 | `deploy:cloudflare` | `node scripts/deploy-cloudflare.mjs` |
 | `deploy:sandbox` | `node scripts/deploy-cloudflare.mjs --sandbox` |
-| `check` | `npm run lint && tsc --noEmit && npm test && npm run check:i18n && npm run docs:check` |
+| `check` | `npm run check:runtime && npm run lint && tsc --noEmit && npm test && npm run check:i18n && npm run docs:check` |
 | `release:prepare` | `npm run check && npm run build` |
 | `test` | `node --import tsx --test tests/*.test.ts` |
+| `test:auth-d1` | `node --import tsx --test tests/auth-d1.integration.ts` |
 | `test:api` | `node tests/api-smoke.mjs` |
 | `docs:generate` | `node scripts/repo-inventory.mjs` |
 | `docs:check` | `node scripts/repo-inventory.mjs --check && node scripts/check-docs.mjs` |
@@ -98,6 +112,8 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 | `start` | `node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0` |
 | `lint` | `eslint . --ignore-pattern dist --ignore-pattern .next` |
 | `check:dependency-security` | `node --import tsx --test tests/dependency-security.test.ts` |
+| `preinstall` | `node scripts/check-node.mjs` |
+| `check:runtime` | `node scripts/check-node.mjs` |
 
 ## Dipendenze dirette
 
@@ -105,21 +121,14 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 
 | Pacchetto | Gruppo | Dichiarata | Risolta |
 |---|---|---|---|
-| `@base-ui/react` | app | `^1.7.0` | `1.7.0` |
 | `@fontsource/noto-emoji` | app | `^5.3.2` | `5.3.2` |
 | `@fontsource/noto-sans` | app | `^5.3.0` | `5.3.0` |
 | `@fontsource/noto-sans-arabic` | app | `^5.3.0` | `5.3.0` |
 | `@fontsource/noto-sans-symbols-2` | app | `^5.3.0` | `5.3.0` |
-| `@hookform/resolvers` | app | `^5.7.1` | `5.7.1` |
 | `@pdf-lib/fontkit` | app | `^1.1.1` | `1.1.1` |
-| `@shadcn/react` | app | `^0.3.0` | `0.3.0` |
 | `class-variance-authority` | app | `0.7.1` | `0.7.1` |
 | `clsx` | app | `2.1.1` | `2.1.1` |
-| `cmdk` | app | `^1.1.1` | `1.1.1` |
-| `date-fns` | app | `^4.4.0` | `4.4.0` |
 | `drizzle-orm` | app | `0.45.2` | `0.45.2` |
-| `embla-carousel-react` | app | `^8.6.0` | `8.6.0` |
-| `input-otp` | app | `^1.4.2` | `1.4.2` |
 | `lucide-react` | app | `^1.31.0` | `1.31.0` |
 | `next` | app | `16.3.8` | `16.3.8` |
 | `next-themes` | app | `^0.4.6` | `0.4.6` |
@@ -133,14 +142,10 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `prosemirror-view` | app | `^1.42.6` | `1.42.6` |
 | `radix-ui` | app | `^1.6.7` | `1.6.7` |
 | `react` | app | `19.2.8` | `19.2.8` |
-| `react-day-picker` | app | `^10.0.1` | `10.0.1` |
 | `react-dom` | app | `19.2.8` | `19.2.8` |
-| `react-hook-form` | app | `^7.85.0` | `7.85.0` |
-| `react-resizable-panels` | app | `^4.12.2` | `4.12.2` |
 | `recharts` | app | `^3.8.0` | `3.8.0` |
 | `sonner` | app | `^2.0.8` | `2.0.8` |
 | `tailwind-merge` | app | `3.6.0` | `3.6.0` |
-| `vaul` | app | `^1.1.2` | `1.1.2` |
 | `zod` | app | `^3.25.76` | `3.25.76` |
 | `@cloudflare/vite-plugin` | tooling/test | `1.62.3` | `1.62.3` |
 | `@cloudflare/workers-types` | tooling/test | `5.20261001.1` | `5.20261001.1` |
@@ -161,5 +166,5 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `tw-animate-css` | tooling/test | `^1.4.0` | `1.4.0` |
 | `typescript` | tooling/test | `5.9.3` | `5.9.3` |
 | `vinext` | tooling/test | `^1.0.0-beta.10` | `1.0.0-beta.10` |
-| `vite` | tooling/test | `8.0.16` | `8.0.16` |
+| `vite` | tooling/test | `8.1.6` | `8.1.6` |
 | `wrangler` | tooling/test | `4.145.0` | `4.145.0` |

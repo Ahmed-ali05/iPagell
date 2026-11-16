@@ -1,4 +1,4 @@
-> **Archivio storico conservato il 1 ottobre 2026.** Il testo seguente registra analisi e decisioni di quel periodo, incluse eventuali aggiunte successive. Non usarlo come descrizione corrente. Vedere [VERIFICATION-MATRIX.md](VERIFICATION-MATRIX.md) e [indice documentazione](README.md). I collegamenti ai file del codice puntano al tree attuale, non al commit storico.
+> **Archivio storico conservato il 1 ottobre 2026.** Il testo seguente registra analisi e decisioni di quel periodo, incluse eventuali aggiunte successive. Non usarlo come descrizione corrente. Vedere [VERIFICATION-MATRIX.md](../VERIFICATION-MATRIX.md) e [indice documentazione](../README.md). I collegamenti ai file del codice puntano al tree attuale, non al commit storico.
 
 # iPagell — Verification Matrix
 

@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Appunti](APPUNTI-SPEC.md) · [Formato](../lib/notes/format.ts) · [Verifiche](VERIFICATION-MATRIX.md)
 
-Aggiornamento: **1 ottobre 2026**, applicativo Sites 27. Il [design iniziale](APPUNTI-EDITOR-DESIGN-2026-09-30.md) e il [piano](APPUNTI-EDITOR-PIANO.md) sono storici. I criteri ancora da provare non vengono presentati come risultati del rilascio.
+Aggiornamento: **1 ottobre 2026**, applicativo Sites 27. Il [design iniziale](archive/APPUNTI-EDITOR-DESIGN-2026-09-30.md) e il [piano](archive/APPUNTI-EDITOR-PIANO.md) sono storici. I criteri ancora da provare non vengono presentati come risultati del rilascio.
 
 ## Componenti effettivi
 
@@ -56,6 +56,8 @@ Dopo fallimento, il testo aperto resta disponibile per Riprova, Copia testo e do
 
 ## Export e compatibilità
 
+Nei lettori personale e di classe il menu dei tre punti apre Esporta appunto: una finestra dedicata contiene NoteExport con PDF e formati secondari. Modifica, copia e rimozione sono nello stesso menu, secondo i permessi esistenti. La lettura personale omette descrizione introduttiva e stato normale di sincronizzazione della nota, mantenendo avvisi e gestione dei conflitti. La stampa conserva il titolo e nasconde i comandi.
+
 PDF: titolo, materia, data e, per classe, metadati pertinenti; blocchi con grassetto/liste/a-capo e font locali con licenze. Il modulo PDF e font sono caricati su richiesta. Preparazione mostra stato/errore; poi sono disponibili Salva PDF, Apri PDF e Condividi dove la File API lo consente. Nessun DOCX implementato.
 
 Markdown è un formato secondario; una nota plain viene convertita per export solo se senza perdita. Plain conserva anche download .txt; Copia testo usa il testo visibile. Backup V3 conserva formato, V2 importa plain, V1 riguarda il diario. `inFlight` locale non viene esportato.
@@ -67,7 +69,3 @@ Le API dei testi richiedono contratto 2 e, per update/delete, formato atteso olt
 Test del parser: escape, literal plain, canonicalità, newline/grassetto in tutti i blocchi, testo visibile; selezione: titoli/liste/Select all/bookmark; autosave/storage: chiamate concorrenti, modifiche durante write, risposta persa, errore quota e retry. API: formato personale/classe, contratto, permessi e CAS.
 
 Le prove locali del rilascio verificano riapertura, anteprima e salvataggio di a-capo formattati, e rifiuto del grassetto oltre limite con editing successivo riuscito. La [matrice](VERIFICATION-MATRIX.md) conserva evidenze e conteggi. Per completare la QA mobile servono dispositivi iOS/Android fisici, tastiera virtuale/IME, focus con selezione nativa, download/condivisione PDF, PWA aggiornata e accessibilità. Non dichiararli verificati sulla base di un viewport desktop.
-
-## Export dal lettore
-
-Il menu dei tre punti apre Esporta appunto, una finestra dedicata con PDF e altri formati. Il corpo della nota resta al centro della vista di lettura; formati, serializzazione ed esportazione non cambiano.

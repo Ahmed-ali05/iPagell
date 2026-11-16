@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Editor](APPUNTI-EDITOR-SPEC.md) · [API](API.md) · [Architettura](ARCHITECTURE-CURRENT.md)
 
-Aggiornamento UI: **10 ottobre 2026**. Contratti di persistenza invariati rispetto a Sites 27. La [specifica iniziale](APPUNTI-DESIGN-2026-09-30.md) conserva le decisioni del primo progetto; non è la descrizione corrente. Questo documento distingue comportamento implementato e limiti ancora da verificare.
+Aggiornamento UI: **10 ottobre 2026**. Contratti di persistenza invariati rispetto a Sites 27. La [specifica iniziale](archive/APPUNTI-DESIGN-2026-09-30.md) conserva le decisioni del primo progetto; non è la descrizione corrente. Questo documento distingue comportamento implementato e limiti ancora da verificare.
 
 ## Due spazi e copie indipendenti
 

@@ -1,4 +1,4 @@
-> **Archivio storico conservato il 1 ottobre 2026.** Il testo seguente registra analisi e decisioni di quel periodo, incluse eventuali aggiunte successive. Non usarlo come descrizione corrente. Vedere [ARCHITECTURE-CURRENT.md](ARCHITECTURE-CURRENT.md) e [indice documentazione](README.md). I collegamenti ai file del codice puntano al tree attuale, non al commit storico.
+> **Archivio storico conservato il 1 ottobre 2026.** Il testo seguente registra analisi e decisioni di quel periodo, incluse eventuali aggiunte successive. Non usarlo come descrizione corrente. Vedere [ARCHITECTURE-CURRENT.md](../ARCHITECTURE-CURRENT.md) e [indice documentazione](../README.md). I collegamenti ai file del codice puntano al tree attuale, non al commit storico.
 
 # iPagell — Architettura corrente
 
@@ -395,7 +395,7 @@ Se diverso, la route restituisce 404.
 - `components/class-events-panel.tsx`: attività condivise dentro una classe.
 - `components/ipagell-app.tsx`: tab Classi e integrazione agenda.
 
-La vista Classi viene montata al primo accesso e resta montata finché resta attivo lo stesso `DiaryWorkspace` (identificato da `user.id`). Conserva in memoria elenco, selezione e dettagli per `classId`; il pannello conserva anche gli eventi per `classId`. Tornando al tab, i dati sono subito visibili e una lettura non bloccante parte se l'elenco o gli eventi hanno più di 30 secondi. L'elenco sblocca la UI senza attendere il dettaglio. Gli inviti si caricano aprendo la sezione di gestione. Le scritture confermate aggiornano o invalidano i dati coinvolti. Questa cache di vista non è persistente e non sostituisce i controlli di accesso server. [Misurazione e limiti](CLASSI-PERFORMANCE.md).
+La vista Classi viene montata al primo accesso e resta montata finché resta attivo lo stesso `DiaryWorkspace` (identificato da `user.id`). Conserva in memoria elenco, selezione e dettagli per `classId`; il pannello conserva anche gli eventi per `classId`. Tornando al tab, i dati sono subito visibili e una lettura non bloccante parte se l'elenco o gli eventi hanno più di 30 secondi. L'elenco sblocca la UI senza attendere il dettaglio. Gli inviti si caricano aprendo la sezione di gestione. Le scritture confermate aggiornano o invalidano i dati coinvolti. Questa cache di vista non è persistente e non sostituisce i controlli di accesso server. [Misurazione e limiti](../CLASSI-PERFORMANCE.md).
 
 ### 6.3 Client HTTP
 

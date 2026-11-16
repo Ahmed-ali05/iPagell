@@ -1,13 +1,13 @@
 # Prompt operativi — editor visivo ed esportazione degli appunti
 
-> **Prompt conservati come storico di progetto.** La sequenza iniziale è stata realizzata: editor, backup V3 e pubblicazione Sites 27. Prima di riusarli per un nuovo intervento, adattarli al codice attuale e leggere [Editor](APPUNTI-EDITOR-SPEC.md), [Appunti](APPUNTI-SPEC.md) e [Verifiche](VERIFICATION-MATRIX.md). Non assumere che textarea, backup V2 o assenza del formato descrivano ancora la repository.
+> **Prompt conservati come storico di progetto.** La sequenza iniziale è stata realizzata: editor, backup V3 e pubblicazione Sites 27. Prima di riusarli per un nuovo intervento, adattarli al codice attuale e leggere [Editor](../APPUNTI-EDITOR-SPEC.md), [Appunti](../APPUNTI-SPEC.md) e [Verifiche](../VERIFICATION-MATRIX.md). Non assumere che textarea, backup V2 o assenza del formato descrivano ancora la repository.
 
 
 Usare i tre prompt in ordine. Il primo produce la specifica, il secondo implementa, il terzo pubblica. Il piano e le evidenze iniziali sono in [APPUNTI-EDITOR-PIANO.md](APPUNTI-EDITOR-PIANO.md). Ogni fase deve rileggere il codice corrente perché il working tree può cambiare.
 
 ## 1. Analisi esecutiva
 
-> Lavora in /Users/ahmedali/Documents/ProgettiCodex/iPagell. Leggi AGENTS.md, docs/REPO-SNAPSHOT.md, docs/ARCHITECTURE-CURRENT.md, docs/VERIFICATION-MATRIX.md, docs/APPUNTI-SPEC.md e docs/APPUNTI-EDITOR-PIANO.md. Controlla git status: gli appunti nel working tree sono modifiche locali; preservale. Verifica sempre il codice corrente.
+> Lavora in /Users/ahmedali/Documents/ProgettiCodex/iPagell. Leggi AGENTS.md, docs/REPO-SNAPSHOT.md, docs/ARCHITECTURE-CURRENT.md, docs/VERIFICATION-MATRIX.md, docs/APPUNTI-SPEC.md e docs/archive/APPUNTI-EDITOR-PIANO.md. Controlla git status: gli appunti nel working tree sono modifiche locali; preservale. Verifica sempre il codice corrente.
 >
 > Prepara una specifica esecutiva per rendere visivamente formattabili gli appunti personali e di classe mantenendo Markdown limitato sul backend. L'utente può essere un ragazzino: usa il campo titolo già esistente e pochi comandi contestuali per titolo di sezione, grassetto ed elenco. Non richiedere sintassi Markdown e non aggiungere istruzioni permanenti all'interfaccia.
 >

@@ -1,5 +1,7 @@
 # Schermata Classi: diagnosi e verifica locale
 
+Rapporto complementare: conserva diagnosi e misure dell'intervento, senza una nuova misurazione in questo riordino. Il comportamento corrente è descritto in [Architettura](ARCHITECTURE-CURRENT.md); risultati e limiti vanno letti con la [matrice](VERIFICATION-MATRIX.md).
+
 ## Causa
 
 Prima della correzione, `view-stage` aveva `key={activeTab}` e `ClassesView` era renderizzata solo con `activeTab === "classes"`. Ogni uscita smontava vista e pannello eventi. Al ritorno il loader principale aspettava `GET /api/classes` → `GET /api/classes/:id` →, per owner/moderator, `GET /api/classes/:id/invites`; il pannello avviava separatamente `GET /api/classes/:id/events` dopo il dettaglio. `cache: no-store` è corretto per queste API, ma non conservava lo stato React della schermata.

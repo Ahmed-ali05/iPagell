@@ -16,6 +16,12 @@ Recupero: codice casuale di 32 byte, digest nel database, rotazione monouso al r
 
 CSRF: origine esatta e JSON sulle mutazioni, più controllo Fetch Metadata. Questi controlli non proteggono da uno script malevolo già eseguito nella stessa origine. La fiducia in `CF-Connecting-IP` richiede il percorso edge previsto; non esporre il Worker tramite un proxy che consenta al client di falsificare quell’header.
 
+## Preparazione W8-A, verificata solo localmente
+
+La migrazione 0007 aggiunge lo stato schema auth e le credenziali separate. In modalità legacy si autentica esclusivamente con accounts: il backfill iniziale può diventare obsoleto. L’adattatore supporta anche lo schema futuro senza le due colonne segrete; non è stata consegnata né eseguita una contrazione remota. Le guardie DB respingono scritture auth con modalità paused/ignota, incluse richieste già in volo. La pausa blocca anche DELETE di inviti e diari, per arrestare gli effetti dei vecchi writer. Le strutture provider, prove ed epoch restano inattive.
+
+Cambio password e cancellazione ricontrollano la stessa sessione, scadenza e auth_version nella mutazione dopo il KDF. Inviti, diario e account condividono il predicato di cancellazione; un vincolo FK fallito annulla il batch. Il client esegue il flush prima della richiesta, invalida la propria generazione subito dopo successo e ripulisce soltanto l’ID catturato. Un errore di pulizia locale viene segnalato senza riaprire l’account cancellato. I log delle eccezioni inattese contengono soltanto il nome dell’errore, senza testo SQL/provider o parametri. [Prove e limiti](docs/improvement-2026-10-01/AUTH-COMPATIBILITY-W8A.md).
+
 ## Dove restano i dati
 
 | Sede | Contenuto / limite |
@@ -46,3 +52,7 @@ Classi, eventi, agenda personale collegata, materie e appunti condivisi sono imp
 - [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md): file non fidati, prompt injection, isolamento di storage/vettori, cancellazione dei derivati, quote e trattamento da parte del fornitore.
 
 Non collegare un modello AI o accettare file reali in produzione finché informativa, provider, regione, conservazione, scansione, cancellazione e responsabilità operativa non sono stati approvati e verificati.
+
+## Runtime e dipendenze — 22 ottobre 2026
+
+PHP non è presente nel sorgente o nella pubblicazione Sites. Node serve per gli strumenti locali e CI; il Worker pubblico usa il runtime Cloudflare gestito dalla piattaforma. Usare le release corrette ammesse in `package.json`, con 22.23.4 selezionato in `.nvmrc`. Il controllo runtime rifiuta anche Node 23, fuori supporto. Vite è aggiornato a 8.1.6; audit npm completo e regressioni della patch locale braces restano obbligatori. [Avvisi, perimetro e prove](docs/RUNTIME-SECURITY-2026-10-22.md). Il risultato npm non verifica il runtime gestito dal fornitore.

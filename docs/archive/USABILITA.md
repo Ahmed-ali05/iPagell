@@ -1,5 +1,7 @@
 # Valutazione usabilità — integrazione Classi
 
+> **Rapporto storico del 16 settembre 2026.** Le priorità seguenti sono quelle della verifica originaria, non un backlog corrente. Vedere [Reference UX](../UX-REFERENCE.md), [Piano prodotto](../PRODOTTO.md) e [indice dell'archivio](README.md).
+
 Verifica del 16 settembre 2026. Ambiente locale con account e dati sintetici; nessuna modifica ai dati reali dell'utente.
 
 ## Migliorie incluse

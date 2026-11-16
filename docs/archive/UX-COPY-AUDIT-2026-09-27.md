@@ -1,5 +1,7 @@
 # Audit UX e copy — 27 settembre 2026
 
+> **Resoconto storico.** Registra gli interventi di quel ciclo; non descrive automaticamente le schermate dopo le modifiche successive. Vedere [Reference UX](../UX-REFERENCE.md), [Guida utente](../GUIDA-UTENTE.md) e [indice dell'archivio](README.md).
+
 Ambito: landing, ingresso, onboarding, Home, navigazione, Agenda, Voti, Assenze, Classi, Statistiche, Impostazioni, moduli e stati vuoti. Le proposte derivano dal codice corrente e dalla verifica locale; i documenti di repository sono stati usati come mappa. Classificazione: A essenziale, B utile ma secondario, C contestuale, D ridondante, E debole, F eccessivo o impreciso.
 
 ## P0 — Confusione e claim imprecisi
