@@ -232,6 +232,32 @@ export function createDiarySession(io: Dependencies = browser) {
       try { await io.forget(local?.user.id, local); }
       finally { if (ticket === generation) update({ ...initial, phase: "anonymous" }); }
     }),
+    security(operation: "password" | "delete", fields: Record<string, FormDataEntryValue>, beforeRequest: () => Promise<void>, afterDelete: (id: string) => Promise<void>) {
+      const userId = state.user?.id;
+      return enqueue(async (ticket) => {
+        await beforeRequest();
+        check(ticket);
+        const local = state.diary;
+        if (!userId || state.user?.id !== userId || !local || local.dirty || state.status !== "saved" || io.active() !== userId)
+          throw new RequestError(409, "Sincronizza le modifiche prima di continuare.");
+        const persisted = await io.read(userId);
+        check(ticket);
+        if (!sameLocal(local, persisted)) throw new LocalConflictError();
+        await io.request("/api/auth/security", { method: "POST", body: JSON.stringify({ ...fields, operation, expectedUserId: userId }) });
+        // Server success is final: invalidate async work BEFORE any storage await.
+        // A different account may have entered while the request was in flight.
+        if (ticket === generation) {
+          ++generation;
+          update({ ...initial, phase: "anonymous" });
+        }
+        if (operation === "delete") {
+          // Clean only the captured ID, even after a switch. Attempt both stores.
+          const results = await Promise.allSettled([io.forget(userId, local), afterDelete(userId)]);
+          const failed = results.find(result => result.status === "rejected");
+          if (failed?.status === "rejected") throw new RequestError(500, "Account eliminato. Non è stato possibile rimuovere tutte le copie da questo dispositivo.", "SECURITY_LOCAL_CLEANUP_FAILED");
+        }
+      });
+    },
     reauthenticate() {
       ++generation;
       update({ ...initial, phase: "anonymous" });

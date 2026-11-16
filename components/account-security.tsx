@@ -1,18 +1,17 @@
 "use client";
 import { useRef, useState, type FormEvent } from "react";
 import { useI18n } from "@/components/i18n-provider";
+import { RequestError } from "@/lib/client-http";
 import { apiErrorKey } from "@/lib/i18n/errors";
 import type { MessageKey } from "@/lib/i18n";
 export function AccountSecurity({
-  id,
   username,
   disabled,
-  onChanged,
+  onSubmit,
 }: {
-  id: string;
   username: string;
   disabled: boolean;
-  onChanged: (operation:"password"|"delete") => Promise<void>;
+  onSubmit: (operation:"password"|"delete", fields: Record<string, FormDataEntryValue>) => Promise<void>;
 }) {
   const { t } = useI18n();
   const [mode, setMode] = useState<"password" | "delete">("password"),
@@ -27,25 +26,9 @@ export function AccountSecurity({
     setBusy(true);
     try {
       const fields = Object.fromEntries(new FormData(event.currentTarget));
-      const result = await fetch("/api/auth/security", {
-        method: "POST",
-        credentials: "same-origin",
-        cache: "no-store",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...fields,
-          operation: mode,
-          expectedUserId: id,
-        }),
-      });
-      const body = (await result.json()) as { error?: string; code?: string };
-      if (!result.ok) {
-        setError(apiErrorKey(body.code, "error.operationFailed"));
-        return;
-      }
-      await onChanged(mode);
-    } catch {
-      setError("error.connectionUnavailable");
+      await onSubmit(mode, fields);
+    } catch (error) {
+      setError(error instanceof RequestError ? apiErrorKey(error.code, "error.operationFailed") : "error.connectionUnavailable");
     } finally {
       busyRef.current = false;
       setBusy(false);

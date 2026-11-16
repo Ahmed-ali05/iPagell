@@ -71,6 +71,7 @@ import {
 import { EntryDialog, type ModalType } from "@/components/entry-dialog";
 import { ClassesView } from "@/components/classes-view";
 import { PersonalNotesView } from "@/components/notes-view";
+import { RequestError } from "@/lib/client-http";
 import { flushOpenNotes } from "@/lib/notes/flush";
 import { useNotes } from "@/hooks/use-notes";
 import type { ClassNote, NoteCopySeed, NoteDraft, NotesBackupV3 } from "@/types/notes";
@@ -220,6 +221,14 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [editingSemester, setEditingSemester] = useState<Semester | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsTriggerRef = useRef<HTMLButtonElement>(null);
+  const desktopSettingsTriggerRef = useRef<HTMLButtonElement>(null);
+  const settingsReturnFocusRef = {
+    get current() {
+      return settingsTriggerRef.current?.getClientRects().length
+        ? settingsTriggerRef.current : desktopSettingsTriggerRef.current;
+    },
+  };
   const [deleteSubjectId, setDeleteSubjectId] = useState<string | null>(null);
   const [deleteSemesterId, setDeleteSemesterId] = useState<string | null>(null);
   const [pendingBackup, setPendingBackup] = useState<BackupPayload | NotesBackupV3 | null>(
@@ -602,7 +611,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             </button>
           ))}
         </nav>
-        <button className="settings-nav" onClick={() => setSettingsOpen(true)}>
+        <button ref={desktopSettingsTriggerRef} className="settings-nav" onClick={() => setSettingsOpen(true)}>
           <Settings2 size={19} /> {t("common.settings")}
         </button>
         <div className="profile-chip">
@@ -632,6 +641,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             {session.status === "saved" ? <><Check size={14} aria-hidden="true"/><span>{t("sync.savedShort")}</span></> : t(({ saved: "sync.saved", saving: "sync.saving", offline: "sync.offline", conflict: "sync.conflict", "device-conflict": "sync.deviceConflict", error: "sync.error", expired: "sync.expired" } as const)[session.status])}
           </span>
             <button
+              ref={settingsTriggerRef}
               aria-label={t("common.settings")}
               onClick={() => setSettingsOpen(true)}
             >
@@ -875,6 +885,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           <button
             className={activeTab === id ? "active" : ""}
             key={id}
+            aria-current={activeTab === id ? "page" : undefined}
             onClick={() => navigate(id)}
           >
             <Icon size={21} />
@@ -885,6 +896,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
 
       <EntryDialog
         type={modal}
+        fallbackFocusRef={settingsReturnFocusRef}
         onClose={() => {
           setModal(null);
           setEditingSubject(null);
@@ -911,6 +923,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       />
       <SettingsDialog
         open={settingsOpen}
+        fallbackFocusRef={settingsReturnFocusRef}
         onOpenChange={setSettingsOpen}
         data={data}
         preferences={preferences}
@@ -965,9 +978,17 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           } catch { toast.error(t("notes.saveFailed")); }
         }}
         accountEmail={session.user!.username}
-        accountId={session.user!.id}
         securityDisabled={session.diary!.dirty || session.status !== "saved" || notes.pending>0}
-        onSecurityChanged={async(operation)=>{await flushOpenNotes();if(operation==="delete")await forgetNotes(session.user!.id);session.reauthenticate();}}
+        onSecuritySubmit={async(operation,fields)=>{
+          try { await session.security(operation,fields,flushOpenNotes,forgetNotes); }
+          catch(error) {
+            if(error instanceof RequestError && error.code === "SECURITY_LOCAL_CLEANUP_FAILED") {
+              toast.error(t("security.localCleanupFailed"));
+              return;
+            }
+            throw error;
+          }
+        }}
       />
       <input
         ref={importRef}
@@ -1663,6 +1684,7 @@ function GradesView({
 
 function SettingsDialog({
   open,
+  fallbackFocusRef,
   onOpenChange,
   data,
   preferences,
@@ -1678,11 +1700,11 @@ function SettingsDialog({
   onImport,
   onLogout,
   accountEmail,
-  accountId,
   securityDisabled,
-  onSecurityChanged,
+  onSecuritySubmit,
 }: {
   open: boolean;
+  fallbackFocusRef: { readonly current: HTMLButtonElement | null };
   onOpenChange: (open: boolean) => void;
   data: SchoolData;
   preferences: Preferences;
@@ -1698,14 +1720,13 @@ function SettingsDialog({
   onImport: () => void;
   onLogout: () => void;
   accountEmail: string;
-  accountId: string;
   securityDisabled: boolean;
-  onSecurityChanged: (operation:"password"|"delete") => Promise<void>;
+  onSecuritySubmit: (operation:"password"|"delete", fields: Record<string, FormDataEntryValue>) => Promise<void>;
 }) {
   const { t, locale } = useI18n();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="settings-dialog" aria-describedby={undefined}>
+      <DialogContent className="settings-dialog" aria-describedby={undefined} fallbackFocusRef={fallbackFocusRef}>
         <DialogHeader>
           <DialogTitle>{t("common.settings")}</DialogTitle>
           <LanguageSelect className="language-select" />
@@ -1898,10 +1919,9 @@ function SettingsDialog({
               {t("settings.logoutRemoveCopy")}
             </button>
             <AccountSecurity
-              id={accountId}
               username={accountEmail}
               disabled={securityDisabled}
-              onChanged={onSecurityChanged}
+              onSubmit={onSecuritySubmit}
             />
           </TabsContent>
         </Tabs>

@@ -20,7 +20,8 @@ function harness() {
     remote: structuredClone(a), disk: new Map<string, LocalDiary>(), active: null as string | null,
     online: true, noDiary: false, getError: null as Error | null, saveError: null as Error | null,
     readError: null as Error | null, activateError: null as Error | null,
-    putError: null as Error | null, loseAck: false, puts: 0, logouts: 0,
+    putError: null as Error | null, loseAck: false, puts: 0, logouts: 0, securities: 0,
+    beforeSecurity: async () => {}, forgetError: null as Error | null,
     beforeGet: async () => {}, beforePut: async () => {}, beforeSave: async () => {},
   };
   const io = {
@@ -31,6 +32,7 @@ function harness() {
         if (env.getError) throw env.getError;
         return { user: remote.user, diary: env.noDiary ? null : { data: remote.data, preferences: remote.preferences, revision: remote.revision } };
       }
+      if (path === "/api/auth/security") { env.securities++; await env.beforeSecurity(); return {}; }
       if (path === "/api/auth/logout") { env.logouts++; return {}; }
       assert.equal(path, "/api/diary");
       env.puts++;
@@ -57,8 +59,9 @@ function harness() {
     activate: (id: string | null) => { if (env.activateError) throw env.activateError; env.active = id; },
     forget: async (id?: string, expected?: LocalDiary | null) => {
       if (id && !sameLocal(env.disk.get(id) ?? null, expected ?? null)) throw new LocalConflictError();
+      if (env.forgetError) throw env.forgetError;
       if (id) env.disk.delete(id);
-      env.active = null;
+      if (!id || env.active === id) env.active = null;
     },
     online: () => env.online,
   };
@@ -376,4 +379,55 @@ test("reduce motion roundtrips in backups, including legacy diaries without the 
     assert.equal(restored.preferences.reduceMotion, value);
     assert.deepEqual(restored.data, diary.data);
   }
+});
+
+
+test("security flush fails before request; dirty diary also blocks security", async () => {
+  const {env,session}=harness(); await session.reload();
+  await assert.rejects(session.security("delete",{},async()=>{throw new Error("flush failed");},async()=>{}),/flush failed/);
+  assert.equal(env.securities,0); assert.equal(session.getState().phase,"ready");
+  env.online=false; await session.commit(d=>d,{studentName:"pending"});
+  await assert.rejects(session.security("password",{},async()=>{},async()=>{}),/Sincronizza/);
+  assert.equal(env.securities,0);
+});
+
+test("security success hides deleted account before cleanup and clears only its local copy", async () => {
+  const {env,session}=harness(); await session.reload(); const id=env.active!;
+  const b=fixture("account-b"); env.disk.set(b.user.id,b);
+  let flushed=false,cleaned="";
+  env.beforeSecurity=async()=>{assert.equal(flushed,true);};
+  await session.security("delete",{},async()=>{flushed=true;},async(accountId)=>{
+    assert.equal(session.getState().phase,"anonymous"); cleaned=accountId;
+  });
+  assert.equal(cleaned,id); assert.equal(env.disk.has(id),false);
+  assert.equal(env.disk.has(b.user.id),true); assert.equal(env.active,null);
+});
+
+test("late security response and storage cleanup preserve a new account", async () => {
+  const {env,session}=harness(); await session.reload(); const a=env.active!;
+  const gate=deferred(); const started=deferred();
+  env.beforeSecurity=async()=>{started.resolve();await gate.promise;};
+  let cleaned="";
+  const deleting=session.security("delete",{},async()=>{},async(id)=>{cleaned=id;});
+  await started.promise;
+  const b=fixture("account-b");env.remote=b;env.disk.set(b.user.id,b);env.active=b.user.id;
+  session.accountChanged();
+  const loading=session.reload(); gate.resolve(); await deleting; await loading;
+  assert.equal(cleaned,a); assert.equal(env.disk.has(a),false);
+  assert.equal(env.active,b.user.id);assert.equal(session.getState().user?.id,b.user.id);
+});
+
+test("server security success remains anonymous even when local deletion fails", async () => {
+  const {env,session}=harness();await session.reload();let notesCleaned=false;
+  env.forgetError=new Error("storage denied");
+  await assert.rejects(session.security("delete",{},async()=>{},async()=>{notesCleaned=true;}),{code:"SECURITY_LOCAL_CLEANUP_FAILED"});
+  assert.equal(notesCleaned,true);assert.equal(session.getState().phase,"anonymous");
+  assert.equal(session.getState().diary,null);
+});
+
+test("password change flushes first, retains local copies and revokes the current UI generation", async () => {
+  const {env,session}=harness();await session.reload();const id=env.active!;
+  await session.security("password",{},async()=>{},async()=>{assert.fail("no delete cleanup");});
+  assert.equal(env.securities,1);assert.equal(env.disk.has(id),true);
+  assert.equal(session.getState().phase,"anonymous");
 });
