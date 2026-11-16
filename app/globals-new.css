@@ -551,15 +551,6 @@ button {
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  button {
-    transition:
-      transform 0.18s ease,
-      opacity 0.18s ease,
-      background 0.2s ease;
-  }
-  :where(:root:not([data-reduce-motion="true"])) button:active {
-    transform: scale(0.96);
-  }
   .hero-card,
   .average-card,
   .panel {
@@ -1426,6 +1417,8 @@ button {
   box-shadow: 0 28px 90px rgba(10, 12, 24, 0.25) !important;
 }
 .entry-dialog {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
   max-width: 620px !important;
   max-height: min(88dvh, 760px);
   overflow: auto;
@@ -1445,16 +1438,18 @@ button {
 }
 .entry-dialog form {
   display: grid;
+  min-width: 0;
   gap: 22px;
 }
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 15px;
 }
 .form-grid label,
 .preference-row {
   display: grid;
+  min-width: 0;
   gap: 7px;
   color: var(--ink);
   font-size: 14px;
@@ -1467,6 +1462,8 @@ button {
 .form-grid textarea,
 .preference-row input {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   border: 1px solid var(--input);
   background: var(--surface-solid);
   color: var(--ink);
@@ -1496,6 +1493,39 @@ button {
 .form-grid .color-input {
   padding: 4px;
 }
+/* Avoid iOS date/time width+padding overflow without clipping the control. */
+.native-date-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--input);
+  border-radius: 12px;
+  background: var(--surface-solid);
+  color: var(--ink);
+}
+.native-date-field > input[type] {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 1.5em;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  line-height: 1.5;
+  box-shadow: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.native-date-field > input::-webkit-date-and-time-value { height: 1.5em; text-align: start; }
+.native-date-field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .form-grid label > small {
   font-weight: 500;
   color: var(--subtle);
@@ -1520,11 +1550,20 @@ button {
 }
 .settings-tablist {
   width: 100% !important;
-  height: 42px !important;
+  height: auto !important;
+  min-height: 44px;
   display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 5rem), 1fr));
   background: var(--line) !important;
   border-radius: 14px !important;
+}
+.settings-tablist [data-slot="tabs-trigger"] {
+  height:auto;
+  min-height:44px;
+  padding-block:8px;
+  line-height:1.35;
+  white-space:normal;
+  overflow-wrap:anywhere;
 }
 .settings-section {
   min-width: 0;
@@ -2024,6 +2063,12 @@ fieldset { padding:0; border:0; min-width:0; }
 .account-card { width:100%; max-width:540px; padding:clamp(24px,5vw,42px); border:1px solid var(--line); border-radius:28px; background:var(--surface-solid); box-shadow:0 20px 70px #171a2a0a; }
 .account-brand { display:flex; align-items:center; gap:12px; margin-bottom:24px; font-size:22px; }
 .account-brand .brand-mark { margin:0; box-shadow:none; }
+.account-entry-navigation { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 20px; }
+.account-public-return { display:inline-flex; align-items:center; gap:8px; min-height:44px; max-width:100%; padding:8px 0; color:var(--accent); font-size:14px; font-weight:600; line-height:1.4; text-decoration:none; }
+.account-public-return svg { flex-shrink:0; }
+.account-public-return:hover { text-decoration:underline; text-underline-offset:4px; }
+.account-public-return[aria-disabled="true"] { opacity:.55; cursor:wait; }
+
 .account-card h1 { font-size:clamp(28px,5vw,36px); letter-spacing:-.045em; line-height:1.15; margin:12px 0 20px; }
 .account-note { color:var(--subtle); font-size:.875rem; line-height:1.6; margin:0 0 12px; }
 .account-card .form-grid { margin:20px 0; }
@@ -2058,7 +2103,7 @@ fieldset { padding:0; border:0; min-width:0; }
   .mobile-tabs button { font-size:.75rem; min-width:0; }
   .agenda-list .icon-button,.absence-list .icon-button { display:grid!important; }
   .settings-section-head,.preference-row { flex-wrap:wrap; gap:14px; }
-  .form-grid { grid-template-columns:1fr; }
+  .form-grid { grid-template-columns:minmax(0,1fr); }
   .form-grid .full { grid-column:1; }
   .settings-tablist { width:100%; overflow:auto; }
   .settings-tablist [data-slot="tabs-trigger"] { font-size:.875rem; }
@@ -2791,3 +2836,83 @@ button.agenda-origin { min-height:32px; text-align:left; }
 }
 
 .agenda-reminder { display:inline-flex; align-items:center; }
+
+/* Shared interaction language: immediate press feedback, quiet and reversible motion. */
+:root {
+  --motion-fast: 100ms;
+  --motion-settle: 180ms;
+  --ease-settle: cubic-bezier(.2, .8, .2, 1);
+}
+
+.app-shell :is(.primary-button,.soft-button,.icon-button,.text-link,.nav-item,.settings-nav,.top-actions>button,.mobile-tabs button),
+.account-card button,
+.dialog-dismiss {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+@media (hover:hover) {
+  .app-shell :is(.soft-button,.icon-button,.nav-item:not(.active),.settings-nav,.top-actions>button):not(:disabled):hover,
+  .dialog-dismiss:hover { background:var(--accent-soft); color:var(--accent); }
+}
+
+@media (prefers-reduced-motion:no-preference) {
+  :root:not([data-reduce-motion="true"]) :is(.app-shell,.account-card,[data-slot="dialog-content"]) :is(.primary-button,.soft-button,.icon-button,.nav-item,.settings-nav,.dialog-dismiss),
+  :root:not([data-reduce-motion="true"]) .top-actions>button,
+  :root:not([data-reduce-motion="true"]) .mobile-tabs button {
+    transition:scale var(--motion-settle) var(--ease-settle), background-color var(--motion-fast) ease, color var(--motion-fast) ease;
+  }
+  :root:not([data-reduce-motion="true"]) :is(.app-shell,.account-card,[data-slot="dialog-content"]) :is(.primary-button,.soft-button,.icon-button,.nav-item,.settings-nav,.dialog-dismiss):not(:disabled):active,
+  :root:not([data-reduce-motion="true"]) .top-actions>button:not(:disabled):active,
+  :root:not([data-reduce-motion="true"]) .mobile-tabs button:not(:disabled):active {
+    scale:.98;
+    transition-duration:0s;
+  }
+  [data-slot="dialog-content"][data-state="open"],
+  .action-menu-content[data-state="open"] { animation:surface-arrive var(--motion-settle) var(--ease-settle); }
+  [data-slot="dialog-content"][data-state="closed"],
+  .action-menu-content[data-state="closed"] { animation:surface-leave var(--motion-fast) ease-in; }
+}
+@keyframes surface-arrive { from { opacity:0; scale:.98; } to { opacity:1; scale:1; } }
+@keyframes surface-leave { from { opacity:1; scale:1; } to { opacity:0; scale:.98; } }
+
+[data-slot="dialog-content"] {
+  max-height:calc(100dvh - 32px);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+[data-slot="dialog-content"][data-has-close-button]>[data-slot="dialog-header"] { padding-inline-end:32px; }
+[data-slot="dialog-title"] { line-height:1.35; letter-spacing:-.02em; overflow-wrap:anywhere; }
+.dialog-dismiss {
+  inset-block-start:8px;
+  inset-inline-end:8px;
+  display:grid;
+  place-items:center;
+  width:44px;
+  height:44px;
+  padding:0;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:var(--subtle);
+}
+.action-menu-content { transform-origin:var(--radix-dropdown-menu-content-transform-origin); overscroll-behavior:contain; }
+.action-menu-trigger[data-state="open"] { background:var(--accent-soft); color:var(--accent); }
+
+@media (max-width:820px) {
+  .workspace { padding-bottom:calc(5.5rem + 24px + env(safe-area-inset-bottom)); }
+  .topbar { align-items:flex-start; }
+  .topbar>div:first-child { flex:1; }
+  .topbar h1 { max-width:none; white-space:normal; overflow:visible; text-overflow:clip; text-wrap:balance; }
+  .top-actions { padding-top:2px; flex-shrink:0; }
+  .mobile-tabs { padding:6px; gap:2px; border-radius:20px; }
+  .mobile-tabs button { border-radius:14px; padding:7px 2px; min-height:54px; line-height:1.25; overflow-wrap:anywhere; }
+  .mobile-tabs button.active { background:var(--accent-soft); color:var(--accent); }
+  .mobile-tabs button.active::before { content:none; }
+}
+
+@media (prefers-contrast:more) {
+  .mobile-tabs,.action-menu-content,[data-slot="dialog-content"] { border-color:var(--ink)!important; }
+  .mobile-tabs button.active { outline:2px solid currentColor; outline-offset:-2px; }
+  .action-menu-item[data-highlighted] { outline:2px solid var(--ink); outline-offset:-2px; }
+}

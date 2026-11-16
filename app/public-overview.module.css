@@ -1,0 +1,43 @@
+.main { width:min(1240px,calc(100% - 64px)); margin-inline:auto; }
+.opening { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr); gap:64px; align-items:center; padding:64px 0 60px; }
+.kicker { color:#716b7c; font-size:.6875rem; font-weight:650; letter-spacing:.13em; line-height:1.6; margin:0 0 24px; }
+.heroCopy h1 { font-size:clamp(3.1rem,5.7vw,5rem); line-height:1.02; letter-spacing:-.065em; font-weight:600; margin:0; text-wrap:balance; }
+.heroCopy h1 span { display:block; color:#6655e6; font-family:Georgia,"Times New Roman",serif; font-style:italic; font-weight:400; letter-spacing:-.065em; line-height:1.16; }
+.intro { color:#696674; font-size:1.0625rem; line-height:1.75; max-width:470px; margin:26px 0 0; }
+.actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px 24px; margin-top:30px; }
+.textLink { color:#363044; display:inline-flex; min-height:44px; align-items:center; gap:8px; text-decoration:none; font-size:.875rem; font-weight:600; }
+.textLink:hover { color:#5140cb; }
+.caption { color:#77717f; font-size:.6875rem; margin:15px 0 0; }
+.cover { position:relative; background:#ece8f5; border:1px solid #d8d1e6; border-radius:5px 18px 18px 5px; padding:28px 28px 22px 38px; box-shadow:inset 7px 0 0 #ded7ee, 0 18px 45px #3f345c09; }
+.coverHeader { display:flex; align-items:center; gap:9px; font-size:.75rem; font-weight:600; color:#5c4b7d; }
+.coverNumber { margin-left:auto; font-variant-numeric:tabular-nums; font-size:.6875rem; }
+.cover h2 { max-width:280px; font-size:clamp(1.65rem,2.8vw,2.25rem); line-height:1.15; font-weight:550; letter-spacing:-.04em; margin:24px 0; color:#352a48; }
+.screenshot { padding:10px; border:1px solid #d8d1e6; background:#f8f6fc; border-radius:12px; box-shadow:0 8px 16px #493f6710; }
+.coverFooter { display:flex; align-items:flex-start; flex-direction:column; gap:14px; margin-top:16px; }
+.coverFooter > span { color:#786e88; font-size:.625rem; line-height:1.5; }
+.coverLink { display:flex; align-items:center; justify-content:space-between; width:100%; min-height:44px; border-top:1px solid #d8d1e6; padding-top:12px; font-size:.8125rem; font-weight:650; color:#5140cb; text-decoration:none; }
+.sectionHeader { display:flex; justify-content:space-between; align-items:center; border-top:1px solid #dedbd4; padding:25px 0; color:#665e71; }
+.sectionHeader h2 { font-size:.875rem; font-weight:550; margin:0; }
+.tools { display:grid; grid-template-columns:1.1fr 1fr; gap:24px; }
+.tool { display:flex; flex-direction:column; color:#272230; border-radius:14px; padding:28px 32px; text-decoration:none; border:1px solid #e2deda; transition:border-color .18s,background .18s; }
+.noteTool { background:#fffefa; }
+.averageTool { background:#edece7; border-color:#e0ddd6; }
+.tool:hover { border-color:#b1a7c8; background:#f7f3ff; }
+.toolTop { display:flex; justify-content:space-between; gap:10px; align-items:center; color:#6d647a; font-size:.75rem; }
+.tool h3 { margin:26px 0 12px; font-size:clamp(1.5rem,2.5vw,2rem); font-weight:550; letter-spacing:-.04em; line-height:1.15; }
+.tool > p { color:#696674; font-size:.9375rem; line-height:1.65; margin:0 0 28px; max-width:370px; }
+.toolBottom { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; margin-top:auto; padding-top:20px; border-top:1px solid #ddd8d0; font-size:.75rem; }
+.toolBottom > span:first-child { color:#80778a; font-size:.6875rem; }
+.toolBottom > span:last-child { display:inline-flex; align-items:center; gap:8px; font-weight:650; color:#5140cb; }
+.diaryInvitation { display:flex; gap:64px; justify-content:space-between; align-items:center; padding:54px 0 8px; }
+.diaryInvitation .kicker { margin-bottom:12px; }
+.diaryInvitation h2 { font-size:1.75rem; line-height:1.2; font-weight:550; letter-spacing:-.035em; margin:0 0 12px; }
+.diaryInvitation p:not(.kicker) { max-width:630px; color:#696674; font-size:.9375rem; line-height:1.65; margin:0; }
+.diaryActions { flex-shrink:0; max-width:290px; }
+.schoolContext { border-top:1px solid var(--line); margin-top:36px; padding-top:28px; }
+.schoolContext h2 { font-size:1.5rem; line-height:1.25; font-weight:550; letter-spacing:-.025em; margin:0 0 16px; }
+.schoolContext p { max-width:760px; color:var(--subtle); font-size:.9375rem; line-height:1.7; margin:12px 0 0; }
+@media (max-width:1000px) { .opening { gap:32px; } .cover { padding:24px 20px 20px 30px; } .heroCopy h1 { font-size:clamp(2.6rem,5.7vw,4rem); } .tool { padding:24px; } }
+@media (max-width:720px) { .main { width:calc(100% - 40px); } .opening { grid-template-columns:1fr; padding:36px 0 32px; gap:32px; } .heroCopy h1 { font-size:clamp(2.8rem,9.8vw,4rem); } .kicker { margin-bottom:20px; font-size:.625rem; } .intro { margin-top:20px; font-size:1rem; } .actions { margin-top:24px; } .caption { margin-top:12px; } .cover { width:100%; padding:24px 24px 18px 34px; } .cover h2 { max-width:100%; font-size:1.75rem; margin-block:20px; } .screenshot { max-width:430px; } .tools { grid-template-columns:1fr; gap:16px; } .tool h3 { font-size:1.75rem; } .diaryInvitation { align-items:flex-start; flex-direction:column; gap:24px; padding-top:36px; } .diaryActions { max-width:100%; } }
+@media (prefers-reduced-motion:reduce) { .tool { transition:none; } }
+[data-reduce-motion="true"] .tool { transition:none; }

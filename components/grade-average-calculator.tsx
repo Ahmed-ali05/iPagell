@@ -1,11 +1,12 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
-import { LanguageSelect, useI18n } from "@/components/i18n-provider";
-import { calculatorAverage, parseCalculatorEntry, type CalculatorGrade } from "@/lib/grade-average-calculator";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useI18n } from "@/components/i18n-provider";
+import { calculatorAverage, parseCalculatorEntry, restoreCalculatorGrades, type CalculatorGrade } from "@/lib/grade-average-calculator";
 import { CURRENT_GRADING_SYSTEM, formatNumericGrade } from "@/lib/grading";
 import { formatNumber, selectPlural } from "@/lib/i18n";
-import { publicLandingPaths } from "@/lib/i18n/public-routes";
+import { PublicHeader, PublicFooter } from "@/components/public-header";
+import shell from "@/app/public-space.module.css";
 import styles from "@/app/grade-average.module.css";
 
 const system = CURRENT_GRADING_SYSTEM;
@@ -18,6 +19,22 @@ export function GradeAverageCalculator() {
   const [error, setError] = useState<"grade" | "weight" | null>(null);
   const gradeRef = useRef<HTMLInputElement>(null);
   const weightRef = useRef<HTMLInputElement>(null);
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    let active = true;
+    queueMicrotask(() => {
+    if (!active) return;
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("ipagell-public-average-v1") ?? "null");
+      if (saved) { setGrades(restoreCalculatorGrades(saved.grades, system)); if (typeof saved.gradeInput === "string") setGradeInput(saved.gradeInput.slice(0, 80)); if (typeof saved.weightInput === "string") setWeightInput(saved.weightInput.slice(0, 80)); }
+    } catch { /* A blocked browser store leaves the calculator usable. */ }
+    setHydrated(true);
+    });
+    return () => { active = false; };
+  }, []);
+  useEffect(() => {
+    if (hydrated) { try { sessionStorage.setItem("ipagell-public-average-v1", JSON.stringify({ grades, gradeInput, weightInput })); } catch { /* Calculation does not require storage. */ } }
+  }, [grades, gradeInput, weightInput, hydrated]);
   const average = calculatorAverage(grades, system);
   const count = grades.length;
   const countLabel = t(selectPlural(locale, count, "average.countOne", "average.countOther"), { count });
@@ -41,21 +58,17 @@ export function GradeAverageCalculator() {
     gradeRef.current?.focus();
   }
 
-  return <div className={styles.page}>
-    <header className={styles.header}>
-      <a className={styles.brand} href={publicLandingPaths[locale]} aria-label="iPagell"><span className={styles.logo}>iP</span><span>iPagell</span></a>
-      <div className={styles.headerRight}>
-        <LanguageSelect className="language-select" publicRoute averageRoute />
-        <a className={styles.homeLink} href={publicLandingPaths[locale]}>{t("average.home")}</a>
-      </div>
-    </header>
+  return <div className={`${styles.page} ${shell.page}`}>
+    <PublicHeader current="average" />
     <main className={styles.main}>
       <div className={styles.intro}>
+        <p className={shell.eyebrow}><span>04</span>{t("public.noAccount")}</p>
         <h1>{t("average.title")}</h1>
         <p>{t("average.description")}</p>
       </div>
       <section className={styles.tool} aria-label={t("average.toolLabel")}>
         <form className={styles.form} onSubmit={addGrade} noValidate>
+          <fieldset disabled={!hydrated} className={styles.inputGroup}>
           <div className={styles.fields}>
             <div className={styles.field}>
               <label htmlFor="calculator-grade">{t("average.gradeLabel")}</label>
@@ -70,6 +83,7 @@ export function GradeAverageCalculator() {
           </div>
           {error && <p className={styles.error} id="calculator-error" role="alert">{t(error === "grade" ? "average.gradeError" : "average.weightError", { minimum: system.values.minimum, maximum: system.values.maximum })}</p>}
           <button className={styles.addButton} type="submit">{t("average.add")}</button>
+        </fieldset>
         </form>
         <div className={styles.result} aria-live="polite" aria-atomic="true">
           <span>{t("average.resultLabel")}</span>
@@ -87,11 +101,16 @@ export function GradeAverageCalculator() {
         </div>}
       </section>
       <div className={styles.notes}>
-        <section><h2>{t("average.formulaTitle")}</h2><p>{t("average.formulaText")}</p></section>
+        <section><h2>{t("average.formulaTitle")}</h2><p>{t("average.formulaText")}</p><p>{t("average.example", {
+          firstGrade: formatNumber(locale, 4.5, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+          secondGrade: formatNumber(locale, 5.5, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+          result: formatNumber(locale, 5.2, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+        })}</p></section>
+        <p>{t("average.schoolRules")}</p>
         <p>{t("average.privacy")}</p>
         <div className={styles.cta}><p>{t("average.ctaText")}</p><a href={`/app?mode=register&uiLocale=${locale}`}>{t("average.ctaLink")}</a></div>
       </div>
     </main>
-    <footer className={styles.footer}>{t("landing.footer")}</footer>
+    <PublicFooter />
   </div>;
 }

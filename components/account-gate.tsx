@@ -1,6 +1,9 @@
 "use client";
 import { useRef, useState, type FormEvent } from "react";
+import { ArrowLeft } from "lucide-react";
+import { publicLandingPaths } from "@/lib/i18n/public-routes";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
+import { NativeDateInput } from "@/components/ui/native-date-input";
 import { apiErrorKey } from "@/lib/i18n/errors";
 import { RequestError } from "@/lib/client-http";
 import type { MessageKey } from "@/lib/i18n";
@@ -30,7 +33,7 @@ export function AccountGate({
   onAuthenticated,
   onLogout,
 }: Props) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [mode, setMode] = useState<"login" | "register" | "recover">(initialMode);
   const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
@@ -136,7 +139,18 @@ export function AccountGate({
           <span className="brand-mark">iP</span>
           <b>iPagell</b>
         </div>
-        <LanguageSelect className="language-select" />
+        <div className="account-entry-navigation">
+          {!user && !recovery && <a
+            className="account-public-return"
+            href={publicLandingPaths[locale]}
+            aria-disabled={busy || undefined}
+            onClick={event => { if (busyRef.current) event.preventDefault(); }}
+          >
+            <ArrowLeft size={18} aria-hidden="true" />
+            <span>{t("auth.backPublic")}</span>
+          </a>}
+          <LanguageSelect className="language-select" />
+        </div>
         <h1>
           {recovery
             ? t("auth.recoveryTitle")
@@ -237,7 +251,7 @@ export function AccountGate({
                       </label>
                       <label>
                         {t("auth.start")}
-                        <input
+                        <NativeDateInput
                           name="startDate"
                           type="date"
                           defaultValue={year + "-08-24"}
@@ -246,7 +260,7 @@ export function AccountGate({
                       </label>
                       <label>
                         {t("auth.end")}
-                        <input
+                        <NativeDateInput
                           name="endDate"
                           type="date"
                           defaultValue={year + 1 + "-01-31"}

@@ -1,4 +1,4 @@
-.page { --ink: #17182a; --muted: #606375; --purple: #6655e6; min-height: 100dvh; color: var(--ink); background: #fbfbfd; }
+.page { --ink: #17182a; --muted: #606375; --purple: #6655e6; min-height: 100dvh; color: var(--ink); background: #f7f6f2; }
 .header, .main, .footer { width: min(760px, calc(100% - 32px)); margin-inline: auto; }
 .header { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-size: 18px; font-weight: 800; letter-spacing: -.03em; }
@@ -58,3 +58,8 @@
   .listWrap { padding-inline: 18px; }
   .gradeWeight { font-size: 12px; }
 }
+.inputGroup { border:0; padding:0; margin:0; min-width:0; }
+.main { padding-top:42px; padding-bottom:12px; }
+.intro h1 { font-weight:600; }
+.intro > p:first-child { color:#5140cb; font-size:.75rem; margin-bottom:12px; }
+@media (max-width:600px) { .main { padding-top:28px; } }

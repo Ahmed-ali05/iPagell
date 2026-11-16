@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { locales } from "@/lib/i18n/locale";
-import { publicAveragePaths } from "@/lib/i18n/public-routes";
+import { publicAveragePaths, publicDiaryPaths, publicNotesPaths } from "@/lib/i18n/public-routes";
 
 const CANONICAL_HOST = "ipagell.website";
 
@@ -26,7 +26,7 @@ export function proxy(request: NextRequest) {
   if (locale) {
     requestHeaders.set("x-ipagell-explicit-locale", locale);
     requestHeaders.set("x-ipagell-public-locale", locale);
-  } else if (request.nextUrl.pathname === "/" || request.nextUrl.pathname === publicAveragePaths.it) {
+  } else if (request.nextUrl.pathname === "/" || request.nextUrl.pathname === publicAveragePaths.it || request.nextUrl.pathname === publicDiaryPaths.it || request.nextUrl.pathname === publicNotesPaths.it) {
     requestHeaders.set("x-ipagell-public-locale", "it");
   } else if (request.nextUrl.pathname === "/app") {
     const appLocale = locales.find((candidate) => candidate === request.nextUrl.searchParams.get("uiLocale"));

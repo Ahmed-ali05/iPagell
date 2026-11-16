@@ -43,7 +43,7 @@ test("extreme finite weights preserve the mean without overflow or underflow", (
 });
 
 test("all localized tool metadata share canonical, hreflang and translated copy", async () => {
-  const languages = Object.fromEntries(locales.map((locale) => [locale, `https://ipagell.website${publicAveragePaths[locale]}`]));
+  const languages = Object.fromEntries(locales.flatMap((locale) => [[locale, `https://ipagell.website${publicAveragePaths[locale]}`], [`${locale}-CH`, `https://ipagell.website${publicAveragePaths[locale]}`]]));
   for (const locale of locales) {
     const messages = await loadMessages(locale);
     const metadata = await publicAverageMetadata(locale);

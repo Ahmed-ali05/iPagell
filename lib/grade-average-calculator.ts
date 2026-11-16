@@ -29,3 +29,13 @@ export function calculatorAverage(grades: readonly CalculatorGrade[], system: Nu
   if (grades.some((grade) => !isValidGradeValue(grade.value, system) || !Number.isFinite(grade.weight) || grade.weight <= 0)) return null;
   return weightedArithmeticMean(grades);
 }
+
+/** Restore only validated inputs; never trust cached values or identifiers. */
+export function restoreCalculatorGrades(input: unknown, system: NumericGradingSystem): (CalculatorGrade & { entered: string; enteredWeight: string })[] {
+  if (!Array.isArray(input) || input.length > 1000) return [];
+  return input.flatMap((row, index) => {
+    if (!row || typeof row.entered !== "string" || typeof row.enteredWeight !== "string" || row.entered.length > 80 || row.enteredWeight.length > 80) return [];
+    const parsed = parseCalculatorEntry(row.entered, row.enteredWeight, system);
+    return "error" in parsed ? [] : [{ id: `restored-${index}`, ...parsed, entered: row.entered, enteredWeight: row.enteredWeight }];
+  });
+}
