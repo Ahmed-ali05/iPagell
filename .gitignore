@@ -41,10 +41,15 @@ yarn-error.log*
 next-env.d.ts
 *.tsbuildinfo
 /dist/
+/experiments/study-local/dist/
+/experiments/study-local/node_modules/
 /.wrangler/
 # Checkout-local execution profile and tool state; never publish them.
 /.sites-runtime/
-/.agents/
+/.agents/*
+!/.agents/skills/
+/.agents/skills/*
+!/.agents/skills/apple-design/
 /.codex/
 /outputs/
 /work/

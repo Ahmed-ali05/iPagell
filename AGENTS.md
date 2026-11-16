@@ -19,6 +19,10 @@ In caso di conflitto tra documentazione e codice, il codice corrente è la fonte
 
 Se una modifica rende obsoleta una parte della documentazione tecnica, aggiornare i documenti pertinenti nello stesso task, senza riscrivere sezioni non coinvolte.
 
+## Design dell'interfaccia
+
+Per progettare o rifinire UI e interazioni, leggere la skill locale [apple-design](.agents/skills/apple-design/SKILL.md). Applicarla nel perimetro della richiesta, riusando token, componenti e preferenze di accessibilità di iPagell. La skill guida feedback, movimento, gerarchia e tipografia; non impone un restyling né nuove dipendenze. Per task solo backend, dati, dipendenze o pubblicazione non è necessaria.
+
 # Produzione e pubblicazione
 
 - La produzione richiesta con «deploy» o «pubblica» è **https://ipagell.website**.
