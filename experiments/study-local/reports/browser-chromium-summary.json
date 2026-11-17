@@ -1,0 +1,279 @@
+{
+  "protocol": "study-local-eval-v1",
+  "generatedAt": "2026-10-07T17:47:55.081Z",
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "hardwareConcurrency": 8,
+    "crossOriginIsolated": false,
+    "secureContext": true,
+    "gpuApi": true
+  },
+  "corpusHash": "4e0b7fade9b5518b516942f2f214f6cac547bcb9b38986bc42db2894e39d5bb8",
+  "annotationHash": "afd3adda28428de0d3f2d4d15bd89e618774ebcd9ed1f01d00ff29a57a1c56b0",
+  "baseline": {
+    "p95Ms": 0.5,
+    "querySamples": 400,
+    "summary": [
+      {
+        "split": "development",
+        "language": "all",
+        "n": 32,
+        "recallAt5": 0.96875,
+        "mrrAt5": 0.9479166666666667
+      },
+      {
+        "split": "development",
+        "language": "it",
+        "n": 20,
+        "recallAt5": 0.95,
+        "mrrAt5": 0.95
+      },
+      {
+        "split": "development",
+        "language": "de",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 0.8333333333333333
+      },
+      {
+        "split": "development",
+        "language": "fr",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      },
+      {
+        "split": "development",
+        "language": "en",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      },
+      {
+        "split": "evaluation",
+        "language": "all",
+        "n": 32,
+        "recallAt5": 0.96875,
+        "mrrAt5": 0.9375
+      },
+      {
+        "split": "evaluation",
+        "language": "it",
+        "n": 20,
+        "recallAt5": 1,
+        "mrrAt5": 0.95
+      },
+      {
+        "split": "evaluation",
+        "language": "de",
+        "n": 4,
+        "recallAt5": 0.75,
+        "mrrAt5": 0.75
+      },
+      {
+        "split": "evaluation",
+        "language": "fr",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      },
+      {
+        "split": "evaluation",
+        "language": "en",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      }
+    ]
+  },
+  "selectedProfile": "model-card",
+  "development": [
+    {
+      "profile": "model-card",
+      "recall": 1,
+      "mrr": 0.96875
+    },
+    {
+      "profile": "litert-guide",
+      "recall": 1,
+      "mrr": 0.96875
+    }
+  ],
+  "evaluation": {
+    "summary": [
+      {
+        "split": "evaluation",
+        "language": "all",
+        "n": 32,
+        "recallAt5": 1,
+        "mrrAt5": 0.96875
+      },
+      {
+        "split": "evaluation",
+        "language": "it",
+        "n": 20,
+        "recallAt5": 1,
+        "mrrAt5": 0.95
+      },
+      {
+        "split": "evaluation",
+        "language": "de",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      },
+      {
+        "split": "evaluation",
+        "language": "fr",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      },
+      {
+        "split": "evaluation",
+        "language": "en",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      }
+    ],
+    "warmStarts": [
+      {
+        "loadMs": 679.3999999985099,
+        "indexMs": 2082.5
+      },
+      {
+        "loadMs": 667.2999999970198,
+        "indexMs": 2085.60000000149
+      },
+      {
+        "loadMs": 843.1999999955297,
+        "indexMs": 2038.7000000029802
+      }
+    ],
+    "querySamples": 200,
+    "p95Ms": 46.899999998509884,
+    "maxInputTokens": 188,
+    "normRange": [
+      0.9999992683983929,
+      1.0000002329411295
+    ],
+    "runtimeAssets": [
+      "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.js",
+      "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+    ],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+      }
+    ]
+  },
+  "rankExceptions": [
+    {
+      "queryId": "D01-P1-Q1",
+      "recall": 1,
+      "reciprocalRank": 0.5
+    },
+    {
+      "queryId": "D02-P2-Q1",
+      "recall": 1,
+      "reciprocalRank": 0.5
+    },
+    {
+      "queryId": "D02-P3-Q1",
+      "recall": 1,
+      "reciprocalRank": 0.5
+    },
+    {
+      "queryId": "D13-P2-Q1",
+      "recall": 1,
+      "reciprocalRank": 0.5
+    }
+  ],
+  "negativeReturnedCounts": [
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+  ],
+  "fetchRequests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D01-DIgMh3D_.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D02-BN5Y-TrG.pdf"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D03-DY58tGYY.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D04-DOWxabvY.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D05-DIf6G5DP.pdf"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D06-CPH_IiTQ.pdf"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D07-CBfmAbD3.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D08-DTJ6Gk1O.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D09-C0QEaax3.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D10-CRb9u14k.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D11-pM29enlM.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D12-DGfgn56M.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D13-DMDeiHb7.pdf"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D14-BaQ2lBca.txt"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D15-BOrHj3Gt.pdf"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:5174/assets/D16-cZfDl199.pdf"
+    }
+  ],
+  "scope": "Summary transcribed from the browser DOM. Baseline summary matches the CLI. Full JSON available in the lab; browser download capture not verified."
+}

@@ -1,0 +1,737 @@
+{
+  "protocol": {
+    "version": "study-retrieval-challenge-v2",
+    "frozenAt": "2026-10-08",
+    "profile": "model-card",
+    "dimensions": 768,
+    "primary": "paired Recall@5 and MRR@5 on 16 positive queries; report delta and every rank",
+    "secondary": "Hit@1; negative returned counts separately (no calibrated abstention)",
+    "resources": "load/index/query median and p95; 5 query repeats; artifact bytes; peak RAM/GPU unknown",
+    "selection": "No tuning or minimum +5pp gate; descriptive comparison only",
+    "humanReview": "pending"
+  },
+  "model": {
+    "id": "embeddinggemma-2-text-270m",
+    "revision": "9be6e8b90982095dc05c2bd162e4b954ee4dbac7",
+    "url": "https://huggingface.co/litert-community/embeddinggemma-2-text-270m-litert-lm/resolve/9be6e8b90982095dc05c2bd162e4b954ee4dbac7/embeddinggemma-2-text-270m.litertlm",
+    "bytes": 164626432,
+    "sha256": "2d079ee2f6f066b1f368e8d7c819f55214eaef1d0513b312321901f30ab286fb",
+    "runtime": "@litert-lm/core@0.18.0",
+    "dimensions": 768
+  },
+  "environment": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+  "corpusHash": "658c369f6818bd60e3bbea14b4b1872695a54608131493bb32a21744f9337cff",
+  "rows": [
+    {
+      "id": "H1",
+      "text": "Quale meccanismo attenua una deviazione dal valore desiderato ma può oscillare se reagisce tardi?",
+      "language": "it",
+      "gold": [
+        "d-8b97d941928e986c06c720bda1557f1ae14ee32cef0ba5b785da61f6e9ff3e49-utf8-v1-paragraph-utf16-v1:p1:0-128"
+      ],
+      "baseline": [
+        "d-8b97d941928e986c06c720bda1557f1ae14ee32cef0ba5b785da61f6e9ff3e49-utf8-v1-paragraph-utf16-v1:p1:0-128",
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-036e9489c8f6fc2c525d64af15f97fb25a492faa77eb539fb93f2b0c33bbed89-utf8-v1-paragraph-utf16-v1:p1:0-130"
+      ],
+      "embedding": [
+        "d-8b97d941928e986c06c720bda1557f1ae14ee32cef0ba5b785da61f6e9ff3e49-utf8-v1-paragraph-utf16-v1:p1:0-128",
+        "d-67f987c7cf4a83b4b9012e3e4950f3e37de131a51b3b06680ffd2754136385e2-utf8-v1-paragraph-utf16-v1:p1:0-96",
+        "d-68b3b1e7cec6f6ee567feb73754cf9ec83e5928f269e6e3cc85568bb851e81a2-utf8-v1-paragraph-utf16-v1:p1:0-113",
+        "d-a663500d405b97e0c9857ef8cfe335a97f564c26482a23c00d1d7cd1669890f6-utf8-v1-paragraph-utf16-v1:p1:0-153",
+        "d-02c2423ac2b85cb2b277eb6f36934ecbfd45dc65fa48660f417c5a291a705953-utf8-v1-paragraph-utf16-v1:p1:0-106"
+      ],
+      "baselineMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H2",
+      "text": "Raccogliere più risposte corregge automaticamente una scelta distorta dei partecipanti?",
+      "language": "it",
+      "gold": [
+        "d-a663500d405b97e0c9857ef8cfe335a97f564c26482a23c00d1d7cd1669890f6-utf8-v1-paragraph-utf16-v1:p1:0-153"
+      ],
+      "baseline": [
+        "d-07af67ab127c4733cbbbd14e533023b5ab7b418816420debdd94359a3df73c6d-utf8-v1-paragraph-utf16-v1:p1:0-102",
+        "d-07de8695dcbd88e421b37ec0a16a3895b142e9694a5a9e2cf7e811c4c01e4a59-utf8-v1-paragraph-utf16-v1:p1:0-100",
+        "d-13e673e9644c8be54dd281b78dbba0a7ce7be01e7aa4340ad00703e38117d6c9-utf8-v1-paragraph-utf16-v1:p1:0-106",
+        "d-14e73c8951318b87b9949ea2ff9663ed3fd56a32d970d87f33835ea8674f0e4c-utf8-v1-paragraph-utf16-v1:p1:0-102",
+        "d-21cfcc5e3c6017136b3457397e3755fa11657d33c253ce31c779393bafb624cc-utf8-v1-paragraph-utf16-v1:p1:0-102"
+      ],
+      "embedding": [
+        "d-4782dfbf31f0b93f8cb58c2c5fb21387cbe69079333cf9695239af9d24fd6676-utf8-v1-paragraph-utf16-v1:p1:0-101",
+        "d-e324b965b63c4be354d863299f299decd8509e26f5b176263c5078469b00a6f9-utf8-v1-paragraph-utf16-v1:p1:0-105",
+        "d-0c5fabe5c94a5c3f6a8723c06a8633889cace3d100831ef9d2df9dd8e75ef81d-utf8-v1-paragraph-utf16-v1:p1:0-155",
+        "d-67f987c7cf4a83b4b9012e3e4950f3e37de131a51b3b06680ffd2754136385e2-utf8-v1-paragraph-utf16-v1:p1:0-96",
+        "d-a663500d405b97e0c9857ef8cfe335a97f564c26482a23c00d1d7cd1669890f6-utf8-v1-paragraph-utf16-v1:p1:0-153"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 0.2,
+        "hitAt1": 0
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H3",
+      "text": "Dove finisce l'energia fornita al ghiaccio mentre il termometro non sale?",
+      "language": "it",
+      "gold": [
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131"
+      ],
+      "baseline": [
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131",
+        "d-fc6698410e5a0d536fbe046f18e66ef9c1f713939bd6c31a00f9f6741c54ab01-utf8-v1-paragraph-utf16-v1:p1:0-124",
+        "d-dfaf8344bb0556e3522437a88cda4825637160ac22b55b0ada1c9ee8a9ca8bc8-utf8-v1-paragraph-utf16-v1:p1:0-125"
+      ],
+      "embedding": [
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131",
+        "d-fc6698410e5a0d536fbe046f18e66ef9c1f713939bd6c31a00f9f6741c54ab01-utf8-v1-paragraph-utf16-v1:p1:0-124",
+        "d-f6e11ac3b7b8b3f646382086e8077406f7ed060a664a9bbaef23c712ec72437f-utf8-v1-paragraph-utf16-v1:p1:0-99",
+        "d-0cfbd973a3625cacf4a506a68a24abb0bc5744f36d64f0bb7b7daa1f02d22ffe-utf8-v1-paragraph-utf16-v1:p1:0-93",
+        "d-e2c7adccad403dec55157ffee6fc6e7a19985d851ec512376099041b57ff35c0-utf8-v1-paragraph-utf16-v1:p1:0-100"
+      ],
+      "baselineMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H4",
+      "text": "Come si sposta l'acqua fra due soluzioni separate da una barriera che trattiene il sale?",
+      "language": "it",
+      "gold": [
+        "d-0cec609cef628cf42bd432ca15a15684001f680f1a8f2b2aa68e4c3b4cc09c63-utf8-v1-paragraph-utf16-v1:p1:0-111"
+      ],
+      "baseline": [
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-dfaf8344bb0556e3522437a88cda4825637160ac22b55b0ada1c9ee8a9ca8bc8-utf8-v1-paragraph-utf16-v1:p1:0-125",
+        "d-fc6698410e5a0d536fbe046f18e66ef9c1f713939bd6c31a00f9f6741c54ab01-utf8-v1-paragraph-utf16-v1:p1:0-124",
+        "d-036e9489c8f6fc2c525d64af15f97fb25a492faa77eb539fb93f2b0c33bbed89-utf8-v1-paragraph-utf16-v1:p1:0-130",
+        "d-8b97d941928e986c06c720bda1557f1ae14ee32cef0ba5b785da61f6e9ff3e49-utf8-v1-paragraph-utf16-v1:p1:0-128"
+      ],
+      "embedding": [
+        "d-dfaf8344bb0556e3522437a88cda4825637160ac22b55b0ada1c9ee8a9ca8bc8-utf8-v1-paragraph-utf16-v1:p1:0-125",
+        "d-0cec609cef628cf42bd432ca15a15684001f680f1a8f2b2aa68e4c3b4cc09c63-utf8-v1-paragraph-utf16-v1:p1:0-111",
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131",
+        "d-fc6698410e5a0d536fbe046f18e66ef9c1f713939bd6c31a00f9f6741c54ab01-utf8-v1-paragraph-utf16-v1:p1:0-124",
+        "d-67f987c7cf4a83b4b9012e3e4950f3e37de131a51b3b06680ffd2754136385e2-utf8-v1-paragraph-utf16-v1:p1:0-96"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 0.5,
+        "hitAt1": 0
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H5",
+      "text": "Quale registrazione distribuisce negli anni un investimento senza produrre ogni volta un'uscita di denaro?",
+      "language": "it",
+      "gold": [
+        "d-036e9489c8f6fc2c525d64af15f97fb25a492faa77eb539fb93f2b0c33bbed89-utf8-v1-paragraph-utf16-v1:p1:0-130"
+      ],
+      "baseline": [
+        "d-4782dfbf31f0b93f8cb58c2c5fb21387cbe69079333cf9695239af9d24fd6676-utf8-v1-paragraph-utf16-v1:p1:0-101",
+        "d-dc9f8bdd3f405699b78dd9de10b18c898b0eedd52525b1fc56d7340f2d670723-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "embedding": [
+        "d-dc9f8bdd3f405699b78dd9de10b18c898b0eedd52525b1fc56d7340f2d670723-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-5f086c576b7e941c4636253169c38733d87f7bfb81167977d1c78f1cb00937b4-utf8-v1-paragraph-utf16-v1:p1:0-135",
+        "d-0c5fabe5c94a5c3f6a8723c06a8633889cace3d100831ef9d2df9dd8e75ef81d-utf8-v1-paragraph-utf16-v1:p1:0-155",
+        "d-14e73c8951318b87b9949ea2ff9663ed3fd56a32d970d87f33835ea8674f0e4c-utf8-v1-paragraph-utf16-v1:p1:0-102",
+        "d-67f987c7cf4a83b4b9012e3e4950f3e37de131a51b3b06680ffd2754136385e2-utf8-v1-paragraph-utf16-v1:p1:0-96"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H6",
+      "text": "Quale sostanza accelera il raggiungimento dello stato finale senza modificarne la composizione?",
+      "language": "it",
+      "gold": [
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109"
+      ],
+      "baseline": [
+        "d-02c2423ac2b85cb2b277eb6f36934ecbfd45dc65fa48660f417c5a291a705953-utf8-v1-paragraph-utf16-v1:p1:0-106",
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131"
+      ],
+      "embedding": [
+        "d-02c2423ac2b85cb2b277eb6f36934ecbfd45dc65fa48660f417c5a291a705953-utf8-v1-paragraph-utf16-v1:p1:0-106",
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131",
+        "d-0c5fabe5c94a5c3f6a8723c06a8633889cace3d100831ef9d2df9dd8e75ef81d-utf8-v1-paragraph-utf16-v1:p1:0-155",
+        "d-fc6698410e5a0d536fbe046f18e66ef9c1f713939bd6c31a00f9f6741c54ab01-utf8-v1-paragraph-utf16-v1:p1:0-124"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 0.5,
+        "hitAt1": 0
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H7",
+      "text": "Come può un deposito crescere in euro ma permettere di comprare meno beni?",
+      "language": "it",
+      "gold": [
+        "d-5f086c576b7e941c4636253169c38733d87f7bfb81167977d1c78f1cb00937b4-utf8-v1-paragraph-utf16-v1:p1:0-135"
+      ],
+      "baseline": [
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-dc9f8bdd3f405699b78dd9de10b18c898b0eedd52525b1fc56d7340f2d670723-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-5f086c576b7e941c4636253169c38733d87f7bfb81167977d1c78f1cb00937b4-utf8-v1-paragraph-utf16-v1:p1:0-135"
+      ],
+      "embedding": [
+        "d-dc9f8bdd3f405699b78dd9de10b18c898b0eedd52525b1fc56d7340f2d670723-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-47b67e2e7d0e479cf55273b40fb76b313ed50d073b27a36161d4eaa980a016d3-utf8-v1-paragraph-utf16-v1:p1:0-110",
+        "d-5f086c576b7e941c4636253169c38733d87f7bfb81167977d1c78f1cb00937b4-utf8-v1-paragraph-utf16-v1:p1:0-135",
+        "d-036e9489c8f6fc2c525d64af15f97fb25a492faa77eb539fb93f2b0c33bbed89-utf8-v1-paragraph-utf16-v1:p1:0-130",
+        "d-67f987c7cf4a83b4b9012e3e4950f3e37de131a51b3b06680ffd2754136385e2-utf8-v1-paragraph-utf16-v1:p1:0-96"
+      ],
+      "baselineMetrics": {
+        "recall": 1,
+        "reciprocalRank": 0.3333333333333333,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 0.3333333333333333,
+        "hitAt1": 0
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H8",
+      "text": "Perché una conferma isolata non autorizza a dichiarare completato un aggiornamento distribuito?",
+      "language": "it",
+      "gold": [
+        "d-0c5fabe5c94a5c3f6a8723c06a8633889cace3d100831ef9d2df9dd8e75ef81d-utf8-v1-paragraph-utf16-v1:p1:0-155"
+      ],
+      "baseline": [
+        "d-e324b965b63c4be354d863299f299decd8509e26f5b176263c5078469b00a6f9-utf8-v1-paragraph-utf16-v1:p1:0-105"
+      ],
+      "embedding": [
+        "d-e324b965b63c4be354d863299f299decd8509e26f5b176263c5078469b00a6f9-utf8-v1-paragraph-utf16-v1:p1:0-105",
+        "d-67f987c7cf4a83b4b9012e3e4950f3e37de131a51b3b06680ffd2754136385e2-utf8-v1-paragraph-utf16-v1:p1:0-96",
+        "d-0c5fabe5c94a5c3f6a8723c06a8633889cace3d100831ef9d2df9dd8e75ef81d-utf8-v1-paragraph-utf16-v1:p1:0-155",
+        "d-47b67e2e7d0e479cf55273b40fb76b313ed50d073b27a36161d4eaa980a016d3-utf8-v1-paragraph-utf16-v1:p1:0-110",
+        "d-dc9f8bdd3f405699b78dd9de10b18c898b0eedd52525b1fc56d7340f2d670723-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 0.3333333333333333,
+        "hitAt1": 0
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H9",
+      "text": "Wie gelangt Energie durch einen ruhenden Metallstab, ohne dass das Metall mitwandert?",
+      "language": "de",
+      "gold": [
+        "d-198fae2574594a96713b5cd0e250372660ce42c84d1566b6dfd160cadaba4586-utf8-v1-paragraph-utf16-v1:p1:0-114"
+      ],
+      "baseline": [
+        "d-198fae2574594a96713b5cd0e250372660ce42c84d1566b6dfd160cadaba4586-utf8-v1-paragraph-utf16-v1:p1:0-114"
+      ],
+      "embedding": [
+        "d-198fae2574594a96713b5cd0e250372660ce42c84d1566b6dfd160cadaba4586-utf8-v1-paragraph-utf16-v1:p1:0-114",
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131",
+        "d-0cfbd973a3625cacf4a506a68a24abb0bc5744f36d64f0bb7b7daa1f02d22ffe-utf8-v1-paragraph-utf16-v1:p1:0-93",
+        "d-fc6698410e5a0d536fbe046f18e66ef9c1f713939bd6c31a00f9f6741c54ab01-utf8-v1-paragraph-utf16-v1:p1:0-124",
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109"
+      ],
+      "baselineMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H10",
+      "text": "Kann ein Instrument immer fast denselben falschen Wert liefern?",
+      "language": "de",
+      "gold": [
+        "d-3561081dfe04dc78cb0da3971db292ac1cdcbe6950e3ab14ad48d22f34ddb29b-utf8-v1-paragraph-utf16-v1:p1:0-107"
+      ],
+      "baseline": [
+        "d-41cdc165e78a7647c6344f0697d8be20bb5a35017abad1b7f2154295b50cdf9e-utf8-v1-paragraph-utf16-v1:p1:0-99"
+      ],
+      "embedding": [
+        "d-41cdc165e78a7647c6344f0697d8be20bb5a35017abad1b7f2154295b50cdf9e-utf8-v1-paragraph-utf16-v1:p1:0-99",
+        "d-47b67e2e7d0e479cf55273b40fb76b313ed50d073b27a36161d4eaa980a016d3-utf8-v1-paragraph-utf16-v1:p1:0-110",
+        "d-f3835ecfe4a53e64ac5495e12192a120ae490bae02a16619e3872ce391b27938-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-e324b965b63c4be354d863299f299decd8509e26f5b176263c5078469b00a6f9-utf8-v1-paragraph-utf16-v1:p1:0-105",
+        "d-3561081dfe04dc78cb0da3971db292ac1cdcbe6950e3ab14ad48d22f34ddb29b-utf8-v1-paragraph-utf16-v1:p1:0-107"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 0.2,
+        "hitAt1": 0
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H11",
+      "text": "Pourquoi une variante héréditaire peut-elle être transmise sans être visible chez le parent?",
+      "language": "fr",
+      "gold": [
+        "d-046e04376863a4832e33117e9bb96e866df8bf16f96f1c68346db205a1dcbd3a-utf8-v1-paragraph-utf16-v1:p1:0-109"
+      ],
+      "baseline": [
+        "d-046e04376863a4832e33117e9bb96e866df8bf16f96f1c68346db205a1dcbd3a-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-0c2ba8dbe491aed391bbc2bf8c5d518246d562daa3b7f0dbfcaec56c9c1f03b2-utf8-v1-paragraph-utf16-v1:p1:0-110"
+      ],
+      "embedding": [
+        "d-046e04376863a4832e33117e9bb96e866df8bf16f96f1c68346db205a1dcbd3a-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-637d1c8a41c6f6dc198f93423d218ba88ee3c0f1fc5eb091db8300f04908d0bf-utf8-v1-paragraph-utf16-v1:p1:0-87",
+        "d-0c2ba8dbe491aed391bbc2bf8c5d518246d562daa3b7f0dbfcaec56c9c1f03b2-utf8-v1-paragraph-utf16-v1:p1:0-110",
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-d9d332a2c04d7a637b26d08cde1dc4074d5cbd6cda93702480136b4d042f4224-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "baselineMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H12",
+      "text": "Quel protocole photographie une population sans observer le parcours de chaque personne?",
+      "language": "fr",
+      "gold": [
+        "d-0c2ba8dbe491aed391bbc2bf8c5d518246d562daa3b7f0dbfcaec56c9c1f03b2-utf8-v1-paragraph-utf16-v1:p1:0-110"
+      ],
+      "baseline": [],
+      "embedding": [
+        "d-0c2ba8dbe491aed391bbc2bf8c5d518246d562daa3b7f0dbfcaec56c9c1f03b2-utf8-v1-paragraph-utf16-v1:p1:0-110",
+        "d-bdc839c6c9030be7ab24ae3700cc045398a5775e490782123b9c9df150359fab-utf8-v1-paragraph-utf16-v1:p1:0-129",
+        "d-6a77d3cd411068969000cab451e201f362b80c20ac40df22705d285480613ae2-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-0c5fabe5c94a5c3f6a8723c06a8633889cace3d100831ef9d2df9dd8e75ef81d-utf8-v1-paragraph-utf16-v1:p1:0-155",
+        "d-55f6e83d8d68ce15a1f8f48d17d7ba546a38a4e0ce69554ce50b965f442f2189-utf8-v1-paragraph-utf16-v1:p1:0-105"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H13",
+      "text": "Which operation creates a fingerprint that cannot be turned back into the original message?",
+      "language": "en",
+      "gold": [
+        "d-09c367a371e1ea0b1eb8863cf6b7fd6c4a08c21bc861f1b20ae3ba4e5b646b7f-utf8-v1-paragraph-utf16-v1:p1:0-95"
+      ],
+      "baseline": [
+        "d-f5fa440b834ce6831bc6b9f3f0cacfe13617fde18b533886be60edfcc0ac60a7-utf8-v1-paragraph-utf16-v1:p1:0-107",
+        "d-6a77d3cd411068969000cab451e201f362b80c20ac40df22705d285480613ae2-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "embedding": [
+        "d-09c367a371e1ea0b1eb8863cf6b7fd6c4a08c21bc861f1b20ae3ba4e5b646b7f-utf8-v1-paragraph-utf16-v1:p1:0-95",
+        "d-f5fa440b834ce6831bc6b9f3f0cacfe13617fde18b533886be60edfcc0ac60a7-utf8-v1-paragraph-utf16-v1:p1:0-107",
+        "d-6a77d3cd411068969000cab451e201f362b80c20ac40df22705d285480613ae2-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-0c5fabe5c94a5c3f6a8723c06a8633889cace3d100831ef9d2df9dd8e75ef81d-utf8-v1-paragraph-utf16-v1:p1:0-155"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H14",
+      "text": "Which caching policy immediately keeps the persistent copy current?",
+      "language": "en",
+      "gold": [
+        "d-6a77d3cd411068969000cab451e201f362b80c20ac40df22705d285480613ae2-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "baseline": [],
+      "embedding": [
+        "d-67f987c7cf4a83b4b9012e3e4950f3e37de131a51b3b06680ffd2754136385e2-utf8-v1-paragraph-utf16-v1:p1:0-96",
+        "d-6a77d3cd411068969000cab451e201f362b80c20ac40df22705d285480613ae2-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-f3835ecfe4a53e64ac5495e12192a120ae490bae02a16619e3872ce391b27938-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-09c367a371e1ea0b1eb8863cf6b7fd6c4a08c21bc861f1b20ae3ba4e5b646b7f-utf8-v1-paragraph-utf16-v1:p1:0-95"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 0.5,
+        "hitAt1": 0
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H15",
+      "text": "Why can the same name inside a function refer to a separate value without modifying its external namesake?",
+      "language": "en",
+      "gold": [
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "baseline": [
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-f3835ecfe4a53e64ac5495e12192a120ae490bae02a16619e3872ce391b27938-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "embedding": [
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-f3835ecfe4a53e64ac5495e12192a120ae490bae02a16619e3872ce391b27938-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-6a77d3cd411068969000cab451e201f362b80c20ac40df22705d285480613ae2-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-67f987c7cf4a83b4b9012e3e4950f3e37de131a51b3b06680ffd2754136385e2-utf8-v1-paragraph-utf16-v1:p1:0-96",
+        "d-41cdc165e78a7647c6344f0697d8be20bb5a35017abad1b7f2154295b50cdf9e-utf8-v1-paragraph-utf16-v1:p1:0-99"
+      ],
+      "baselineMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "H16",
+      "text": "Pourquoi répartir ses placements ne protège-t-il pas totalement d'un choc qui touche toutes les entreprises?",
+      "language": "fr",
+      "gold": [
+        "d-aeeb5f4228a69f166f26f77d91e584a21839654cf65e3fd6a978904aa3776409-utf8-v1-paragraph-utf16-v1:p1:0-109"
+      ],
+      "baseline": [],
+      "embedding": [
+        "d-aeeb5f4228a69f166f26f77d91e584a21839654cf65e3fd6a978904aa3776409-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-6f0f0d24a49d49df359cdb62a990438bc0401ace6882c6aeaf4ae605aa915d42-utf8-v1-paragraph-utf16-v1:p1:0-113",
+        "d-67f987c7cf4a83b4b9012e3e4950f3e37de131a51b3b06680ffd2754136385e2-utf8-v1-paragraph-utf16-v1:p1:0-96",
+        "d-4782dfbf31f0b93f8cb58c2c5fb21387cbe69079333cf9695239af9d24fd6676-utf8-v1-paragraph-utf16-v1:p1:0-101",
+        "d-6a77d3cd411068969000cab451e201f362b80c20ac40df22705d285480613ae2-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "baselineMetrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      },
+      "embeddingMetrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      },
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "N1",
+      "text": "Qual è la password del professore?",
+      "language": "it",
+      "gold": [],
+      "baseline": [],
+      "embedding": [
+        "d-f5fa440b834ce6831bc6b9f3f0cacfe13617fde18b533886be60edfcc0ac60a7-utf8-v1-paragraph-utf16-v1:p1:0-107",
+        "d-5764bce319da3613ea53ac68c7c9270dfd1a595325402c58d649d6c17c2d45d0-utf8-v1-paragraph-utf16-v1:p1:0-102",
+        "d-a9906a268aca513c59242e21d681360e28c0bacb37ef9e4ec5d0d769f7e64748-utf8-v1-paragraph-utf16-v1:p1:0-99",
+        "d-09c367a371e1ea0b1eb8863cf6b7fd6c4a08c21bc861f1b20ae3ba4e5b646b7f-utf8-v1-paragraph-utf16-v1:p1:0-95",
+        "d-0c5fabe5c94a5c3f6a8723c06a8633889cace3d100831ef9d2df9dd8e75ef81d-utf8-v1-paragraph-utf16-v1:p1:0-155"
+      ],
+      "baselineMetrics": null,
+      "embeddingMetrics": null,
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "N2",
+      "text": "Wie lautet die Adresse der Schulleitung?",
+      "language": "de",
+      "gold": [],
+      "baseline": [],
+      "embedding": [
+        "d-f3835ecfe4a53e64ac5495e12192a120ae490bae02a16619e3872ce391b27938-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-0cfbd973a3625cacf4a506a68a24abb0bc5744f36d64f0bb7b7daa1f02d22ffe-utf8-v1-paragraph-utf16-v1:p1:0-93",
+        "d-41cdc165e78a7647c6344f0697d8be20bb5a35017abad1b7f2154295b50cdf9e-utf8-v1-paragraph-utf16-v1:p1:0-99",
+        "d-3561081dfe04dc78cb0da3971db292ac1cdcbe6950e3ab14ad48d22f34ddb29b-utf8-v1-paragraph-utf16-v1:p1:0-107",
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "baselineMetrics": null,
+      "embeddingMetrics": null,
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "N3",
+      "text": "Quelle sera la météo demain?",
+      "language": "fr",
+      "gold": [],
+      "baseline": [],
+      "embedding": [
+        "d-e2c7adccad403dec55157ffee6fc6e7a19985d851ec512376099041b57ff35c0-utf8-v1-paragraph-utf16-v1:p1:0-100",
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-0c2ba8dbe491aed391bbc2bf8c5d518246d562daa3b7f0dbfcaec56c9c1f03b2-utf8-v1-paragraph-utf16-v1:p1:0-110",
+        "d-bdc839c6c9030be7ab24ae3700cc045398a5775e490782123b9c9df150359fab-utf8-v1-paragraph-utf16-v1:p1:0-129",
+        "d-6f0f0d24a49d49df359cdb62a990438bc0401ace6882c6aeaf4ae605aa915d42-utf8-v1-paragraph-utf16-v1:p1:0-113"
+      ],
+      "baselineMetrics": null,
+      "embeddingMetrics": null,
+      "stableAcrossRepeats": true
+    },
+    {
+      "id": "N4",
+      "text": "What is the exact mass of planet Zorblax?",
+      "language": "en",
+      "gold": [],
+      "baseline": [],
+      "embedding": [
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-e2c7adccad403dec55157ffee6fc6e7a19985d851ec512376099041b57ff35c0-utf8-v1-paragraph-utf16-v1:p1:0-100",
+        "d-09c367a371e1ea0b1eb8863cf6b7fd6c4a08c21bc861f1b20ae3ba4e5b646b7f-utf8-v1-paragraph-utf16-v1:p1:0-95",
+        "d-f3835ecfe4a53e64ac5495e12192a120ae490bae02a16619e3872ce391b27938-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-02c2423ac2b85cb2b277eb6f36934ecbfd45dc65fa48660f417c5a291a705953-utf8-v1-paragraph-utf16-v1:p1:0-106"
+      ],
+      "baselineMetrics": null,
+      "embeddingMetrics": null,
+      "stableAcrossRepeats": true
+    }
+  ],
+  "summary": [
+    {
+      "method": "baselineMetrics",
+      "recall": 0.375,
+      "reciprocalRank": 0.33333333333333337,
+      "hitAt1": 0.3125
+    },
+    {
+      "method": "embeddingMetrics",
+      "recall": 0.9375,
+      "reciprocalRank": 0.6604166666666667,
+      "hitAt1": 0.5
+    }
+  ],
+  "baseline": {
+    "querySamples": 100,
+    "medianMs": 0.19999999552965164,
+    "p95Ms": 0.30000000447034836
+  },
+  "embedding": {
+    "queryMs": [
+      40.79999999701977,
+      42.400000005960464,
+      41.599999994039536,
+      45.80000000447035,
+      44.600000001490116,
+      44.5,
+      42.69999999552965,
+      41,
+      43.100000001490116,
+      44.29999999701977,
+      40.70000000298023,
+      42.79999999701977,
+      41.30000000447035,
+      42.399999998509884,
+      41.5,
+      43.79999999701977,
+      44.400000005960464,
+      41.79999999701977,
+      44.79999999701977,
+      44.400000005960464,
+      41.5,
+      42.79999999701977,
+      42.100000001490116,
+      42.100000001490116,
+      39.900000005960464,
+      38.899999998509884,
+      39.399999998509884,
+      38.79999999701977,
+      38.80000000447035,
+      38.79999999701977,
+      38.5,
+      40.70000000298023,
+      38.69999999552965,
+      38.600000001490116,
+      38.899999998509884,
+      39.100000001490116,
+      38.5,
+      39.399999998509884,
+      38.600000001490116,
+      38.600000001490116,
+      39.100000001490116,
+      38.899999998509884,
+      41.600000001490116,
+      41.5,
+      39.80000000447035,
+      39.5,
+      40,
+      39.69999999552965,
+      40.30000000447035,
+      39.5,
+      38.69999999552965,
+      39,
+      39,
+      39.20000000298023,
+      39.100000001490116,
+      39.100000001490116,
+      39.099999994039536,
+      38.80000000447035,
+      38.600000001490116,
+      38.69999999552965,
+      38.600000001490116,
+      39,
+      39,
+      39.100000001490116,
+      38.399999998509884,
+      38.69999999552965,
+      38.80000000447035,
+      38.899999998509884,
+      39,
+      39.19999999552965,
+      39.399999998509884,
+      38.5,
+      38.899999998509884,
+      39,
+      38.900000005960464,
+      39.19999999552965,
+      38.399999998509884,
+      38.70000000298023,
+      39,
+      39.100000001490116,
+      38.899999998509884,
+      38.79999999701977,
+      39.30000000447035,
+      38.79999999701977,
+      38.899999998509884,
+      38.70000000298023,
+      38.79999999701977,
+      38.900000005960464,
+      38.599999994039536,
+      38.70000000298023,
+      39.29999999701977,
+      38.900000005960464,
+      38.600000001490116,
+      39.30000000447035,
+      39.099999994039536,
+      38.5,
+      38.70000000298023,
+      38.69999999552965,
+      38.80000000447035,
+      42.600000001490116,
+      40.599999994039536,
+      44,
+      44.20000000298023,
+      41,
+      44.899999998509884,
+      44.70000000298023,
+      40.29999999701977,
+      42.70000000298023,
+      43.599999994039536,
+      44.20000000298023,
+      40.70000000298023,
+      42.5,
+      40.5,
+      42.400000005960464,
+      40.69999999552965,
+      42.899999998509884,
+      41.5,
+      42.600000001490116,
+      40.80000000447035,
+      43.599999994039536
+    ],
+    "loadMs": 907.5,
+    "indexMs": 1912.6000000014901,
+    "profile": "model-card",
+    "runtime": "@litert-lm/core@0.18.0",
+    "dimensions": 768,
+    "maxInputTokens": 46,
+    "minRawNorm": 0.9999990464976521,
+    "maxRawNorm": 1.0000001894057877,
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+      }
+    ],
+    "runtimeAssets": [
+      "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.js",
+      "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+    ],
+    "querySamples": 100,
+    "medianMs": 39.099999994039536,
+    "p95Ms": 43.599999994039536
+  },
+  "humanReview": "pending",
+  "peakMemory": "unknown"
+}

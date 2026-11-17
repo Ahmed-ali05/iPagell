@@ -1,0 +1,5 @@
+Il DNS traduce i nomi di dominio in indirizzi IP. Una cache può ridurre le richieste ripetute al risolutore.
+
+Il protocollo TCP ritrasmette i segmenti persi e mantiene l'ordine dei byte. UDP non garantisce consegna né ordine.
+
+Un indirizzo privato non viene instradato direttamente su Internet. Il NAT traduce gli indirizzi fra rete interna ed esterna.

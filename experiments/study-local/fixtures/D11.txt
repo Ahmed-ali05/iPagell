@@ -1,0 +1,3 @@
+Atomicity means a transaction commits all its changes or none of them. A partially applied transfer violates this property.
+
+Isolation controls how concurrent transactions observe one another. Serializability makes their result equivalent to some serial execution.

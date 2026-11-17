@@ -1,0 +1,3 @@
+L'énergie cinétique dépend de la masse et du carré de la vitesse. Doubler la vitesse multiplie cette énergie par quatre.
+
+Dans un système isolé, l'énergie totale se conserve. Un frottement transforme une partie de l'énergie mécanique en énergie thermique.

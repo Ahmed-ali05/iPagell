@@ -1,0 +1,93 @@
+{
+  "protocol": "study-l3-observations-v3",
+  "humanReview": "pending",
+  "plannedSectionsPerMode": 43,
+  "status": "complete-with-timeouts-human-review-pending",
+  "loadAccounting": "Completed worker loadMs only; aborted workers and previous interrupted startup unavailable",
+  "modes": [
+    {
+      "mode": "none",
+      "completed": 39,
+      "failedWorkerSections": 4,
+      "accounted": 43,
+      "browserInterruptions": 0,
+      "timeouts": 4,
+      "valid": 10,
+      "validFirstAttempt": 9,
+      "validAfterRepair": 1,
+      "nonempty": 10,
+      "invalidSections": 29,
+      "invalidOutputsObserved": 59,
+      "attemptsObserved": 69,
+      "repairAttemptsObserved": 30,
+      "nodes": 30,
+      "edges": 22,
+      "actions": {
+        "new": 30
+      },
+      "validationReasons": {
+        "JSON_SYNTAX": 50,
+        "TARGET": 1,
+        "SOURCE_REFERENCE": 5,
+        "SCHEMA_KEYS": 2,
+        "TEXT_LIMIT_OR_MARKUP": 1
+      },
+      "outputCapsObserved": 0,
+      "observedCompleteSectionMs": {
+        "median": 7592.79999999702,
+        "p95": 18346.09999999404,
+        "max": 22089.60000000149
+      },
+      "repairMeasuredMs": 114791.20000001043,
+      "benchmarkEstimatedPrefillMs": 22006.2,
+      "benchmarkEstimatedDecodeMs": 257117.9,
+      "quality": null
+    },
+    {
+      "mode": "embedding",
+      "completed": 35,
+      "failedWorkerSections": 8,
+      "accounted": 43,
+      "browserInterruptions": 1,
+      "timeouts": 7,
+      "valid": 2,
+      "validFirstAttempt": 2,
+      "validAfterRepair": 0,
+      "nonempty": 2,
+      "invalidSections": 33,
+      "invalidOutputsObserved": 66,
+      "attemptsObserved": 68,
+      "repairAttemptsObserved": 33,
+      "nodes": 4,
+      "edges": 2,
+      "actions": {
+        "new": 4
+      },
+      "validationReasons": {
+        "JSON_SYNTAX": 40,
+        "TARGET": 1,
+        "CURRENT_SOURCE_MISSING": 19,
+        "SCHEMA_KEYS": 3,
+        "SOURCE_REFERENCE": 3
+      },
+      "outputCapsObserved": 0,
+      "observedCompleteSectionMs": {
+        "median": 20099.89999999851,
+        "p95": 27967.39999999851,
+        "max": 29582.69999999553
+      },
+      "repairMeasuredMs": 315155.3999999836,
+      "benchmarkEstimatedPrefillMs": 52145.1,
+      "benchmarkEstimatedDecodeMs": 522961.7,
+      "quality": null
+    }
+  ],
+  "pairedFormat": {
+    "pairedSections": 42,
+    "environmentUnavailable": 1,
+    "both": 2,
+    "noneOnly": 8,
+    "embeddingOnly": 0,
+    "neither": 32
+  }
+}

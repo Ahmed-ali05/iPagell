@@ -1,0 +1,180 @@
+{
+  "auditedAt": "2026-10-07",
+  "audit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 5,
+      "dev": 0,
+      "optional": 12,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 16
+    }
+  },
+  "packages": [
+    {
+      "path": "node_modules/@litert-lm/core",
+      "version": "0.18.0",
+      "license": "Apache-2.0",
+      "integrity": "sha512-8v+/xk3NUss4GgDuDU/XT+PqtAZhInS3+6mzla2IVm98t7/KfLSnavY3MbPcYTHHZ8Tk8aiYaFKa40H+PPdy3w==",
+      "optional": false
+    },
+    {
+      "path": "node_modules/@litertjs/wasm-utils",
+      "version": "2.5.3",
+      "license": "Apache-2.0",
+      "integrity": "sha512-4fJiw6tBQnIs+0jH/OQ16nYOiSl8/+zZnn5h2ul8aTKHi05sVqZW580Tmk78pC2kT39A9OYBVdFawteZ/sI1kQ==",
+      "optional": false
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-V+qptzsGnPMFxEbhwc6eDNMe5eDrfiBIp8qGpuRjAVIX4Kn2zxvwQ1Xco6Fwe+3tYIe3iLW8LM9D+SvjyJhqbQ==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-android-arm64",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-0sDMvme+7fj6bHERUaBs5SvEyWaORc91VUkaB4RrtG7p6dBrBNGy1of8cyEKDxygd1FlHtW+Thunj8lSixzY7A==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-darwin-arm64",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-pdHL1TEfFMrnchRYqmPWXKN7hR4XtOYmzJqnh4XhpfWD4/eeSokOGVzrdFP/iQ3sfr2rf0939gOGq9uCp8BGmg==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-darwin-x64",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-iuuk5plGxAcxurxv2ycF2yR20y5zvaBZ4heQdhPpg3EMFD21PhlY1V+YwSRmYRWzbvKL474UYdw3WIg2qfafyw==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-linux-arm-gnueabihf",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-kH7GFR5Unpm77pKSEsmkqvzeQCRD7/MQ7upmeLLjg4XpQ62dX/R6THFsp6vkF1Pkco2aKUq9KhoLM4W5twdk7g==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-linux-arm64-gnu",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-0/Hj7IwM9pmzdwxiqkp4YLJ8dKqASBrWQ3Y7dWUSU/4dgvCL9O6YNvX7xVUJjonQvdD3IE9ESS/nXa5srQqoVw==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-linux-arm64-musl",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-fmjKM0P2MLF9O6XzCQsRjhB+jlLzaf6tFQU36hMPMsYup+VThYvpjjhqNLOc/Ee3tHUE3r13H2BSJx/yXz4pFA==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-linux-riscv64-gnu",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-O/BUrGwrs3pVP9PpD/3++ZiOpjHMJlmiB7aBgswP8rbe4egPfiFkFxmcCczoLvZa72TaQX5lJ8Udedb6rc/Hvg==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-linux-x64-gnu",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-48HkZPQeAN/R+9NPpY64tceoyCUW5xYYtHKZnC+BG11qiihXJCbH+xfbgGU+OdYp1Q4s84HDl9ILU0KBK6SBOQ==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-linux-x64-musl",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-QYHVi7WZ9v+Wm9OQyHLMTnJ8QiBPVX94BgbCHFJC/4bCFMfvX7fRzo4FJPgkRP0ISz3ulYNow/FCbQOPjzhYjg==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-win32-arm64-msvc",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-bWK+YajM/8sL0mMgLtug2s063FVBPzFV4QAn987CQomMKlmzrBY6Trz43KY+24hq7IOa3qNhUAgP/XMEF50ZEQ==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@napi-rs/canvas-win32-x64-msvc",
+      "version": "1.0.10",
+      "license": "MIT",
+      "integrity": "sha512-9WtzW85PaIhtB27iXaR/9RrLCqHLbqD3Z8Q+kh17NjFxwQXFXU5vWbYH4vEH+drM307TTyK3hidZgpt09G5T3g==",
+      "optional": true
+    },
+    {
+      "path": "node_modules/@noble/hashes",
+      "version": "2.4.0",
+      "license": "MIT",
+      "integrity": "sha512-X5XaVWZIBCT7HHZGm5I7ZQXDwLG+bGXuSrMQAW+7Zvl87h1kmc1ZB1VSRJcpUfoUrGQp4Fkoxm5kZ+Ms+aW+eA==",
+      "optional": false
+    },
+    {
+      "path": "node_modules/pdfjs-dist",
+      "version": "6.4.299",
+      "license": "Apache-2.0",
+      "integrity": "sha512-AVl138zALtfaAPvADulE0PZThbYzCBS79nL4pOSL/6Sm/4AH5A21BD9VHt97OlCuzJuCpmeZtAtkinisF4Vb1g==",
+      "optional": false
+    }
+  ],
+  "runtime": {
+    "package": "@litert-lm/core@0.18.0",
+    "files": [
+      {
+        "name": "litertlm_wasm_asyncify_internal.js",
+        "bytes": 303787,
+        "sha256": "bbd95c7e178c369b956160f41b1430c0defae9d05a6cd7c810806e4f464c941b"
+      },
+      {
+        "name": "litertlm_wasm_asyncify_internal.wasm",
+        "bytes": 34417794,
+        "sha256": "91b1e77b17139893d5ba5adddb755870244ba589e55d5bcf8ae191bd1c0b1f6f"
+      },
+      {
+        "name": "litertlm_wasm_compat_asyncify_internal.js",
+        "bytes": 303998,
+        "sha256": "4a99c87c87a4322cf74319d4af9575a29418b58ae6fe77f5929752d2063eb881"
+      },
+      {
+        "name": "litertlm_wasm_compat_asyncify_internal.wasm",
+        "bytes": 34235088,
+        "sha256": "6eaace6df0ed53b03c8932ac97452bca41a1297921bd08c4462ad7b7ba763a21"
+      },
+      {
+        "name": "litertlm_wasm_compat_internal.js",
+        "bytes": 296458,
+        "sha256": "36d9b83db77be1501327c3cf075ab7e213ad329600d45fbcec48654525285781"
+      },
+      {
+        "name": "litertlm_wasm_compat_internal.wasm",
+        "bytes": 21730274,
+        "sha256": "1f82e9f8fd600899be11dae2793d45198a9fc0edac58765cf1921a3571416137"
+      },
+      {
+        "name": "litertlm_wasm_internal.js",
+        "bytes": 296218,
+        "sha256": "195ef5a529df718bc1320e292b4c4d750059350d162ec99654e250ab8a14efa7"
+      },
+      {
+        "name": "litertlm_wasm_internal.wasm",
+        "bytes": 21912708,
+        "sha256": "83e8af6e4deecfb3bb24b6602851dcb8a0c5656547d98eefc5fbd5640ce49ab5"
+      }
+    ]
+  }
+}
