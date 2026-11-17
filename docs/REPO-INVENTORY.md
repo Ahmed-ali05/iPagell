@@ -84,6 +84,10 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 |---|---|
 | `install:ci` | `node scripts/install-ci.mjs` |
 | `dev` | `node scripts/run-framework.mjs dev` |
+| `study:dev` | `npm --prefix experiments/study-local run dev` |
+| `study:check` | `npm --prefix experiments/study-local run check` |
+| `study:build` | `npm --prefix experiments/study-local run build` |
+| `study:evaluate` | `npm --prefix experiments/study-local run evaluate` |
 | `build` | `node scripts/run-framework.mjs build && node scripts/generate-precache.mjs` |
 | `build:cloudflare` | `node scripts/build-cloudflare.mjs` |
 | `deploy:cloudflare` | `node scripts/deploy-cloudflare.mjs` |
