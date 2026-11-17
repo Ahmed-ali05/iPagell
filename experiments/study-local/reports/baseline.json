@@ -1,0 +1,1474 @@
+{
+  "protocol": "study-local-eval-v1",
+  "generatedAt": "2026-10-07T17:36:49.644Z",
+  "environment": {
+    "runtime": "v23.10.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "corpusHash": "4e0b7fade9b5518b516942f2f214f6cac547bcb9b38986bc42db2894e39d5bb8",
+  "annotationHash": "afd3adda28428de0d3f2d4d15bd89e618774ebcd9ed1f01d00ff29a57a1c56b0",
+  "chunker": "paragraph-utf16-v1",
+  "limits": {
+    "fileBytes": 10485760,
+    "pages": 50,
+    "characters": 100000,
+    "chunkUnits": 600,
+    "queryCharacters": 512
+  },
+  "synthetic": true,
+  "annotationStatus": "Exact anchors verified against extracted text; independent human review pending",
+  "documents": 16,
+  "readableDocuments": 15,
+  "chunks": 43,
+  "fingerprints": [
+    {
+      "id": "D01",
+      "title": "Reti: indirizzi e trasporto",
+      "hash": "ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569",
+      "extractor": "utf8-v1",
+      "chunks": 3,
+      "excludedPages": []
+    },
+    {
+      "id": "D02",
+      "title": "Reti: seconda lezione",
+      "hash": "4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19",
+      "extractor": "pdfjs-6.4.299-stream-v1",
+      "chunks": 1,
+      "excludedPages": []
+    },
+    {
+      "id": "D03",
+      "title": "Biologia: cellule",
+      "hash": "17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e",
+      "extractor": "utf8-v1",
+      "chunks": 3,
+      "excludedPages": []
+    },
+    {
+      "id": "D04",
+      "title": "Biologia: energia",
+      "hash": "d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629",
+      "extractor": "utf8-v1",
+      "chunks": 3,
+      "excludedPages": []
+    },
+    {
+      "id": "D05",
+      "title": "Matematica: funzioni",
+      "hash": "e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5",
+      "extractor": "pdfjs-6.4.299-stream-v1",
+      "chunks": 1,
+      "excludedPages": []
+    },
+    {
+      "id": "D06",
+      "title": "Matematica: probabilità",
+      "hash": "744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db",
+      "extractor": "pdfjs-6.4.299-stream-v1",
+      "chunks": 1,
+      "excludedPages": []
+    },
+    {
+      "id": "D07",
+      "title": "Technik: Stromkreis",
+      "hash": "5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f",
+      "extractor": "utf8-v1",
+      "chunks": 2,
+      "excludedPages": []
+    },
+    {
+      "id": "D08",
+      "title": "Technik: Sicherheit",
+      "hash": "4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590",
+      "extractor": "utf8-v1",
+      "chunks": 2,
+      "excludedPages": []
+    },
+    {
+      "id": "D09",
+      "title": "Physique: mouvement",
+      "hash": "c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906",
+      "extractor": "utf8-v1",
+      "chunks": 2,
+      "excludedPages": []
+    },
+    {
+      "id": "D10",
+      "title": "Physique: énergie",
+      "hash": "9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36",
+      "extractor": "utf8-v1",
+      "chunks": 2,
+      "excludedPages": []
+    },
+    {
+      "id": "D11",
+      "title": "Databases: transactions",
+      "hash": "e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a",
+      "extractor": "utf8-v1",
+      "chunks": 2,
+      "excludedPages": []
+    },
+    {
+      "id": "D12",
+      "title": "Databases: indexing",
+      "hash": "c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761",
+      "extractor": "utf8-v1",
+      "chunks": 2,
+      "excludedPages": []
+    },
+    {
+      "id": "D13",
+      "title": "Documento lungo a colonne",
+      "hash": "4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352",
+      "extractor": "pdfjs-6.4.299-stream-v1",
+      "chunks": 15,
+      "excludedPages": []
+    },
+    {
+      "id": "D14",
+      "title": "Testo ostile sintetico",
+      "hash": "09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345",
+      "extractor": "utf8-v1",
+      "chunks": 3,
+      "excludedPages": []
+    },
+    {
+      "id": "D16",
+      "title": "PDF a pagine miste",
+      "hash": "44ed9a92c1d1fa8af8e48e7480bf92cddcb157347fac8693609c5be87b475595",
+      "extractor": "pdfjs-6.4.299-stream-v1",
+      "chunks": 1,
+      "excludedPages": [
+        2
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "fixtureId": "D15",
+      "code": "NO_TEXT"
+    }
+  ],
+  "baseline": {
+    "tokenizer": "Unicode NFKD letters/numbers; explicit multilingual stop list; BM25 k1=1.2 b=0.75",
+    "repetitions": 5,
+    "querySamples": 400,
+    "medianMs": 0.24158299999999144,
+    "p95Ms": 0.2857500000000073,
+    "summary": [
+      {
+        "split": "development",
+        "language": "all",
+        "n": 32,
+        "recallAt5": 0.96875,
+        "mrrAt5": 0.9479166666666667
+      },
+      {
+        "split": "development",
+        "language": "it",
+        "n": 20,
+        "recallAt5": 0.95,
+        "mrrAt5": 0.95
+      },
+      {
+        "split": "development",
+        "language": "de",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 0.8333333333333333
+      },
+      {
+        "split": "development",
+        "language": "fr",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      },
+      {
+        "split": "development",
+        "language": "en",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      },
+      {
+        "split": "evaluation",
+        "language": "all",
+        "n": 32,
+        "recallAt5": 0.96875,
+        "mrrAt5": 0.9375
+      },
+      {
+        "split": "evaluation",
+        "language": "it",
+        "n": 20,
+        "recallAt5": 1,
+        "mrrAt5": 0.95
+      },
+      {
+        "split": "evaluation",
+        "language": "de",
+        "n": 4,
+        "recallAt5": 0.75,
+        "mrrAt5": 0.75
+      },
+      {
+        "split": "evaluation",
+        "language": "fr",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      },
+      {
+        "split": "evaluation",
+        "language": "en",
+        "n": 4,
+        "recallAt5": 1,
+        "mrrAt5": 1
+      }
+    ],
+    "negatives": [
+      {
+        "queryId": "N-it-1",
+        "split": "development",
+        "returned": 0
+      },
+      {
+        "queryId": "N-it-2",
+        "split": "evaluation",
+        "returned": 1
+      },
+      {
+        "queryId": "N-it-3",
+        "split": "development",
+        "returned": 0
+      },
+      {
+        "queryId": "N-it-4",
+        "split": "evaluation",
+        "returned": 0
+      },
+      {
+        "queryId": "N-it-5",
+        "split": "development",
+        "returned": 0
+      },
+      {
+        "queryId": "N-it-6",
+        "split": "evaluation",
+        "returned": 0
+      },
+      {
+        "queryId": "N-it-7",
+        "split": "development",
+        "returned": 0
+      },
+      {
+        "queryId": "N-it-8",
+        "split": "evaluation",
+        "returned": 0
+      },
+      {
+        "queryId": "N-it-9",
+        "split": "development",
+        "returned": 0
+      },
+      {
+        "queryId": "N-it-10",
+        "split": "evaluation",
+        "returned": 0
+      },
+      {
+        "queryId": "N-de-1",
+        "split": "development",
+        "returned": 0
+      },
+      {
+        "queryId": "N-de-2",
+        "split": "evaluation",
+        "returned": 1
+      },
+      {
+        "queryId": "N-fr-1",
+        "split": "development",
+        "returned": 0
+      },
+      {
+        "queryId": "N-fr-2",
+        "split": "evaluation",
+        "returned": 0
+      },
+      {
+        "queryId": "N-en-1",
+        "split": "development",
+        "returned": 0
+      },
+      {
+        "queryId": "N-en-2",
+        "split": "evaluation",
+        "returned": 0
+      }
+    ],
+    "rows": [
+      {
+        "queryId": "D01-P1-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:0-108"
+        ],
+        "found": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:0-113",
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:227-352",
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "metrics": {
+          "recall": 0,
+          "reciprocalRank": 0
+        }
+      },
+      {
+        "queryId": "D01-P1-Q2",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:0-108"
+        ],
+        "found": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:0-108",
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D01-P2-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:110-225"
+        ],
+        "found": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:110-225",
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:0-114",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-600",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:600-1200",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p2:0-600"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D01-P2-Q2",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:110-225"
+        ],
+        "found": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:110-225"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D01-P3-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:227-352"
+        ],
+        "found": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:227-352",
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:0-108"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D02-P1-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "found": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D02-P1-Q2",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "found": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D02-P2-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "found": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369",
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:110-225"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D02-P2-Q2",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "found": [
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:227-352",
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 0.5
+        }
+      },
+      {
+        "queryId": "D02-P3-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "found": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369",
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:0-108"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D03-P1-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:0-114"
+        ],
+        "found": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:0-114"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D03-P1-Q2",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:0-114"
+        ],
+        "found": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:0-114"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D03-P2-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:116-246"
+        ],
+        "found": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:116-246",
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D03-P2-Q2",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:116-246"
+        ],
+        "found": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:116-246"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D03-P3-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:248-355"
+        ],
+        "found": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:248-355"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D04-P1-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:0-113"
+        ],
+        "found": [
+          "d-17715de8f98129a412f1ffa6dc5b93d176b8b3cf75ea8f5e006be4db528d1e7e-utf8-v1-paragraph-utf16-v1:p1:248-355",
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:0-113"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 0.5
+        }
+      },
+      {
+        "queryId": "D04-P1-Q2",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:0-113"
+        ],
+        "found": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:0-113"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D04-P2-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:115-234"
+        ],
+        "found": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:115-234"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D04-P2-Q2",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:115-234"
+        ],
+        "found": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:115-234"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D04-P3-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:236-369"
+        ],
+        "found": [
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:236-369",
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:325-449",
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D05-P1-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332"
+        ],
+        "found": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D05-P1-Q2",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332"
+        ],
+        "found": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332",
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p2:1200-1676"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D05-P2-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332"
+        ],
+        "found": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332",
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p2:1200-1676"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D05-P2-Q2",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332"
+        ],
+        "found": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p3:1200-1697"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D05-P3-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332"
+        ],
+        "found": [
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D06-P1-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "found": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D06-P1-Q2",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "found": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p3:1200-1697"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D06-P2-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "found": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D06-P2-Q2",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "found": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D06-P3-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "found": [
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D07-P1-Q1",
+        "language": "de",
+        "split": "development",
+        "gold": [
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:0-117"
+        ],
+        "found": [
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:119-228",
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:109-241",
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:0-117"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 0.3333333333333333
+        }
+      },
+      {
+        "queryId": "D07-P1-Q2",
+        "language": "de",
+        "split": "development",
+        "gold": [
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:0-117"
+        ],
+        "found": [
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:0-117"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D07-P2-Q1",
+        "language": "de",
+        "split": "development",
+        "gold": [
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:119-228"
+        ],
+        "found": [
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:119-228"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D07-P2-Q2",
+        "language": "de",
+        "split": "development",
+        "gold": [
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:119-228"
+        ],
+        "found": [
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:119-228",
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:0-107",
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:109-241",
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:0-117"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D08-P1-Q1",
+        "language": "de",
+        "split": "evaluation",
+        "gold": [
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:0-107"
+        ],
+        "found": [
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:0-107"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D08-P1-Q2",
+        "language": "de",
+        "split": "evaluation",
+        "gold": [
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:0-107"
+        ],
+        "found": [
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:0-107"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D08-P2-Q1",
+        "language": "de",
+        "split": "evaluation",
+        "gold": [
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:109-241"
+        ],
+        "found": [
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:109-241",
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:0-107",
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:119-228"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D08-P2-Q2",
+        "language": "de",
+        "split": "evaluation",
+        "gold": [
+          "d-4947d933632ef3c7a249388ea50880f6416bd15d5997e5c29da911735471c590-utf8-v1-paragraph-utf16-v1:p1:109-241"
+        ],
+        "found": [],
+        "metrics": {
+          "recall": 0,
+          "reciprocalRank": 0
+        }
+      },
+      {
+        "queryId": "D09-P1-Q1",
+        "language": "fr",
+        "split": "development",
+        "gold": [
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:0-126"
+        ],
+        "found": [
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:0-126",
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:128-261",
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:0-120"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D09-P1-Q2",
+        "language": "fr",
+        "split": "development",
+        "gold": [
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:0-126"
+        ],
+        "found": [
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:0-126",
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:128-261",
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:0-120"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D09-P2-Q1",
+        "language": "fr",
+        "split": "development",
+        "gold": [
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:128-261"
+        ],
+        "found": [
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:128-261"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D09-P2-Q2",
+        "language": "fr",
+        "split": "development",
+        "gold": [
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:128-261"
+        ],
+        "found": [
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:128-261",
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:0-120",
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:0-126"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D10-P1-Q1",
+        "language": "fr",
+        "split": "evaluation",
+        "gold": [
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:0-120"
+        ],
+        "found": [
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:0-120",
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:122-255",
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:128-261",
+          "d-c64a1efc4854293183e6ef03c5a237ad3506b53d6d68d35fc916013de4f24906-utf8-v1-paragraph-utf16-v1:p1:0-126"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D10-P1-Q2",
+        "language": "fr",
+        "split": "evaluation",
+        "gold": [
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:0-120"
+        ],
+        "found": [
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:0-120",
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:122-255"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D10-P2-Q1",
+        "language": "fr",
+        "split": "evaluation",
+        "gold": [
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:122-255"
+        ],
+        "found": [
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:122-255"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D10-P2-Q2",
+        "language": "fr",
+        "split": "evaluation",
+        "gold": [
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:122-255"
+        ],
+        "found": [
+          "d-9ef1c41ebe54c72fc7367e8f0218a4905db6ae16f06da04ce6637b4db0652e36-utf8-v1-paragraph-utf16-v1:p1:122-255"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D11-P1-Q1",
+        "language": "en",
+        "split": "development",
+        "gold": [
+          "d-e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a-utf8-v1-paragraph-utf16-v1:p1:0-123"
+        ],
+        "found": [
+          "d-e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a-utf8-v1-paragraph-utf16-v1:p1:0-123"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D11-P1-Q2",
+        "language": "en",
+        "split": "development",
+        "gold": [
+          "d-e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a-utf8-v1-paragraph-utf16-v1:p1:0-123"
+        ],
+        "found": [
+          "d-e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a-utf8-v1-paragraph-utf16-v1:p1:0-123"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D11-P2-Q1",
+        "language": "en",
+        "split": "development",
+        "gold": [
+          "d-e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a-utf8-v1-paragraph-utf16-v1:p1:125-264"
+        ],
+        "found": [
+          "d-e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a-utf8-v1-paragraph-utf16-v1:p1:125-264",
+          "d-e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a-utf8-v1-paragraph-utf16-v1:p1:0-123"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D11-P2-Q2",
+        "language": "en",
+        "split": "development",
+        "gold": [
+          "d-e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a-utf8-v1-paragraph-utf16-v1:p1:125-264"
+        ],
+        "found": [
+          "d-e10a0e9d13c5f3abfd9e7980636b14d01de61da26d680457061ae04933b9656a-utf8-v1-paragraph-utf16-v1:p1:125-264"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D12-P1-Q1",
+        "language": "en",
+        "split": "evaluation",
+        "gold": [
+          "d-c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761-utf8-v1-paragraph-utf16-v1:p1:0-124"
+        ],
+        "found": [
+          "d-c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761-utf8-v1-paragraph-utf16-v1:p1:0-124"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D12-P1-Q2",
+        "language": "en",
+        "split": "evaluation",
+        "gold": [
+          "d-c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761-utf8-v1-paragraph-utf16-v1:p1:0-124"
+        ],
+        "found": [
+          "d-c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761-utf8-v1-paragraph-utf16-v1:p1:0-124",
+          "d-c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761-utf8-v1-paragraph-utf16-v1:p1:126-238"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D12-P2-Q1",
+        "language": "en",
+        "split": "evaluation",
+        "gold": [
+          "d-c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761-utf8-v1-paragraph-utf16-v1:p1:126-238"
+        ],
+        "found": [
+          "d-c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761-utf8-v1-paragraph-utf16-v1:p1:126-238"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D12-P2-Q2",
+        "language": "en",
+        "split": "evaluation",
+        "gold": [
+          "d-c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761-utf8-v1-paragraph-utf16-v1:p1:126-238"
+        ],
+        "found": [
+          "d-c50d80afa4a41db5a511663226a098ba6fcbb5a2d8fb7bffca0302854a4ac761-utf8-v1-paragraph-utf16-v1:p1:126-238"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D13-P1-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:1200-1687"
+        ],
+        "found": [
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:1200-1687",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-600",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:600-1200",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p2:0-600",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p3:0-600"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D13-P2-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p2:1200-1676"
+        ],
+        "found": [
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p2:1200-1676",
+          "d-e9d2f9e104baad8bf2d040fd0f2979cea25bbab1e775143d34f6495450bc84a5-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-332"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D13-P3-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p3:1200-1697"
+        ],
+        "found": [
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p3:1200-1697",
+          "d-44ed9a92c1d1fa8af8e48e7480bf92cddcb157347fac8693609c5be87b475595-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-291",
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D13-P4-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p4:1200-1687"
+        ],
+        "found": [
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p4:1200-1687",
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:325-449",
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:0-108",
+          "d-44ed9a92c1d1fa8af8e48e7480bf92cddcb157347fac8693609c5be87b475595-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-291"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D14-P1-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:0-168"
+        ],
+        "found": [
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:0-168",
+          "d-744c76c1b7dac2edda0ccc979fa98167714aba2d17eef870e141c3379292c8db-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-352"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D14-P2-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:170-323"
+        ],
+        "found": [
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:170-323"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D14-P3-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:325-449"
+        ],
+        "found": [
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:325-449",
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369",
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:0-168",
+          "d-d5d5056e905394a37707aee5336e3eb36224f7f4dd3e76b9ddd8fc4fd473c629-utf8-v1-paragraph-utf16-v1:p1:236-369",
+          "d-4bd7786162c2c4b4da2d382077d249a22c315f1b55622f432adbade4b6851352-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p4:1200-1687"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D16-P1-Q1",
+        "language": "it",
+        "split": "development",
+        "gold": [
+          "d-44ed9a92c1d1fa8af8e48e7480bf92cddcb157347fac8693609c5be87b475595-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-291"
+        ],
+        "found": [
+          "d-44ed9a92c1d1fa8af8e48e7480bf92cddcb157347fac8693609c5be87b475595-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-291"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D16-P2-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-44ed9a92c1d1fa8af8e48e7480bf92cddcb157347fac8693609c5be87b475595-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-291"
+        ],
+        "found": [
+          "d-44ed9a92c1d1fa8af8e48e7480bf92cddcb157347fac8693609c5be87b475595-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-291",
+          "d-09f6ead1fa2d443e3310ec6073559d467196b6c3b53a66e3ce3e913ac7ce4345-utf8-v1-paragraph-utf16-v1:p1:325-449"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "D16-P3-Q1",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [
+          "d-44ed9a92c1d1fa8af8e48e7480bf92cddcb157347fac8693609c5be87b475595-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-291"
+        ],
+        "found": [
+          "d-44ed9a92c1d1fa8af8e48e7480bf92cddcb157347fac8693609c5be87b475595-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-291",
+          "d-ffe219fb58faac448ccc27d598f6d685acc5f603614fa1e26b473d28e34db569-utf8-v1-paragraph-utf16-v1:p1:227-352",
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "metrics": {
+          "recall": 1,
+          "reciprocalRank": 1
+        }
+      },
+      {
+        "queryId": "N-it-1",
+        "language": "it",
+        "split": "development",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-it-2",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [],
+        "found": [
+          "d-4496a58a992a6f6e7ec07b49ca828b7ce01eafc27b7ce9d4ba952e110abf1d19-pdfjs-6.4.299-stream-v1-paragraph-utf16-v1:p1:0-369"
+        ],
+        "metrics": null
+      },
+      {
+        "queryId": "N-it-3",
+        "language": "it",
+        "split": "development",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-it-4",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-it-5",
+        "language": "it",
+        "split": "development",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-it-6",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-it-7",
+        "language": "it",
+        "split": "development",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-it-8",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-it-9",
+        "language": "it",
+        "split": "development",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-it-10",
+        "language": "it",
+        "split": "evaluation",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-de-1",
+        "language": "de",
+        "split": "development",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-de-2",
+        "language": "de",
+        "split": "evaluation",
+        "gold": [],
+        "found": [
+          "d-5f599d699764e6bb95e5ce64756ddd9ea1d9ffde59aa7bc361e5e6150cfa797f-utf8-v1-paragraph-utf16-v1:p1:0-117"
+        ],
+        "metrics": null
+      },
+      {
+        "queryId": "N-fr-1",
+        "language": "fr",
+        "split": "development",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-fr-2",
+        "language": "fr",
+        "split": "evaluation",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-en-1",
+        "language": "en",
+        "split": "development",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      },
+      {
+        "queryId": "N-en-2",
+        "language": "en",
+        "split": "evaluation",
+        "gold": [],
+        "found": [],
+        "metrics": null
+      }
+    ]
+  },
+  "embedding": {
+    "status": "not-qualified",
+    "reason": "Requires browser worker/model probe and separate development/evaluation comparison"
+  },
+  "limitations": [
+    "Synthetic authored questions; not independent language or semantic validation",
+    "Negative queries report returned counts; no calibrated abstention threshold",
+    "No mobile, account persistence or offline readiness qualified"
+  ]
+}

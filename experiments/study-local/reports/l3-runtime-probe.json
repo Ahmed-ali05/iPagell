@@ -1,0 +1,64 @@
+{
+  "protocol": "study-local-eval-v1",
+  "promptVersion": "study-proposals-v1",
+  "model": {
+    "id": "gemma-4-E2B-it-gpu",
+    "revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+    "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it-gpu.litertlm",
+    "bytes": 2008432640,
+    "sha256": "a53a59001894c58e6bdb5b9b227709f91a2e3e556baa7d85acf9c55402ba5cf5",
+    "runtime": "@litert-lm/core@0.18.0",
+    "license": "Apache-2.0"
+  },
+  "limits": {
+    "sourceTokens": 1024,
+    "contextTokens": 4096,
+    "outputTokens": 1024,
+    "repairs": 1,
+    "sectionMs": 30000,
+    "nodes": 5,
+    "edges": 6,
+    "responseUnits": 16000
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "hardwareConcurrency": 8,
+    "secureContext": true,
+    "crossOriginIsolated": false
+  },
+  "status": "runtime-ready-quality-unqualified",
+  "startedAt": "2026-10-08T08:28:50.821Z",
+  "networkScope": "Guarded fetch and CSP; browser-wide traffic not exhaustively captured",
+  "memory": "Peak CPU/GPU memory not measurable with this browser API",
+  "applied": false,
+  "admission": {
+    "capabilities": {
+      "workerGpuAdapter": true,
+      "shaderF16Available": true,
+      "note": "API admission check; not a precision or device qualification"
+    },
+    "storage": {
+      "quota": 12910532387,
+      "usage": 2173114147,
+      "usageDetails": {
+        "fileSystem": 2008432964,
+        "indexedDB": 164681183
+      }
+    },
+    "requiredFreeBytes": 4083974144
+  },
+  "weightsVerified": true,
+  "runtimeProbe": {
+    "mode": "none",
+    "loadMs": 3073,
+    "results": [],
+    "requests": [
+      {
+        "method": "GET",
+        "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+      }
+    ],
+    "promptVersion": "study-proposals-v1"
+  },
+  "fetchRequests": []
+}

@@ -1,0 +1,3 @@
+Eine Sicherung unterbricht den Stromkreis bei zu hohem Strom. Sie ersetzt nicht jede andere Schutzmaßnahme.
+
+Die Reihenschaltung führt denselben Strom durch alle Bauteile. In einer Parallelschaltung liegt an jedem Zweig dieselbe Spannung an.

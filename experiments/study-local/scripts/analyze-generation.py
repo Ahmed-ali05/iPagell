@@ -1,0 +1,15 @@
+import json,math,collections,pathlib
+base=pathlib.Path('experiments/study-local/reports');r=json.loads((base/'l3-corpus-v2.json').read_text())
+def quantile(values,q):
+ a=sorted(values);return a[min(len(a)-1,max(0,math.ceil(len(a)*q)-1))] if a else None
+analysis={'protocol':'study-l3-observations-v3','humanReview':'pending','plannedSectionsPerMode':43,'status':r.get('status'),'loadAccounting':r.get('loadAccounting'),'modes':[]}
+for run in r.get('runs',[]):
+ rs=run['results'];fail=[f for f in r.get('failures',[]) if f['mode']==run['mode']];diag=[d for x in rs for d in x.get('diagnostics',[])]
+ a={'mode':run['mode'],'completed':len(rs),'failedWorkerSections':len(fail),'accounted':len(rs)+len(fail),'browserInterruptions':sum(f['code']=='BROWSER_INTERRUPTION' for f in fail),'timeouts':sum(f['code']=='TIMEOUT' for f in fail),'valid':sum(bool(x.get('proposal')) for x in rs),'validFirstAttempt':sum(bool(x.get('proposal')) and x['attempts']==1 for x in rs),'validAfterRepair':sum(bool(x.get('proposal')) and x['attempts']>1 for x in rs),'nonempty':sum(bool(x.get('proposal',{}).get('nodes')) for x in rs if x.get('proposal')),'invalidSections':sum(not x.get('proposal') for x in rs),'invalidOutputsObserved':sum(x['invalidOutputs'] for x in rs),'attemptsObserved':sum(x['attempts'] for x in rs),'repairAttemptsObserved':sum(x['attempts']>1 for x in rs),'nodes':sum(len(x['proposal']['nodes']) for x in rs if x.get('proposal')),'edges':sum(len(x['proposal']['edges']) for x in rs if x.get('proposal')),'actions':dict(collections.Counter(n['action'] for x in rs if x.get('proposal') for n in x['proposal']['nodes'])),'validationReasons':dict(collections.Counter(m.split('(')[1].split(')')[0] for x in rs for m in x.get('validationFailures',[]))),'outputCapsObserved':sum(d['shape']['outputCapReached'] for d in diag),'observedCompleteSectionMs':{'median':quantile([x['ms'] for x in rs],.5),'p95':quantile([x['ms'] for x in rs],.95),'max':max([x['ms'] for x in rs],default=None)},'repairMeasuredMs':sum(d['prefillMs']+d['sendMs']+d['validationMs'] for d in diag if d['repair']),'benchmarkEstimatedPrefillMs':sum(d['benchmark']['lastPrefillTokenCount']/d['benchmark']['lastPrefillTokensPerSecond']*1000 for d in diag if d['benchmark']['lastPrefillTokensPerSecond']>0),'benchmarkEstimatedDecodeMs':sum(d['benchmark']['lastDecodeTokenCount']/d['benchmark']['lastDecodeTokensPerSecond']*1000 for d in diag if d['benchmark']['lastDecodeTokensPerSecond']>0),'quality':None}
+ analysis['modes'].append(a)
+if len(r.get('runs',[]))==2:
+ a,b=[{x['sectionId'] for x in run['results'] if x.get('proposal')} for run in r['runs']]
+ unavailable={f['sectionId'] for f in r.get('failures',[]) if f['code']=='BROWSER_INTERRUPTION'}
+ a-=unavailable;b-=unavailable
+ analysis['pairedFormat']={'pairedSections':43-len(unavailable),'environmentUnavailable':len(unavailable),'both':len(a&b),'noneOnly':len(a-b),'embeddingOnly':len(b-a),'neither':43-len(unavailable)-len(a|b)}
+(base/'l3-analysis-v3.json').write_text(json.dumps(analysis,indent=2)+'\n');print(json.dumps(analysis,indent=2))
