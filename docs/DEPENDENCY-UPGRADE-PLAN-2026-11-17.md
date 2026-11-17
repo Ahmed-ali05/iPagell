@@ -68,11 +68,17 @@ Con Fasi 1 e 2 applicate al lockfile, `eslint-plugin-react-hooks` accetta zod 4 
 
 GHSA-fc5q-39xc-vjpf è pubblicata dal 19 ottobre 2026 (CVSS 7.5) e non ha versioni corrette. Upstream esiste la PR [micromatch/picomatch#254](https://github.com/micromatch/picomatch/pull/254), aperta il 17 novembre 2026 e non ancora unita. Dopo le Fasi 1 e 2, picomatch è l'unica causa delle 19 segnalazioni high residue.
 
-Opzioni, da decidere:
+Opzioni valutate:
 
-1. **Attendere il rilascio upstream** (consigliata), con una scadenza, ad esempio due settimane; poi aggiornare e rimuovere il blocco. Nel frattempo la CI resta rossa.
+1. **Attendere il rilascio upstream**, con una scadenza; poi aggiornare e rimuovere il blocco. Nel frattempo la CI resta rossa.
 2. **Patch locale**, come per braces (`vendor/braces`): copre le linee 2.3.x e 4.0.x e richiede prove di regressione; costo maggiore.
 3. **Eccezione temporanea e motivata** nel gate di audit, con data di scadenza: richiede di modificare esplicitamente la policy del 10 ottobre.
+
+**Decisione del 17 novembre 2026: opzione 1.** Il proprietario attende il rilascio upstream. Al momento della decisione la PR #254 è aperta e non unita. Nessuna eccezione nel gate e nessuna patch locale.
+
+- **Scadenza: 1 dicembre 2026.** Se entro quella data non esiste una release di picomatch corretta per le linee usate (2.3.x e 4.0.x), si riapre la scelta fra le opzioni 2 e 3.
+- **Quando esce la release:** aggiornare il lockfile (`npm update picomatch` o un override alla versione corretta), verificare con `npm ls picomatch` che non restino copie vulnerabili, eseguire `npm audit --audit-level=low` (atteso: zero) e la CI completa; poi registrare qui l'esito.
+- **Fino ad allora:** la CI delle PR 9, 10 e 11 resta rossa al passo audit. picomatch non è nel bundle del Worker: il rischio riguarda solo build, lint e sviluppo locale.
 
 ## Stato delle prove di questo piano
 
