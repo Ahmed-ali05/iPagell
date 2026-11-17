@@ -1,6 +1,6 @@
 # iPagell — Cookie e archivi del browser
 
-**Bozza essenziale aggiornata l’11 novembre 2026.** Testo breve per gli utenti, seguito dall’inventario tecnico e dalla decisione ancora da completare. Nessun banner è stato aggiunto o pubblicato.
+**Bozza essenziale aggiornata il 17 novembre 2026**, riallineata all’hosting su Cloudflare. Testo breve per gli utenti, seguito dall’inventario tecnico e dalla decisione ancora da completare. Nessun banner è stato aggiunto o pubblicato.
 
 ## Testo proposto per gli utenti
 
@@ -12,13 +12,13 @@ Il browser conserva lingua, preferenze, copie offline e bozze. Il calcolatore se
 
 Gli archivi persistenti non hanno tutti una scadenza automatica: possono rimanere fino alla pulizia prevista dal relativo flusso o alla rimozione dei dati del sito. I marcatori d’installazione usano finestre logiche di 90 giorni, che non garantiscono da sole la cancellazione fisica. Le cache dell’interfaccia vengono aggiornate dal service worker, che esclude le API. I dettagli sono nell’inventario sotto.
 
-La [documentazione Sites](https://learn.chatgpt.com/docs/sites/managing-a-site) descrive statistiche automatiche di traffico anche senza un SDK aggiunto all’app. Nel codice di iPagell non sono presenti integrazioni di pubblicità o analytics commerciali; questo non esclude misurazioni dell’hosting.
+iPagell non usa pubblicità, analytics commerciali o cookie di terze parti. Il fornitore di hosting, Cloudflare, non aggiunge cookie al sito; produce statistiche aggregate sul traffico e i registri tecnici descritti nell’[informativa privacy](INFORMATIVA-PRIVACY-IT-BOZZA.md). Il sito chiede inoltre al browser di segnalare a Cloudflare eventuali errori di connessione (Network Error Logging): secondo Cloudflare queste segnalazioni non conservano l’indirizzo IP, ma solo rete, Paese e area di provenienza.
 
 Puoi bloccare o rimuovere cookie e dati del sito dalle impostazioni del browser. Potresti uscire dall’account o perdere preferenze e bozze non sincronizzate: esporta prima ciò che vuoi conservare. Puoi gestire separatamente il permesso notifiche, che non è un consenso ad altri trattamenti. Per gli altri dati e i tuoi diritti consulta l’[informativa privacy](INFORMATIVA-PRIVACY-IT-BOZZA.md).
 
 ## Inventario tecnico di riferimento
 
-Inventario del checkout, non cattura completa del traffico della produzione. Può essere presentato come approfondimento; la decisione interna sul banner in fondo non va pubblicata come se fosse già conclusa.
+Inventario del checkout più un controllo mirato della produzione del 17 novembre 2026 (vedi la nota sul banner). Non è una cattura completa del traffico. Può essere presentato come approfondimento; la decisione interna sul banner in fondo non va pubblicata come se fosse già conclusa.
 
 ### Cookie di accesso
 
@@ -62,12 +62,20 @@ Puoi gestire i permessi di notifica nelle impostazioni del browser o del disposi
 
 Il percorso corrente usa anzitutto documentazione pubblica, impostazioni disponibili e una verifica tecnica mirata; non prevede un’email obbligatoria al supporto o l’acquisto di una piattaforma consensi. La decisione dipende dal trattamento concreto secondo le regole applicabili, come nel [piano minimo](ESSENZIALI-PRIVACY-2026-10-22.md).
 
-Nel codice riletto non sono state individuate integrazioni commerciali di pubblicità o analytics. È però documentata una misurazione automatica nel servizio di hosting. Gli archivi inventariati sopra servono alle funzioni dell’app, ma questa osservazione non classifica automaticamente ogni chiave come strettamente necessaria.
+Nel codice riletto non sono state individuate integrazioni commerciali di pubblicità o analytics. Gli archivi inventariati sopra servono alle funzioni dell’app, ma questa osservazione non classifica automaticamente ogni chiave come strettamente necessaria.
 
-Prima di decidere definitivamente l’assenza del banner:
+**Controllo della produzione Cloudflare, 17 novembre 2026** (account Cloudflare del gestore e richieste anonime con `curl` su `/`, `/app`, `/calcolo-media-voti` e `/api/account`):
 
-1. Verificare cookie, richieste e script effettivi su ambiente pubblico e candidato, distinguendo funzioni richieste e preferenze facoltative.
-2. Chiarire il funzionamento delle statistiche Sites e degli altri servizi del provider: identificatori, dati trattati, destinatari, scopi, durata e possibilità di scelta. Una cattura senza cookie aggiuntivi non escluderebbe una misurazione effettuata sul server.
+- Nessun header `Set-Cookie` senza sessione: niente `__cf_bm` o altri cookie dell’edge. Bot Fight Mode e protezioni bot a pagamento sono disattivati; la zona è sul piano Free.
+- Cloudflare Web Analytics non è configurato (nessun sito RUM nell’account) e la homepage non carica `cloudflareinsights` né altri script esterni. Restano le statistiche aggregate della zona e dei Worker, calcolate lato server.
+- Ogni risposta contiene gli header `Report-To` e `NEL` verso `a.nel.cloudflare.com` (`success_fraction` 0: si segnalano solo gli errori). La documentazione Cloudflare dichiara che l’IP resta in memoria solo per la durata della richiesta e si conservano ASN, Paese e area metropolitana. La funzione si gestisce dalla dashboard (Network Error Logging Monitoring).
+- Email Obfuscation è attiva: agisce sull’HTML e non imposta cookie.
+- Workers Logs registra le richieste lato server (vedi informativa): non è uno strumento sul dispositivo, ma rientra nella trasparenza.
+
+Con questi elementi il sito non usa tecnologie sul dispositivo per finalità diverse dal funzionamento richiesto, salvo le segnalazioni NEL, che servono all’affidabilità del servizio e non identificano la persona secondo il fornitore. La raccomandazione resta **nessun banner**, con informazione chiara in questa pagina. Decisioni ancora aperte:
+
+1. Confermare la scelta sulle segnalazioni NEL (lasciarle e descriverle, oppure disattivarle dalla dashboard se non servono).
+2. Ripetere il controllo se si attivano Web Analytics, Bot Fight Mode, Turnstile o altri servizi Cloudflare che aggiungono script o cookie.
 3. Applicare le regole svizzere al trattamento concreto e valutare separatamente eventuali requisiti connessi ad altri mercati.
 4. Se emergono trattamenti per cui occorre una scelta, prevederne gli effetti reali prima dell’attivazione e una gestione successiva. Non aggiungere un popup puramente decorativo né un consenso unico obbligatorio alla privacy.
 
@@ -75,4 +83,4 @@ Il progetto non riceve un nuovo tracciatore o un banner con questa bozza. La [gu
 
 ## Evidenze tecniche usate
 
-[Sessione](../../lib/server/auth.ts), [diario locale](../../lib/account-storage.ts), [Appunti account](../../lib/notes/storage.ts), [Appunti senza account](../../lib/public-notes.ts), [calcolatore](../../components/grade-average-calculator.tsx), [lingua](../../lib/i18n/locale.ts), [installazione](../../lib/install-app.ts), [workspace e notifiche](../../components/ipagell-app.tsx), [service worker](../../public/sw.js). L’inventario deve essere riallineato se questi comportamenti cambiano prima della pubblicazione.
+[Sessione](../../lib/server/auth.ts), [diario locale](../../lib/account-storage.ts), [Appunti account](../../lib/notes/storage.ts), [Appunti senza account](../../lib/public-notes.ts), [calcolatore](../../components/grade-average-calculator.tsx), [lingua](../../lib/i18n/locale.ts), [installazione](../../lib/install-app.ts), [workspace e notifiche](../../components/ipagell-app.tsx), [service worker](../../public/sw.js), [configurazione Worker](../../wrangler.jsonc). Fonti Cloudflare: [Network Error Logging](https://developers.cloudflare.com/network-error-logging/), [Workers Logs](https://developers.cloudflare.com/workers/observability/logs/workers-logs/). L’inventario deve essere riallineato se questi comportamenti cambiano prima della pubblicazione.

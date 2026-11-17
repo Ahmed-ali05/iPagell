@@ -10,6 +10,8 @@ Data: **15 ottobre 2026**. Oggetto: servizio pubblico **https://ipagell.website*
 
 **Revisione documentale dell’11 novembre:** informative e regole sono state accorciate, separando il testo per gli utenti dalle note interne e conservando gli inventari tecnici utili. Le fonti ufficiali sono state rilette, inclusi i termini Sites aggiornati il 6 novembre; le verifiche residue sono raccolte nel piano minimo. Nessuna modifica all’app o nuova verifica della produzione.
 
+**Aggiornamento del 17 novembre 2026 — hosting Cloudflare:** dal 16 novembre la produzione non è più su ChatGPT Sites ma su un Worker Cloudflare del gestore, con D1 in giurisdizione UE. Le osservazioni di questo rapporto su Sites, OpenAI Ireland, DPA e subresponsabili Sites e statistiche Sites (LEG-04, LEG-08) descrivono quindi la situazione precedente. Fornitore, trasferimenti, registri e conservazione aggiornati sono nelle [bozze in docs/legal](legal/ESSENZIALI-PRIVACY-2026-10-22.md). Nuovo punto aperto: i dati rimasti nel D1 di Sites.
+
 ## 1. Esito e limiti
 
 **Oggi non ci sono elementi sufficienti per dichiarare iPagell pienamente conforme.** La lacuna pubblica più evidente è l’assenza di una vera informativa privacy accessibile dalla homepage e dalla registrazione. Seguono gestione dei minori, documentazione dei fornitori, conservazione, esercizio dei diritti e completezza della cancellazione.
