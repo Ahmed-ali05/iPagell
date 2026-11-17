@@ -1,6 +1,6 @@
 # iPagell — Regole d’uso
 
-**Bozza essenziale aggiornata l’11 novembre 2026.** Proposta per il servizio attuale: l’adozione delle regole e la loro accettazione non sono state implementate. Le note interne in fondo non fanno parte del testo destinato agli utenti.
+**Bozza essenziale aggiornata il 17 novembre 2026** (hosting su Cloudflare dal 16 novembre). Proposta per il servizio attuale: l’adozione delle regole e la loro accettazione non sono state implementate. Le note interne in fondo non fanno parte del testo destinato agli utenti.
 
 ## Testo proposto per gli utenti
 
@@ -40,7 +40,7 @@ Possono verificarsi errori e interruzioni: puoi segnalarli al contatto indicato.
 
 | Punto | Cosa manca |
 |---|---|
-| Pubblico ed età | Adottare o correggere la proposta 13+, definire eventuali soglie superiori, capacità di discernimento e rappresentanza. Non esiste un controllo anagrafico dedicato nel codice attuale. |
+| Pubblico ed età | Adottare o correggere la proposta 13+, definire eventuali soglie superiori, capacità di discernimento e rappresentanza. Non esiste un controllo anagrafico dedicato nel codice attuale. Con il passaggio a Cloudflare il vincolo dei termini Sites (§2.5(d)) non si applica più: la soglia è ora una scelta del gestore. Le condizioni self-serve di Cloudflare vanno comunque rilette per eventuali limiti sull’uso del servizio. |
 | Modello di servizio | Confermare l’offerta effettiva e i Paesi destinatari. Non introdurre obblighi commerciali, esclusioni o promesse di gratuità perpetua sulla base della sola assenza di pagamenti nell’app. Valutare eventuali informazioni aggiuntive sul gestore, compreso il recapito, in base al perimetro applicabile. |
 | Contenuti e licenza | Verificare compatibilità del permesso proposto con fornitori, materiali di terzi e impostazioni di condivisione. Non modificare la titolarità dei contenuti con una formula generica. |
 | Segnalazioni e interventi | Rendere operativo il contatto e una procedura riservata; individuare chi può intervenire e con quali strumenti. Non risulta un pannello del gestore dedicato alle segnalazioni. I poteri dei moderatori di classe non lo sostituiscono. |
@@ -53,6 +53,6 @@ La modalità di accettazione è una scelta da progettare sul rapporto concreto. 
 
 ## Fonti e riscontro tecnico
 
-Fonti rilette l’11 novembre 2026: [UFDC — FAQ, inclusione delle condizioni e clausole abusive](https://www.konsum.admin.ch/it/risposte-a-domande-frequenti-faq), [SECO — contratti e minorenni](https://www.seco.admin.ch/it/prima-dell-acquisto-e-della-conclusione-del-contratto), [IPI — diritto d’autore nelle scuole](https://www.ige.ch/it/protezione/diritto-dautore/utilizzare-unopera/diritto-dautore-nelle-scuole), [Sites — vincolo sul pubblico, §2.5(d)](https://openai.com/policies/chatgpt-sites-terms/). Le fonti sul commercio elettronico non qualificano automaticamente iPagell come negozio online.
+Fonti rilette l’11 novembre 2026: [UFDC — FAQ, inclusione delle condizioni e clausole abusive](https://www.konsum.admin.ch/it/risposte-a-domande-frequenti-faq), [SECO — contratti e minorenni](https://www.seco.admin.ch/it/prima-dell-acquisto-e-della-conclusione-del-contratto), [IPI — diritto d’autore nelle scuole](https://www.ige.ch/it/protezione/diritto-dautore/utilizzare-unopera/diritto-dautore-nelle-scuole). I termini Sites (§2.5(d)), consultati l’11 novembre, non riguardano più il servizio dal 16 novembre 2026. Le fonti sul commercio elettronico non qualificano automaticamente iPagell come negozio online.
 
 Riferimenti del codice controllato: [registrazione e recupero](../../lib/auth-validation.ts), [modulo account](../../components/account-gate.tsx), [registrazione server](../../app/api/auth/register/route.ts), [recupero server](../../app/api/auth/recover/route.ts), [sicurezza account](../../app/api/auth/security/route.ts), [permessi classe](../../lib/classes/permissions.ts), [repository classe](../../lib/server/class-repository.ts), [note e ritiro](../../lib/server/note-repository.ts), [backup](../../lib/notes/backup.ts). La lettura del checkout non certifica l’identità con la versione pubblicata. Nessuna funzione o controllo è stato eseguito su dati utente.
