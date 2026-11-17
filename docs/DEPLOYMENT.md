@@ -25,7 +25,7 @@ npm run release:prepare
 npm run deploy:cloudflare
 ```
 
-`deploy:cloudflare` compila con `IPAGELL_DEPLOY_TARGET=cloudflare`, esegue un dry run, applica al D1 remoto le migrazioni non ancora applicate e pubblica il Worker. Una migrazione applicata non si annulla con un rollback del codice. Richiede Node 22.23.4+ / 24.22.1+ / 26.12.1+; su questo Mac si usa `/opt/homebrew/opt/node@24/bin`.
+`deploy:cloudflare` compila con `IPAGELL_DEPLOY_TARGET=cloudflare`, verifica che la config generata in `dist/server/wrangler.json` sia quella di produzione (Worker `ipagell`, D1 `ipagell-live`), esegue un dry run, applica al D1 remoto le migrazioni non ancora applicate e pubblica il Worker con quella config. `wrangler.jsonc` dalla radice non si usa per il deploy: la sua `main` punta all'entry del binding locale. Lo staging si pubblica con `CLOUDFLARE_ENV=staging npm run build:cloudflare` seguito da `npx wrangler deploy -c dist/server/wrangler.json`, senza il passo di migrazione di produzione. Una migrazione applicata non si annulla con un rollback del codice. Richiede Node 22.23.4+ / 24.22.1+ / 26.12.1+; su questo Mac si usa `/opt/homebrew/opt/node@24/bin`.
 
 ### Backup e ripristino del D1 di produzione
 
