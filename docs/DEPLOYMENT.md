@@ -27,6 +27,19 @@ npm run deploy:cloudflare
 
 `deploy:cloudflare` compila con `IPAGELL_DEPLOY_TARGET=cloudflare`, esegue un dry run, applica al D1 remoto le migrazioni non ancora applicate e pubblica il Worker. Una migrazione applicata non si annulla con un rollback del codice. Richiede Node 22.23.4+ / 24.22.1+ / 26.12.1+; su questo Mac si usa `/opt/homebrew/opt/node@24/bin`.
 
+### Backup e ripristino del D1 di produzione
+
+Il JSON di backup scaricato dagli utenti non sostituisce un backup operativo del database. Procedura manuale, da ripetere almeno una volta al mese e prima di ogni migrazione:
+
+```bash
+npx wrangler d1 export ipagell-live --remote --output ~/Backup/ipagell/ipagell-live-AAAA-MM-GG.sql
+```
+
+- Il file contiene i dati degli utenti: conservalo fuori dal repository e fuori da cartelle sincronizzate (iCloud, Dropbox), cifrato o su un supporto controllato.
+- Ripristino di prova: importa il dump in un D1 separato e di prova (mai in `ipagell-live`), poi confronta i conteggi delle tabelle. Registra data ed esito.
+- Verifica nel dashboard Cloudflare se Time Travel è disponibile per il piano e per quanti giorni; non è documentato come verificato.
+- Responsabile del backup, frequenza e conservazione: da assegnare; finché non c'è un nome, il responsabile è il proprietario del repository.
+
 Le sezioni seguenti descrivono il periodo Sites e restano come registro storico.
 
 ## Una produzione: ipagell.website (periodo Sites, fino al 16 novembre 2026)
@@ -45,17 +58,21 @@ Il Worker indipendente configurato in `wrangler.jsonc` ha un **database separato
 
 [Preparazione al rilascio](improvement-2026-10-01/W8A-RELEASE-PREPARATION.md): ramo isolato dalla sorgente Sites 39, gate CI D1 e verifiche locali. Nessuna pubblicazione del candidato. Il candidato corrente pubblica soltanto le correzioni security sullo schema Sites 39 invariato. La 0007 mai pubblicata e il suo snapshot sono rinviati in `operations/w8a/deferred-expansion/`, fuori dal runner Sites; bootstrap/backfill non sono necessari per questo candidato. Il [runbook](../operations/w8a/RUNBOOK.md) riguarda la futura espansione, ancora bloccata sul canale amministrativo e restore gestito. Il rollback del Worker sul medesimo DB è una prova distinta dal restore DB. Nessuna 0008 o provider inclusi.
 
-## Quando modifichi tu il codice
+## Quando modifichi il codice (flusso attuale, Cloudflare)
 
 1. Crea un ramo dal `main` aggiornato e modifica il progetto.
 2. Da un clone pulito esegui `npm run install:ci`. Per l'anteprima usa `npm run dev`; inizializza il database locale come indicato in [Manutenzione](MANUTENZIONE.md).
 3. Esegui `npm run release:prepare`: controlla codice, tipi, test, documentazione e genera la build.
 4. Salva le modifiche con un commit, invia il ramo su GitHub e apri una pull request. Il workflow **Controlli iPagell** esegue gli stessi controlli; puoi avviarlo anche da GitHub → Actions → Controlli iPagell → Run workflow. Unisci quando è verde.
-5. Apri il progetto aggiornato in Codex e chiedi: **«Pubblica questo codice su ipagell.website usando il progetto Sites esistente»**.
+5. Pubblica solo da `main` allineato a `origin/main`, con working tree pulito (`git status` vuoto per i file del rilascio), seguendo la sezione «Pubblicare un aggiornamento». Dopo il rilascio verifica https://ipagell.website (homepage, `/app`, `/api/account` senza sessione → 401).
+
+Il deploy non viene eseguito dalla CI: va lanciato a mano dal Mac con il login Wrangler dell'account del proprietario.
 
 GitHub verifica il codice ma non pubblica la produzione. Il deploy Sites richiede il collegamento Sites autenticato di Codex: in questo repository non è configurata un'integrazione CI per pubblicare su Sites. `release:prepare` prepara il rilascio, non lo pubblica.
 
-## Procedura di pubblicazione per Codex
+## Procedura di pubblicazione per Codex (storica, non più valida dal 16 novembre 2026)
+
+Non seguire questa procedura: il flusso Sites non è più disponibile. Per i rilasci vedi «Pubblicare un aggiornamento». Testo storico:
 
 Usare la skill Sites hosting: verificare il progetto e i domini esistenti, compilare per Sites con `npm run build` (senza `IPAGELL_DEPLOY_TARGET=cloudflare`), salvare e inviare l'esatto sorgente al repository restituito dal connettore, preparare il pacchetto e pubblicare la versione con Sites. Attendere lo stato `succeeded` e confermare l'URL **https://ipagell.website**. Il push del sorgente Sites è distinto da GitHub.
 
