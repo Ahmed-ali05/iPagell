@@ -1,5 +1,7 @@
 # W8-A — schema, inizializzazione e recupero
 
+> **Superato per la produzione dal 17 novembre 2026.** Produzione sul Worker Cloudflare `ipagell` e D1 `ipagell-live`: canale Sites, export e restore gestiti non sono più disponibili. La sequenza attuale è in [W8B-PIANO-CLOUDFLARE](../../docs/improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md). Le passi qui sotto restano valide solo come riferimento storico.
+
 **Perimetro aggiornato:** questo documento riguarda l’espansione 0007 ora rinviata in `operations/w8a/deferred-expansion/`. Il candidato security corrente non modifica lo schema e non richiede bootstrap. Il blocco amministrativo/restore resta valido per l’espansione; non impedisce di provare separatamente il rilascio senza migrazioni e il rollback del Worker.
 
 17 ottobre 2026. [Rapporto](../../docs/improvement-2026-10-01/W8A-RELEASE-PREPARATION.md).

@@ -24,7 +24,36 @@
     "enabled": true,
     "logs": {
       "enabled": true,
-      "head_sampling_rate": 1
+      "head_sampling_rate": 1,
+      // Nessun log automatico per richiesta (IP, posizione, user agent, account):
+      // restano solo gli errori registrati dal codice. Vedi docs/legal.
+      "invocation_logs": false
+    }
+  },
+  "env": {
+    "staging": {
+      "name": "ipagell-staging",
+      "workers_dev": true,
+      "routes": [],
+      "vars": {
+        "IPAGELL_CLASSES": "enabled"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "ipagell-staging",
+          "database_id": "64346ec7-f2aa-4926-8a98-c0f2f487634e",
+          "migrations_dir": "drizzle"
+        }
+      ],
+      "observability": {
+        "enabled": true,
+        "logs": {
+          "enabled": true,
+          "head_sampling_rate": 1,
+          "invocation_logs": false
+        }
+      }
     }
   }
 }
