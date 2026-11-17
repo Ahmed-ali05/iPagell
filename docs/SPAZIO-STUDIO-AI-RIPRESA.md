@@ -9,7 +9,7 @@
 Challenge ricerca v2 separata dal corpus originale: 48 passaggi sintetici, 16 query positive
 (it 8, de 2, fr 3, en 3) e 4 senza risposta. Parafrasi, negazioni, omonimi e distrattori
 che riportano affermazioni errate esplicitamente marcate. Gold fissati in
-[hard-corpus.ts](../experiments/study-local/src/hard-corpus.ts), da revisionare da una persona.
+`experiments/study-local/src/hard-corpus.ts`, da revisionare da una persona.
 Non è un test cieco esterno: l'autore conosce i risultati precedenti, ma non quelli v2.
 
 Prima del ranking: stesso estrattore/chunker per entrambi, profilo model-card L1 congelato,
@@ -44,8 +44,8 @@ contro il 270M. Il vantaggio osservato è positivo ma piccolo, su un campione qu
 Artefatto 164.626.432 byte, indice circa 2,1 s, query p95 46,9 ms contro 0,5 ms BM25;
 picco RAM/GPU non misurato. Non equivale a correttezza universale.
 
-Nuova [baseline](../experiments/study-local/reports/retrieval-challenge-v2-baseline.json)
-e [inferenza reale Chromium](../experiments/study-local/reports/retrieval-challenge-v2-browser.json):
+Nuova `experiments/study-local/reports/retrieval-challenge-v2-baseline.json`
+e `experiments/study-local/reports/retrieval-challenge-v2-browser.json`:
 
 | Misura | BM25 | EmbeddingGemma 270M |
 |---|---:|---:|
@@ -75,7 +75,7 @@ Il booleano `enableConstrainedDecoding` non espone un JSON Schema arbitrario nel
 firma JS installata. L'[API C++ per constrained decoding](https://github.com/google-ai-edge/LiteRT-LM/blob/main/docs/api/cpp/constrained-decoding.md)
 è distinta: non si presume disponibile in JS.
 
-[Risposte finali sintetiche e tempi](../experiments/study-local/reports/l3-synthetic-variants-v2-initial.json).
+`experiments/study-local/reports/l3-synthetic-variants-v2-initial.json`.
 Ogni riga è una prova reale, stesso file E2B già presente e verificato, seed 42, greedy,
 nessuna riparazione; non una media o un confronto causale di prestazioni.
 
@@ -104,7 +104,7 @@ le durate ricavate dai rate sono stime, non misure indipendenti. La verifica SHA
 
 Prima correzione v2: richiesta utente reale, esempio estraneo e schema esplicito;
 **non sufficiente** sui riferimenti canonici del corpus. Il
-[tentativo conservato](../experiments/study-local/reports/l3-corpus-v2-before-alias.json)
+`experiments/study-local/reports/l3-corpus-v2-before-alias.json`
 conclude 10/43 sezioni, 2 valide; timeout sulla sezione 11. Le altre 33 sezioni non sono
 valutate, il confronto con recupero non è raggiunto. I metadati distinguono forma,
 cap token, possibile troncamento, validazione e costo della riparazione. Il watchdog
@@ -131,7 +131,7 @@ corrente assente falliscono, senza correzioni euristiche. Contratto finale
 
 La prova alias sulla fonte DNS è valida: 202 token, 4.518,7 ms send, tre concetti e due
 relazioni, riferimenti finali canonici. Una ripetizione senza cambiamenti è conservata
-nel [report completo delle varianti](../experiments/study-local/reports/l3-synthetic-variants-v2.json).
+nel `experiments/study-local/reports/l3-synthetic-variants-v2.json`.
 La validità strutturale non giudica l'aggiunta dell'espansione “Time To Live”, assente
 nella fonte: anche una risposta valida può introdurre conoscenza esterna.
 
@@ -219,9 +219,9 @@ umane prima di generalizzare.
 
 ## Confronto completo disponibile: esiti e parti non osservabili
 
-[Report integrale](../experiments/study-local/reports/l3-corpus-v2.json),
-[conteggi ricavati](../experiments/study-local/reports/l3-analysis-v3.json),
-[scheda con fonti affiancate](../experiments/study-local/reports/l3-human-review.html).
+`experiments/study-local/reports/l3-corpus-v2.json`,
+`experiments/study-local/reports/l3-analysis-v3.json`,
+`experiments/study-local/reports/l3-human-review.html`.
 Il nome del file v2 identifica il protocollo di confronto; il prompt registrato è v3-alias.
 15 documenti leggibili, 43 sezioni; PDF D15 senza testo escluso, pagina 2 di D16 esclusa.
 
@@ -247,8 +247,8 @@ La sessione browser è stata trovata ricaricata, con pagina vuota e job assente,
 il file locale conservava 17 sezioni concluse con recupero. Causa del ricaricamento non
 identificata. Una lettura UI ha anche incontrato un timeout del controllo automatico
 dello strumento, risolto dal solo ritentativo consentito: nessun aggiramento, nessun
-verdetto di sicurezza o del modello. Lo [snapshot dell'interruzione](../experiments/study-local/reports/l3-corpus-v3-browser-interruption.json)
-e il [primo passaggio v3](../experiments/study-local/reports/l3-corpus-v3-first-pass.json)
+verdetto di sicurezza o del modello. Lo `experiments/study-local/reports/l3-corpus-v3-browser-interruption.json`
+e il `experiments/study-local/reports/l3-corpus-v3-first-pass.json`
 sono conservati. La continuazione salta la sezione scaduta/interrotta, non la ritenta,
 e prosegue le successive con un nuovo worker e gli stessi budget. Nessun aumento
 di timeout, token o numero di riparazioni. Una sessione interrotta non qualifica il modello.
@@ -347,7 +347,7 @@ Nessuna integrazione L4, pubblicazione, cloud o modifica alle note/stato L2.
   non sono artefatti della build laboratorio. Nessuna integrazione nel client/precache
   principale e nessuna pubblicazione eseguita.
 
-Per riprodurre usare le istruzioni del [laboratorio](../experiments/study-local/README.md).
+Per riprodurre usare le istruzioni del `experiments/study-local/README.md`.
 I report sintetici sono copiabili; conservarli prima di ripetere una prova che usa lo
 stesso nome file. La scheda di revisione va compilata da una persona e le annotazioni
 vanno salvate separatamente: non dichiara la revisione già completata.

@@ -5,7 +5,7 @@
 **8 ottobre 2026. L0 documentato, L1 e L2 manuale implementati nel laboratorio; banco L3 implementato ma generatore non qualificato; L4 non avviato.**
 
 **Avanzamento:** la preparazione L0 è nel [rapporto dedicato](SPAZIO-STUDIO-AI-L0.md).
-Il successivo [rapporto L1](SPAZIO-STUDIO-AI-L1.md) e il [laboratorio](../experiments/study-local/README.md)
+Il successivo [rapporto L1](SPAZIO-STUDIO-AI-L1.md) e il `experiments/study-local/README.md`
 consegnano parser/fonti, baseline e confronto embedding nel browser. Il recupero AI funziona
 nella prova sintetica, con vantaggio osservato positivo; il vecchio criterio +5 punti era impossibile sulla baseline e viene rettificato in L1;
 restano qualifiche numeriche, di rete, memoria e dispositivi. I prompt sotto conservano il mandato,

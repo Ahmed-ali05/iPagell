@@ -9,7 +9,7 @@ sul piccolo corpus è positivo; il criterio di +5 punti di L0 era irraggiungibil
 
 ## Perimetro consegnato
 
-Sorgente e istruzioni in [experiments/study-local](../experiments/study-local/README.md).
+Sorgente e istruzioni in `experiments/study-local/README.md`.
 `npm run study:dev` apre un Vite separato su `127.0.0.1:5174`; nessun import dall'app,
 account, outbox, endpoint, binding Sites o service worker. Dipendenze/lockfile e build
 separati; la shell principale non carica parser, runtime o pesi. Le esclusioni di lint/tipi
@@ -54,7 +54,7 @@ copia parziale è pronta. Questa non è la persistenza dello studio L2 né un ba
 | Backend | `Backend.GPU` esplicito, worker classico: il loader usa `importScripts`, incompatibile con un module worker. Parser separato in module worker |
 | Input/output | Stringa passata dal wrapper senza prefisso aggiunto nel JS; output 768 dimensioni, normalizzazione richiesta e ricontrollata, vettori finiti/non nulli, overflow in errore |
 
-Integrità npm, licenze dichiarate e hash WASM sono nel [report dipendenze](../experiments/study-local/reports/dependencies.json).
+Integrità npm, licenze dichiarate e hash WASM sono nel `experiments/study-local/reports/dependencies.json`.
 `npm audit` sul lockfile del laboratorio: zero vulnerabilità segnalate. Questo non dimostra
 assenza di difetti né sostituisce la revisione dei termini prima della distribuzione.
 La precisione delle attivazioni, il pooling interno e la revisione esatta del tokenizer nei
@@ -73,7 +73,7 @@ estratto, ma non una revisione linguistica/didattica umana indipendente.
 lingua. Parafrasi dello stesso passaggio nello stesso split; corpus comune. BM25 Unicode
 NFKD, stop list esplicita, `k1=1.2`, `b=0.75`. Stessi chunk e filtri per entrambi i metodi.
 Hash corpus: `4e0b7fade9b5518b516942f2f214f6cac547bcb9b38986bc42db2894e39d5bb8`.
-Ranking completi della baseline nel [report CLI](../experiments/study-local/reports/baseline.json).
+Ranking completi della baseline nel `experiments/study-local/reports/baseline.json`.
 
 Confrontati sul solo sviluppo i profili model card e guida LiteRT: scelta per Recall@5,
 poi MRR@5; il profilo scelto è congelato prima della valutazione. Entrambi i profili ottengono Recall 1 e MRR 0,96875 sullo sviluppo; lo spareggio
@@ -108,7 +108,7 @@ cinque vicini: nessuna soglia di astensione calibrata e nessuna similarità pres
 La prova reale usa il browser integrato Chromium 154, contesto localhost sicuro, API GPU
 presente, 8 thread dichiarati, `crossOriginIsolated=false`. La user agent dichiara macOS;
 modello fisico, versione OS effettiva e alimentazione non sono stati inventariati. Tempi
-locali osservati nella [sintesi browser](../experiments/study-local/reports/browser-chromium-summary.json):
+locali osservati nella `experiments/study-local/reports/browser-chromium-summary.json`:
 BM25 p95 0,5 ms (400 query), embedding p95 46,9 ms (200 query a caldo); tre avvii con pesi
 presenti 679,4/667,3/843,2 ms e indice dei 43 chunk 2.082,5/2.085,6/2.038,7 ms. WASM effettivo
 `litertlm_wasm_internal`, massimo 188 token osservati, norme restituite fra 0,99999927 e

@@ -84,10 +84,6 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 |---|---|
 | `install:ci` | `node scripts/install-ci.mjs` |
 | `dev` | `node scripts/run-framework.mjs dev` |
-| `study:dev` | `npm --prefix experiments/study-local run dev` |
-| `study:check` | `npm --prefix experiments/study-local run check` |
-| `study:build` | `npm --prefix experiments/study-local run build` |
-| `study:evaluate` | `npm --prefix experiments/study-local run evaluate` |
 | `build` | `node scripts/run-framework.mjs build && node scripts/generate-precache.mjs` |
 | `build:cloudflare` | `node scripts/build-cloudflare.mjs` |
 | `deploy:cloudflare` | `node scripts/deploy-cloudflare.mjs` |
@@ -121,7 +117,7 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `clsx` | app | `2.1.1` | `2.1.1` |
 | `drizzle-orm` | app | `0.45.2` | `0.45.2` |
 | `lucide-react` | app | `^1.31.0` | `1.31.0` |
-| `next` | app | `16.3.8` | `16.3.8` |
+| `next` | app | `16.4.6` | `16.4.6` |
 | `next-themes` | app | `^0.4.6` | `0.4.6` |
 | `pdf-lib` | app | `^1.17.1` | `1.17.1` |
 | `prosemirror-commands` | app | `^1.7.2` | `1.7.2` |
@@ -132,8 +128,8 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `prosemirror-state` | app | `^1.4.4` | `1.4.4` |
 | `prosemirror-view` | app | `^1.42.6` | `1.42.6` |
 | `radix-ui` | app | `^1.6.7` | `1.6.7` |
-| `react` | app | `19.2.8` | `19.2.8` |
-| `react-dom` | app | `19.2.8` | `19.2.8` |
+| `react` | app | `19.3.1` | `19.3.1` |
+| `react-dom` | app | `19.3.1` | `19.3.1` |
 | `recharts` | app | `^3.8.0` | `3.8.0` |
 | `sonner` | app | `^2.0.8` | `2.0.8` |
 | `tailwind-merge` | app | `3.6.0` | `3.6.0` |
@@ -149,9 +145,9 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `braces` | tooling/test | `file:vendor/braces` | `3.0.3-ipagell.1` |
 | `drizzle-kit` | tooling/test | `0.31.10` | `0.31.10` |
 | `eslint` | tooling/test | `9.39.4` | `9.39.4` |
-| `eslint-config-next` | tooling/test | `16.3.8` | `16.3.8` |
+| `eslint-config-next` | tooling/test | `16.4.6` | `16.4.6` |
 | `fake-indexeddb` | tooling/test | `^6.2.5` | `6.2.5` |
-| `react-server-dom-webpack` | tooling/test | `19.2.8` | `19.2.8` |
+| `react-server-dom-webpack` | tooling/test | `19.3.1` | `19.3.1` |
 | `tailwindcss` | tooling/test | `4.2.1` | `4.2.1` |
 | `tsx` | tooling/test | `^4.22.1` | `4.22.1` |
 | `tw-animate-css` | tooling/test | `^1.4.0` | `1.4.0` |

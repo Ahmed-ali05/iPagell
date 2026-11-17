@@ -1,6 +1,6 @@
 # Spazio Studio — prova generativa locale L3
 
-[Indice](README.md) · [Protocollo L0](SPAZIO-STUDIO-AI-L0.md) · [L2](SPAZIO-STUDIO-AI-L2.md) · [Prompt](SPAZIO-STUDIO-AI-PROMPTS.md) · [Laboratorio](../experiments/study-local/README.md)
+[Indice](README.md) · [Protocollo L0](SPAZIO-STUDIO-AI-L0.md) · [L2](SPAZIO-STUDIO-AI-L2.md) · [Prompt](SPAZIO-STUDIO-AI-PROMPTS.md) · `experiments/study-local/README.md`
 
 **8 ottobre 2026. Banco L3 implementato nel laboratorio separato; generatore non qualificato. Nessuna pubblicazione.**
 La mappa L2 conserva il contratto manuale. Le proposte generative sono effimere e non hanno
@@ -46,7 +46,7 @@ Non dichiarare il dispositivo qualificato dopo il solo controllo di ammissione.
 
 ## Contratto delle proposte
 
-[Prompt e validatore](../experiments/study-local/src/proposals.ts): `study-proposals-v1`.
+`experiments/study-local/src/proposals.ts`: `study-proposals-v1`.
 Una sezione corrisponde a ciascun chunk canonico L1, senza filtro di rilevanza sui nuovi
 argomenti. I paragrafi lunghi rimangono segmentati dal chunker L1; nessun troncamento nuovo.
 
@@ -106,7 +106,7 @@ sandbox contro codice same-origin malevolo e non cattura tutto il traffico del b
 
 ## Valutazione ed evidenze
 
-[Checklist del corpus](../experiments/study-local/src/generation-eval.ts): 40 concetti essenziali,
+`experiments/study-local/src/generation-eval.ts`: 40 concetti essenziali,
 uno per ciascun passaggio annotato L1, con riferimento esatto verificato sull’estrazione reale,
 negazioni e istruzioni ostili. Nessun modello è giudice unico di sé stesso.
 Il report conta tutte le sezioni, anche vuote o invalide, concetti/relazioni proposti,
@@ -120,11 +120,11 @@ numero di concetti viene presentato come numero di affermazioni supportate.
 | Nuovi test L3 | Copertura di tutte le sezioni, schema/limiti/citazioni, markup/tool/ID inventati, negazioni nel prompt, candidato/fonti di entrambe le lezioni, relazioni/cicli, diff senza note personali, quota, stream/hash/abort, rete, annotazioni reali PDF/TXT, denominatori e watchdog/risultati tardivi |
 | Ammissione browser | Chromium 154/macOS, 8 thread dichiarati, WebGPU worker e shader-f16 disponibili; contesto sicuro senza cross-origin isolation; quota circa 10,9 GB, uso iniziale circa 164,7 MB |
 | Download annullato reale | Avanzamento osservato a 8.441.328 byte; annullamento riportato dall’interfaccia e stato L3 azzerato |
-| File completo e avvio | File locale verificato; `GPU_ARTISAN` avviato in 3.073 ms. [Report browser di avvio](../experiments/study-local/reports/l3-runtime-probe.json). Nessun documento passato al motore in questa prova |
+| File completo e avvio | File locale verificato; `GPU_ARTISAN` avviato in 3.073 ms. `experiments/study-local/reports/l3-runtime-probe.json`. Nessun documento passato al motore in questa prova |
 | Annullamento riverifica | File locale letto parzialmente, comando Annulla ricevuto e stato azzerato. Round trip del comando di automazione 965 ms; non è una qualificazione universale del tempo UI/GPU |
-| Tentativo sul corpus | 43 sezioni previste; prime 3 completate senza proposte valide, 6 output rifiutati dopo massimo una riparazione. Tempi 20.324,7 / 27.281 / 20.619,9 ms. La quarta sezione raggiunge il watchdog di 30 s: worker terminato, 40 sezioni non completate. [Report integrale del tentativo](../experiments/study-local/reports/l3-corpus-attempt.json) |
-| Diagnosi su una sezione breve | Ulteriore prova sintetica sul DNS, 2 risposte rifiutate con `JSON_SYNTAX`, 27.692,7 ms inclusa riparazione. [Report diagnostico](../experiments/study-local/reports/l3-diagnostic.json). Non è il corpus completo; non attribuire metriche semantiche a questo campione |
-| Ripetizione diagnostica finale | Stessa sezione breve, 2 risposte rifiutate con `JSON_SYNTAX`, 22.283,5 ms inclusa riparazione; avvio 2.312,3 ms. Stato UI `no-valid-proposals` verificato. [Report finale](../experiments/study-local/reports/l3-diagnostic-final.json) |
+| Tentativo sul corpus | 43 sezioni previste; prime 3 completate senza proposte valide, 6 output rifiutati dopo massimo una riparazione. Tempi 20.324,7 / 27.281 / 20.619,9 ms. La quarta sezione raggiunge il watchdog di 30 s: worker terminato, 40 sezioni non completate. `experiments/study-local/reports/l3-corpus-attempt.json` |
+| Diagnosi su una sezione breve | Ulteriore prova sintetica sul DNS, 2 risposte rifiutate con `JSON_SYNTAX`, 27.692,7 ms inclusa riparazione. `experiments/study-local/reports/l3-diagnostic.json`. Non è il corpus completo; non attribuire metriche semantiche a questo campione |
+| Ripetizione diagnostica finale | Stessa sezione breve, 2 risposte rifiutate con `JSON_SYNTAX`, 22.283,5 ms inclusa riparazione; avvio 2.312,3 ms. Stato UI `no-valid-proposals` verificato. `experiments/study-local/reports/l3-diagnostic-final.json` |
 | Recupero e stato personale | Il ramo embedding non è raggiunto dopo l’interruzione della baseline. Verificata riapertura del profilo A con due concetti, fonte, nota e stato personale conservati |
 | App e build | `npm run check`: lint/tipi, 114 test, i18n 758 chiavi, documentazione. Build principale e laboratorio riuscite, 31 asset shell; nessun identificativo/asset studio o modello nel client/precache dell’app |
 

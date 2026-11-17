@@ -15,7 +15,7 @@ Evidenze aggiornate al **1 ottobre 2026**. Riferimento delle prove annuali: Site
 
 ## Appunti da lezione — preparazione, 10 ottobre 2026
 
-[Analisi e confini](LEZIONI-LIVE-AI.md), [protocollo](lezioni-live-ai/EVALUATION.md) e [area di lavoro](../experiments/lecture-notes/README.md). LN-00 è una preparazione documentale; le fasi successive non sono state eseguite.
+[Analisi e confini](LEZIONI-LIVE-AI.md), [protocollo](lezioni-live-ai/EVALUATION.md) e `experiments/lecture-notes/README.md`. LN-00 è una preparazione documentale; le fasi successive non sono state eseguite.
 
 | Verifica | Evidenza e limite |
 |---|---|
@@ -202,7 +202,7 @@ La parte testuale/manuale può proseguire. Benchmark AI subordinato alla qualifi
 ## Spazio Studio L1 — 7 ottobre 2026
 
 Implementazione ed evidenze nel [rapporto L1](SPAZIO-STUDIO-AI-L1.md); sorgenti/istruzioni nel
-[laboratorio](../experiments/study-local/README.md). Prova isolata, nessuna pubblicazione o account reale.
+`experiments/study-local/README.md`. Prova isolata, nessuna pubblicazione o account reale.
 
 | Verifica | Esito e limite |
 |---|---|
@@ -241,9 +241,9 @@ scrittura generativa nell’archivio L2, integrazione o pubblicazione.
 | Contratto L3 | Tipi e 47 test laboratorio passati: 15 L1 + 18 L2 + 14 L3. JSON chiuso/limiti, citazioni e candidati, HTML/Mermaid/tool/ID inventati, relazioni/cicli, diff senza note personali, quota, hash/abort anche durante lettura cache, rete fissata, annotazioni PDF/TXT reali, denominatori e watchdog/risultati tardivi |
 | App | `npm run check` passato: lint, tipi, 114 test, i18n 758 chiavi e documentazione. Nessun codice del diario/Appunti modificato da L3 |
 | Build e isolamento | Build app e laboratorio riuscite; 31 asset shell principali. Nessun identificativo Gemma/LiteRT, `study-proposals-v1`, `study-graph-v1` o PDF.js nel client/precache dell’app |
-| Pesi e avvio reale | File E2B 2.008.432.640 byte completato, SHA-256 verificato e conservato in OPFS. Backend web `GPU_ARTISAN` avviato in 3.073 ms; [report](../experiments/study-local/reports/l3-runtime-probe.json). Non equivale a inferenza o qualità qualificate |
+| Pesi e avvio reale | File E2B 2.008.432.640 byte completato, SHA-256 verificato e conservato in OPFS. Backend web `GPU_ARTISAN` avviato in 3.073 ms; `experiments/study-local/reports/l3-runtime-probe.json`. Non equivale a inferenza o qualità qualificate |
 | Cancel reale | Annullati download parziale e riverifica cache; interfaccia azzerata. Round trip automazione del secondo comando 965 ms; tempi UI/GPU universali non certificati |
-| Qualificazione generativa | Esito negativo E2B/prompt v1: 3/43 sezioni completate, 6 output rifiutati, quarta sezione oltre watchdog 30 s. [Tentativo](../experiments/study-local/reports/l3-corpus-attempt.json). Diagnosi separata: 2 ulteriori output non parsabili come JSON. Ramo embedding non raggiunto, nessuna metrica semantica o beneficio del recupero dichiarato. Accettazione e L4 sospesi |
+| Qualificazione generativa | Esito negativo E2B/prompt v1: 3/43 sezioni completate, 6 output rifiutati, quarta sezione oltre watchdog 30 s. `experiments/study-local/reports/l3-corpus-attempt.json`. Diagnosi separata: 2 ulteriori output non parsabili come JSON. Ramo embedding non raggiunto, nessuna metrica semantica o beneficio del recupero dichiarato. Accettazione e L4 sospesi |
 | Persistenza dopo errore | Riaperto profilo sintetico A con due concetti, fonte, nota e stato personali L2 conservati |
 
 

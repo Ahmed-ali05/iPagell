@@ -73,4 +73,4 @@ LN-05 produce una proposta; non modifica ancora l’app. La proposta deve specif
 
 ## Ripresa del lavoro
 
-Aprire l’[area di lavoro](../../experiments/lecture-notes/README.md), completare LN-01 e compilare un nuovo rapporto dal [modello](REPORT-TEMPLATE.md). Prima di ogni fase rileggere la precedente decisione; aggiornare soltanto sezioni e documenti coinvolti. Mantenere «proposto», «eseguito» e «verificato» distinti, riportando anche fallimenti e misure mancanti.
+Aprire l’`experiments/lecture-notes/README.md`, completare LN-01 e compilare un nuovo rapporto dal [modello](REPORT-TEMPLATE.md). Prima di ogni fase rileggere la precedente decisione; aggiornare soltanto sezioni e documenti coinvolti. Mantenere «proposto», «eseguito» e «verificato» distinti, riportando anche fallimenti e misure mancanti.
