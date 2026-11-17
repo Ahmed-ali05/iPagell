@@ -90,6 +90,21 @@ Ramo `deps/phase1-toolchain`, basato su `c036af5`. Versioni risolte: vinext 1.4.
 - `tests/node-policy.test.ts` ora confronta la Vite risolta con la versione esatta dichiarata in `package.json`, invece di fissare 8.1.6.
 - Non verificati: lettore di schermo, telefono fisico, deploy su staging o produzione.
 
+### Fase 2 applicata — 17 novembre 2026
+
+Ramo `deps/phase2-zod4`, sopra la Fase 1. `zod` 3.25.76 → **4.6.7**; `eslint-plugin-react-hooks` usa la stessa copia, quindi non resta zod 3 nel lockfile.
+
+- `npm audit`: **19 high, 0 moderate, 0 critical**, tutte dovute a picomatch (Fase 3).
+- TypeScript compila senza modifiche. L'unico intervento sul codice sostituisce il deprecato `z.ZodIssueCode.custom` con `"custom"` in `lib/validation.ts`.
+- Cambi di comportamento verificati sugli schemi reali:
+  - `.default()`: i valori predefiniti di classi, inviti, attività, sottoscrizioni e note restano gli stessi; nessuno schema con default passa da `.partial()`, e `subscriptionUpdate` senza `personalEvent` resta parziale.
+  - `.uuid()`: ora richiede UUID conformi RFC. Tutti gli ID dell'app nascono da `crypto.randomUUID()` e passano; un UUID non conforme, prima accettato, ora è rifiutato.
+  - `.datetime()`: invariato (offset rifiutato dove non dichiarato).
+  - Messaggi predefiniti: zod 4 cambia il testo inglese degli errori senza messaggio personalizzato. L'interfaccia mostra chiavi tradotte per codice, quindi cambia solo il campo `error` grezzo di alcune risposte API (creazione e ingresso nelle classi).
+- Con Node 24.22.3: `npm run check` (**147 test**), `release:prepare`, `test:auth-d1`, `test:auth-restore` e `build:cloudflare` superati; **146 controlli API** sul Worker compilato con D1 locale nuovo.
+- Browser sul Worker locale: registrazione, creazione del diario, voto (`PUT /api/diary` 200) e nuovo appunto (`POST /api/notes` 201). Database locale eliminato al termine.
+- Non verificati: import di backup reali V1/V2 oltre ai test automatici, telefono fisico, staging e produzione.
+
 ## Ordine consigliato
 
 1. Riallineare il branch locale `sync/checkout-20261116` al remoto: contiene quattro commit non pubblicati.

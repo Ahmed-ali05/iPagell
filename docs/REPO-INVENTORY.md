@@ -137,7 +137,7 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `recharts` | app | `^3.8.0` | `3.8.0` |
 | `sonner` | app | `^2.0.8` | `2.0.8` |
 | `tailwind-merge` | app | `3.6.0` | `3.6.0` |
-| `zod` | app | `^3.25.76` | `3.25.76` |
+| `zod` | app | `^4.6.7` | `4.6.7` |
 | `@cloudflare/vite-plugin` | tooling/test | `1.70.0` | `1.70.0` |
 | `@cloudflare/workers-types` | tooling/test | `5.20261117.1` | `5.20261117.1` |
 | `@tailwindcss/postcss` | tooling/test | `4.2.1` | `4.2.1` |
