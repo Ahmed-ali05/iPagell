@@ -4,7 +4,7 @@
 
 ## Separazione successiva del rilascio security
 
-Il candidato corrente supporta lo schema Sites 39 invariato senza bootstrap; 0007 e snapshot sono conservati in `operations/w8a/deferred-expansion/`, fuori dal runner. Le correzioni security restano, con modalità server esplicita `legacy-unexpanded` e verifica dello schema anche nelle scritture finali. Le sezioni seguenti documentano la precedente implementazione con espansione; stato attuale e prova gestita nel [rapporto di preparazione](W8A-RELEASE-PREPARATION.md). Non confondere rollback del Worker e restore DB.
+Il candidato corrente supporta lo schema Sites 39 invariato senza bootstrap; 0007 e snapshot erano conservati in `operations/w8a/deferred-expansion/`, fuori dal runner; dal 17 novembre 2026 sono in `drizzle/` sul branch W8-B ([piano](W8B-PIANO-CLOUDFLARE.md)). Le correzioni security restano, con modalità server esplicita `legacy-unexpanded` e verifica dello schema anche nelle scritture finali. Le sezioni seguenti documentano la precedente implementazione con espansione; stato attuale e prova gestita nel [rapporto di preparazione](W8A-RELEASE-PREPARATION.md). Non confondere rollback del Worker e restore DB.
 
 ## Risultato e perimetro
 
@@ -16,7 +16,7 @@ Un solo writer; revisione separata in sola lettura con **gpt-6.1-sol / high**, c
 
 ## Comportamento implementato
 
-- [0007](../../operations/w8a/deferred-expansion/0007_auth_compatibility.sql) aggiunge otto tabelle auth e `accounts.auth_operation_id`, senza modificare 0000–0006 o ricreare accounts. La revisione operativa successiva rende la 0007 solo schema: inizializzazione separata e backfill esplicito opzionale fuori dalle migrazioni, come descritto nel [runbook](../../operations/w8a/RUNBOOK.md). La copia preserva gli hash byte per byte e non serve per autenticare in legacy. Schema e snapshot Drizzle aggiornati; 23 tabelle e 8 migrazioni nel sorgente, non una dichiarazione sul DB remoto.
+- [0007](../../drizzle/0007_auth_compatibility.sql) aggiunge otto tabelle auth e `accounts.auth_operation_id`, senza modificare 0000–0006 o ricreare accounts. La revisione operativa successiva rende la 0007 solo schema: inizializzazione separata e backfill esplicito opzionale fuori dalle migrazioni, come descritto nel [runbook](../../operations/w8a/RUNBOOK.md). La copia preserva gli hash byte per byte e non serve per autenticare in legacy. Schema e snapshot Drizzle aggiornati; 23 tabelle e 8 migrazioni nel sorgente, non una dichiarazione sul DB remoto.
 - [AuthRepository](../../lib/server/auth-repository.ts) riconosce solo schema 7/legacy o 8/credentials. Stato assente, ignoto o paused fallisce chiuso. In legacy tutte le operazioni usano esclusivamente accounts: nuove registrazioni/reset/password possono rendere la copia obsoleta e non la rendono mai autorevole. Non esistono writer bidirezionali.
 - In credentials le query non citano le colonne segrete di accounts. Registrazione account+credenziale è atomica; credenziale assente non abilita password né recovery. Il KDF dummy rimane sul login e sulla verifica security senza password.
 - I trigger DB fermano anche writer già oltre il controllo applicativo quando auth è paused. Sono inclusi DELETE di inviti e diari, perché il vecchio security handler poteva aver già avviato quel batch. La pausa può quindi impedire anche la cancellazione di una classe con inviti: è una finestra operativa da pianificare.

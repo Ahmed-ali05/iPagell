@@ -1,4 +1,5 @@
 import { HttpError } from "./http";
+import { NO_PASSWORD } from "./password";
 
 export type AuthMode = "legacy-unexpanded" | "legacy" | "credentials";
 
@@ -89,6 +90,65 @@ export class AuthRepository {
         .bind(passwordHash, recoveryHash, Date.now(), account.id, account.id, account.auth_version + 1, operationId),
     ]);
     return results[0].results.length === 1;
+  }
+
+  // --- Google sign-in (legacy mode only: identities need the 0007 expansion) ---
+
+  async createOAuthTransaction(input: { id: string; stateHash: string; bindingHash: string; nonce: string; redirectUri: string; expiresAt: number }, mode: AuthMode) {
+    if (mode !== "legacy") throw new HttpError(503, "Accesso con Google non disponibile.", "AUTH_UNAVAILABLE");
+    const now = Date.now();
+    const [, inserted] = await this.db.batch([
+      this.db.prepare(`DELETE FROM auth_transactions WHERE expires_at<? AND ${this.gate(mode)}`).bind(now),
+      // At most 3 pending transactions per browser binding.
+      this.db.prepare(`INSERT INTO auth_transactions(id,state_hash,binding_hash,browser_epoch,provider,purpose,nonce,redirect_uri,status,expires_at)
+        SELECT ?,?,?,0,'google','login',?,?,'pending',? WHERE ${this.gate(mode)}
+        AND (SELECT count(*) FROM auth_transactions WHERE binding_hash=? AND status='pending' AND expires_at>?)<3 RETURNING id`)
+        .bind(input.id, input.stateHash, input.bindingHash, input.nonce, input.redirectUri, input.expiresAt, input.bindingHash, now),
+    ]);
+    return inserted.results.length === 1;
+  }
+
+  // Single winner: only one callback can move a pending transaction to processing.
+  async claimOAuthTransaction(stateHash: string, bindingHash: string, mode: AuthMode) {
+    if (mode !== "legacy") return null;
+    return this.db.prepare(`UPDATE auth_transactions SET status='processing'
+      WHERE state_hash=? AND binding_hash=? AND provider='google' AND purpose='login' AND status='pending' AND expires_at>? AND ${this.gate(mode)}
+      RETURNING id,nonce,redirect_uri`)
+      .bind(stateHash, bindingHash, Date.now()).first<{ id: string; nonce: string; redirect_uri: string }>();
+  }
+
+  async failOAuthTransaction(id: string) {
+    await this.db.prepare("UPDATE auth_transactions SET status='failed' WHERE id=? AND status IN ('pending','processing')").bind(id).run().catch(() => undefined);
+  }
+
+  // Consumes the transaction and creates the session in one batch. A new account
+  // and its identity are created in the same batch when the subject is unknown.
+  async finishGoogleLogin(input: { transactionId: string; issuer: string; subject: string; sessionHash: string; sessionExpiresAt: number; newAccount: { id: string; username: string } }, mode: AuthMode) {
+    if (mode !== "legacy") throw new HttpError(503, "Accesso con Google non disponibile.", "AUTH_UNAVAILABLE");
+    const operationId = crypto.randomUUID(), now = Date.now(), gate = this.gate(mode);
+    const consumed = `EXISTS(SELECT 1 FROM auth_transactions WHERE id=? AND operation_id=? AND status='consumed')`;
+    const { id, username } = input.newAccount;
+    const results = await this.db.batch([
+      this.db.prepare(`UPDATE auth_transactions SET status='consumed',operation_id=? WHERE id=? AND status='processing' AND ${gate} RETURNING id`)
+        .bind(operationId, input.transactionId),
+      this.db.prepare(`INSERT INTO accounts(id,username,password_hash,recovery_hash,auth_version,created_at)
+        SELECT ?,?,?,?,1,? WHERE ${gate} AND ${consumed}
+        AND NOT EXISTS(SELECT 1 FROM account_identities WHERE issuer=? AND subject=?)
+        ON CONFLICT(username) DO NOTHING RETURNING id`)
+        .bind(id, username, NO_PASSWORD, NO_PASSWORD, now, input.transactionId, operationId, input.issuer, input.subject),
+      this.db.prepare(`INSERT INTO account_identities(id,account_id,provider,issuer,subject,status,created_at)
+        SELECT ?,?,'google',?,?,'active',? WHERE ${gate} AND ${consumed}
+        AND EXISTS(SELECT 1 FROM accounts WHERE id=? AND username=?)
+        AND NOT EXISTS(SELECT 1 FROM account_identities WHERE issuer=? AND subject=?)`)
+        .bind(crypto.randomUUID(), id, input.issuer, input.subject, now, input.transactionId, operationId, id, username, input.issuer, input.subject),
+      this.db.prepare(`INSERT INTO sessions(token_hash,user_id,auth_version,expires_at)
+        SELECT ?,a.id,a.auth_version,? FROM account_identities i JOIN accounts a ON a.id=i.account_id
+        WHERE i.issuer=? AND i.subject=? AND i.provider='google' AND i.status='active' AND ${gate} AND ${consumed} RETURNING user_id`)
+        .bind(input.sessionHash, input.sessionExpiresAt, input.issuer, input.subject, input.transactionId, operationId),
+    ]);
+    const session = results[3].results[0] as { user_id: string } | undefined;
+    if (!session) return null;
+    return { userId: session.user_id, created: results[1].results.length === 1 };
   }
 
   async deleteAccount(account: PasswordAccount, mode: AuthMode, sessionHash: string) {

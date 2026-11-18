@@ -9,7 +9,7 @@ import { flushOpenNotes } from "@/lib/notes/flush";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import styles from "@/app/public-space.module.css";
 
-export type PublicSection = "home" | "diary" | "notes" | "average";
+export type PublicSection = "home" | "diary" | "notes" | "average" | "legal";
 
 /** Flush the current editor before client navigation; keep recovery explicit. */
 export function PublicLink({ href, children, className, current }: { href: string; children: ReactNode; className?: string; current?: boolean }) {
@@ -58,5 +58,5 @@ export function PublicHeader({ current }: { current: PublicSection }) {
 
 export function PublicFooter() {
   const { t } = useI18n();
-  return <footer className={styles.footer}><span>iPagell<span className={styles.brandDot}>.</span></span><p>{t("landing.footer")}</p><a href="https://github.com/Ahmed-ali05/iPagell" target="_blank" rel="noopener noreferrer">GitHub <ArrowUpRight size={14} aria-hidden="true" /></a></footer>;
+  return <footer className={styles.footer}><span>iPagell<span className={styles.brandDot}>.</span></span><p>{t("landing.footer")}</p><PublicLink href="/legale">{t("legal.footerLink")}</PublicLink><a href="https://github.com/Ahmed-ali05/iPagell" target="_blank" rel="noopener noreferrer">GitHub <ArrowUpRight size={14} aria-hidden="true" /></a></footer>;
 }

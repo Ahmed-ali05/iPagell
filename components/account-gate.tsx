@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowLeft } from "lucide-react";
 import { publicLandingPaths } from "@/lib/i18n/public-routes";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
@@ -45,12 +45,61 @@ export function AccountGate({
   } | null>(null);
   const [saved, setSaved] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [googleReady, setGoogleReady] = useState(false);
   const year = new Date().getFullYear() - (new Date().getMonth() < 7 ? 1 : 0);
+  useEffect(() => {
+    if (user) return;
+    // Outcome of a returning Google redirect; the flag is removed from the address.
+    const url = new URL(window.location.href);
+    const outcome = url.searchParams.get("accesso");
+    const returned: MessageKey | null = outcome === "google-error" ? "auth.googleFailed" : outcome === "google-cancelled" ? "auth.googleCancelled" : null;
+    if (outcome) {
+      url.searchParams.delete("accesso");
+      window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    }
+    let active = true;
+    fetch("/api/auth/providers", { credentials: "same-origin", cache: "no-store" })
+      .then((response) => (response.ok ? response.json() as Promise<{ google?: boolean }> : null))
+      .catch(() => null)
+      .then((result) => {
+        if (!active) return;
+        setGoogleReady(result?.google === true);
+        if (returned) setError(returned);
+      });
+    return () => { active = false; };
+  }, [user]);
+  async function startGoogle() {
+    if (busyRef.current) return;
+    setError(null);
+    busyRef.current = true;
+    setBusy(true);
+    try {
+      const response = await fetch("/api/auth/oauth/google/start", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ageConfirmed: true }),
+      });
+      const result = (await response.json()) as { url?: string; error?: string; code?: string };
+      if (!response.ok || typeof result.url !== "string" || !result.url.startsWith("https://accounts.google.com/"))
+        throw new RequestError(response.status, result.error ?? "Accesso non riuscito", result.code);
+      // Stay busy: the browser is leaving for Google.
+      window.location.assign(result.url);
+    } catch (e) {
+      setError(e instanceof RequestError ? apiErrorKey(e.code, "auth.googleFailed") : e instanceof TypeError ? "auth.network" : "auth.googleFailed");
+      busyRef.current = false;
+      setBusy(false);
+    }
+  }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busyRef.current) return;
     setError(null);
-    const fields = Object.fromEntries(new FormData(event.currentTarget));
+    const formFields = Object.fromEntries(new FormData(event.currentTarget));
+    const fields: Record<string, FormDataEntryValue | boolean> = !user && mode === "register"
+      ? { ...formFields, ageConfirmed: formFields.ageConfirmed === "on" }
+      : formFields;
     const parsed = (
       user
         ? registerSchema
@@ -199,6 +248,20 @@ export function AccountGate({
             {error && <p className="form-error" role="alert">{t(error)}</p>}
           </div>
         ) : (
+          <>
+          {!user && mode !== "recover" && googleReady && (
+            <div className="oauth-entry">
+              <button type="button" className="soft-button oauth-button" disabled={busy} onClick={() => void startGoogle()}>
+                <GoogleMark />
+                {t("auth.continueGoogle")}
+              </button>
+              <p className="account-note oauth-consent">
+                {t("auth.googleConsent")}{" "}
+                <a href="/legale" target="_blank" rel="noopener noreferrer">{t("legal.footerLink")}</a>
+              </p>
+              <p className="oauth-divider"><span>{t("auth.orUsername")}</span></p>
+            </div>
+          )}
           <form onSubmit={submit} key={user?.id ?? mode}>
             <fieldset disabled={busy} className="form-grid">
               {user ? (
@@ -330,6 +393,15 @@ export function AccountGate({
                       {t("auth.noEmail")}
                     </p>
                   )}
+                  {mode === "register" && (
+                    <label className="account-consent full">
+                      <input type="checkbox" name="ageConfirmed" required />
+                      <span>
+                        {t("auth.ageConfirm")}{" "}
+                        <a href="/legale" target="_blank" rel="noopener noreferrer">{t("legal.footerLink")}</a>
+                      </span>
+                    </label>
+                  )}
                 </>
               )}
             </fieldset>
@@ -390,8 +462,21 @@ export function AccountGate({
               </div>
             )}
           </form>
+          </>
         )}
       </section>
     </main>
+  );
+}
+
+// Google's standard "G" mark, as its branding guidelines require next to the label.
+function GoogleMark() {
+  return (
+    <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+    </svg>
   );
 }

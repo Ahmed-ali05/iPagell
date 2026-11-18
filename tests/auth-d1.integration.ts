@@ -7,7 +7,7 @@ import { DUMMY_HASH, hashPassword, verifyPassword } from "../lib/server/password
 
 // Real local D1 via the Worker binding. Avoid Miniflare 5's blocking Node proxy.
 // No persistence, remote database, application listener or user data.
-async function fixture(expand = true) {
+async function fixture(expand = true, bootstrap = false) {
   const options = convertV4MiniflareOptions({ name: "auth-test", modules: true, cf: false,
     compatibilityDate: "2026-09-16", d1Databases: { DB: "auth-synthetic" },
     script: `export default {async fetch(request,env) {
@@ -36,7 +36,7 @@ async function fixture(expand = true) {
   const db = { prepare, batch } as unknown as D1Database;
   const auth = new AuthRepository(db);
   async function migrate(name: string) {
-    const sql = await readFile(new URL(`../${name.startsWith("0007_") ? "operations/w8a/deferred-expansion" : "drizzle"}/${name}`, import.meta.url), "utf8");
+    const sql = await readFile(new URL(`../drizzle/${name}`, import.meta.url), "utf8");
     await batch(sql.split("--> statement-breakpoint").map(sql => ({ sql: sql.trim(), args: [] })).filter(s => s.sql));
   }
   try {
@@ -50,7 +50,8 @@ async function fixture(expand = true) {
     await db.prepare("INSERT INTO class_invites(id,class_id,secret_hash,created_by,created_at) VALUES('invite','class','invite-digest','a',1)").run();
     await db.prepare("INSERT INTO personal_notes(id,user_id,subject_id,subject_name,title,content,byte_size,last_mutation_id,created_at,updated_at) VALUES('note','a','s','S','T','synthetic',9,'mutation',1,1)").run();
     if (expand) await migrate("0007_auth_compatibility.sql");
-    return { db, auth, dispose: () => mf.dispose() };
+    if (bootstrap) await migrate("0008_auth_bootstrap_legacy.sql");
+    return { db, auth, migrate, dispose: () => mf.dispose() };
   } catch (error) { await mf.dispose(); throw error; }
 }
 
@@ -181,6 +182,35 @@ test("W8-A real D1: expansion, authority, fences, CAS and compatible contracted 
   } finally {await dispose();}
 });
 
+test("W8-B Cloudflare: drizzle 0007+0008 open legacy mode with existing data intact",async t=>{
+  const {db,auth,migrate,dispose}=await fixture(true,true);
+  try {
+    await t.test("bootstrap migration selects legacy and keeps existing hashes and data",async()=>{
+      assert.equal(await auth.mode(),"legacy");
+      assert.equal((await auth.find("legacy","legacy"))?.password_hash,DUMMY_HASH);
+      assert.equal(await db.prepare("SELECT account_id FROM account_credentials").first(),null);
+      assert.equal((await db.prepare("SELECT payload FROM diaries WHERE user_id='a'").first<{payload:string}>())?.payload,"synthetic diary");
+      assert.deepEqual((await db.prepare("PRAGMA foreign_key_check").all()).results,[]);
+    });
+    await t.test("register, password change and delete work after the migration run",async()=>{
+      assert.equal(await auth.register("w8b","w8b",DUMMY_HASH,"recovery-w8b","legacy"),true);
+      assert.equal(await auth.register("w8b-dup","w8b",DUMMY_HASH,"x","legacy"),false);
+      const a=(await auth.find("legacy","legacy"))!;
+      assert.equal(await auth.replacePassword(a,DUMMY_HASH,"recovery-w8b-a","legacy","session-a"),true);
+      const updated=(await auth.find("legacy","legacy"))!;
+      await db.prepare("INSERT INTO sessions VALUES('current-w8b','a',?,?)").bind(updated.auth_version,Date.now()+60000).run();
+      assert.equal(await auth.deleteAccount(updated,"legacy","current-w8b"),true);
+      assert.equal(await db.prepare("SELECT id FROM accounts WHERE id='a'").first(),null);
+      assert.ok(await db.prepare("SELECT id FROM accounts WHERE id='b'").first());
+    });
+    await t.test("re-running the bootstrap fails instead of reopening another state",async()=>{
+      await db.prepare("UPDATE auth_schema_state SET write_mode='paused'").run();
+      await assert.rejects(migrate("0008_auth_bootstrap_legacy.sql"));
+      await assert.rejects(auth.mode());
+    });
+  } finally {await dispose();}
+});
+
 test("W8-A security release supports the unchanged Sites 39 schema without bootstrap",async t=>{
   const {db,auth,dispose}=await fixture(false);
   try {
@@ -219,6 +249,77 @@ test("W8-A security release supports the unchanged Sites 39 schema without boots
       await db.prepare("ALTER TABLE accounts ADD auth_operation_id TEXT").run();
       await assert.rejects(auth.mode());
       assert.equal(await auth.register("partial6","partial6",DUMMY_HASH,"x","legacy-unexpanded"),false);
+    });
+  }finally{await dispose();}
+});
+
+test("Google sign-in: single-winner transactions, passwordless accounts and identity reuse",async t=>{
+  const {db,auth,dispose}=await fixture(true,true);
+  const issuer="https://accounts.google.com";
+  const tx=async(id:string,binding="bind-1",ttl=60000)=>auth.createOAuthTransaction({id,stateHash:`state-${id}`,bindingHash:binding,
+    nonce:`nonce-${id}`,redirectUri:"https://ipagell.website/api/auth/oauth/google/callback",expiresAt:Date.now()+ttl},"legacy");
+  const finish=(transactionId:string,subject:string,session:string,newId:string,username:string)=>auth.finishGoogleLogin({transactionId,issuer,subject,
+    sessionHash:session,sessionExpiresAt:Date.now()+60000,newAccount:{id:newId,username}},"legacy");
+  try{
+    await t.test("Google needs the expanded legacy schema",async()=>{
+      await assert.rejects(auth.createOAuthTransaction({id:"x",stateHash:"x",bindingHash:"x",nonce:"x",redirectUri:"x",expiresAt:1},"legacy-unexpanded"));
+      assert.equal(await auth.claimOAuthTransaction("x","x","credentials"),null);
+    });
+    await t.test("a transaction is claimed once, only by its browser and before expiry",async()=>{
+      assert.equal(await tx("t1"),true);
+      assert.equal(await auth.claimOAuthTransaction("state-t1","bind-other","legacy"),null,"other browser");
+      const claimed=await auth.claimOAuthTransaction("state-t1","bind-1","legacy");
+      assert.deepEqual([claimed?.id,claimed?.nonce],["t1","nonce-t1"]);
+      assert.equal(await auth.claimOAuthTransaction("state-t1","bind-1","legacy"),null,"replayed state");
+      assert.equal(await tx("t-old","bind-1",-1),true);
+      assert.equal(await auth.claimOAuthTransaction("state-t-old","bind-1","legacy"),null,"expired");
+    });
+    await t.test("at most three pending transactions per browser",async()=>{
+      assert.equal(await tx("p1","bind-2"),true);assert.equal(await tx("p2","bind-2"),true);assert.equal(await tx("p3","bind-2"),true);
+      assert.equal(await tx("p4","bind-2"),false);
+      assert.equal(await tx("q1","bind-3"),true,"other browsers are unaffected");
+    });
+    await t.test("first sign-in creates account, identity and session atomically",async()=>{
+      const result=await finish("t1","sub-1","g-session-1","g1","u_aaaaaaaaaaaaaaaaaaaaaaaaaa");
+      assert.deepEqual(result,{userId:"g1",created:true});
+      const row=await db.prepare("SELECT username,password_hash,recovery_hash,auth_version FROM accounts WHERE id='g1'").first();
+      assert.deepEqual(row,{username:"u_aaaaaaaaaaaaaaaaaaaaaaaaaa",password_hash:"none$google",recovery_hash:"none$google",auth_version:1});
+      assert.ok(await db.prepare("SELECT 1 FROM account_identities WHERE account_id='g1' AND issuer=? AND subject='sub-1' AND status='active'").bind(issuer).first());
+      assert.ok(await db.prepare("SELECT 1 FROM sessions WHERE token_hash='g-session-1' AND user_id='g1'").first());
+      assert.equal((await db.prepare("SELECT status FROM auth_transactions WHERE id='t1'").first<{status:string}>())?.status,"consumed");
+      assert.equal(await auth.find("u_aaaaaaaaaaaaaaaaaaaaaaaaaa","legacy").then(a=>verifyPassword("none$google",a!.password_hash!)),false,"no password login");
+    });
+    await t.test("a consumed transaction cannot finish twice",async()=>{
+      assert.equal(await finish("t1","sub-1","g-session-dup","g-dup","u_dupdupdupdupdupdupdupdupdu"),null);
+      assert.equal(await db.prepare("SELECT 1 FROM sessions WHERE token_hash='g-session-dup'").first(),null);
+      assert.equal(await db.prepare("SELECT 1 FROM accounts WHERE id='g-dup'").first(),null);
+    });
+    await t.test("the same subject signs in to the same account without a new one",async()=>{
+      await auth.claimOAuthTransaction("state-p1","bind-2","legacy");
+      assert.deepEqual(await finish("p1","sub-1","g-session-2","g-new","u_bbbbbbbbbbbbbbbbbbbbbbbbbb"),{userId:"g1",created:false});
+      assert.equal(await db.prepare("SELECT 1 FROM accounts WHERE id='g-new'").first(),null);
+      assert.equal((await db.prepare("SELECT count(*) AS n FROM account_identities").first<{n:number}>())?.n,1);
+    });
+    await t.test("a handle collision creates nothing and no session",async()=>{
+      await auth.claimOAuthTransaction("state-p2","bind-2","legacy");
+      assert.equal(await finish("p2","sub-2","g-session-3","g2","legacy"),null);
+      assert.equal(await db.prepare("SELECT 1 FROM account_identities WHERE subject='sub-2'").first(),null);
+      assert.equal(await db.prepare("SELECT 1 FROM sessions WHERE token_hash='g-session-3'").first(),null);
+    });
+    await t.test("a disabled identity gets no session and no replacement account",async()=>{
+      await db.prepare("UPDATE account_identities SET status='disabled' WHERE subject='sub-1'").run();
+      await auth.claimOAuthTransaction("state-p3","bind-2","legacy");
+      assert.equal(await finish("p3","sub-1","g-session-4","g3","u_cccccccccccccccccccccccccc"),null);
+      assert.equal(await db.prepare("SELECT 1 FROM accounts WHERE id='g3'").first(),null);
+      await db.prepare("UPDATE account_identities SET status='active' WHERE subject='sub-1'").run();
+    });
+    await t.test("deleting a Google account removes its identity, so the subject can start over",async()=>{
+      const account=(await auth.find("u_aaaaaaaaaaaaaaaaaaaaaaaaaa","legacy"))!;
+      assert.equal(await auth.deleteAccount(account,"legacy","g-session-1"),true);
+      assert.equal(await db.prepare("SELECT 1 FROM account_identities WHERE subject='sub-1'").first(),null);
+      assert.equal(await db.prepare("SELECT 1 FROM sessions WHERE user_id='g1'").first(),null);
+      assert.ok(await db.prepare("SELECT 1 FROM accounts WHERE id='a'").first(),"legacy accounts untouched");
+      assert.deepEqual((await db.prepare("PRAGMA foreign_key_check").all()).results,[]);
     });
   }finally{await dispose();}
 });

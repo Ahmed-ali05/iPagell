@@ -6,15 +6,18 @@ import { apiErrorKey } from "@/lib/i18n/errors";
 import type { MessageKey } from "@/lib/i18n";
 export function AccountSecurity({
   username,
+  passwordless = false,
   disabled,
   onSubmit,
 }: {
   username: string;
+  /** Google accounts: no password to change; deletion needs a recent sign-in. */
+  passwordless?: boolean;
   disabled: boolean;
   onSubmit: (operation:"password"|"delete", fields: Record<string, FormDataEntryValue>) => Promise<void>;
 }) {
   const { t } = useI18n();
-  const [mode, setMode] = useState<"password" | "delete">("password"),
+  const [mode, setMode] = useState<"password" | "delete">(passwordless ? "delete" : "password"),
     [busy, setBusy] = useState(false),
     [error, setError] = useState<MessageKey | null>(null);
   const busyRef = useRef(false);
@@ -38,9 +41,9 @@ export function AccountSecurity({
     <details className="security-settings">
       <summary>{t("security.title")}</summary>
       <p>
-        {t("security.passwordHint")}
+        {passwordless ? t("security.googleHint") : t("security.passwordHint")}
       </p>
-      <div className="auth-links">
+      {!passwordless && <div className="auth-links">
         <button
           type="button"
           className="soft-button"
@@ -61,7 +64,7 @@ export function AccountSecurity({
         >
           {t("security.deleteAccount")}
         </button>
-      </div>
+      </div>}
       {disabled && (
         <p>
           {t("security.pendingChanges")}
@@ -69,7 +72,7 @@ export function AccountSecurity({
       )}
       <form onSubmit={submit} key={mode}>
         <fieldset disabled={disabled || busy} className="form-grid">
-          <label className="full">
+          {!passwordless && <label className="full">
             {t("security.currentPassword")}
             <input
               name="currentPassword"
@@ -78,7 +81,7 @@ export function AccountSecurity({
               maxLength={128}
               required
             />
-          </label>
+          </label>}
           {mode === "password" ? (
             <label className="full">
               {t("security.newPassword")}

@@ -7,8 +7,8 @@ import {
   json,
   readJson,
 } from "@/lib/server/http";
-import { DUMMY_HASH, hashPassword, verifyPassword } from "@/lib/server/password";
-import { identity, rateLimit, sessionCookie, sessionTokenHash } from "@/lib/server/auth";
+import { DUMMY_HASH, NO_PASSWORD, hashPassword, verifyPassword } from "@/lib/server/password";
+import { identity, rateLimit, sessionAgeSeconds, sessionCookie, sessionTokenHash } from "@/lib/server/auth";
 import { AuthRepository } from "@/lib/server/auth-repository";
 export const dynamic = "force-dynamic";
 const schema = z.discriminatedUnion("operation", [
@@ -24,7 +24,8 @@ const schema = z.discriminatedUnion("operation", [
     .object({
       operation: z.literal("delete"),
       expectedUserId: z.string().max(100),
-      currentPassword: z.string().min(1).max(128),
+      // Absent for Google accounts, which prove a recent sign-in instead.
+      currentPassword: z.string().min(1).max(128).optional(),
       confirmation: z.string().max(32),
     })
     .strict(),
@@ -53,9 +54,20 @@ export async function POST(request: Request) {
     const mode = await auth.mode();
     const account = await auth.find(user.username, mode);
     const sessionHash = sessionTokenHash(request);
-    const valid = await verifyPassword(input.currentPassword, account?.password_hash ?? DUMMY_HASH);
-    if (!account || !account.password_hash || !sessionHash || !valid)
-      return json({ error: "Password non valida.", code: "SECURITY_INVALID_PASSWORD" }, 401);
+    if (account && sessionHash && account.password_hash === NO_PASSWORD) {
+      // Google account: no password to change; deletion needs a sign-in from the last 10 minutes.
+      if (input.operation === "password")
+        return json({ error: "Questo account accede con Google e non ha una password.", code: "SECURITY_NO_PASSWORD" }, 400);
+      const age = await sessionAgeSeconds(request);
+      if (age === null || age > 10 * 60)
+        return json({ error: "Per sicurezza esci e accedi di nuovo con Google, poi riprova.", code: "SECURITY_REAUTH_REQUIRED" }, 401);
+    } else {
+      const valid = await verifyPassword(input.currentPassword ?? "", account?.password_hash ?? DUMMY_HASH);
+      if (!account || !account.password_hash || !sessionHash || !valid)
+        return json({ error: "Password non valida.", code: "SECURITY_INVALID_PASSWORD" }, 401);
+    }
+    if (!account || !sessionHash)
+      return json({ error: "Accedi di nuovo.", code: "SECURITY_SESSION_REQUIRED" }, 401);
     if (input.operation === "password") {
       const hash = await hashPassword(input.newPassword);
       const changed = await auth.replacePassword(account, hash, account.recovery_hash, mode, sessionHash);

@@ -54,7 +54,7 @@ Puoi eliminare l’account verificando l’accesso; se possiedi una classe, il p
 
 Puoi chiedere informazioni e accesso ai tuoi dati, correzione, cancellazione e gli altri diritti previsti nel tuo caso, compresa la consegna o trasmissione dei dati quando applicabile. La verifica del richiedente deve essere proporzionata. Per il diritto d’accesso svizzero il riscontro è in linea di principio gratuito entro 30 giorni. Puoi rivolgerti anche all’[IFPDT](https://www.edoeb.admin.ch/it).
 
-iPagell si rivolge a studenti dai **13 anni**, nel rispetto di eventuali soglie superiori applicabili e del coinvolgimento del rappresentante legale quando necessario. Se qualcosa non è chiaro, chiedi aiuto a un adulto prima di condividere dati.
+iPagell si rivolge a studenti dai **14 anni**. Prima di questa età serve l’autorizzazione di un genitore o di chi ha la responsabilità genitoriale; la registrazione chiede di confermarlo. Se qualcosa non è chiaro, chiedi aiuto a un adulto prima di condividere dati.
 
 ## Note interne — da non pubblicare
 

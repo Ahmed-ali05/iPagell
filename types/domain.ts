@@ -77,6 +77,8 @@ export interface Preferences {
 export interface AccountIdentity {
   id: string;
   username: string;
+  /** How the account signs in; absent in older cached identities. */
+  method?: "password" | "google";
 }
 export interface DiarySnapshot {
   data: SchoolData;

@@ -416,7 +416,8 @@ function EntryForm({
             </label>
             <label>
               {t("entry.note")}
-              <input name="note" maxLength={4000} />
+              <input name="note" maxLength={4000} aria-describedby="absence-note-hint" />
+              <small id="absence-note-hint">{t("absence.noteHint")}</small>
             </label>
           </>
         )}

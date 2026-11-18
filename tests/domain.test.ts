@@ -166,7 +166,8 @@ test("new passwords accept 12 characters and retain upper and repetition limits"
     const password = "Ab".repeat(Math.ceil(length / 2)).slice(0, length);
     const accepted = length >= 12 && length <= 128;
     assert.equal(passwordSchema.safeParse(password).success, accepted);
-    assert.equal(signupSchema.safeParse({ username: "test_user", password }).success, accepted);
+    assert.equal(signupSchema.safeParse({ username: "test_user", password, ageConfirmed: true }).success, accepted);
+    assert.equal(signupSchema.safeParse({ username: "test_user", password }).success, false);
     assert.equal(recoverySchema.safeParse({ username: "test_user", password, recoveryCode: "a".repeat(64) }).success, accepted);
   }
   assert.equal(passwordSchema.safeParse("a".repeat(12)).success, false);

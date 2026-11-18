@@ -110,7 +110,7 @@ try{
     INSERT INTO class_notes(id,class_id,class_name,author_id,author_name,subject_id,subject_name,title,content,byte_size,last_mutation_id,created_at,updated_at) VALUES('synthetic-shared','synthetic-class','Restore class','synthetic-a','A','synthetic-subject','S','T','shared sentinel',15,'synthetic-shared-mutation',1,1);
     INSERT INTO class_note_pins VALUES('synthetic-shared','synthetic-a');`);
   const legacy=await checkpoint(source,"legacy-restore");
-  await sql(source,await readFile(path.join(root,"operations/w8a/deferred-expansion/0007_auth_compatibility.sql"),"utf8"));
+  await sql(source,await readFile(path.join(root,"drizzle/0007_auth_compatibility.sql"),"utf8"));
   await sql(source,await readFile(path.join(root,"operations/w8a/initialize-legacy.sql"),"utf8"));
   // Backfill is unnecessary for W8-A. Exercise its actual bounded SQL explicitly.
   const backfill=await readFile(path.join(root,"operations/w8a/backfill-legacy.sql"),"utf8");

@@ -1,0 +1,14 @@
+/* Testi legali: lettura lunga su superficie solida, tipografia del sito pubblico. */
+.document { max-width:760px; margin-inline:auto; padding:32px clamp(20px,4vw,48px); background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-card); box-shadow:var(--shadow-card); font-size:1rem; line-height:1.65; }
+.document h1 { margin:0 0 8px; font-size:clamp(1.75rem,3.5vw,2.25rem); line-height:1.15; letter-spacing:-.02em; }
+.document h2 { margin:40px 0 8px; padding-top:24px; border-top:1px solid var(--line); font-size:1.375rem; line-height:1.25; letter-spacing:-.01em; scroll-margin-top:24px; }
+.document h3 { margin:24px 0 4px; font-size:1.0625rem; line-height:1.35; }
+.document p, .document ul { margin:0 0 12px; }
+.document ul { padding-left:1.25rem; }
+.document li + li { margin-top:6px; }
+.document a { color:var(--accent); }
+.meta { color:var(--subtle); font-size:.875rem; margin:0 0 20px; }
+.toc { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 8px; padding:0; list-style:none; }
+.toc a { display:inline-flex; align-items:center; min-height:44px; padding:0 14px; border-radius:var(--radius-control); background:var(--accent-soft); color:var(--accent); font-weight:600; font-size:.9375rem; text-decoration:none; }
+.document .toc li + li { margin-top:0; }
+@media (max-width:640px) { .document { padding:24px 16px; border-radius:16px; } }

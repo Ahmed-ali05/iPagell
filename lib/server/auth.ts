@@ -1,10 +1,10 @@
 import { database } from "./db";
 import { HttpError } from "./http";
-import { randomToken, tokenHash } from "./password";
+import { NO_PASSWORD, randomToken, tokenHash } from "./password";
 import { AuthRepository, authWriteGate, type AuthMode } from "./auth-repository";
 import type { AccountIdentity } from "@/types/domain";
 
-const TTL = 14 * 24 * 60 * 60;
+export const TTL = 14 * 24 * 60 * 60;
 function cookieName(request: Request) {
   return new URL(request.url).protocol === "https:"
     ? "__Host-ipagell-session"
@@ -36,10 +36,18 @@ export async function identity(
   if (!token) return null;
   return database()
     .prepare(
-      `SELECT a.id, a.username FROM sessions s JOIN accounts a ON a.id=s.user_id AND a.auth_version=s.auth_version WHERE s.token_hash=? AND s.expires_at>?`,
+      `SELECT a.id, a.username, CASE WHEN a.password_hash=? THEN 'google' ELSE 'password' END AS method FROM sessions s JOIN accounts a ON a.id=s.user_id AND a.auth_version=s.auth_version WHERE s.token_hash=? AND s.expires_at>?`,
     )
-    .bind(tokenHash(token), Date.now())
+    .bind(NO_PASSWORD, tokenHash(token), Date.now())
     .first<AccountIdentity>();
+}
+// Seconds since the current session was issued (sessions have a fixed TTL).
+export async function sessionAgeSeconds(request: Request) {
+  const token = readToken(request);
+  if (!token) return null;
+  const row = await database().prepare("SELECT expires_at FROM sessions WHERE token_hash=?")
+    .bind(tokenHash(token)).first<{ expires_at: number }>();
+  return row ? (Date.now() - (row.expires_at - TTL * 1000)) / 1000 : null;
 }
 export async function issueSession(
   request: Request,

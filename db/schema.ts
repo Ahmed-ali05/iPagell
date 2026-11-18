@@ -15,6 +15,7 @@ export const accounts = sqliteTable("accounts", {
   passwordHash: text("password_hash").notNull(),
   recoveryHash: text("recovery_hash").notNull(),
   authVersion: integer("auth_version").notNull().default(1),
+  authOperationId: text("auth_operation_id"),
   createdAt: integer("created_at").notNull(),
 });
 export const sessions = sqliteTable(
@@ -221,3 +222,62 @@ export const classNotePins = sqliteTable("class_note_pins", {
   noteId: text("note_id").notNull().references(() => classNotes.id, { onDelete: "cascade" }),
   userId: text("user_id").notNull().references(() => accounts.id, { onDelete: "cascade" }),
 }, (t) => [primaryKey({ columns: [t.noteId, t.userId] })]);
+
+// W8-A expansion: reserved protocol tables remain unused until their rollout gates.
+export const authSchemaState = sqliteTable("auth_schema_state", {
+  id: integer("id").primaryKey(),
+  schemaVersion: integer("schema_version").notNull(),
+  writeMode: text("write_mode", { enum: ["legacy", "credentials", "paused"] }).notNull(),
+}, t => [check("auth_schema_singleton", sql`${t.id}=1`),
+  check("auth_schema_mode", sql`${t.writeMode} IN ('legacy','credentials','paused')`)]);
+export const accountCredentials = sqliteTable("account_credentials", {
+  accountId: text("account_id").primaryKey().references(() => accounts.id, { onDelete: "cascade" }),
+  passwordHash: text("password_hash").notNull(),
+  recoveryHash: text("recovery_hash"),
+  updatedAt: integer("updated_at").notNull(),
+});
+export const accountIdentities = sqliteTable("account_identities", {
+  id: text("id").primaryKey(),
+  accountId: text("account_id").notNull().references(() => accounts.id, { onDelete: "cascade" }),
+  provider: text("provider").notNull(), issuer: text("issuer").notNull(), subject: text("subject").notNull(),
+  status: text("status").notNull(), createdAt: integer("created_at").notNull(),
+}, t => [uniqueIndex("identities_subject_unique").on(t.issuer,t.subject),
+  uniqueIndex("identities_account_provider_unique").on(t.accountId,t.provider),
+  check("identities_provider", sql`${t.provider} IN ('google','apple')`),
+  check("identities_status", sql`${t.status} IN ('active','disabled')`)]);
+export const accountEmails = sqliteTable("account_emails", {
+  accountId: text("account_id").primaryKey().references(() => accounts.id, { onDelete: "cascade" }),
+  email: text("email").notNull(), emailKey: text("email_key").notNull().unique(),
+  verifiedAt: integer("verified_at").notNull(), status: text("status").notNull(),
+}, t => [check("emails_status", sql`${t.status} IN ('deliverable','bounced')`)]);
+export const authBrowserEpochs = sqliteTable("auth_browser_epochs", {
+  bindingHash: text("binding_hash").primaryKey(), epoch: integer("epoch").notNull(),
+  accountId: text("account_id").references(() => accounts.id, { onDelete: "set null" }),
+  operationId: text("operation_id"), expiresAt: integer("expires_at").notNull(),
+}, t => [index("browser_epochs_expiry").on(t.expiresAt)]);
+export const authTransactions = sqliteTable("auth_transactions", {
+  id: text("id").primaryKey(), stateHash: text("state_hash").notNull().unique(),
+  bindingHash: text("binding_hash").notNull(), browserEpoch: integer("browser_epoch").notNull(),
+  provider: text("provider").notNull(), purpose: text("purpose").notNull(),
+  accountId: text("account_id").references(() => accounts.id, { onDelete: "cascade" }),
+  sessionHash: text("session_hash"), authVersion: integer("auth_version"),
+  nonce: text("nonce").notNull(), pkceEncrypted: text("pkce_encrypted"), redirectUri: text("redirect_uri").notNull(),
+  status: text("status").notNull(), expiresAt: integer("expires_at").notNull(), operationId: text("operation_id"),
+}, t => [index("transactions_expiry").on(t.expiresAt), index("transactions_browser").on(t.bindingHash),
+  check("transactions_provider", sql`${t.provider} IN ('google','apple')`),
+  check("transactions_purpose", sql`${t.purpose} IN ('login','link','reauth')`),
+  check("transactions_status", sql`${t.status} IN ('pending','processing','verified','consumed','failed')`)]);
+export const authChallenges = sqliteTable("auth_challenges", {
+  tokenHash: text("token_hash").primaryKey(), purpose: text("purpose").notNull(),
+  accountId: text("account_id").references(() => accounts.id, { onDelete: "cascade" }),
+  authVersion: integer("auth_version"), email: text("email").notNull(),
+  expiresAt: integer("expires_at").notNull(), usedAt: integer("used_at"), operationId: text("operation_id"),
+}, t => [index("challenges_expiry").on(t.expiresAt),
+  check("challenges_purpose", sql`${t.purpose} IN ('verify','signup','reset')`)]);
+export const authGrants = sqliteTable("auth_grants", {
+  tokenHash: text("token_hash").primaryKey(),
+  accountId: text("account_id").notNull().references(() => accounts.id, { onDelete: "cascade" }),
+  sessionHash: text("session_hash").notNull(), authVersion: integer("auth_version").notNull(),
+  method: text("method").notNull(), operation: text("operation").notNull(), target: text("target").notNull(),
+  expiresAt: integer("expires_at").notNull(), consumedBy: text("consumed_by"),
+}, t => [index("grants_expiry").on(t.expiresAt)]);

@@ -15,12 +15,12 @@ const wrangler = resolve(root, "node_modules/wrangler/bin/wrangler.js");
 const generatedConfig = "dist/server/wrangler.json";
 
 // Un CLOUDFLARE_ENV ereditato dalla shell selezionerebbe un ambiente diverso.
-const { CLOUDFLARE_ENV: _ignored, ...inheritedEnv } = process.env;
 const env = {
-  ...inheritedEnv,
+  ...process.env,
   IPAGELL_DEPLOY_TARGET: "cloudflare",
   WRANGLER_LOG_PATH: resolve(root, ".wrangler/logs"),
 };
+delete env.CLOUDFLARE_ENV;
 
 function run(command, args, extraEnv = env) {
   const result = spawnSync(command, args, { cwd: root, env: extraEnv, stdio: "inherit" });

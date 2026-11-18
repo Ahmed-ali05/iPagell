@@ -12,7 +12,7 @@ iPagell aiuta a organizzare voti, attività, assenze e appunti. I calcoli dipend
 
 ### Età e account
 
-Il servizio si rivolge a studenti dai **13 anni**, con eventuali soglie superiori applicabili e rappresentanza legale quando necessaria. Se hai dubbi sulle condivisioni, chiedi aiuto a un adulto.
+Il servizio si rivolge a studenti dai **14 anni**. Prima di questa età serve l’autorizzazione di un genitore o di chi ha la responsabilità genitoriale; la registrazione chiede di confermarlo. Se hai dubbi sulle condivisioni, chiedi aiuto a un adulto.
 
 Puoi usare un nome utente diverso dal tuo nome reale. Proteggi password e codice di recupero e non usare account altrui. Il recupero attuale utilizza il codice dedicato, senza email associata all’account. Se non puoi più accedere e hai perso il codice, l’assistenza non può garantire di riconoscerti e ripristinare l’accesso. Non inviare le credenziali al contatto di assistenza.
 

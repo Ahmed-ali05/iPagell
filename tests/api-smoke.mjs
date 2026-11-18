@@ -59,7 +59,7 @@ function check(value, expected, label) {
 }
 async function signUp(suffix) {
   const username = prefix + suffix;
-  const r = await call("/api/auth/register", { username, password });
+  const r = await call("/api/auth/register", { username, password, ageConfirmed: true });
   check(r.status, 201, "register " + suffix);
   const account = {
     username,

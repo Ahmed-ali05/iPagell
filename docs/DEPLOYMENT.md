@@ -27,6 +27,25 @@ npm run deploy:cloudflare
 
 `deploy:cloudflare` compila con `IPAGELL_DEPLOY_TARGET=cloudflare`, verifica che la config generata in `dist/server/wrangler.json` sia quella di produzione (Worker `ipagell`, D1 `ipagell-live`), esegue un dry run, applica al D1 remoto le migrazioni non ancora applicate e pubblica il Worker con quella config. `wrangler.jsonc` dalla radice non si usa per il deploy: la sua `main` punta all'entry del binding locale. Lo staging si pubblica con `CLOUDFLARE_ENV=staging npm run build:cloudflare` seguito da `npx wrangler deploy -c dist/server/wrangler.json`, senza il passo di migrazione di produzione. Una migrazione applicata non si annulla con un rollback del codice. Richiede Node 22.23.4+ / 24.22.1+ / 26.12.1+; su questo Mac si usa `/opt/homebrew/opt/node@24/bin`.
 
+### Accesso con Google: configurazione
+
+Il pulsante resta nascosto finché il Worker non ha tre valori: `GOOGLE_REDIRECT_URI` (già in `wrangler.jsonc`, uno per produzione e uno per staging) e i due secret `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Serve anche lo schema 0007+0008, quindi in produzione prima la Fase D del [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md).
+
+1. Google Cloud Console → nuovo progetto → **Google Auth Platform**: branding (nome iPagell, email di supporto, home `https://ipagell.website`, privacy `https://ipagell.website/legale`), dominio autorizzato `ipagell.website`, pubblico «Esterno», scope solo `openid`. Finché l'app è in «Test», solo gli utenti di test aggiunti possono accedere.
+2. **Client** → tipo «Applicazione web». URI di reindirizzamento autorizzati, esatti:
+   - `https://ipagell.website/api/auth/oauth/google/callback`
+   - `https://ipagell-staging.ahmedbasto59.workers.dev/api/auth/oauth/google/callback`
+   - facoltativo per lo sviluppo: `http://localhost:5173/api/auth/oauth/google/callback`
+3. Inserire i valori senza scriverli in file del repository:
+   ```bash
+   npx wrangler secret put GOOGLE_CLIENT_ID --env staging
+   npx wrangler secret put GOOGLE_CLIENT_SECRET --env staging
+   ```
+   Per la produzione gli stessi comandi senza `--env staging`. In locale, un file `.dev.vars` (ignorato da Git) con le tre variabili e il redirect `localhost`.
+4. Verifica: `GET /api/auth/providers` deve rispondere `{"google":true}` solo sull'host del redirect. Su `www` il pulsante non compare (www reindirizza comunque all'apex).
+
+L'accesso Google non usa scrypt, quindi rientra nel limite CPU del piano Workers Free; registrazione e accesso con password no (vedi il piano W8-B).
+
 ### Backup e ripristino del D1 di produzione
 
 Il JSON di backup scaricato dagli utenti non sostituisce un backup operativo del database. Procedura manuale, da ripetere almeno una volta al mese e prima di ogni migrazione:
@@ -56,7 +75,7 @@ Il Worker indipendente configurato in `wrangler.jsonc` ha un **database separato
 
 ## Candidato W8-A — 17 ottobre 2026
 
-[Preparazione al rilascio](improvement-2026-10-01/W8A-RELEASE-PREPARATION.md): ramo isolato dalla sorgente Sites 39, gate CI D1 e verifiche locali. Nessuna pubblicazione del candidato. Il candidato corrente pubblica soltanto le correzioni security sullo schema Sites 39 invariato. La 0007 mai pubblicata e il suo snapshot sono rinviati in `operations/w8a/deferred-expansion/`, fuori dal runner Sites; bootstrap/backfill non sono necessari per questo candidato. Il [runbook](../operations/w8a/RUNBOOK.md) riguarda la futura espansione, ancora bloccata sul canale amministrativo e restore gestito. Il rollback del Worker sul medesimo DB è una prova distinta dal restore DB. Nessuna 0008 o provider inclusi.
+[Preparazione al rilascio](improvement-2026-10-01/W8A-RELEASE-PREPARATION.md): ramo isolato dalla sorgente Sites 39, gate CI D1 e verifiche locali. Nessuna pubblicazione del candidato. Il candidato corrente pubblica soltanto le correzioni security sullo schema Sites 39 invariato. La 0007 mai pubblicata e il suo snapshot sono rinviati in `operations/w8a/deferred-expansion/`, fuori dal runner Sites; bootstrap/backfill non sono necessari per questo candidato. Il [runbook](../operations/w8a/RUNBOOK.md) riguarda la futura espansione, ancora bloccata sul canale amministrativo e restore gestito. Il rollback del Worker sul medesimo DB è una prova distinta dal restore DB. Nessuna 0008 o provider inclusi. Dal 17 novembre 2026, sul branch `auth/w8b-cloudflare`, la 0007 è stata spostata in `drizzle/` con il bootstrap 0008: vedi il [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md).
 
 ## Quando modifichi il codice (flusso attuale, Cloudflare)
 

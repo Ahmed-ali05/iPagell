@@ -4,7 +4,7 @@
 
 ## Piano corrente — security senza migrazioni
 
-La ripresa successiva ad `a832119` separa il rilascio delle correzioni di sicurezza dall’espansione del DB. `db/schema.ts`, journal e SQL attivi 0000–0006 coincidono con Sites 39: **15 tabelle, 7 migrazioni, nessuna nuova migrazione**. 0007 e snapshot sono preservati byte per byte in `operations/w8a/deferred-expansion/`, fuori dal runner Sites. Nessuna 0008, cutover o provider.
+La ripresa successiva ad `a832119` separa il rilascio delle correzioni di sicurezza dall’espansione del DB. `db/schema.ts`, journal e SQL attivi 0000–0006 coincidono con Sites 39: **15 tabelle, 7 migrazioni, nessuna nuova migrazione**. 0007 e snapshot erano preservati byte per byte in `operations/w8a/deferred-expansion/`, fuori dal runner Sites. Nessuna 0008, cutover o provider. Dal 17 novembre 2026 sono in `drizzle/` sul branch `auth/w8b-cloudflare`, con il bootstrap 0008: [piano W8-B](W8B-PIANO-CLOUDFLARE.md).
 
 `AuthRepository` riconosce lo schema non espanso tramite assenza degli otto oggetti auth e forma esatta delle sei colonne di accounts; le scritture finali, inclusa emissione sessione, ripetono la guardia per rifiutare un’espansione concorrente. Non è un fallback da uno stato espanso danneggiato: oggetti residui, colonna auth_operation_id, singleton assente/ignoto/paused restano chiusi. Le correzioni CAS, sessione, cancellazione, cleanup client e redazione log restano nel rilascio.
 
