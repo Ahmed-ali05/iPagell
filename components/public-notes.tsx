@@ -23,7 +23,7 @@ export function PublicNotes() {
   }
   useEffect(() => { let active = true; void readPublicNote().then(note => { if (active) setLoaded({ note, memory: false, id: Date.now() }); }, () => { if (active) setFailed(true); }); return () => { active = false; }; }, []);
   return <div className={styles.page}><PublicHeader current="notes" /><main className={styles.main}>
-    <div className={styles.intro}><div><p className={styles.eyebrow}><span>03</span>{t("public.noAccount")}</p><h1>{t("public.notesTitle")}</h1><p>{t("public.notesDescription")}</p></div></div>
+    <div className={styles.intro}><div><p className={styles.eyebrow}>{t("public.noAccount")}</p><h1>{t("public.notesTitle")}</h1><p>{t("public.notesDescription")}</p></div></div>
     {loaded ? <NotesWorkspace key={loaded.id} initial={loaded.note} memory={loaded.memory} onReload={load} onReset={note => setLoaded({ note, memory: loaded.memory, id: Date.now() })} /> : failed ? <div className={styles.notice} role="alert"><div><p>{t("public.loadError")}</p><div className={styles.dialogActions}><button className={styles.secondaryButton} onClick={() => void load()}>{t("public.retry")}</button><button className={styles.secondaryButton} onClick={() => setLoaded({ note: emptyPublicNote(), memory: true, id: Date.now() })}>{t("public.memoryAction")}</button></div></div></div> : <p role="status">{t("public.loading")}</p>}
     <div className={styles.underNote}><div><h2>{t("public.localTitle")}</h2><p>{t("public.localText")}</p></div><div><h2>{t("public.connectedTitle")}</h2><p>{t("public.connectedText")}</p><PublicLink href={publicDiaryPaths[locale]}>{t("public.discover")}<ArrowUpRight size={16} aria-hidden="true" /></PublicLink></div></div>
   </main><PublicFooter /></div>;

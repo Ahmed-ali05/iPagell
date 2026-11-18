@@ -38,7 +38,7 @@ function pinDraft(record:PersonalRecord):NoteDraft|null{
   return {userId:"",id:record.id,space:"personal",subjectId:value.subjectId,subjectName:value.subjectName,title:value.title,content:value.content,contentFormat:value.contentFormat,expectedContentFormat:record.remote?.contentFormat??"plain",pinned:!value.pinned,baseRevision:record.remote?.revision??0,mutationId:crypto.randomUUID(),localVersion:0,localEditedAt:Date.now()};
 }
 
-export function PersonalNotesView({controller,userId,data,initialSubjectId="",initialNew=false,initialOpenId="",onBackToContext,contextLabel,onAddSubject,onCopyToClass}:{controller:NotesController;userId:string;data:SchoolData;initialSubjectId?:string;initialNew?:boolean;initialOpenId?:string;onBackToContext:()=>void;contextLabel:string;onAddSubject:()=>void;onCopyToClass:(note:NoteCopySeed)=>void}){
+export function PersonalNotesView({controller,userId,data,initialSubjectId="",initialNew=false,initialOpenId="",onBackToContext,contextLabel,onAddSubject,onCopyToClass}:{controller:NotesController;userId:string;data:SchoolData;initialSubjectId?:string;initialNew?:boolean;initialOpenId?:string;onBackToContext?:()=>void;contextLabel:string;onAddSubject:()=>void;onCopyToClass:(note:NoteCopySeed)=>void}){
   const {t,locale}=useI18n();
   const [selection,setSelection]=useState<Selection>(null),[query,setQuery]=useState(""),[filter,setFilter]=useState(initialSubjectId),[error,setError]=useState("");
   const [exportOpen,setExportOpen]=useState(false);
@@ -90,7 +90,7 @@ export function PersonalNotesView({controller,userId,data,initialSubjectId="",in
     void task.then(()=>setSelection(null)).catch(()=>setError(t("notes.saveFailed")));
   };
   return <section className="notes-space" aria-label={t("notes.my")}>
-    <button className="text-link notes-context-back" onClick={()=>selection?.kind==="read"?setSelection(null):onBackToContext()}><ChevronLeft size={18}/>{selection?.kind==="read"?t("notes.viewAll"):t("notes.backToContext",{name:contextLabel})}</button>
+    {(selection?.kind==="read"||onBackToContext)&&<button className="text-link notes-context-back" onClick={()=>selection?.kind==="read"?setSelection(null):onBackToContext?.()}><ChevronLeft size={18}/>{selection?.kind==="read"?t("notes.viewAll"):t("notes.backToContext",{name:contextLabel})}</button>}
     {selection?.kind!=="edit"&&controller.records.some(r=>r.draft)&&<p className="notes-banner" role="status">{t("notes.pending",{count:controller.records.filter(r=>r.draft).length})}</p>}
     {controller.phase==="expired"&&<p className="notes-banner error" role="alert">{t("notes.expired")}</p>}
     {controller.phase==="offline"&&<p className="notes-banner" role="status">{t("notes.offline")}</p>}

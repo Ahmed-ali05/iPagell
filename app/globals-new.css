@@ -5,13 +5,13 @@
 :root {
   --ink: #171a2a;
   --subtle: #6f7387;
-  --canvas: #f2f4f9;
+  --canvas: #f2f2f7;
   --surface: #fff;
   --surface-solid: #fff;
   --line: rgba(27, 30, 48, 0.08);
-  --accent: #6655e6;
-  --accent-fill: #6655e6;
-  --accent-soft: #eeebff;
+  --accent: #0066cc;
+  --accent-fill: #0071e3;
+  --accent-soft: #e8f2ff;
   --danger: #be344b;
   --danger-fill: #be344b;
   --success: #24936a;
@@ -21,7 +21,7 @@
   --card-foreground: #171a2a;
   --popover: #fff;
   --popover-foreground: #171a2a;
-  --primary: #6655e6;
+  --primary: #0071e3;
   --primary-foreground: #fff;
   --secondary: #f1f2f7;
   --secondary-foreground: #171a2a;
@@ -29,12 +29,13 @@
   --muted-foreground: #6f7387;
   --border: #e8e8ee;
   --input: #dddde7;
-  --ring: #6655e6;
+  --ring: #0071e3;
   --destructive: #dd4f62;
   --radius: 0.9rem;
 }
 [data-theme="dark"] {
-  --accent: #a99afa;
+  --accent: #64b5ff;
+  --accent-fill: #0a84ff;
   --danger: #ff8797;
   --ink: #f5f5fb;
   --subtle: #9b9eb1;
@@ -42,21 +43,21 @@
   --surface: #191b26;
   --surface-solid: #191b26;
   --line: rgba(255, 255, 255, 0.08);
-  --accent-soft: rgba(104, 84, 230, 0.2);
+  --accent-soft: rgba(10, 132, 255, 0.2);
   --background: #191b26;
   --foreground: #f5f5fb;
   --card: #191b26;
   --card-foreground: #f5f5fb;
   --popover: #20222e;
   --popover-foreground: #f5f5fb;
-  --primary: #8372f3;
+  --primary: #0a84ff;
   --secondary: #292b38;
   --secondary-foreground: #f5f5fb;
   --muted: #292b38;
   --muted-foreground: #9b9eb1;
   --border: #343641;
   --input: #444654;
-  --ring: #8372f3;
+  --ring: #0a84ff;
 }
 * {
   box-sizing: border-box;
@@ -78,7 +79,7 @@ button {
 .app-shell {
   min-height: 100dvh;
   background:
-    radial-gradient(circle at 75% -10%, #ebe7ff 0, transparent 28rem),
+    radial-gradient(circle at 75% -10%, #e3efff 0, transparent 28rem),
     var(--canvas);
   color: var(--ink);
   transition:
@@ -87,7 +88,7 @@ button {
 }
 [data-theme="dark"] .app-shell {
   background:
-    radial-gradient(circle at 75% -10%, #252044 0, transparent 28rem),
+    radial-gradient(circle at 75% -10%, #10233d 0, transparent 28rem),
     var(--canvas);
 }
 .desktop-nav {
@@ -110,7 +111,7 @@ button {
   place-items: center;
   background: var(--accent-fill);
   color: white;
-  box-shadow: 0 12px 25px #6655e638;
+  box-shadow: 0 12px 25px #0071e338;
   margin: 0 12px 42px;
   font-weight: 800;
   letter-spacing: -0.06em;
@@ -227,7 +228,7 @@ button {
   padding: 30px;
   overflow: hidden;
   color: white;
-  background: linear-gradient(145deg, #1d2031, #292548);
+  background: linear-gradient(145deg, #172033, #1d3a63);
 }
 .hero-card::after {
   content: "";
@@ -254,7 +255,7 @@ button {
   color: var(--subtle);
 }
 .hero-card .eyebrow {
-  color: #aba8c7;
+  color: #a9b8cf;
 }
 .date-pill {
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -269,7 +270,7 @@ button {
   align-items: center;
   gap: 8px;
   margin-top: 40px;
-  color: #ceccdf;
+  color: #cdd7e6;
   font-size: 14px;
 }
 .subject-kicker span,
@@ -288,7 +289,7 @@ button {
   letter-spacing: -0.04em;
 }
 .hero-card p {
-  color: #a9a7ba;
+  color: #a7b3c4;
   font-size: 14px;
 }
 .hero-card button {
@@ -316,7 +317,7 @@ button {
   background: #6b59ec;
   font-size: 32px;
   font-weight: 800;
-  box-shadow: 0 18px 50px rgba(105, 87, 232, 0.4);
+  box-shadow: 0 18px 50px rgba(0, 113, 227, 0.35);
 }
 .hero-orb small {
   display: block;
@@ -358,7 +359,7 @@ button {
   display: block;
   width: 69%;
   height: 100%;
-  background: linear-gradient(90deg, #f1a24f, #6655e6);
+  background: linear-gradient(90deg, #f1a24f, #0071e3);
   border-radius: inherit;
 }
 .scale {
@@ -641,7 +642,7 @@ button {
 .primary-button {
   background: var(--accent-fill);
   color: white;
-  box-shadow: 0 9px 24px #6655e62e;
+  box-shadow: 0 9px 24px #0071e32e;
 }
 .soft-button {
   background: var(--surface);
@@ -1264,7 +1265,7 @@ button {
   min-height: 190px;
   border-radius: 28px;
   padding: 28px;
-  background: linear-gradient(135deg, #1d2031, #36315e);
+  background: linear-gradient(135deg, #1d2031, #1d3a63);
   color: white;
   display: flex;
   align-items: stretch;
@@ -1289,7 +1290,7 @@ button {
 }
 .stats-hero p {
   margin: 0;
-  color: #b2b0c3;
+  color: #aab6c8;
   font-size: 14px;
 }
 .stats-hero > div:last-child {
@@ -1305,13 +1306,13 @@ button {
   gap: 5px;
 }
 .stats-hero > div:last-child svg {
-  color: #9e90ff;
+  color: #64b5ff;
 }
 .stats-hero > div:last-child b {
   font-size: 34px;
 }
 .stats-hero > div:last-child small {
-  color: #b2b0c3;
+  color: #aab6c8;
 }
 .stats-layout {
   display: grid;
@@ -2023,7 +2024,7 @@ button {
 .calendar-day { background:transparent; color:inherit; border:0; border-top:1px solid var(--line); text-align:left; }
 .calendar-day[aria-pressed="true"] { background:var(--accent-soft); border-radius:12px; }
 :root { color-scheme: light; --subtle:#606578; }
-[data-theme="dark"] { color-scheme:dark; --subtle:#b1b4c5; --accent:#9788ff; }
+[data-theme="dark"] { color-scheme:dark; --subtle:#b1b4c5; --accent:#64b5ff; }
 body { font-size:1rem; line-height:1.5; }
 button,a,input,select,textarea { -webkit-tap-highlight-color:transparent; }
 button:disabled { opacity:.5; cursor:not-allowed; }
@@ -2916,3 +2917,141 @@ button.agenda-origin { min-height:32px; text-align:left; }
   .mobile-tabs button.active { outline:2px solid currentColor; outline-offset:-2px; }
   .action-menu-item[data-highlighted] { outline:2px solid var(--ink); outline-offset:-2px; }
 }
+
+/* Liquid Glass normalization layer, 18 November 2026 (docs/UI-REDESIGN-2026-11-18.md).
+   Unifies radii, shadows and title tracking over the earlier layers. Glass is limited to the
+   mobile bar, which overlaps content; reading surfaces, forms and grades stay opaque. */
+:root {
+  --radius-card: 20px;
+  --radius-control: 12px;
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .05);
+  --glass-bar: rgba(255, 255, 255, .72);
+  --glass-line: rgba(255, 255, 255, .65);
+  --glass-highlight: rgba(255, 255, 255, .5);
+}
+[data-theme="dark"] {
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .28);
+  --glass-bar: rgba(30, 32, 44, .72);
+  --glass-line: rgba(255, 255, 255, .1);
+  --glass-highlight: rgba(255, 255, 255, .06);
+}
+.app-shell :is(.hero-card, .average-card, .panel, .sync-banner, .grade-summary, .grade-prompt, .dashboard-overdue) { border-radius: var(--radius-card); }
+.app-shell .panel:not(.today-panel, .subjects-panel) { box-shadow: var(--shadow-card); }
+.account-card { border-radius: 24px; }
+.app-shell .topbar h1, .account-card h1 { letter-spacing: -.025em; font-weight: 700; }
+.app-shell .eyebrow { letter-spacing: .04em; }
+.app-shell :is(.primary-button, .soft-button), .account-card :is(.primary-button, .soft-button) { border-radius: var(--radius-control); font-weight: 650; }
+.app-shell .primary-button, .account-card .primary-button {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-fill) 86%, white), var(--accent-fill));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 4px 12px color-mix(in srgb, var(--accent-fill) 24%, transparent);
+}
+.app-shell .nav-item { border-radius: var(--radius-control); }
+/* The desktop sidebar already has a labelled Settings entry; keep the icon-only duplicate for mobile. */
+@media (min-width: 821px) { .top-actions > button { display: none !important; } }
+@media (max-width: 820px) {
+  .mobile-tabs { background: var(--surface-solid); border-color: var(--line); }
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .mobile-tabs {
+      background: var(--glass-bar);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      backdrop-filter: saturate(180%) blur(20px);
+      border-color: var(--glass-line);
+      box-shadow: 0 10px 30px rgba(16, 24, 40, .12), inset 0 1px 0 var(--glass-highlight);
+    }
+  }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .mobile-tabs { background: var(--surface-solid) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+}
+/* Card headings carried weight 400 next to a 700 page title, flattening the hierarchy. */
+.app-shell :is(.hero-card h2, .panel-title h3, .dashboard-section-heading h3) { font-weight: 700; letter-spacing: -.02em; }
+/* Home sections as grouped cards: same surface, padding and radius as the notes card, so the
+   order of the page reads as a stack of equal blocks instead of mixed flat lists and cards. */
+.app-shell .dashboard-grid > :is(.dashboard-overdue, .today-panel, .grade-summary, .grade-prompt) {
+  padding: 14px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-card);
+}
+.app-shell .dashboard-grid > .today-panel .panel-title { border-bottom: 0; }
+.app-shell .dashboard-grid :is(.dashboard-overdue, .today-panel) .activity-row:last-of-type { border-bottom: 0; }
+.app-shell .grade-summary > span { font-size: .875rem; font-weight: 600; }
+.app-shell .dashboard-grid :is(.panel-title h3, .dashboard-section-heading h3) { font-size: 1.125rem; line-height: 1.3; }
+.app-shell .dashboard-grid > .notes-home-card { padding: 16px 20px 20px; }
+.app-shell .notes-home-card .notes-actions > button { flex: 1 1 auto; white-space: nowrap; }
+/* Tailwind preflight resets headings to weight inherit (400), so section titles read as body text.
+   Zero-specificity default: any explicit weight elsewhere still wins. */
+:where(.app-shell, .account-card, [data-slot="dialog-content"]) :where(h1, h2, h3, h4) { font-weight: 700; letter-spacing: -.015em; }
+:where(.app-shell) :where(.agenda-group-heading) { font-weight: 600; letter-spacing: 0; }
+
+/* Segmented control: the active segment is a raised white surface, as in iOS. */
+.segmented { background: rgba(118, 118, 128, .12) !important; }
+.segmented [data-slot="tabs-trigger"] { color: var(--subtle); font-weight: 600; }
+.segmented [data-slot="tabs-trigger"][data-state="active"] { background: var(--surface-solid) !important; color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .1), 0 1px 1px rgba(0, 0, 0, .04); }
+[data-theme="dark"] .segmented { background: rgba(118, 118, 128, .24) !important; }
+[data-theme="dark"] .segmented [data-slot="tabs-trigger"][data-state="active"] { background: #3a3c4a !important; }
+
+/* Calendar: number and activity dots share the column centre, aligned with the weekday labels. */
+.calendar-day { flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; text-align: center; }
+.calendar-day > div { align-items: center; justify-content: center; min-height: 6px; }
+.calendar-day i { width: 6px; height: 6px; }
+
+@media (max-width: 820px) {
+  /* View switch and origin filter on one row, so content starts higher on phones. */
+  .view-controls-filters { flex-wrap: nowrap; }
+  .view-controls-filters .segmented { flex: 1 1 auto; min-width: 0; }
+  .view-controls-filters .segmented [data-slot="tabs-trigger"] { padding: 0 10px !important; }
+  .view-controls-filters [data-slot="native-select-wrapper"] { flex: 0 1 40%; min-width: 6.5rem; }
+}
+
+/* Grades: scope selects share one row on phones; register rows get breathing room above the divider. */
+@media (max-width: 820px) {
+  .grade-scope-filter { flex-wrap: nowrap; gap: 10px; }
+  .grade-scope-filter label { flex: 1 1 0; }
+}
+.grades-register > article { padding-block: 12px; }
+.grades-register > article > div:nth-child(2) b,
+.grades-register > article > div:nth-child(2) strong { font-weight: 650; }
+
+/* Statistics summary: an earlier phone grid expected an icon column that is no longer rendered,
+   squeezing "subjects with grades" into a narrow column. Count and subjects now read as one line. */
+.stats-hero > div:last-child { display: flex; flex-direction: column; gap: 2px; }
+.stats-hero > div:last-child :is(b, small) { grid-column: auto; grid-row: auto; }
+.stats-hero > div:last-child b { font-size: 1.75rem; line-height: 1.1; letter-spacing: -.02em; }
+@media (max-width: 820px) {
+  .stats-hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .stats-hero > div:last-child { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; min-width: 0; padding: 14px 0 0; border-left: 0; border-top: 1px solid var(--line); }
+  .stats-hero > div:last-child b { font-size: 1.25rem; }
+}
+.stats-layout .panel h3 { font-size: 1.1875rem; line-height: 1.3; }
+
+/* Absences: date, text, hours and delete stay on one row; stats align their numbers on one line. */
+.absence-list > article { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 12px; flex-wrap: nowrap; padding-block: 10px; }
+.absence-list > article > .icon-button { grid-column: auto; grid-row: auto; }
+.absence-stat { align-content: space-between; }
+.absence-list .panel-title h3, .absence-subjects .panel-title h3 { font-size: 1.1875rem; }
+
+/* Navigation weight: Absences sits in a quieter secondary group of the sidebar and as a plain
+   row at the end of Home, instead of a primary tab (docs/UI-REDESIGN-2026-11-18.md). */
+.desktop-nav .nav-separator { display: block; height: 1px; margin: 10px 14px; background: var(--line); }
+.desktop-nav .nav-item.secondary { min-height: 40px; font-size: .875rem; font-weight: 600; }
+.dashboard-quiet-link { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 8px 20px; border: 0; border-radius: var(--radius-card); background: transparent; color: var(--subtle); font: inherit; font-size: .9375rem; font-weight: 600; text-align: left; cursor: pointer; }
+.dashboard-quiet-link > span { flex: 1; }
+@media (hover: hover) { .dashboard-quiet-link:hover { background: var(--accent-soft); color: var(--accent); } }
+.dashboard-quiet-link:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent-fill) 45%, transparent); outline-offset: 2px; }
+
+/* Account entry points: the sidebar chip and the phone avatar both open Settings.
+   Home ends with a quiet group (Absences, Statistics, Settings) so nothing depends on one path. */
+.desktop-nav .profile-chip { width: 100%; border: 0; border-top: 1px solid var(--line); border-radius: var(--radius-control); background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.desktop-nav .profile-chip > div { flex: 1; min-width: 0; }
+.desktop-nav .profile-chip > div b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.desktop-nav .profile-chip > svg { flex-shrink: 0; color: var(--subtle); }
+.desktop-nav .profile-chip > span { background: var(--accent-fill); }
+@media (hover: hover) { .desktop-nav .profile-chip:hover { background: var(--accent-soft); } }
+.desktop-nav .profile-chip:focus-visible, .account-avatar-button:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent-fill) 45%, transparent); outline-offset: 2px; }
+.top-actions > .account-avatar-button { width: 44px; min-width: 44px; height: 44px; padding: 0; border: 0 !important; border-radius: 50% !important; background: var(--accent-fill) !important; color: #fff; box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-fill) 25%, transparent) !important; font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+.dashboard-quiet-links { display: grid; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface-solid); }
+.dashboard-quiet-links .dashboard-quiet-link { border-radius: 0; }
+.dashboard-quiet-links .dashboard-quiet-link + .dashboard-quiet-link { border-top: 1px solid var(--line); }
+.dashboard-quiet-links .dashboard-quiet-link > svg:first-child { color: var(--accent); }

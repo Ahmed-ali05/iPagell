@@ -34,6 +34,7 @@ Le guide restano direttamente in `docs/`, nei percorsi richiesti da `AGENTS.md`.
 | [Elenco Agenda](AGENDA-LIST-2026-10-10.md) | Analisi, stati, ordinamento e limiti della revisione del 10 ottobre |
 | [Reference UX](UX-REFERENCE.md) | Direzione di progetto e resoconti cronologici; non è una lista di funzioni già consegnate |
 | [Semplificazione UI del 10 ottobre](UX-SIMPLIFICATION-2026-10-10.md) | Analisi delle viste, decisioni applicate localmente e limiti della verifica |
+| [Ridisegno UI del 18 novembre](UI-REDESIGN-2026-11-18.md) | Analisi preliminare, sistema visivo blu/Liquid Glass e interventi su spazio pubblico e app |
 | [Contribuire](../CONTRIBUTING.md) | Procedura per modifiche, verifiche e documentazione |
 
 ## Piani e proposte

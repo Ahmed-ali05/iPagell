@@ -62,7 +62,7 @@ export function GradeAverageCalculator() {
     <PublicHeader current="average" />
     <main className={styles.main}>
       <div className={styles.intro}>
-        <p className={shell.eyebrow}><span>04</span>{t("public.noAccount")}</p>
+        <p className={shell.eyebrow}>{t("public.noAccount")}</p>
         <h1>{t("average.title")}</h1>
         <p>{t("average.description")}</p>
       </div>
