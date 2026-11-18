@@ -1,6 +1,6 @@
 # Spazio Studio — mappa manuale locale L2
 
-[Indice](README.md) · [L1](SPAZIO-STUDIO-AI-L1.md) · [Prompt](SPAZIO-STUDIO-AI-PROMPTS.md) · [Laboratorio](../experiments/study-local/README.md)
+[Indice](README.md) · [L1](SPAZIO-STUDIO-AI-L1.md) · [Prompt](SPAZIO-STUDIO-AI-PROMPTS.md) · `experiments/study-local/README.md`
 
 **7 ottobre 2026. Implementazione nel laboratorio separato, nessuna pubblicazione.**
 La mappa funziona senza scaricare un modello. L2 non integra gli account, il diario,
@@ -29,7 +29,7 @@ non automaticamente corretta o una prova della sintesi.
 
 ## Contratto e limiti
 
-Implementazione in [graph.ts](../experiments/study-local/src/graph.ts).
+Implementazione in `experiments/study-local/src/graph.ts`.
 Schema chiuso **`study-graph-v1`**: spazio/materia/lingua, documenti estratti immutabili,
 grafo corrente e fino a 20 snapshot precedenti della mappa. Originali Blob separati dai
 metadati; stato personale in `graph.personal`, distinto da concetti e relazioni.
@@ -58,7 +58,7 @@ espliciti ma non operazioni del comando Undo della mappa. Non c’è redo.
 
 ## Archivio, concorrenza e uscita
 
-[study-store.ts](../experiments/study-local/src/study-store.ts) usa IndexedDB
+`experiments/study-local/src/study-store.ts` usa IndexedDB
 `ipagell-study-lab-archive-v1`, store `accounts`, chiave `accountId`. Un record contiene
 revisione opaca UUID, token di cancellazione, archivio e originali. Nessuna outbox,
 richiesta API, accesso al DB dell’app, vettore o peso del modello in questo archivio.

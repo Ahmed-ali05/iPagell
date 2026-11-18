@@ -33,7 +33,7 @@ La nuova funzione vuole risolvere un altro problema: perdere contenuti utili men
 | Generazione di appunti live | Proposta, nessun generatore qualificato per questo compito | Risparmio di lavoro, fedeltà o miglioramento dell’apprendimento |
 | Altro laboratorio AI | Sperimentazione separata, con limiti generativi documentati | Prontezza del nuovo caso d’uso o impossibilità generale di realizzarlo |
 
-Riscontri: [tipi](../../types/domain.ts), [controller note](../../hooks/use-notes.ts), [formato](../../lib/notes/format.ts), [validazione](../../lib/notes/validation.ts), [note di classe](../../components/class-notes-panel.tsx), [area Lezioni](../../experiments/lecture-notes/README.md), [diagnosi Studio](../SPAZIO-STUDIO-AI-RIPRESA.md). La ricerca nei percorsi applicativi e nel manifest non ha trovato una pipeline di acquisizione/trascrizione.
+Riscontri: [tipi](../../types/domain.ts), [controller note](../../hooks/use-notes.ts), [formato](../../lib/notes/format.ts), [validazione](../../lib/notes/validation.ts), [note di classe](../../components/class-notes-panel.tsx), `experiments/lecture-notes/README.md`, [diagnosi Studio](../SPAZIO-STUDIO-AI-RIPRESA.md). La ricerca nei percorsi applicativi e nel manifest non ha trovato una pipeline di acquisizione/trascrizione.
 
 ### Per chi esisterebbe realmente
 

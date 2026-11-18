@@ -126,7 +126,7 @@ export function StatsView({
                     color: "var(--ink)",
                   }}
                 />
-                <Bar isAnimationActive={reduceMotion ? false : "auto"} dataKey="media" radius={[8, 8, 3, 3]} fill="#6655e6" />
+                <Bar isAnimationActive={reduceMotion ? false : "auto"} dataKey="media" radius={[8, 8, 3, 3]} fill="#0071e3" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -208,11 +208,11 @@ export function StatsView({
                   type="monotone"
                   dataKey="media"
                   name={t("stats.weightedAverage")}
-                  stroke="#6655e6"
+                  stroke="#0071e3"
                   strokeWidth={3}
                   dot={{
                     r: 4,
-                    fill: "#6655e6",
+                    fill: "#0071e3",
                     strokeWidth: 2,
                     stroke: "var(--surface)",
                   }}

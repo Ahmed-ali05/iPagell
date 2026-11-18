@@ -9,10 +9,10 @@ Generato da `scripts/repo-inventory.mjs` leggendo il sorgente, senza rete o dati
 | Pacchetto | `ipagell@0.1.0` |
 | Node dichiarato | `^22.23.4 || ^24.22.1 || ^26.12.1` |
 | Lockfile | 3 |
-| Cataloghi | it, de, fr, en; 850 chiavi nel riferimento italiano |
-| Schema D1 versionato | 15 tabelle |
-| Migrazioni | 7, SQL e journal concordanti |
-| File route API | 27 |
+| Cataloghi | it, de, fr, en; 865 chiavi nel riferimento italiano |
+| Schema D1 versionato | 23 tabelle |
+| Migrazioni | 9, SQL e journal concordanti |
+| File route API | 30 |
 
 ## API esportate
 
@@ -23,6 +23,9 @@ L'elenco verifica presenza e metodi, non permessi o forma dei payload: vedere [C
 | `/api/account` | GET, POST | [route](../app/api/account/route.ts) |
 | `/api/auth/login` | POST | [route](../app/api/auth/login/route.ts) |
 | `/api/auth/logout` | POST | [route](../app/api/auth/logout/route.ts) |
+| `/api/auth/oauth/google/callback` | GET | [route](../app/api/auth/oauth/google/callback/route.ts) |
+| `/api/auth/oauth/google/start` | POST | [route](../app/api/auth/oauth/google/start/route.ts) |
+| `/api/auth/providers` | GET | [route](../app/api/auth/providers/route.ts) |
 | `/api/auth/recover` | POST | [route](../app/api/auth/recover/route.ts) |
 | `/api/auth/register` | POST | [route](../app/api/auth/register/route.ts) |
 | `/api/auth/security` | POST | [route](../app/api/auth/security/route.ts) |
@@ -67,6 +70,14 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 - `class_subjects`
 - `class_notes`
 - `class_note_pins`
+- `auth_schema_state`
+- `account_credentials`
+- `account_identities`
+- `account_emails`
+- `auth_browser_epochs`
+- `auth_transactions`
+- `auth_challenges`
+- `auth_grants`
 
 ## Migrazioni
 
@@ -77,6 +88,8 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 - [0004_glossy_stranger.sql](../drizzle/0004_glossy_stranger.sql)
 - [0005_heavy_elektra.sql](../drizzle/0005_heavy_elektra.sql)
 - [0006_daily_stranger.sql](../drizzle/0006_daily_stranger.sql)
+- [0007_auth_compatibility.sql](../drizzle/0007_auth_compatibility.sql)
+- [0008_auth_bootstrap_legacy.sql](../drizzle/0008_auth_bootstrap_legacy.sql)
 
 ## Script npm
 
@@ -120,6 +133,7 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `class-variance-authority` | app | `0.7.1` | `0.7.1` |
 | `clsx` | app | `2.1.1` | `2.1.1` |
 | `drizzle-orm` | app | `0.45.2` | `0.45.2` |
+| `jose` | app | `6.2.15` | `6.2.15` |
 | `lucide-react` | app | `^1.31.0` | `1.31.0` |
 | `next` | app | `16.3.8` | `16.3.8` |
 | `next-themes` | app | `^0.4.6` | `0.4.6` |

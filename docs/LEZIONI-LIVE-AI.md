@@ -1,6 +1,6 @@
 # Lezioni live → appunti per materia
 
-[Indice](README.md) · [Piano](lezioni-live-ai/PLAN.md) · [Valutazione](lezioni-live-ai/EVALUATION.md) · [Fonti](lezioni-live-ai/SOURCES.md) · [Area di lavoro](../experiments/lecture-notes/README.md)
+[Indice](README.md) · [Piano](lezioni-live-ai/PLAN.md) · [Valutazione](lezioni-live-ai/EVALUATION.md) · [Fonti](lezioni-live-ai/SOURCES.md) · `experiments/lecture-notes/README.md`
 
 **10 ottobre 2026 — preparazione documentale, senza implementazione.** Prima sperimentazione su **notebook con Chrome, lezioni in italiano**, scelta confermata dall’utente. Nome di lavoro: **Appunti da lezione**. Nessun motore installato, modello scaricato, microfono attivato o benchmark eseguito in questa preparazione.
 

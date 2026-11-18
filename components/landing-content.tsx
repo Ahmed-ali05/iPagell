@@ -52,7 +52,7 @@ export function LandingContent({ localePath, authenticated = false, section = "h
   return <div className={`${styles.page} ${shell.page}`}>
     <PublicHeader current="diary" />
     <main>
-      <div className={shell.main}><div className={shell.intro}><div><p className={shell.eyebrow}><span>02</span>{t("public.accountRequired")}</p><h1>{t("public.diaryCard")}</h1><p>{t("public.diaryCardText")}</p></div></div></div>
+      <div className={shell.main}><div className={shell.intro}><div><p className={shell.eyebrow}>{t("public.accountRequired")}</p><h1>{t("public.diaryCard")}</h1><p>{t("public.diaryCardText")}</p></div></div></div>
       <Tabs defaultValue="features" className={styles.chapters}>
         <TabsList className={styles.chapterTabs} aria-label={t("public.diary")}>
           <TabsTrigger value="features">{t("landing.navFeatures")}</TabsTrigger>
