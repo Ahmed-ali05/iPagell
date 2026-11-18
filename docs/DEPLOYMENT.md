@@ -27,6 +27,14 @@ npm run deploy:cloudflare
 
 `deploy:cloudflare` compila con `IPAGELL_DEPLOY_TARGET=cloudflare`, verifica che la config generata in `dist/server/wrangler.json` sia quella di produzione (Worker `ipagell`, D1 `ipagell-live`), esegue un dry run, applica al D1 remoto le migrazioni non ancora applicate e pubblica il Worker con quella config. `wrangler.jsonc` dalla radice non si usa per il deploy: la sua `main` punta all'entry del binding locale. Lo staging si pubblica con `CLOUDFLARE_ENV=staging npm run build:cloudflare` seguito da `npx wrangler deploy -c dist/server/wrangler.json`, senza il passo di migrazione di produzione. Una migrazione applicata non si annulla con un rollback del codice. Richiede Node 22.23.4+ / 24.22.1+ / 26.12.1+; su questo Mac si usa `/opt/homebrew/opt/node@24/bin`.
 
+### Ridisegno UI — 18 novembre 2026
+
+Pubblicata la versione Worker **`7b26524e-f3e0-4b27-8326-d006ff16b713`** su `ipagell.website`, `www.ipagell.website` e `ipagell.ahmedbasto59.workers.dev`. Sorgente: commit `60cac90` del ramo `ui/liquid-glass-redesign-sync` ([PR 12](https://github.com/Ahmed-ali05/iPagell/pull/12)), cioè la produzione di `sync/checkout-20261116` più il solo [ridisegno UI](UI-REDESIGN-2026-11-18.md). Versione precedente, per un eventuale rollback: `f78d7a92-3106-461e-b485-c6d2f999ee9e`.
+
+Eccezione al flusso «solo da `main`», decisa dal proprietario: la CI di tutte le PR aperte (#9–#12) si ferma all'audit delle dipendenze (avvisi su `wrangler`/`miniflare` e su `zod`, correzione nelle PR #10 e #11). Il rilascio non cambia dipendenze né schema: l'unico avviso runtime (`zod`) era già nella versione precedente. Pubblicato da una copia separata con installazione pulita (`npm run install:ci`, Node 24.22.3), non dal working tree locale con modifiche auth in corso.
+
+Prima: `npm run release:prepare` superato (147 test). `wrangler d1 migrations list` sul D1 remoto: nessuna migrazione da applicare; il deploy lo ha confermato. Dopo: `/`, `/de`, `/fr`, `/en`, `/app`, le tre utility pubbliche, sitemap, robots, service worker e manifest rispondono 200; `/api/account` senza sessione 401; `www` reindirizza con 308 mantenendo percorso e query. Il CSS servito contiene i nuovi token. Nessun account o dato remoto modificato. Il service worker non usa `skipWaiting()`: chi ha l'app aperta vede la nuova interfaccia dopo aver chiuso e riaperto le schede.
+
 ### Backup e ripristino del D1 di produzione
 
 Il JSON di backup scaricato dagli utenti non sostituisce un backup operativo del database. Procedura manuale, da ripetere almeno una volta al mese e prima di ogni migrazione:
