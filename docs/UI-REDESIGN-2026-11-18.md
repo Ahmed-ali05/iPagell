@@ -86,12 +86,32 @@ Con un account di prova locale (3 materie, 7 voti, 3 attività, 1 assenza senza 
 - **Impostazioni da più punti:** su telefono l'icona in alto diventa l'avatar dell'account; su desktop la scheda account in fondo alla barra laterale è un pulsante. In fondo alla Home il gruppo «Altro» (`home.moreLinks`) porta ad Assenze, Statistiche e Impostazioni.
 - **Tema scuro:** un vecchio strato impostava ancora `--accent` viola (`#9788ff`); ora blu.
 
+### Fase 4 — Home pubblica: marchio e testi brevi (richiesta del proprietario)
+
+Problema: testi lunghi e poco invoglianti, marchio poco presente, tre card equivalenti che ripetevano l'hero. Struttura nuova di `components/public-overview.tsx`, dall'alto:
+
+1. **Hero:** H1 invariato («Il tuo diario scolastico.», chiave SEO), introduzione ridotta a due frasi brevi, «Crea un account»/«Accedi» e un collegamento «Appunti e media voti anche senza account» all'ancora `#strumenti`. A destra una scena blu del marchio con il monogramma «iP» in filigrana e tre screenshot localizzati sovrapposti (appunto, prossima consegna, medie), con alt testuali e dimensioni dichiarate.
+2. **Agenda, voti e appunti in un unico diario** (H2): quattro voci da una riga ciascuna — Agenda, Voti, Appunti, Classi — e una fascia privacy con il collegamento alla pagina del diario.
+3. **Prova subito, senza account** (H2): Appunti online e Calcolo della media.
+4. **Pensato per la Svizzera** (H2): tre dati in evidenza (1–6, 4 lingue, Web) e una nota breve sulle regole della scuola.
+5. **Chiusura del marchio:** fascia blu con monogramma, «Un diario solo tuo.» e le due azioni.
+
+SEO: un solo H1, H2 descrittivi con le parole del prodotto (agenda, voti, appunti, Svizzera, senza account), tutti i contenuti nell'HTML iniziale, nessun cambio a title, description, canonical, alternate o JSON-LD. Gli screenshot restano `<img>` con alt localizzati. L'entrata delle schermate (solo uno scorrimento di 14 px, senza dissolvenza: restano visibili anche se l'animazione non parte; immagini caricate subito) è disattivata con Riduci movimento di sistema o dell'account; il titolo sfumato ha un colore pieno di riserva e in contrasto elevato.
+
+Ritocchi richiesti dopo la prima versione:
+
+- **Schermate blu:** le dodici immagini di `public/product-media/{it,de,fr,en}/` sono rigenerate dall'app attuale con `npm run media:capture` (vedi [UX-REFERENCE](UX-REFERENCE.md#immagini-e-lingue)); ora mostrano accento blu, Matematica in blu e date relative alla cattura. La cattura desktop della consegna limita la scheda a 600 px per restare leggibile nella pagina del diario.
+- **Pagina «Il diario» più breve:** 26 testi accorciati in quattro lingue (circa il 35% di caratteri in meno: introduzione, tour, dettagli, classi e privacy, primi passi, quattro risposte FAQ, invito finale «Crea il tuo diario»). Restano invariati titoli SEO, H1, domande FAQ e fatti: scala 1–6, privacy, pubblicazione con conferma, limiti offline e regole della scuola.
+
+Testi: nuove chiavi `public.homeFreeHint`, `public.featuresTitle`, `public.feature{Agenda,Grades,Notes,Classes}Text`, `public.privacyLine`, `public.toolsTitle`, `public.fact{Scale,Languages,Web}{Value,Text}`, `public.ctaTitle`, `public.ctaText`; accorciate `public.homeText`, `public.notesCardText`, `public.averageCardText`, `public.swissTitle`, `public.swissText`; rimosse `public.chooseTitle`, `public.diaryPreviewTitle`, `public.swissScale`. Quattro lingue, «vous» in francese, grafia svizzera in tedesco.
+
 ## 4. File modificati
 
 - Token e accento: `app/globals-new.css` (valori in `:root`, `[data-theme="dark"]`, residui viola, strato finale di normalizzazione).
 - Spazio pubblico: `app/public-space.module.css`, `app/public-overview.module.css`, `app/marketing-page.module.css`, `app/grade-average.module.css`, `components/public-overview.tsx`; numerazione rimossa in `components/landing-content.tsx`, `components/public-notes.tsx`, `components/grade-average-calculator.tsx`.
 - App: voce Appunti nella barra laterale in `components/ipagell-app.tsx`; colori dei grafici in `components/stats-view.tsx`.
-- Testi: `public.startHere` sostituita da `public.chooseTitle` nei quattro cataloghi.
+- Testi: `public.startHere` sostituita da `public.chooseTitle` nei quattro cataloghi (poi rimossa nella fase 4).
+- Fase 4: `components/public-overview.tsx`, `app/public-overview.module.css` (riscritti), `lib/i18n/messages/{it,de,fr,en}.json`, `docs/REPO-INVENTORY.md` (chiavi e script), `scripts/capture-product-media.mjs` e script npm `media:capture`, `public/product-media/{it,de,fr,en}/*.webp`, `lib/product-media.json`, `docs/UX-REFERENCE.md`.
 
 ## 5. Verifiche e limiti
 
@@ -107,3 +127,6 @@ Eseguito il 18 novembre 2026 con Node 24.22.3:
 - Fase 3: `npm run check` completo (lint, TypeScript, 152 test, cataloghi, inventario, link) e `npm run build` superati con Node 24.22.3. Il compilatore React segnalava come impura una chiamata a `openNotes` dentro `nav.map`: risolto con un gestore `openNotesFromNav` definito a livello di componente.
 
 Non verificato: classi con membri e attività condivise, tedesco e francese a schermo (in francese la voce «Notes de cours» della barra va su due righe), testo al 200%, Safari e dispositivi fisici. Le immagini del prodotto in `public/product-media` mostrano ancora l'interfaccia viola e vanno rigenerate. Il colore predefinito di una nuova materia (`components/entry-dialog.tsx`) resta `#6655e6` perché è un valore salvato nei dati. Nessuna pubblicazione.
+
+- Fase 4: `npm run check` completo (lint, TypeScript, 158 test, 878 chiavi, inventario, link) e `npm run build` superati con Node 24. Dev server: home italiana a 1280 e 390 px, tedesca a 320 px, francese a 1440 px, senza scroll orizzontale; HTML servito con status 200, un H1, quattro H2, sei H3, tre immagini con alt, canonical e JSON-LD presenti. Corretti nella prova: composizione mobile che copriva l'appunto, icona privacy isolata su telefono, schede «senza account» compresse in francese. Non verificati: testo al 200%, Safari, dispositivi fisici. Nessuna pubblicazione.
+- Ritocchi fase 4: dodici catture rigenerate e ispezionate (it/de/fr/en); home a 1280 px con le nuove immagini; pagina diario in italiano e tedesco a 1280 px. `npm run check` (158 test, 878 chiavi) e `npm run build` (40 asset in precache) superati. Ogni esecuzione dello script lascia account dimostrativi nel solo D1 locale di sviluppo.

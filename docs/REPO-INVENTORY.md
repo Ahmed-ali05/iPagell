@@ -9,7 +9,7 @@ Generato da `scripts/repo-inventory.mjs` leggendo il sorgente, senza rete o dati
 | Pacchetto | `ipagell@0.1.0` |
 | Node dichiarato | `^22.23.4 || ^24.22.1 || ^26.12.1` |
 | Lockfile | 3 |
-| Cataloghi | it, de, fr, en; 865 chiavi nel riferimento italiano |
+| Cataloghi | it, de, fr, en; 878 chiavi nel riferimento italiano |
 | Schema D1 versionato | 23 tabelle |
 | Migrazioni | 9, SQL e journal concordanti |
 | File route API | 30 |
@@ -110,6 +110,7 @@ Da [schema](../db/schema.ts); l'esistenza nel sorgente non prova l'applicazione 
 | `test:auth-d1` | `node --import tsx --test tests/auth-d1.integration.ts` |
 | `test:auth-restore` | `node --import tsx scripts/w8a-restore-rehearsal.ts` |
 | `test:api` | `node tests/api-smoke.mjs` |
+| `media:capture` | `node scripts/capture-product-media.mjs` |
 | `docs:generate` | `node scripts/repo-inventory.mjs` |
 | `docs:check` | `node scripts/repo-inventory.mjs --check && node scripts/check-docs.mjs` |
 | `check:i18n` | `node scripts/check-i18n.mjs` |

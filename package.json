@@ -24,6 +24,7 @@
     "test:auth-d1": "node --import tsx --test tests/auth-d1.integration.ts",
     "test:auth-restore": "node --import tsx scripts/w8a-restore-rehearsal.ts",
     "test:api": "node tests/api-smoke.mjs",
+    "media:capture": "node scripts/capture-product-media.mjs",
     "docs:generate": "node scripts/repo-inventory.mjs",
     "docs:check": "node scripts/repo-inventory.mjs --check && node scripts/check-docs.mjs",
     "check:i18n": "node scripts/check-i18n.mjs",
