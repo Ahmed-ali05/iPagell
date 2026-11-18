@@ -35,6 +35,14 @@ Eccezione al flusso «solo da `main`», decisa dal proprietario: la CI di tutte 
 
 Prima: `npm run release:prepare` superato (147 test). `wrangler d1 migrations list` sul D1 remoto: nessuna migrazione da applicare; il deploy lo ha confermato. Dopo: `/`, `/de`, `/fr`, `/en`, `/app`, le tre utility pubbliche, sitemap, robots, service worker e manifest rispondono 200; `/api/account` senza sessione 401; `www` reindirizza con 308 mantenendo percorso e query. Il CSS servito contiene i nuovi token. Nessun account o dato remoto modificato. Il service worker non usa `skipWaiting()`: chi ha l'app aperta vede la nuova interfaccia dopo aver chiuso e riaperto le schede.
 
+### Nuova home pubblica — 18 novembre 2026
+
+Pubblicata la versione Worker **`7a07b2ec-712d-4fcd-8717-74ae8f66ea85`** (20:32 UTC) su `ipagell.website`, `www.ipagell.website` e `ipagell.ahmedbasto59.workers.dev`. Sorgente: commit `941dfc3` del ramo `release/home-20261118`, cioè la versione precedente (`d39609f` di `ui/liquid-glass-redesign-sync`) più il solo commit della nuova home: hero con il marchio, testi brevi di home e pagina «Il diario», schermate di prodotto rigenerate in blu ([fase 4](UI-REDESIGN-2026-11-18.md#fase-4--home-pubblica-marchio-e-testi-brevi-richiesta-del-proprietario)). Versione precedente, per un eventuale rollback: `7b26524e-f3e0-4b27-8326-d006ff16b713`.
+
+Stessa eccezione al flusso «solo da `main`» del rilascio precedente, decisa dal proprietario: escluse le migrazioni 0007/0008 e l'accesso Google del ramo `auth/w8b-cloudflare` (Fase D del piano W8-B non ancora eseguita). Nessun cambio a dipendenze, schema o binding. Pubblicato da un worktree separato con installazione pulita (`npm run install:ci`, Node 24.22.3).
+
+Prima: `npm run check` (147 test, 865 chiavi, inventario e link) e `npm run build` superati sul ramo di rilascio; `wrangler d1 migrations list` sul D1 remoto: nessuna migrazione da applicare, confermato dal deploy. Dopo: `/`, `/de`, `/fr`, `/en`, `/scopri-ipagell`, `/app`, sitemap, robots, service worker e una delle nuove immagini rispondono 200; `/api/account` senza sessione 401; `www` reindirizza con 308. HTML della home: un H1, i quattro nuovi H2, canonical e `index, follow`. Nessun account o dato remoto modificato. Come prima, chi ha l'app aperta vede la nuova versione dopo aver chiuso e riaperto le schede.
+
 ### Backup e ripristino del D1 di produzione
 
 Il JSON di backup scaricato dagli utenti non sostituisce un backup operativo del database. Procedura manuale, da ripetere almeno una volta al mese e prima di ogni migrazione:
