@@ -37,6 +37,10 @@ Alle 09:44 UTC la versione `41dfaad0` (ramo `release/deps-20261119`, senza Googl
 
 **Da qui si pubblica solo da `main`** (la PR 16 ha unito `release/integrazione-20261119`). Un deploy da un ramo che non la contiene rimuove Google e `/legale` dalla produzione: per questo `deploy:cloudflare` si ferma se il ramo non è `main`, se ci sono modifiche non committate o se `HEAD` non coincide con `origin/main`. `IPAGELL_DEPLOY_ANY_BRANCH=1` salta il controllo solo per emergenze consapevoli.
 
+### Classi e Voti più chiari — 19 novembre 2026
+
+Primo deploy da `main` con il controllo del ramo: commit `75c8912` (PR 17, 18 e 19), versione Worker **`f858b3cf-72b0-4592-84e7-d6b5a1ff170c`** alle 12:23 UTC, nessuna migrazione da applicare. Prima: `npm run release:prepare` con 159/159 test, lint, tipi, i18n, documentazione e build. Dopo: `/`, `/de`, `/app`, `/legale`, sitemap, robots e `sw.js` 200; `www` 308 con percorso e query; `providers` `{"google":true}`; `/api/account` 401; Origin estraneo 403; il bundle servito contiene i nuovi testi di Classi e Voti. Non ripetute prove nel browser autenticato né `test:auth-d1`/`test:api`.
+
 ### Accesso con Google: configurazione
 
 Il pulsante resta nascosto finché il Worker non ha tre valori: `GOOGLE_REDIRECT_URI` (già in `wrangler.jsonc`, uno per produzione e uno per staging) e i due secret `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Serve anche lo schema 0007+0008, quindi in produzione prima la Fase D del [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md).
