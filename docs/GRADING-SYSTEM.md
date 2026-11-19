@@ -22,7 +22,7 @@ The shape permits future numeric ranges with either direction and ordered labels
 
 ## Not implemented
 
-IB, GCSE, percentages, letter grades, A–F, custom scales, grading-system selection, per-subject schemes, conversion between systems, and database or diary migrations are not implemented. No universal conversion (for example, IB to GPA) is assumed.
+In the diary, IB, GCSE, percentages, letter grades, A–F, custom scales, grading-system selection, per-subject schemes, conversion between systems, and database or diary migrations are not implemented. Only the public calculator offers other numeric scales (see below). No universal conversion (for example, IB to GPA) is assumed.
 
 ## Inventory of current dependencies
 
@@ -41,7 +41,19 @@ The current grade screen adds and deletes grades, but has no direct edit action 
 
 ## Public grade average calculator
 
-The public calculator uses the existing `numeric-1-6` preset for parsing and bounds. Its formula is `sum(grade × user weight) / sum(user weights)`, with default weight 1. `weightedArithmeticMean()` in `lib/calculations.ts` is the shared arithmetic primitive used by the calculator and the existing subject/overall calculations. The calculator deliberately does not apply assessment-type weights, subject coefficients, semesters, or a pass/fail judgement. Invalid grades or non-positive/non-finite weights cannot enter the calculation; an empty list has no average. The displayed result uses the preset's one-decimal precision, while calculation retains the unrounded value.
+The public calculator offers the five presets in `CALCULATOR_GRADING_SYSTEMS` (`lib/grading.ts`), with `numeric-1-6` as the default:
+
+| Preset | Range | Order | Passing value | Display | Written forms besides plain numbers |
+|---|---|---|---|---|---|
+| `numeric-1-6` (diary scale) | 1–6 | higher is better | 4 | 1 decimal | `4-5` = 4.5 |
+| `numeric-1-10` | 1–10 | higher is better | 6 | 2 decimals | `6+` = 6.25, `6-` = 5.75, `6½`, `6/7` and `6-7` = 6.5 |
+| `numeric-0-20` | 0–20 | higher is better | 10 | 2 decimals | none; 0 is a valid grade |
+| `numeric-1-6-lower-better` | 1–6 | lower is better | 4 | 1 decimal | none |
+| `percent-0-100` | 0–100 | higher is better | none | 1 decimal | `85%` |
+
+The country shown next to each option is a hint, not an official rule. Written forms are declared per preset in `notation` and parsed by `parseNumericGrade`; a form that a preset does not enable is rejected, so the diary's 1–6 behaviour is unchanged. When a form is used, the calculator shows the counted value before and after adding the grade. Each scale keeps its own list in `sessionStorage` (`ipagell-public-average-v2`, which migrates the v1 single list to `numeric-1-6`); switching scale never converts or mixes grades. A note under the call to action states that the diary still uses only 1–6. Notation for `+/-` on the lower-is-better and 0–20 scales, and «out of N» input, are not decided.
+
+Its formula is `sum(grade × user weight) / sum(user weights)`, with default weight 1. `weightedArithmeticMean()` in `lib/calculations.ts` is the shared arithmetic primitive used by the calculator and the existing subject/overall calculations. The calculator deliberately does not apply assessment-type weights, subject coefficients, semesters, or a pass/fail judgement. Invalid grades or non-positive/non-finite weights cannot enter the calculation; an empty list has no average. The displayed result uses the preset's display precision, while calculation retains the unrounded value.
 
 The tool runs entirely in client state. It does not call an API or persist the entered grades. Its four canonical routes and metadata are listed in `lib/i18n/public-routes.ts` and `lib/i18n/public-page.ts`. Calculator visits do not register the app service worker. If an existing registration checks for an update during a calculator visit, the new worker defers installation until an app or landing page is open, preserving the old offline shell. The utility does not promise offline navigation.
 

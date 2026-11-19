@@ -9,7 +9,7 @@ Generato da `scripts/repo-inventory.mjs` leggendo il sorgente, senza rete o dati
 | Pacchetto | `ipagell@0.1.0` |
 | Node dichiarato | `^22.23.4 || ^24.22.1 || ^26.12.1` |
 | Lockfile | 3 |
-| Cataloghi | it, de, fr, en; 881 chiavi nel riferimento italiano |
+| Cataloghi | it, de, fr, en; 904 chiavi nel riferimento italiano |
 | Schema D1 versionato | 23 tabelle |
 | Migrazioni | 9, SQL e journal concordanti |
 | File route API | 30 |

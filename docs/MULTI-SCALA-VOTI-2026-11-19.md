@@ -51,7 +51,7 @@ Vantaggi: nessuna nuova entità, backup semplice, storico mai reinterpretato da 
 
 ## Fasi proposte
 
-1. **Calcolatore pubblico multi-scala.** Non salva dati: rischio nullo per gli utenti. È il canale di acquisizione più rapido (ricerche tipo «calcolo media voti») e mostra quali scale vengono usate davvero.
+1. **Calcolatore pubblico multi-scala.** Non salva dati: rischio nullo per gli utenti. È il canale di acquisizione più rapido (ricerche tipo «calcolo media voti») e mostra quali scale vengono usate davvero. *Implementata il 19 novembre 2026, non ancora pubblicata: dettagli in [Sistema voti](GRADING-SYSTEM.md#public-grade-average-calculator).*
 2. **Fondamenta invisibili.** Tutte le funzioni ricevono la scala come parametro invece di leggere sempre 1–6; sufficienza a tre stati (sopra / sotto / non definita). Un rilascio *legge* il nuovo formato ma *scrive* ancora quello vecchio, così i client si aggiornano prima che il formato cambi.
 3. **Nuove scale nel diario.** Scale numeriche, scelta nel setup e nelle Impostazioni, nuovo formato del diario, blocco lato server delle scritture incompatibili.
 4. **Eccezione per materia, notazioni `+/-` e voti «su N».** Poi giudizi e altre famiglie, solo con domanda reale.
