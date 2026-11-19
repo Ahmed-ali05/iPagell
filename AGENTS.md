@@ -30,7 +30,7 @@ Skill complementari, da usare quando la richiesta lo giustifica (in caso di conf
 - [accessibility](.agents/skills/accessibility/SKILL.md): verifica WCAG 2.2 con prove nel browser e tastiera.
 - [core-web-vitals](.agents/skills/core-web-vitals/SKILL.md): reattività e stabilità (INP, LCP, CLS), misurando prima di ottimizzare.
 
-Ogni skill esterna ha una sezione «Adattamento iPagell» che prevale sul testo originale.
+Ogni skill esterna ha una sezione «Adattamento iPagell» che prevale sul testo originale. In Claude Code le stesse skill sono disponibili anche come comandi (per esempio `/microinteractions`) tramite collegamenti simbolici in `.claude/skills/`; i file da modificare restano quelli in `.agents/skills/`.
 
 # Produzione e pubblicazione
 
