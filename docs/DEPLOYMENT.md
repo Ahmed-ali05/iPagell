@@ -43,6 +43,14 @@ Stessa eccezione al flusso «solo da `main`» del rilascio precedente, decisa da
 
 Prima: `npm run check` (147 test, 865 chiavi, inventario e link) e `npm run build` superati sul ramo di rilascio; `wrangler d1 migrations list` sul D1 remoto: nessuna migrazione da applicare, confermato dal deploy. Dopo: `/`, `/de`, `/fr`, `/en`, `/scopri-ipagell`, `/app`, sitemap, robots, service worker e una delle nuove immagini rispondono 200; `/api/account` senza sessione 401; `www` reindirizza con 308. HTML della home: un H1, i quattro nuovi H2, canonical e `index, follow`. Nessun account o dato remoto modificato. Come prima, chi ha l'app aperta vede la nuova versione dopo aver chiuso e riaperto le schede.
 
+### Dipendenze senza vulnerabilità — 19 novembre 2026
+
+Pubblicata la versione Worker **`41dfaad0-e1dc-42a5-930b-24646013a7e0`** su `ipagell.website`, `www.ipagell.website` e `ipagell.ahmedbasto59.workers.dev`. Sorgente: commit `af33682` del ramo `release/deps-20261119` ([PR 14](https://github.com/Ahmed-ali05/iPagell/pull/14)), cioè la versione precedente più le Fasi 1 e 2 del [piano dipendenze](DEPENDENCY-UPGRADE-PLAN-2026-11-17.md): vinext 1.4.6, vite 8.3.8, wrangler 4.164.0, zod 4.6.7. Chiude l'advisory zod GHSA-mrhx-c7xc-m3w5, presente nel bundle del Worker. Versione precedente, per un eventuale rollback: `7a07b2ec-712d-4fcd-8717-74ae8f66ea85`.
+
+Pubblicata su decisione del proprietario prima dell'esito della CI della PR 14; la CI della PR 11, con lo stesso lockfile, era verde. Nessuna migrazione (confermato da `wrangler d1 migrations list` e dal deploy), nessun cambio a schema, binding o domini.
+
+Prima: in locale con installazione pulita audit a zero, `npm run check` (147 test), `test:auth-d1`, `test:auth-restore`, build e 146 controlli API sul Worker compilato ([prove](DEPENDENCY-UPGRADE-PLAN-2026-11-17.md#fase-3-chiusa--19-novembre-2026)). Dopo: le quattro home, `/scopri-ipagell`, le utility pubbliche, `/app`, sitemap, robots, service worker, manifest e immagini 200; `/api/account` 401; `www` 308 con query conservata; login con credenziali inesistenti 401 `AUTH_INVALID_CREDENTIALS`, registrazione invalida 400 `AUTH_INVALID_SIGNUP`; `/app` si avvia nel browser con il solo 401 atteso in console. Il testo grezzo di alcuni errori di validazione è ora quello di zod 4 (l'interfaccia usa il codice). Nessun account o dato remoto creato o modificato.
+
 ### Backup e ripristino del D1 di produzione
 
 Il JSON di backup scaricato dagli utenti non sostituisce un backup operativo del database. Procedura manuale, da ripetere almeno una volta al mese e prima di ogni migrazione:
