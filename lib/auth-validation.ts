@@ -21,7 +21,12 @@ export const credentialsSchema = z
   .object({ username: usernameSchema, password: z.string().min(1).max(128) })
   .strict();
 export const signupSchema = z
-  .object({ username: usernameSchema, password: passwordSchema })
+  .object({
+    username: usernameSchema,
+    password: passwordSchema,
+    // Dichiarazione di età: 14 anni o autorizzazione di un genitore (docs/legal).
+    ageConfirmed: z.literal(true, { message: "Conferma l’età o l’autorizzazione di un genitore." }),
+  })
   .strict();
 export const recoverySchema = z
   .object({

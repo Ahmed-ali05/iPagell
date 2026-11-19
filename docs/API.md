@@ -43,6 +43,8 @@ L'[inventario generato](REPO-INVENTORY.md#api-esportate) verifica i metodi espor
 
 `user = { id, username }`. Registrazione account e creazione diario sono due passaggi distinti: dopo la prima, `GET /api/account` può restituire `diary: null`. Un username duplicato restituisce 409; non esiste idempotency key per registrazione o recupero.
 
+Il candidato security W8-A supporta lo schema invariato Sites 39 senza bootstrap. Il server riconosce esattamente le sei colonne legacy di accounts e l’assenza di tutti gli oggetti auth dell’espansione; ripete questa verifica nelle scritture finali. Schema parziale, stato espanso assente/ignoto o paused falliscono chiusi, senza fallback. La 0007 resta fuori dal pacchetto attivo. In un futuro schema espanso la fonte delle credenziali è scelta soltanto dallo stato schema server, senza fallback sulla copia iniziale. Pausa/stato non supportato impediscono nuove autenticazioni e operazioni security; gli errori inattesi restano 503 generici. Nessun endpoint Google/Apple/email è disponibile. [Stato locale e rollout](improvement-2026-10-01/AUTH-COMPATIBILITY-W8A.md).
+
 ### Profilo iniziale
 
 ```json
@@ -112,7 +114,7 @@ Il retry conserva ID e payload della mutazione in volo. Ripetere la medesima scr
 - Cambio password: `{ operation: "password", expectedUserId, currentPassword, newPassword }`.
 - Eliminazione: `{ operation: "delete", expectedUserId, currentPassword, confirmation }`, dove `confirmation` è lo username esatto normalizzato.
 
-Il cambio password incrementa `auth_version`, mantiene il codice di recupero e invalida le sessioni. Il recupero ruota invece anche il codice. La cancellazione elimina diario e account in una transazione; le sessioni sono eliminate tramite FK. Queste API non cancellano i file scaricati né gli archivi del browser: il client gestisce separatamente la propria copia.
+Il cambio password incrementa `auth_version`, mantiene il codice di recupero e invalida le sessioni. Il recupero ruota invece anche il codice. La cancellazione elimina inviti creati, diario e account in una transazione; ogni effetto ricontrolla la medesima sessione ancora valida e auth_version dopo la verifica della password. Le sessioni sono eliminate tramite FK. Queste API non cancellano i file scaricati né gli archivi del browser: il client gestisce separatamente la propria copia.
 
 ## Errori e limiti
 

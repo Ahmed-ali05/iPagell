@@ -1,0 +1,26 @@
+# Output and dependencies of the future isolated laboratory.
+/node_modules/
+/dist/
+/models-local/
+/data-local/
+/traces-local/
+/reports-local/
+.env*
+.dev.vars*
+*.tsbuildinfo
+
+# Do not accidentally version audio, model weights or browser traces.
+*.wav
+*.mp3
+*.m4a
+*.ogg
+*.opus
+*.flac
+*.webm
+*.pcm
+*.onnx
+*.ort
+*.gguf
+*.bin
+*.safetensors
+*.har

@@ -50,6 +50,20 @@
       "when": 1790796491054,
       "tag": "0006_daily_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1792232964999,
+      "tag": "0007_auth_compatibility",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1794945600000,
+      "tag": "0008_auth_bootstrap_legacy",
+      "breakpoints": true
     }
   ]
 }

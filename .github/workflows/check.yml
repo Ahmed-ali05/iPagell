@@ -1,4 +1,4 @@
-name: Controlli iPagell
+name: Checks
 
 on:
   push:
@@ -20,14 +20,18 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
       - run: npm run install:ci
-      - name: Verifica patch delle dipendenze
+      - name: Verify dependency patches
         run: npm run check:dependency-security
-      - name: Audit dipendenze
+      - name: Audit dependencies
         run: npm audit --audit-level=low
       - run: npm run release:prepare
-      - name: Riepilogo
+      - name: Auth compatibility on synthetic local D1
+        run: npm run test:auth-d1
+      - name: Export and restore synthetic local D1
+        run: npm run test:auth-restore
+      - name: Summary
         run: |
-          echo 'Controlli e build superati. Per pubblicare su https://ipagell.website seguire docs/DEPLOYMENT.md. Questo workflow non effettua deploy.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Checks and build passed. This workflow does not deploy; to publish to https://ipagell.website follow docs/DEPLOYMENT.md.' >> "$GITHUB_STEP_SUMMARY"

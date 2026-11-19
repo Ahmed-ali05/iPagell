@@ -60,7 +60,7 @@ function toDocument(node: PMNode): NoteDocument {
 }
 
 export type NoteEditorValue = { contentFormat: NoteFormat; content: string };
-export default function NoteEditor({ value, onChange, disabled = false, label }: { value: NoteEditorValue; onChange: (value: NoteEditorValue) => void; disabled?: boolean; label: string }) {
+export default function NoteEditor({ value, onChange, disabled = false, label, placeholder }: { value: NoteEditorValue; onChange: (value: NoteEditorValue) => void; disabled?: boolean; label: string; placeholder?: string }) {
   const { t } = useI18n();
   const host = useRef<HTMLDivElement>(null), view = useRef<EditorView | null>(null), callback = useRef(onChange);
   const mode = useRef<NoteFormat>(value.contentFormat), current = useRef(value.content), composing = useRef(false), pending = useRef<(() => void) | null>(null);
@@ -103,7 +103,7 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
         if (!raw) { setError(t("notes.pasteEmpty")); return true; }
         view.dispatch(view.state.tr.insertText(raw)); return true;
       },
-      attributes: { "aria-label": label, role:"textbox", "aria-multiline":"true", spellcheck: "true" },
+      attributes: { "aria-label": label, role:"textbox", "aria-multiline":"true", spellcheck: "true", "data-placeholder": placeholder ?? "" },
       editable:()=>!disabled,
     });
     view.current = editor;
@@ -167,7 +167,7 @@ export default function NoteEditor({ value, onChange, disabled = false, label }:
       <button type="button" disabled={disabled} aria-label={t("notes.redo")} onClick={() => run(redo,false)}>↷</button>
       {menu && <div className="visual-note-list-menu"><button type="button" disabled={disabled} onClick={() => run(toggleNoteList(schema.nodes.bullet_list))}>{t("notes.bulletList")}</button><button type="button" disabled={disabled} onClick={() => run(toggleNoteList(schema.nodes.ordered_list))}>{t("notes.numberedList")}</button></div>}
     </div>
-    <div ref={host} className="visual-note-surface" aria-disabled={disabled} onKeyDown={event => { if (event.key === "Escape" && menu) { setMenu(false); view.current?.focus(); } }} />
+    <div ref={host} className="visual-note-surface" data-empty={value.content.length === 0} aria-disabled={disabled} onKeyDown={event => { if (event.key === "Escape" && menu) { setMenu(false); view.current?.focus(); } }} />
     {error && <p className="notes-error" role="alert">{error}</p>}
   </div>;
 }

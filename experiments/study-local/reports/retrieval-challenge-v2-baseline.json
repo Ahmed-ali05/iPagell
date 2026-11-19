@@ -1,0 +1,322 @@
+{
+  "protocol": {
+    "version": "study-retrieval-challenge-v2",
+    "frozenAt": "2026-10-08",
+    "profile": "model-card",
+    "dimensions": 768,
+    "primary": "paired Recall@5 and MRR@5 on 16 positive queries; report delta and every rank",
+    "secondary": "Hit@1; negative returned counts separately (no calibrated abstention)",
+    "resources": "load/index/query median and p95; 5 query repeats; artifact bytes; peak RAM/GPU unknown",
+    "selection": "No tuning or minimum +5pp gate; descriptive comparison only",
+    "humanReview": "pending"
+  },
+  "corpusHash": "658c369f6818bd60e3bbea14b4b1872695a54608131493bb32a21744f9337cff",
+  "rows": [
+    {
+      "id": "H1",
+      "text": "Quale meccanismo attenua una deviazione dal valore desiderato ma può oscillare se reagisce tardi?",
+      "language": "it",
+      "gold": [
+        "d-8b97d941928e986c06c720bda1557f1ae14ee32cef0ba5b785da61f6e9ff3e49-utf8-v1-paragraph-utf16-v1:p1:0-128"
+      ],
+      "found": [
+        "d-8b97d941928e986c06c720bda1557f1ae14ee32cef0ba5b785da61f6e9ff3e49-utf8-v1-paragraph-utf16-v1:p1:0-128",
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-036e9489c8f6fc2c525d64af15f97fb25a492faa77eb539fb93f2b0c33bbed89-utf8-v1-paragraph-utf16-v1:p1:0-130"
+      ],
+      "metrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      }
+    },
+    {
+      "id": "H2",
+      "text": "Raccogliere più risposte corregge automaticamente una scelta distorta dei partecipanti?",
+      "language": "it",
+      "gold": [
+        "d-a663500d405b97e0c9857ef8cfe335a97f564c26482a23c00d1d7cd1669890f6-utf8-v1-paragraph-utf16-v1:p1:0-153"
+      ],
+      "found": [
+        "d-07af67ab127c4733cbbbd14e533023b5ab7b418816420debdd94359a3df73c6d-utf8-v1-paragraph-utf16-v1:p1:0-102",
+        "d-07de8695dcbd88e421b37ec0a16a3895b142e9694a5a9e2cf7e811c4c01e4a59-utf8-v1-paragraph-utf16-v1:p1:0-100",
+        "d-13e673e9644c8be54dd281b78dbba0a7ce7be01e7aa4340ad00703e38117d6c9-utf8-v1-paragraph-utf16-v1:p1:0-106",
+        "d-14e73c8951318b87b9949ea2ff9663ed3fd56a32d970d87f33835ea8674f0e4c-utf8-v1-paragraph-utf16-v1:p1:0-102",
+        "d-21cfcc5e3c6017136b3457397e3755fa11657d33c253ce31c779393bafb624cc-utf8-v1-paragraph-utf16-v1:p1:0-102"
+      ],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H3",
+      "text": "Dove finisce l'energia fornita al ghiaccio mentre il termometro non sale?",
+      "language": "it",
+      "gold": [
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131"
+      ],
+      "found": [
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131",
+        "d-fc6698410e5a0d536fbe046f18e66ef9c1f713939bd6c31a00f9f6741c54ab01-utf8-v1-paragraph-utf16-v1:p1:0-124",
+        "d-dfaf8344bb0556e3522437a88cda4825637160ac22b55b0ada1c9ee8a9ca8bc8-utf8-v1-paragraph-utf16-v1:p1:0-125"
+      ],
+      "metrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      }
+    },
+    {
+      "id": "H4",
+      "text": "Come si sposta l'acqua fra due soluzioni separate da una barriera che trattiene il sale?",
+      "language": "it",
+      "gold": [
+        "d-0cec609cef628cf42bd432ca15a15684001f680f1a8f2b2aa68e4c3b4cc09c63-utf8-v1-paragraph-utf16-v1:p1:0-111"
+      ],
+      "found": [
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-dfaf8344bb0556e3522437a88cda4825637160ac22b55b0ada1c9ee8a9ca8bc8-utf8-v1-paragraph-utf16-v1:p1:0-125",
+        "d-fc6698410e5a0d536fbe046f18e66ef9c1f713939bd6c31a00f9f6741c54ab01-utf8-v1-paragraph-utf16-v1:p1:0-124",
+        "d-036e9489c8f6fc2c525d64af15f97fb25a492faa77eb539fb93f2b0c33bbed89-utf8-v1-paragraph-utf16-v1:p1:0-130",
+        "d-8b97d941928e986c06c720bda1557f1ae14ee32cef0ba5b785da61f6e9ff3e49-utf8-v1-paragraph-utf16-v1:p1:0-128"
+      ],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H5",
+      "text": "Quale registrazione distribuisce negli anni un investimento senza produrre ogni volta un'uscita di denaro?",
+      "language": "it",
+      "gold": [
+        "d-036e9489c8f6fc2c525d64af15f97fb25a492faa77eb539fb93f2b0c33bbed89-utf8-v1-paragraph-utf16-v1:p1:0-130"
+      ],
+      "found": [
+        "d-4782dfbf31f0b93f8cb58c2c5fb21387cbe69079333cf9695239af9d24fd6676-utf8-v1-paragraph-utf16-v1:p1:0-101",
+        "d-dc9f8bdd3f405699b78dd9de10b18c898b0eedd52525b1fc56d7340f2d670723-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H6",
+      "text": "Quale sostanza accelera il raggiungimento dello stato finale senza modificarne la composizione?",
+      "language": "it",
+      "gold": [
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109"
+      ],
+      "found": [
+        "d-02c2423ac2b85cb2b277eb6f36934ecbfd45dc65fa48660f417c5a291a705953-utf8-v1-paragraph-utf16-v1:p1:0-106",
+        "d-991e594d48d1acc77bae0f0f4744a19898458a6ff0af8e52760c08d276d40287-utf8-v1-paragraph-utf16-v1:p1:0-131"
+      ],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H7",
+      "text": "Come può un deposito crescere in euro ma permettere di comprare meno beni?",
+      "language": "it",
+      "gold": [
+        "d-5f086c576b7e941c4636253169c38733d87f7bfb81167977d1c78f1cb00937b4-utf8-v1-paragraph-utf16-v1:p1:0-135"
+      ],
+      "found": [
+        "d-7dc4d4e42de8868ee32a7652cc741ccd42eb2dead2a62243d9de6d81b4140022-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-dc9f8bdd3f405699b78dd9de10b18c898b0eedd52525b1fc56d7340f2d670723-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-5f086c576b7e941c4636253169c38733d87f7bfb81167977d1c78f1cb00937b4-utf8-v1-paragraph-utf16-v1:p1:0-135"
+      ],
+      "metrics": {
+        "recall": 1,
+        "reciprocalRank": 0.3333333333333333,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H8",
+      "text": "Perché una conferma isolata non autorizza a dichiarare completato un aggiornamento distribuito?",
+      "language": "it",
+      "gold": [
+        "d-0c5fabe5c94a5c3f6a8723c06a8633889cace3d100831ef9d2df9dd8e75ef81d-utf8-v1-paragraph-utf16-v1:p1:0-155"
+      ],
+      "found": [
+        "d-e324b965b63c4be354d863299f299decd8509e26f5b176263c5078469b00a6f9-utf8-v1-paragraph-utf16-v1:p1:0-105"
+      ],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H9",
+      "text": "Wie gelangt Energie durch einen ruhenden Metallstab, ohne dass das Metall mitwandert?",
+      "language": "de",
+      "gold": [
+        "d-198fae2574594a96713b5cd0e250372660ce42c84d1566b6dfd160cadaba4586-utf8-v1-paragraph-utf16-v1:p1:0-114"
+      ],
+      "found": [
+        "d-198fae2574594a96713b5cd0e250372660ce42c84d1566b6dfd160cadaba4586-utf8-v1-paragraph-utf16-v1:p1:0-114"
+      ],
+      "metrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      }
+    },
+    {
+      "id": "H10",
+      "text": "Kann ein Instrument immer fast denselben falschen Wert liefern?",
+      "language": "de",
+      "gold": [
+        "d-3561081dfe04dc78cb0da3971db292ac1cdcbe6950e3ab14ad48d22f34ddb29b-utf8-v1-paragraph-utf16-v1:p1:0-107"
+      ],
+      "found": [
+        "d-41cdc165e78a7647c6344f0697d8be20bb5a35017abad1b7f2154295b50cdf9e-utf8-v1-paragraph-utf16-v1:p1:0-99"
+      ],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H11",
+      "text": "Pourquoi une variante héréditaire peut-elle être transmise sans être visible chez le parent?",
+      "language": "fr",
+      "gold": [
+        "d-046e04376863a4832e33117e9bb96e866df8bf16f96f1c68346db205a1dcbd3a-utf8-v1-paragraph-utf16-v1:p1:0-109"
+      ],
+      "found": [
+        "d-046e04376863a4832e33117e9bb96e866df8bf16f96f1c68346db205a1dcbd3a-utf8-v1-paragraph-utf16-v1:p1:0-109",
+        "d-0c2ba8dbe491aed391bbc2bf8c5d518246d562daa3b7f0dbfcaec56c9c1f03b2-utf8-v1-paragraph-utf16-v1:p1:0-110"
+      ],
+      "metrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      }
+    },
+    {
+      "id": "H12",
+      "text": "Quel protocole photographie une population sans observer le parcours de chaque personne?",
+      "language": "fr",
+      "gold": [
+        "d-0c2ba8dbe491aed391bbc2bf8c5d518246d562daa3b7f0dbfcaec56c9c1f03b2-utf8-v1-paragraph-utf16-v1:p1:0-110"
+      ],
+      "found": [],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H13",
+      "text": "Which operation creates a fingerprint that cannot be turned back into the original message?",
+      "language": "en",
+      "gold": [
+        "d-09c367a371e1ea0b1eb8863cf6b7fd6c4a08c21bc861f1b20ae3ba4e5b646b7f-utf8-v1-paragraph-utf16-v1:p1:0-95"
+      ],
+      "found": [
+        "d-f5fa440b834ce6831bc6b9f3f0cacfe13617fde18b533886be60edfcc0ac60a7-utf8-v1-paragraph-utf16-v1:p1:0-107",
+        "d-6a77d3cd411068969000cab451e201f362b80c20ac40df22705d285480613ae2-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H14",
+      "text": "Which caching policy immediately keeps the persistent copy current?",
+      "language": "en",
+      "gold": [
+        "d-6a77d3cd411068969000cab451e201f362b80c20ac40df22705d285480613ae2-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "found": [],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "H15",
+      "text": "Why can the same name inside a function refer to a separate value without modifying its external namesake?",
+      "language": "en",
+      "gold": [
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "found": [
+        "d-c72c3bc509d18adf857fd3f425ca26c09375cf311b277a4bdb239576a78b0e66-utf8-v1-paragraph-utf16-v1:p1:0-103",
+        "d-f3835ecfe4a53e64ac5495e12192a120ae490bae02a16619e3872ce391b27938-utf8-v1-paragraph-utf16-v1:p1:0-103"
+      ],
+      "metrics": {
+        "recall": 1,
+        "reciprocalRank": 1,
+        "hitAt1": 1
+      }
+    },
+    {
+      "id": "H16",
+      "text": "Pourquoi répartir ses placements ne protège-t-il pas totalement d'un choc qui touche toutes les entreprises?",
+      "language": "fr",
+      "gold": [
+        "d-aeeb5f4228a69f166f26f77d91e584a21839654cf65e3fd6a978904aa3776409-utf8-v1-paragraph-utf16-v1:p1:0-109"
+      ],
+      "found": [],
+      "metrics": {
+        "recall": 0,
+        "reciprocalRank": 0,
+        "hitAt1": 0
+      }
+    },
+    {
+      "id": "N1",
+      "text": "Qual è la password del professore?",
+      "language": "it",
+      "gold": [],
+      "found": [],
+      "metrics": null
+    },
+    {
+      "id": "N2",
+      "text": "Wie lautet die Adresse der Schulleitung?",
+      "language": "de",
+      "gold": [],
+      "found": [],
+      "metrics": null
+    },
+    {
+      "id": "N3",
+      "text": "Quelle sera la météo demain?",
+      "language": "fr",
+      "gold": [],
+      "found": [],
+      "metrics": null
+    },
+    {
+      "id": "N4",
+      "text": "What is the exact mass of planet Zorblax?",
+      "language": "en",
+      "gold": [],
+      "found": [],
+      "metrics": null
+    }
+  ],
+  "querySamples": 100,
+  "medianMs": 0.17708399999992253,
+  "p95Ms": 0.33825000000001637,
+  "embedding": "not-run",
+  "humanReview": "pending"
+}

@@ -1,0 +1,504 @@
+[
+  {
+    "variant": "production-example",
+    "model": {
+      "id": "gemma-4-E2B-it-gpu",
+      "revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it-gpu.litertlm",
+      "bytes": 2008432640,
+      "sha256": "a53a59001894c58e6bdb5b9b227709f91a2e3e556baa7d85acf9c55402ba5cf5",
+      "runtime": "@litert-lm/core@0.18.0",
+      "license": "Apache-2.0"
+    },
+    "environment": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "result": {
+      "source": "Il DNS traduce nomi di dominio in indirizzi IP. La cache DNS conserva temporaneamente le risposte fino al TTL.",
+      "runtimeMs": 124.39999999850988,
+      "loadMs": 2018.6999999955297,
+      "prefillMs": 738.6000000014901,
+      "sendMs": 4944.10000000149,
+      "benchmark": {
+        "lastPrefillTokensPerSecond": 610.3557998264391,
+        "lastPrefillTokenCount": 211,
+        "lastDecodeTokensPerSecond": 44.383898751977505,
+        "lastDecodeTokenCount": 202,
+        "timeToFirstTokenInSecond": 0.697430693
+      },
+      "totalTokens": 651,
+      "outputCapReached": false,
+      "messageKeys": [
+        "role",
+        "content"
+      ],
+      "role": "assistant",
+      "contentType": "object",
+      "channelLengths": {},
+      "raw": "{\"version\":\"study-proposals-v1\",\"nodes\":[{\"id\":\"p1\",\"title\":\"Funzione del DNS\",\"summary\":\"Il DNS traduce nomi di dominio in indirizzi IP.\",\"sources\":[\"s1\"],\"action\":\"new\",\"target\":null},{\"id\":\"p2\",\"title\":\"Ruolo della Cache DNS\",\"summary\":\"La cache DNS conserva temporaneamente le risposte del DNS fino al TTL.\",\"sources\":[\"s1\"],\"action\":\"new\",\"target\":null},{\"id\":\"p3\",\"title\":\"Concetto TTL\",\"summary\":\"Il TTL (Time To Live) è il tempo per cui la cache DNS conserva le risposte.\",\"sources\":[\"s1\"],\"action\":\"new\",\"target\":null}],\"edges\": [{\"from\": \"p1\", \"to\": \"p2\", \"type\": \"related\", \"sources\": [\"s1\"]}, {\"from\": \"p2\", \"to\": \"p3\", \"type\": \"related\", \"sources\": [\"s1\"]}]}",
+      "validation": "valid",
+      "parsed": {
+        "version": "study-proposals-v1",
+        "nodes": [
+          {
+            "id": "p1",
+            "title": "Funzione del DNS",
+            "summary": "Il DNS traduce nomi di dominio in indirizzi IP.",
+            "sources": [
+              "s1"
+            ],
+            "action": "new",
+            "target": null
+          },
+          {
+            "id": "p2",
+            "title": "Ruolo della Cache DNS",
+            "summary": "La cache DNS conserva temporaneamente le risposte del DNS fino al TTL.",
+            "sources": [
+              "s1"
+            ],
+            "action": "new",
+            "target": null
+          },
+          {
+            "id": "p3",
+            "title": "Concetto TTL",
+            "summary": "Il TTL (Time To Live) è il tempo per cui la cache DNS conserva le risposte.",
+            "sources": [
+              "s1"
+            ],
+            "action": "new",
+            "target": null
+          }
+        ],
+        "edges": [
+          {
+            "from": "p1",
+            "to": "p2",
+            "type": "related",
+            "sources": [
+              "s1"
+            ]
+          },
+          {
+            "from": "p2",
+            "to": "p3",
+            "type": "related",
+            "sources": [
+              "s1"
+            ]
+          }
+        ]
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+        }
+      ],
+      "repairMs": 0,
+      "repairs": 0
+    }
+  },
+  {
+    "variant": "legacy",
+    "model": {
+      "id": "gemma-4-E2B-it-gpu",
+      "revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it-gpu.litertlm",
+      "bytes": 2008432640,
+      "sha256": "a53a59001894c58e6bdb5b9b227709f91a2e3e556baa7d85acf9c55402ba5cf5",
+      "runtime": "@litert-lm/core@0.18.0",
+      "license": "Apache-2.0"
+    },
+    "environment": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "result": {
+      "source": "Il DNS traduce nomi di dominio in indirizzi IP. La cache DNS conserva temporaneamente le risposte fino al TTL.",
+      "runtimeMs": 92.10000000149012,
+      "loadMs": 1976.5,
+      "prefillMs": 571.2000000029802,
+      "sendMs": 8339.10000000149,
+      "benchmark": {
+        "lastPrefillTokensPerSecond": 257.87965616045847,
+        "lastPrefillTokenCount": 9,
+        "lastDecodeTokensPerSecond": 46.416859567901234,
+        "lastDecodeTokenCount": 385,
+        "timeToFirstTokenInSecond": 0.550443896
+      },
+      "totalTokens": 691,
+      "outputCapReached": false,
+      "messageKeys": [
+        "role",
+        "content"
+      ],
+      "role": "assistant",
+      "contentType": "object",
+      "channelLengths": {},
+      "raw": "```json\n{\n  \"study-proposals-v1\": {\n    \"nodes\": [\n      {\n        \"id\": \"p1\",\n        \"title\": \"Funzione di traduzione DNS\",\n        \"summary\": \"Esplorare il processo attraverso il quale il DNS traduce i nomi di dominio in indirizzi IP.\",\n        \"sources\": [\n          \"s1\"\n        ],\n        \"action\": \"new\",\n        \"target\": null\n      },\n      {\n        \"id\": \"p2\",\n        \"title\": \"Ruolo della cache DNS\",\n        \"summary\": \"Analizzare come la cache DNS gestisce e conserva temporaneamente le risposte ricevute.\",\n        \"sources\": [\n          \"s1\"\n        ],\n        \"action\": \"new\",\n        \"target\": null\n      },\n      {\n        \"id\": \"p3\",\n        \"title\": \"Meccanismo TTL\",\n        \"summary\": \"Esaminare il concetto di TTL (Time To Live) nel contesto della conservazione delle risposte nella cache DNS.\",\n        \"sources\": [\n          \"s1\"\n        ],\n        \"action\": \"new\",\n        \"target\": null\n      }\n    ],\n    \"edges\": [\n      {\n        \"from\": \"p1\",\n        \"to\": \"p2\",\n        \"type\": \"related\",\n        \"sources\": [\n          \"s1\"\n        ]\n      },\n      {\n        \"from\": \"p2\",\n        \"to\": \"p3\",\n        \"type\": \"related\",\n        \"sources\": [\n          \"s1\"\n        ]\n      }\n    ]\n  }\n}\n```",
+      "validation": "Proposta fuori contratto (JSON_SYNTAX): usa la mappa manuale oppure una nuova prova locale.",
+      "requests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+        }
+      ],
+      "repairMs": 0,
+      "repairs": 0
+    }
+  },
+  {
+    "variant": "minimal-legacy",
+    "model": {
+      "id": "gemma-4-E2B-it-gpu",
+      "revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it-gpu.litertlm",
+      "bytes": 2008432640,
+      "sha256": "a53a59001894c58e6bdb5b9b227709f91a2e3e556baa7d85acf9c55402ba5cf5",
+      "runtime": "@litert-lm/core@0.18.0",
+      "license": "Apache-2.0"
+    },
+    "environment": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "result": {
+      "source": "Il DNS traduce nomi di dominio in indirizzi IP. La cache DNS conserva temporaneamente le risposte fino al TTL.",
+      "runtimeMs": 94.5,
+      "loadMs": 2239.2999999970198,
+      "prefillMs": 403.29999999701977,
+      "sendMs": 713.1000000014901,
+      "benchmark": {
+        "lastPrefillTokensPerSecond": 239.36170212765956,
+        "lastPrefillTokenCount": 9,
+        "lastDecodeTokensPerSecond": 43.70761115297664,
+        "lastDecodeTokenCount": 29,
+        "timeToFirstTokenInSecond": 0.37627931025
+      },
+      "totalTokens": 126,
+      "outputCapReached": false,
+      "messageKeys": [
+        "role",
+        "content"
+      ],
+      "role": "assistant",
+      "contentType": "object",
+      "channelLengths": {},
+      "raw": "{\"title\": \"DNS\", \"summary\": \"Il DNS traduce nomi di dominio in indirizzi IP.\", \"sources\": [\"s1\"]}",
+      "validation": "valid",
+      "parsed": {
+        "title": "DNS",
+        "summary": "Il DNS traduce nomi di dominio in indirizzi IP.",
+        "sources": [
+          "s1"
+        ]
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+        }
+      ],
+      "repairMs": 0,
+      "repairs": 0
+    }
+  },
+  {
+    "variant": "minimal-direct",
+    "model": {
+      "id": "gemma-4-E2B-it-gpu",
+      "revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it-gpu.litertlm",
+      "bytes": 2008432640,
+      "sha256": "a53a59001894c58e6bdb5b9b227709f91a2e3e556baa7d85acf9c55402ba5cf5",
+      "runtime": "@litert-lm/core@0.18.0",
+      "license": "Apache-2.0"
+    },
+    "environment": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "result": {
+      "source": "Il DNS traduce nomi di dominio in indirizzi IP. La cache DNS conserva temporaneamente le risposte fino al TTL.",
+      "runtimeMs": 98.80000000447035,
+      "loadMs": 2097.6999999955297,
+      "prefillMs": 406.80000000447035,
+      "sendMs": 827.6999999955297,
+      "benchmark": {
+        "lastPrefillTokensPerSecond": 417.0073589533933,
+        "lastPrefillTokenCount": 51,
+        "lastDecodeTokensPerSecond": 42.15729030382323,
+        "lastDecodeTokenCount": 29,
+        "timeToFirstTokenInSecond": 0.3982206895
+      },
+      "totalTokens": 120,
+      "outputCapReached": false,
+      "messageKeys": [
+        "role",
+        "content"
+      ],
+      "role": "assistant",
+      "contentType": "object",
+      "channelLengths": {},
+      "raw": "{\"title\": \"DNS\", \"summary\": \"Il DNS traduce nomi di dominio in indirizzi IP.\", \"sources\": [\"s1\"]}",
+      "validation": "valid",
+      "parsed": {
+        "title": "DNS",
+        "summary": "Il DNS traduce nomi di dominio in indirizzi IP.",
+        "sources": [
+          "s1"
+        ]
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+        }
+      ],
+      "repairMs": 0,
+      "repairs": 0
+    }
+  },
+  {
+    "variant": "minimal-example",
+    "model": {
+      "id": "gemma-4-E2B-it-gpu",
+      "revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it-gpu.litertlm",
+      "bytes": 2008432640,
+      "sha256": "a53a59001894c58e6bdb5b9b227709f91a2e3e556baa7d85acf9c55402ba5cf5",
+      "runtime": "@litert-lm/core@0.18.0",
+      "license": "Apache-2.0"
+    },
+    "environment": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "result": {
+      "source": "Il DNS traduce nomi di dominio in indirizzi IP. La cache DNS conserva temporaneamente le risposte fino al TTL.",
+      "runtimeMs": 84.69999999552965,
+      "loadMs": 1838.8999999985099,
+      "prefillMs": 339.8999999985099,
+      "sendMs": 653.4000000059605,
+      "benchmark": {
+        "lastPrefillTokensPerSecond": 637.8132118451025,
+        "lastPrefillTokenCount": 84,
+        "lastDecodeTokensPerSecond": 48.923679060665364,
+        "lastDecodeTokenCount": 25,
+        "timeToFirstTokenInSecond": 0.33424000000000004
+      },
+      "totalTokens": 149,
+      "outputCapReached": false,
+      "messageKeys": [
+        "role",
+        "content"
+      ],
+      "role": "assistant",
+      "contentType": "object",
+      "channelLengths": {},
+      "raw": "{\"title\":\"DNS\",\"summary\":\"Il DNS traduce nomi di dominio in indirizzi IP.\",\"sources\":[\"s1\"]}",
+      "validation": "valid",
+      "parsed": {
+        "title": "DNS",
+        "summary": "Il DNS traduce nomi di dominio in indirizzi IP.",
+        "sources": [
+          "s1"
+        ]
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+        }
+      ],
+      "repairMs": 0,
+      "repairs": 0
+    }
+  },
+  {
+    "variant": "full-example",
+    "model": {
+      "id": "gemma-4-E2B-it-gpu",
+      "revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it-gpu.litertlm",
+      "bytes": 2008432640,
+      "sha256": "a53a59001894c58e6bdb5b9b227709f91a2e3e556baa7d85acf9c55402ba5cf5",
+      "runtime": "@litert-lm/core@0.18.0",
+      "license": "Apache-2.0"
+    },
+    "environment": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "result": {
+      "source": "Il DNS traduce nomi di dominio in indirizzi IP. La cache DNS conserva temporaneamente le risposte fino al TTL.",
+      "runtimeMs": 84,
+      "loadMs": 1800,
+      "prefillMs": 438,
+      "sendMs": 4436.20000000298,
+      "benchmark": {
+        "lastPrefillTokensPerSecond": 883.1908831908833,
+        "lastPrefillTokenCount": 124,
+        "lastDecodeTokensPerSecond": 46.906723297005904,
+        "lastDecodeTokenCount": 201,
+        "timeToFirstTokenInSecond": 0.42791890525000004
+      },
+      "totalTokens": 563,
+      "outputCapReached": false,
+      "messageKeys": [
+        "role",
+        "content"
+      ],
+      "role": "assistant",
+      "contentType": "object",
+      "channelLengths": {},
+      "raw": "{\"version\":\"study-proposals-v1\",\"nodes\":[{\"id\":\"p1\",\"title\":\"Funzione del DNS\",\"summary\":\"Il DNS ha il compito di tradurre i nomi di dominio in indirizzi IP.\",\"sources\":[\"s1\"],\"action\":\"new\",\"target\":null},{\"id\":\"p2\",\"title\":\"Cache DNS\",\"summary\":\"La cache DNS ha la funzione di conservare temporaneamente le risposte ricevute fino al raggiungimento del TTL.\",\"sources\":[\"s1\"],\"action\":\"new\",\"target\":null},{\"id\":\"p3\",\"title\":\"TTL (Time To Live)\",\"summary\":\"Il TTL è il parametro che determina per quanto tempo la cache DNS conserva le risposte.\",\"sources\":[\"s1\"],\"action\":\"new\",\"target\":null}],\"edges\": [{\"from\":\"p1\",\"to\":\"p2\",\"type\":\"related\",\"sources\":[\"s1\"]}, {\"from\":\"p2\",\"to\":\"p3\",\"type\":\"related\",\"sources\":[\"s1\"]}]}",
+      "validation": "valid",
+      "parsed": {
+        "version": "study-proposals-v1",
+        "nodes": [
+          {
+            "id": "p1",
+            "title": "Funzione del DNS",
+            "summary": "Il DNS ha il compito di tradurre i nomi di dominio in indirizzi IP.",
+            "sources": [
+              "s1"
+            ],
+            "action": "new",
+            "target": null
+          },
+          {
+            "id": "p2",
+            "title": "Cache DNS",
+            "summary": "La cache DNS ha la funzione di conservare temporaneamente le risposte ricevute fino al raggiungimento del TTL.",
+            "sources": [
+              "s1"
+            ],
+            "action": "new",
+            "target": null
+          },
+          {
+            "id": "p3",
+            "title": "TTL (Time To Live)",
+            "summary": "Il TTL è il parametro che determina per quanto tempo la cache DNS conserva le risposte.",
+            "sources": [
+              "s1"
+            ],
+            "action": "new",
+            "target": null
+          }
+        ],
+        "edges": [
+          {
+            "from": "p1",
+            "to": "p2",
+            "type": "related",
+            "sources": [
+              "s1"
+            ]
+          },
+          {
+            "from": "p2",
+            "to": "p3",
+            "type": "related",
+            "sources": [
+              "s1"
+            ]
+          }
+        ]
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+        }
+      ],
+      "repairMs": 0,
+      "repairs": 0
+    }
+  },
+  {
+    "variant": "full-constrained",
+    "model": {
+      "id": "gemma-4-E2B-it-gpu",
+      "revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+      "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it-gpu.litertlm",
+      "bytes": 2008432640,
+      "sha256": "a53a59001894c58e6bdb5b9b227709f91a2e3e556baa7d85acf9c55402ba5cf5",
+      "runtime": "@litert-lm/core@0.18.0",
+      "license": "Apache-2.0"
+    },
+    "environment": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "result": {
+      "source": "Il DNS traduce nomi di dominio in indirizzi IP. La cache DNS conserva temporaneamente le risposte fino al TTL.",
+      "runtimeMs": 81.80000000447035,
+      "loadMs": 1823.1999999955297,
+      "prefillMs": 1625.1000000014901,
+      "sendMs": 4315.0999999940395,
+      "benchmark": {
+        "lastPrefillTokensPerSecond": 768.277571251549,
+        "lastPrefillTokenCount": 124,
+        "lastDecodeTokensPerSecond": 48.50737263798055,
+        "lastDecodeTokenCount": 201,
+        "timeToFirstTokenInSecond": 0.46901542275
+      },
+      "totalTokens": 563,
+      "outputCapReached": false,
+      "messageKeys": [
+        "role",
+        "content"
+      ],
+      "role": "assistant",
+      "contentType": "object",
+      "channelLengths": {},
+      "raw": "{\"version\":\"study-proposals-v1\",\"nodes\":[{\"id\":\"p1\",\"title\":\"Funzione del DNS\",\"summary\":\"Il DNS ha il compito di tradurre i nomi di dominio in indirizzi IP.\",\"sources\":[\"s1\"],\"action\":\"new\",\"target\":null},{\"id\":\"p2\",\"title\":\"Cache DNS\",\"summary\":\"La cache DNS ha la funzione di conservare temporaneamente le risposte ricevute fino al raggiungimento del TTL.\",\"sources\":[\"s1\"],\"action\":\"new\",\"target\":null},{\"id\":\"p3\",\"title\":\"TTL (Time To Live)\",\"summary\":\"Il TTL è il parametro che determina per quanto tempo la cache DNS conserva le risposte.\",\"sources\":[\"s1\"],\"action\":\"new\",\"target\":null}],\"edges\": [{\"from\":\"p1\",\"to\":\"p2\",\"type\":\"related\",\"sources\":[\"s1\"]}, {\"from\":\"p2\",\"to\":\"p3\",\"type\":\"related\",\"sources\":[\"s1\"]}]}",
+      "validation": "valid",
+      "parsed": {
+        "version": "study-proposals-v1",
+        "nodes": [
+          {
+            "id": "p1",
+            "title": "Funzione del DNS",
+            "summary": "Il DNS ha il compito di tradurre i nomi di dominio in indirizzi IP.",
+            "sources": [
+              "s1"
+            ],
+            "action": "new",
+            "target": null
+          },
+          {
+            "id": "p2",
+            "title": "Cache DNS",
+            "summary": "La cache DNS ha la funzione di conservare temporaneamente le risposte ricevute fino al raggiungimento del TTL.",
+            "sources": [
+              "s1"
+            ],
+            "action": "new",
+            "target": null
+          },
+          {
+            "id": "p3",
+            "title": "TTL (Time To Live)",
+            "summary": "Il TTL è il parametro che determina per quanto tempo la cache DNS conserva le risposte.",
+            "sources": [
+              "s1"
+            ],
+            "action": "new",
+            "target": null
+          }
+        ],
+        "edges": [
+          {
+            "from": "p1",
+            "to": "p2",
+            "type": "related",
+            "sources": [
+              "s1"
+            ]
+          },
+          {
+            "from": "p2",
+            "to": "p3",
+            "type": "related",
+            "sources": [
+              "s1"
+            ]
+          }
+        ]
+      },
+      "requests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+        }
+      ],
+      "repairMs": 0,
+      "repairs": 0
+    }
+  }
+]

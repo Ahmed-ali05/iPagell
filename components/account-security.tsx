@@ -1,21 +1,23 @@
 "use client";
 import { useRef, useState, type FormEvent } from "react";
 import { useI18n } from "@/components/i18n-provider";
+import { RequestError } from "@/lib/client-http";
 import { apiErrorKey } from "@/lib/i18n/errors";
 import type { MessageKey } from "@/lib/i18n";
 export function AccountSecurity({
-  id,
   username,
+  passwordless = false,
   disabled,
-  onChanged,
+  onSubmit,
 }: {
-  id: string;
   username: string;
+  /** Google accounts: no password to change; deletion needs a recent sign-in. */
+  passwordless?: boolean;
   disabled: boolean;
-  onChanged: (operation:"password"|"delete") => Promise<void>;
+  onSubmit: (operation:"password"|"delete", fields: Record<string, FormDataEntryValue>) => Promise<void>;
 }) {
   const { t } = useI18n();
-  const [mode, setMode] = useState<"password" | "delete">("password"),
+  const [mode, setMode] = useState<"password" | "delete">(passwordless ? "delete" : "password"),
     [busy, setBusy] = useState(false),
     [error, setError] = useState<MessageKey | null>(null);
   const busyRef = useRef(false);
@@ -27,25 +29,9 @@ export function AccountSecurity({
     setBusy(true);
     try {
       const fields = Object.fromEntries(new FormData(event.currentTarget));
-      const result = await fetch("/api/auth/security", {
-        method: "POST",
-        credentials: "same-origin",
-        cache: "no-store",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...fields,
-          operation: mode,
-          expectedUserId: id,
-        }),
-      });
-      const body = (await result.json()) as { error?: string; code?: string };
-      if (!result.ok) {
-        setError(apiErrorKey(body.code, "error.operationFailed"));
-        return;
-      }
-      await onChanged(mode);
-    } catch {
-      setError("error.connectionUnavailable");
+      await onSubmit(mode, fields);
+    } catch (error) {
+      setError(error instanceof RequestError ? apiErrorKey(error.code, "error.operationFailed") : "error.connectionUnavailable");
     } finally {
       busyRef.current = false;
       setBusy(false);
@@ -55,9 +41,9 @@ export function AccountSecurity({
     <details className="security-settings">
       <summary>{t("security.title")}</summary>
       <p>
-        {t("security.passwordHint")}
+        {passwordless ? t("security.googleHint") : t("security.passwordHint")}
       </p>
-      <div className="auth-links">
+      {!passwordless && <div className="auth-links">
         <button
           type="button"
           className="soft-button"
@@ -78,7 +64,7 @@ export function AccountSecurity({
         >
           {t("security.deleteAccount")}
         </button>
-      </div>
+      </div>}
       {disabled && (
         <p>
           {t("security.pendingChanges")}
@@ -86,7 +72,7 @@ export function AccountSecurity({
       )}
       <form onSubmit={submit} key={mode}>
         <fieldset disabled={disabled || busy} className="form-grid">
-          <label className="full">
+          {!passwordless && <label className="full">
             {t("security.currentPassword")}
             <input
               name="currentPassword"
@@ -95,7 +81,7 @@ export function AccountSecurity({
               maxLength={128}
               required
             />
-          </label>
+          </label>}
           {mode === "password" ? (
             <label className="full">
               {t("security.newPassword")}

@@ -1,0 +1,204 @@
+{
+  "date": "2026-10-17",
+  "base_commit": "a832119ef1163654fba1546cacc0b3106acb5665",
+  "decision": "Split security fixes from deferred database expansion. No new database migration in the security release.",
+  "production": {
+    "id": "appgprj_6aa9bf5f9a00819189df944bf2d51850",
+    "status": "active",
+    "current_live_url": "https://ipagell.website",
+    "latest_version_number": 39,
+    "access_mode": "public",
+    "current_user_role": "owner",
+    "allowed_user_count": 1,
+    "allowed_group_count": 0,
+    "mutation_calls": 0,
+    "domains": [
+      {
+        "hostname": "ipagell.website",
+        "status": "active",
+        "ssl_status": "active"
+      },
+      {
+        "hostname": "www.ipagell.website",
+        "status": "active",
+        "ssl_status": "active"
+      }
+    ],
+    "overview": {
+      "project_id": "appgprj_6aa9bf5f9a00819189df944bf2d51850",
+      "bindings": [
+        "DB"
+      ],
+      "selected_binding_name": "DB",
+      "tables": [
+        "accounts",
+        "auth_limits",
+        "class_departures",
+        "class_event_subscriptions",
+        "class_events",
+        "class_invites",
+        "class_members",
+        "class_note_pins",
+        "class_notes",
+        "class_subjects",
+        "classes",
+        "diaries",
+        "personal_note_sequences",
+        "personal_notes",
+        "sessions"
+      ],
+      "model_projection": {
+        "truncated": false,
+        "omitted_project_id": false,
+        "omitted_selected_binding": false,
+        "omitted_bindings": 0,
+        "omitted_tables": 0
+      }
+    }
+  },
+  "private_test": {
+    "id": "appgprj_6ad35e658c4c819182752ed1350b2521",
+    "status": "active",
+    "current_live_url": "https://ipagell-w8a-private-20261017.produc-ch.chatgpt.site",
+    "latest_version_number": 2,
+    "access_mode": "custom",
+    "current_user_role": "owner",
+    "allowed_user_count": 1,
+    "allowed_group_count": 0,
+    "binding": "DB",
+    "dedication_evidence": "New Sites project, new binding provisioned by Sites on its first deployment, initial accounts page empty. Physical D1 resource ID is not exposed by the connector.",
+    "initial_accounts_count": 0,
+    "custom_domains": [],
+    "baseline": {
+      "id": "appgdep_6ad35ecf9d548191964b217f3699ef6a",
+      "project_id": "appgprj_6ad35e658c4c819182752ed1350b2521",
+      "version_id": "appgprj_6ad35e658c4c819182752ed1350b2521~appgver_06b29994e3a48191940bb44af4d9ce64",
+      "status": "succeeded",
+      "url": "https://ipagell-w8a-private-20261017.produc-ch.chatgpt.site",
+      "updated_at": "2026-10-17T11:41:28.111224+00:00"
+    },
+    "security": {
+      "id": "appgdep_6ad35fba453c8191becca1e959fcb9f6",
+      "project_id": "appgprj_6ad35e658c4c819182752ed1350b2521",
+      "version_id": "appgprj_6ad35e658c4c819182752ed1350b2521~appgver_ea1c2797f4c08191b8052a862a09257e",
+      "status": "succeeded",
+      "url": "https://ipagell-w8a-private-20261017.produc-ch.chatgpt.site",
+      "updated_at": "2026-10-17T11:45:20.720365+00:00"
+    },
+    "rollback": {
+      "id": "appgdep_6ad360025e408191aea123205d170333",
+      "project_id": "appgprj_6ad35e658c4c819182752ed1350b2521",
+      "version_id": "appgprj_6ad35e658c4c819182752ed1350b2521~appgver_06b29994e3a48191940bb44af4d9ce64",
+      "status": "succeeded",
+      "url": "https://ipagell-w8a-private-20261017.produc-ch.chatgpt.site",
+      "updated_at": "2026-10-17T11:46:26.766309+00:00"
+    },
+    "reapply": {
+      "id": "appgdep_6ad3602ca5d88191828f5c1a1a0facac",
+      "project_id": "appgprj_6ad35e658c4c819182752ed1350b2521",
+      "version_id": "appgprj_6ad35e658c4c819182752ed1350b2521~appgver_ea1c2797f4c08191b8052a862a09257e",
+      "status": "succeeded",
+      "url": "https://ipagell-w8a-private-20261017.produc-ch.chatgpt.site",
+      "updated_at": "2026-10-17T11:47:09.805850+00:00"
+    },
+    "versions": [
+      {
+        "id": "appgprj_6ad35e658c4c819182752ed1350b2521~appgver_ea1c2797f4c08191b8052a862a09257e",
+        "version_number": 2,
+        "source": {
+          "commit_sha": "ee26a5c39da9daef43476bc93aa2741d28af4980"
+        }
+      },
+      {
+        "id": "appgprj_6ad35e658c4c819182752ed1350b2521~appgver_06b29994e3a48191940bb44af4d9ce64",
+        "version_number": 1,
+        "source": {
+          "commit_sha": "ccdd5c9d48e6f298dcbefb155924f60aa8c4db54"
+        }
+      }
+    ],
+    "cleanup": [
+      {
+        "table": "accounts",
+        "rows": 0,
+        "has_more": false,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "diaries",
+        "rows": 0,
+        "has_more": false,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      },
+      {
+        "table": "personal_notes",
+        "rows": 0,
+        "has_more": false,
+        "projection": {
+          "truncated": false,
+          "truncated_values": 0,
+          "omitted_columns": 0,
+          "omitted_rows": 0,
+          "next_offset": null
+        }
+      }
+    ]
+  },
+  "managed_checks": {
+    "https_requests": true,
+    "anonymous_private_request_status": 401,
+    "login_on_baseline": true,
+    "existing_data_after_security": true,
+    "password_change_and_session_revocation": true,
+    "recovery_and_session_revocation": true,
+    "rollback_login_after_credential_changes": true,
+    "reapply_login": true,
+    "account_id_preserved": true,
+    "diary_canonical_sha256": "a64c533235b768bc09a68ac51124e1d18947e1d385d798502411b4afdd0c5281",
+    "synthetic_note_preserved": true,
+    "secure_cookie_properties": [
+      "__Host- prefix",
+      "Secure",
+      "HttpOnly",
+      "SameSite=Lax"
+    ],
+    "synthetic_account_deleted": true,
+    "post_delete_session_rejected": true
+  },
+  "local_checks": {
+    "release_prepare": "passed: lint, types, 137 unit tests, i18n, inventory, docs, Sites build",
+    "d1_tests": 15,
+    "api_checks": 146,
+    "active_schema_equals_sites39": true,
+    "active_migrations": "0000\u20130006, byte-identical to Sites 39",
+    "deferred_0007_and_snapshot_byte_identical_to_a832119": true,
+    "deferred_expansion_restore": "passed locally after path relocation; not a managed restore qualification",
+    "raw_release_prepare_stdout_sha256": "1b2dbd2141b63032f7ad854a3602d9521c97c76346438972c46f22a3185c135d"
+  },
+  "limits": {
+    "managed_database_backup_restore": false,
+    "managed_migration_journal_export_restore": false,
+    "rpo_rto_retention_qualified": false,
+    "provider_enabled": false,
+    "cutover_or_0008": false,
+    "production_deployed": false,
+    "browser_qa_repeated": false
+  },
+  "harness_repairs": [
+    "Baseline harness initially addressed subjects at the wrong nesting level; partial synthetic account deleted.",
+    "Baseline checkpoint was corrected to use a canonical normalized GET of the persisted diary; earlier synthetic account deleted. Final run used the corrected harness."
+  ],
+  "credential_handling": "Native credentials and service token retained only in session memory and hidden stdin. No tokens, cookies, password or recovery code in saved proof."
+}

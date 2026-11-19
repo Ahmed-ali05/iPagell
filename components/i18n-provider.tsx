@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { Globe2 } from "lucide-react";
 import { defaultLocale, defaultMessages, initialLocale, loadMessages, localeStorageKey, saveLocale, translate, type Locale, type MessageKey, type Messages } from "@/lib/i18n";
-import { publicAveragePaths } from "@/lib/i18n/public-routes";
+import { publicAveragePaths, publicDiaryPaths, publicLandingPaths, publicNotesPaths } from "@/lib/i18n/public-routes";
 
 type I18nContextValue = {
   locale: Locale;
@@ -71,7 +71,7 @@ export function useI18n() {
   return context;
 }
 
-export function LanguageSelect({ className, publicRoute = false, averageRoute = false }: { className?: string; publicRoute?: boolean; averageRoute?: boolean }) {
+export function LanguageSelect({ className, publicRoute = false, averageRoute = false, notesRoute = false, diaryRoute = false }: { className?: string; publicRoute?: boolean; averageRoute?: boolean; notesRoute?: boolean; diaryRoute?: boolean }) {
   const { locale, setLocale, t } = useI18n();
   function chooseLocale(next: Locale) {
     if (!publicRoute) {
@@ -79,11 +79,7 @@ export function LanguageSelect({ className, publicRoute = false, averageRoute = 
       return;
     }
     const current = new URL(window.location.href);
-    const currentCode = current.pathname.split("/")[1];
-    const hasLocalePath = currentCode === "it" || currentCode === "de" || currentCode === "fr" || currentCode === "en";
-    current.pathname = averageRoute ? publicAveragePaths[next] : hasLocalePath
-      ? (next === "it" ? "/it" : `/${next}`)
-      : (next === "it" ? "/" : `/${next}`);
+    current.pathname = diaryRoute ? publicDiaryPaths[next] : notesRoute ? publicNotesPaths[next] : averageRoute ? publicAveragePaths[next] : publicLandingPaths[next];
     window.location.assign(current.href);
   }
   return <label className={className} aria-label={t("locale.label")}>

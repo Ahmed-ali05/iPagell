@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { locales, type Locale } from "./locale";
+import type { Locale } from "./locale";
 import { getServerMessages } from "./server";
-import { publicAveragePaths, publicLandingPaths } from "./public-routes";
+import { publicAveragePaths, publicDiaryPaths, publicNotesPaths, publicLandingPaths, publicLanguageAlternates } from "./public-routes";
 
 export { publicLandingPaths, publicAveragePaths } from "./public-routes";
-const ogLocales: Record<Locale, string> = { it: "it_CH", de: "de_CH", fr: "fr_CH", en: "en_GB" };
+const ogLocales: Record<Locale, string> = { it: "it_CH", de: "de_CH", fr: "fr_CH", en: "en_CH" };
 
 export async function publicLandingMetadata(locale: Locale, indexable = true): Promise<Metadata> {
   const messages = await getServerMessages(locale);
@@ -18,10 +18,7 @@ export async function publicLandingMetadata(locale: Locale, indexable = true): P
     manifest: locale === "it" ? "/manifest.webmanifest" : `/manifest-${locale}.webmanifest`,
     alternates: {
       canonical: publicLandingPaths[locale],
-      languages: {
-        ...Object.fromEntries(locales.map((supported) => [supported, `https://ipagell.website${publicLandingPaths[supported]}`])),
-        "x-default": "https://ipagell.website/",
-      },
+      languages: publicLanguageAlternates(publicLandingPaths),
     },
     openGraph: {
       type: "website",
@@ -32,7 +29,7 @@ export async function publicLandingMetadata(locale: Locale, indexable = true): P
       url: `https://ipagell.website${publicLandingPaths[locale]}`,
       images: [{
         url: socialImage, width: 1200, height: 630, type: "image/png",
-        alt: `${messages["landing.title"]} ${messages["landing.lead"]}`,
+        alt: messages["public.socialImageAlt"],
       }],
     },
     twitter: { card: "summary_large_image", title: socialTitle, description, images: [socialImage] },
@@ -55,15 +52,12 @@ export async function publicAverageMetadata(locale: Locale, indexable = true): P
     manifest: locale === "it" ? "/manifest.webmanifest" : `/manifest-${locale}.webmanifest`,
     alternates: {
       canonical: publicAveragePaths[locale],
-      languages: {
-        ...Object.fromEntries(locales.map((supported) => [supported, `https://ipagell.website${publicAveragePaths[supported]}`])),
-        "x-default": `https://ipagell.website${publicAveragePaths.it}`,
-      },
+      languages: publicLanguageAlternates(publicAveragePaths),
     },
     openGraph: {
       type: "website", locale: ogLocales[locale], siteName: "iPagell",
       title: socialTitle, description, url,
-      images: [{ url: socialImage, width: 1200, height: 630, type: "image/png", alt: socialTitle }],
+      images: [{ url: socialImage, width: 1200, height: 630, type: "image/png", alt: messages["public.socialImageAlt"] }],
     },
     twitter: { card: "summary_large_image", title: socialTitle, description, images: [socialImage] },
     robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
@@ -81,4 +75,19 @@ export function publicWebsiteStructuredData() {
 
 export function serializeStructuredData(value: unknown): string {
   return JSON.stringify(value).replaceAll("<", "\\u003c");
+}
+
+export async function publicSpaceMetadata(locale: Locale, section: "notes" | "diary", indexable = true): Promise<Metadata> {
+  const messages = await getServerMessages(locale);
+  const paths = section === "notes" ? publicNotesPaths : publicDiaryPaths;
+  const title = messages[section === "notes" ? "public.notesMetaTitle" : "public.diaryMetaTitle"];
+  const description = messages[section === "notes" ? "public.notesMetaDescription" : "public.diaryMetaDescription"];
+  const metadata = await publicAverageMetadata(locale, indexable);
+  const socialTitle = `${title} | iPagell`;
+  return {
+    ...metadata, title, description,
+    alternates: { canonical: paths[locale], languages: publicLanguageAlternates(paths) },
+    openGraph: { ...metadata.openGraph, title: socialTitle, description, url: `https://ipagell.website${paths[locale]}`, images: [{ url: `/og${locale === "it" ? "" : `-${locale}`}.png`, width: 1200, height: 630, alt: messages["public.socialImageAlt"] }] },
+    twitter: { ...metadata.twitter, title: socialTitle, description },
+  };
 }

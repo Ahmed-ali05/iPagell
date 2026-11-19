@@ -1,48 +1,67 @@
-# Sicurezza e trattamento dei dati
+# Security and data handling
 
-[Indice](README.md) · [API](docs/API.md) · [Operatività](docs/MANUTENZIONE.md)
+[README](README.md) · [API](docs/API.md) · [Operations](docs/MANUTENZIONE.md)
 
-Documento tecnico-descrittivo. Non è un’informativa privacy legale, una certificazione o una promessa di invulnerabilità.
+This is a technical description. It is not a legal privacy notice, a certification or a promise of invulnerability.
 
-## Confini di fiducia
+## Reporting a vulnerability
 
-Il browser e i suoi input non sono autorità per la proprietà del diario. Ogni API privata ricava l’utente dalla sessione e usa query parametrizzate. `expectedUserId` rileva cambi account; non sostituisce la verifica del cookie. L’isolamento applicativo non impedisce al gestore autorizzato dell’infrastruttura di accedere al database: non è cifratura end-to-end.
+Please **do not** open a public issue, pull request or discussion for a security problem.
 
-Password: scrypt N=16384, r=8, p=5, output 32 byte, salt casuale 16 byte e confronto timing-safe. Un solo hashing concorrente per isolate; sovraccarico restituisce errore, non una coda illimitata. Non sono implementati pepper, verifica password compromesse o autenticazione a due fattori.
+- Use GitHub's private reporting: **Security → Report a vulnerability** on this repository, or
+- email **ipagell.service@gmail.com** with the subject `Security`.
 
-Sessioni: token casuale 32 byte, solo digest SHA-256 nel database, durata fissa 14 giorni. Cookie HTTPS `__Host-ipagell-session`, HttpOnly, Secure, SameSite=Lax, Path=/, senza Domain; nome separato non-Secure in HTTP locale. Versione credenziali verificata a ogni richiesta. Non spostare token in localStorage.
+Do not include real backups, passwords, recovery codes, cookies or database dumps. Include the affected version or commit, the impact, reproducible steps using synthetic accounts and minimal evidence. Do not access other people's data and do not run load tests against the public site.
 
-Recupero: codice casuale di 32 byte, digest nel database, rotazione monouso al reset. Il codice permette di cambiare password: trattarlo come una credenziale. Cambio password e recupero invalidano le vecchie sessioni; revoca server non significa cancellazione remota di copie offline.
+There is no formal response-time commitment yet. Maintainers aim to acknowledge reports, reproduce them in isolation, assess the risk, agree on containment and release, add regression tests and communicate the limits of the fix.
 
-CSRF: origine esatta e JSON sulle mutazioni, più controllo Fetch Metadata. Questi controlli non proteggono da uno script malevolo già eseguito nella stessa origine. La fiducia in `CF-Connecting-IP` richiede il percorso edge previsto; non esporre il Worker tramite un proxy che consenta al client di falsificare quell’header.
+### Supported versions
 
-## Dove restano i dati
+Only the version currently deployed at [ipagell.website](https://ipagell.website), built from the latest released source, receives security fixes.
 
-| Sede | Contenuto / limite |
+## Trust boundaries
+
+The browser and its inputs are never the authority on who owns a diary. Every private API derives the user from the session and uses parameterised queries. `expectedUserId` detects account switches; it does not replace cookie verification. Application-level isolation does not prevent the authorised infrastructure operator from accessing the database: this is not end-to-end encryption.
+
+Passwords: scrypt with N=16384, r=8, p=5, 32-byte output, a random 16-byte salt and timing-safe comparison. Only one concurrent hash runs per isolate; overload returns an error instead of an unbounded queue. A pepper, breached-password checks and two-factor authentication are not implemented.
+
+Sessions: a random 32-byte token, with only its SHA-256 digest stored in the database, and a fixed 14-day lifetime. The HTTPS cookie is `__Host-ipagell-session`, HttpOnly, Secure, SameSite=Lax, Path=/, with no Domain; a separate non-Secure name is used for local HTTP. The credential version is checked on every request. Do not move tokens to localStorage.
+
+Recovery: a random 32-byte code, stored as a digest and rotated after a single use at reset. The code allows the password to be changed, so treat it as a credential. Changing the password or recovering the account invalidates old sessions; revoking a session on the server does not remotely delete offline copies.
+
+CSRF: mutations require the exact origin and a JSON body, plus a Fetch Metadata check. These checks do not protect against a malicious script already running on the same origin. Trusting `CF-Connecting-IP` relies on the expected edge path; do not expose the Worker through a proxy that lets clients forge that header.
+
+## W8-A preparation, verified locally only
+
+Migration 0007 adds the auth schema state and separate credentials. 0007 is schema-only: an explicit, separate initialisation is required before traffic is reopened, otherwise auth stays blocked. In legacy mode authentication uses `accounts` only, even without a backfill; an optional explicit copy can become stale. The adapter also supports the future schema without the two secret columns; no remote contraction has been delivered or run. Database guards reject auth writes while the mode is paused or unknown, including requests already in flight. The pause also blocks DELETE on invites and diaries, to stop the effects of old writers. Provider, proof and epoch structures remain inactive.
+
+Password change and account deletion re-check the same session, expiry and `auth_version` inside the mutation after the KDF. Invites, diary and account share the same deletion predicate; a failed FK constraint rolls back the batch. The client flushes before the request, invalidates its own generation right after success and clears only the captured ID. A local clean-up error is reported without reopening the deleted account. Logs of unexpected exceptions contain only the error name, with no SQL or provider text and no parameters. [Evidence and limits](docs/improvement-2026-10-01/AUTH-COMPATIBILITY-W8A.md).
+
+## Where data is stored
+
+| Location | Contents / limits |
 |---|---|
-| D1 | Account, digest credenziali/sessioni, snapshot diario, bucket rate limit, classi/membri/inviti, attività/sottoscrizioni, appunti personali e condivisi, materie e pin di classe |
-| IndexedDB | Diario per account e archivio Appunti separato con bozze, conflitti, payload in volo e piano d'import; non cifrati con la password |
-| localStorage | Puntatore account, lingua interfaccia, cache agenda collegata, marcatori notifiche/installazione e possibili preferenze legacy |
-| Cache service worker | Shell generica e asset consentiti, non API |
-| Backup JSON scaricato | Diario/preferenze, note/bozze/conflitti e copie delle proprie note di classe in chiaro; fuori dal controllo dell’app, senza credenziali o payload in volo |
+| D1 | Accounts, credential and session digests, diary snapshots, rate-limit buckets, classes, members and invites, activities and subscriptions, personal and shared notes, class subjects and pins |
+| IndexedDB | Per-account diary and a separate Notes store with drafts, conflicts, in-flight payloads and the import plan; not encrypted with the password |
+| localStorage | Account pointer, interface language, linked agenda cache, notification and install markers, and possible legacy preferences |
+| Service worker cache | Generic shell and allowed assets, never API responses |
+| Downloaded JSON backup | Diary and preferences, notes, drafts, conflicts and copies of your own class notes in plain text; outside the app's control, with no credentials or in-flight payloads |
 
-La cancellazione account rimuove i dati applicativi correnti dal database e invalida le sessioni; non garantisce rimozione da backup infrastrutturali, esportazioni o dispositivi offline. Tempi di conservazione infrastrutturali, titolare, contatto e informativa vanno definiti dal responsabile del servizio: non inventarli nella UI.
+Deleting an account removes current application data from the database and invalidates sessions; it does not guarantee removal from infrastructure backups, exports or offline devices. Infrastructure retention periods, the data controller, contact details and the privacy notice must be defined by whoever operates the service: do not invent them in the UI.
 
-La pulizia di sessioni scadute e bucket avviene in occasione della creazione di una sessione, non tramite un job periodico dedicato. Logout rimuove la copia del diario attivo; l'interfaccia può conservare l'archivio Appunti dello stesso account se contiene note o bozze pendenti, dopo il flush e l'avviso. Non cancella necessariamente tutti gli archivi legacy o di precedenti account. Su un dispositivo condiviso verificare questo stato prima di uscire.
+Expired sessions and buckets are cleaned up when a session is created, not by a dedicated periodic job. Logging out removes the copy of the active diary; the interface may keep the same account's Notes store if it contains pending notes or drafts, after flushing and warning the user. It does not necessarily delete every legacy store or those of previous accounts. On a shared device, check this before signing out.
 
-Gli appunti personali hanno solo endpoint per il titolare. Quelli di classe richiedono membership corrente; solo l'autore può riscrivere il testo, owner/moderator possono moderare tramite ritiro. L'archivio autore espone soltanto i propri testi anche dopo la perdita della membership. Pin e bozze restano personali. La lettura usa un AST chiuso e nodi React ammessi; il protocollo richiede formato e contratto client espliciti. Le copie fra spazi sono un'azione volontaria dell'utente.
+Personal notes have owner-only endpoints. Class notes require current membership; only the author can rewrite the text, while owners and moderators can moderate by withdrawing a note. The author archive exposes only the author's own texts, even after membership is lost. Pins and drafts stay personal. Rendering uses a closed AST and an allow-list of React nodes; the protocol requires an explicit format and client contract. Copying between spaces is always a voluntary user action.
 
-## Segnalazioni riservate
+## Feature status
 
-Non pubblicare exploit con dati reali, backup, password, codici di recupero, cookie o dump database. Contattare privatamente il responsabile del progetto tramite un canale già verificato. Un indirizzo dedicato e uno SLA **non sono ancora definiti**: la loro attivazione è una priorità prima della diffusione ampia.
+Classes, events, the linked personal agenda, subjects and shared notes are implemented in the code: they check authorisation on the server and keep shared data separate from the diary. The runtime value of the Classes flag cannot be derived from the repository alone. Release evidence and limits are in the [verification matrix](docs/VERIFICATION-MATRIX.md). The AI study space is still future work. The specifications set security requirements before any extension:
 
-Includere versione interessata, impatto, passaggi riproducibili su account sintetici e prove minimizzate. Non accedere a dati altrui né svolgere test di carico sul sito pubblico. Chi mantiene il progetto deve confermare la ricezione, riprodurre in isolamento, classificare il rischio, concordare contenimento e rilascio, aggiornare i test e comunicare i limiti della correzione.
+- [Self-managed classes](docs/CLASSI.md): server-side authorisation, invites stored as digests, diary isolation and tests against IDOR and privilege escalation;
+- [AI study space](docs/SPAZIO-STUDIO-AI.md): untrusted files, prompt injection, storage and vector isolation, deletion of derived data, quotas and processing by the provider.
 
-## Stato delle funzioni
+Do not connect an AI model or accept real files in production until the privacy notice, provider, region, retention, scanning, deletion and operational responsibility have been approved and verified.
 
-Classi, eventi, agenda personale collegata, materie e appunti condivisi sono implementati nel codice: verificano autorizzazioni server-side e separano i dati condivisi dal diario. Il valore runtime del flag Classi non deriva dalla sola repository. Le prove del rilascio e i limiti sono nella [matrice](docs/VERIFICATION-MATRIX.md). Lo spazio studio AI resta futuro. Le specifiche fissano requisiti di sicurezza prima dell'eventuale estensione:
+## Runtime and dependencies — 22 October 2026
 
-- [Classi autogestite](docs/CLASSI.md): autorizzazioni server-side, inviti conservati come digest, isolamento del diario e test contro IDOR/escalation;
-- [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md): file non fidati, prompt injection, isolamento di storage/vettori, cancellazione dei derivati, quote e trattamento da parte del fornitore.
-
-Non collegare un modello AI o accettare file reali in produzione finché informativa, provider, regione, conservazione, scansione, cancellazione e responsabilità operativa non sono stati approvati e verificati.
+PHP is not present in the source or in the deployed build. Node is used for local tooling and CI; the public Worker runs on the Cloudflare runtime managed by the platform. Use the patched releases allowed in `package.json`, with 22.23.4 selected in `.nvmrc`. The runtime check also rejects Node 23, which is out of support. Vite is on 8.3.8 ([plan of 17 November 2026](docs/DEPENDENCY-UPGRADE-PLAN-2026-11-17.md)); a full npm audit and regression tests for the local `braces` patch remain mandatory. [Advisories, scope and evidence](docs/RUNTIME-SECURITY-2026-10-22.md). The npm result does not verify the runtime managed by the provider.

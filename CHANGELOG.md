@@ -1,5 +1,49 @@
 # Registro modifiche
 
+## Non rilasciato — 19 novembre 2026, presentazione GitHub in inglese
+
+- README principale in inglese con screenshot, badge CI e sito, struttura del progetto e deploy; versione italiana in `README.it.md`.
+- CONTRIBUTING e SECURITY tradotti in inglese; SECURITY indica ora un canale di segnalazione privato. Aggiunti codice di condotta, modelli di issue e di pull request; nomi del workflow CI in inglese.
+- `docs:check` controlla anche `README.it.md` e `CODE_OF_CONDUCT.md`. Solo documentazione e metadati: nessuna modifica al runtime, nessun deploy necessario.
+
+## 22 ottobre 2026 — Sicurezza runtime e toolchain
+
+- Node minimo aggiornato alle release corrette del 21 ottobre; `.nvmrc`, CI e controllo preventivo bloccano runtime vulnerabili, fuori supporto o non ancora verificati.
+- Vite 8.0.16 → 8.1.6 e lockfile aggiornato per cinque advisory del server di sviluppo; preservate le correzioni precedenti.
+- [Analisi, fonti e verifiche](docs/RUNTIME-SECURITY-2026-10-22.md). Nessuna modifica a dati, autenticazione, schema o domini.
+
+## W8-A security — candidato privato, 17 ottobre 2026
+
+Correzioni security compatibili con lo schema Sites 39 senza bootstrap; espansione 0007 rinviata fuori dalle migrazioni attive. Nessuna modifica alla produzione. Prova HTTPS e rollback del Worker nel solo ambiente privato sintetico; [rapporto](docs/improvement-2026-10-01/W8A-RELEASE-PREPARATION.md). Restore DB gestito e provider restano fuori dal risultato.
+
+## 17 ottobre 2026 — W8-A, operazioni e prova di recupero locale
+
+0007 solo schema; bootstrap esplicito e backfill opzionale limitato fuori dalle migrazioni. Verificati export/restore sintetici locali prima/dopo espansione, preservando dati, FK, sequenze e fencing. [Runbook e limiti gestiti](operations/w8a/RUNBOOK.md). Nessun deploy o dato remoto modificato.
+
+
+## 17 ottobre 2026 — W8-A, preparazione locale account
+
+Espansione auth 0007, adattatore legacy/credenziali e guardie DB per sospendere le scritture durante un futuro cutover. Cancellazione account con versione/sessione ricontrollate su tutti gli effetti; flush appunti prima della richiesta e pulizia locale limitata all’ID catturato. Eccezioni server senza testo sensibile nei log. [Evidenze e gate](docs/improvement-2026-10-01/AUTH-COMPATIBILITY-W8A.md). Verificato soltanto in ambiente locale sintetico; nessuna migrazione remota, provider o pubblicazione.
+
+
+## 15 ottobre 2026 — Campi data su iOS
+
+- Separati padding e bordo dai campi data/ora nativi per evitare l’allargamento del pannello su iOS. Colonne dei moduli restringibili; selettore nativo e dati invariati.
+- Correzione condivisa fra voto, agenda, assenza, semestri, setup e attività di classe. [Analisi e verifiche](docs/IOS-DATE-OVERFLOW-2026-10-15.md).
+
+## 15 ottobre 2026 — Rifinitura delle interazioni
+
+- Feedback mirati, finestre e menu coerenti, chiusura accessibile e ripristino del focus dopo il passaggio dalle Impostazioni agli editor.
+- Titoli mobili completi, navigazione selezionata più chiara e schede delle Impostazioni adattive al testo ingrandito.
+- [Analisi e verifiche](docs/APPLE-DESIGN-2026-10-15.md); pubblicazione registrata nel [registro](docs/DEPLOYMENT.md).
+
+
+## Non rilasciato — 10 ottobre 2026, preparazione Appunti da lezione
+
+- Predisposta una nuova sperimentazione documentale per ascolto locale, trascrizione italiana e appunto per materia, con notebook Chrome come primo dispositivo confermato.
+- Aggiunti [analisi](docs/LEZIONI-LIVE-AI.md), piano LN-00–LN-05, fonti primarie, protocollo di efficacia e modello rapporto; area separata `experiments/lecture-notes` con esclusioni Git per audio, pesi e tracce locali.
+- Definiti confini di conservazione, prova del filtro delle digressioni e verifiche prima del pilota scolastico. Nessun codice, dipendenza, modello scaricato, benchmark o deploy; verifiche documentali nella [matrice](docs/VERIFICATION-MATRIX.md).
+
 ## Agenda — 10 ottobre 2026 (Sites 37)
 
 - Elenco con attività da fare in testa, gruppi per giorno locale e storico Completate/Annullate richiudibile; scadenze passate mai completate automaticamente.
@@ -32,13 +76,27 @@
 
 [Documentazione](docs/README.md) · [Pubblicazione](docs/DEPLOYMENT.md) · [Verifiche](docs/VERIFICATION-MATRIX.md)
 
-Versione npm, formato del diario, backup, revisione dati e numero Sites sono contatori distinti. Le voci di rilascio riportano solo pubblicazioni documentate; il [registro precedente](docs/CHANGELOG-HISTORY.md) conserva i passaggi storici.
+Versione npm, formato del diario, backup, revisione dati e numero Sites sono contatori distinti. Le voci di rilascio riportano solo pubblicazioni documentate; il [registro precedente](docs/archive/CHANGELOG-HISTORY.md) conserva i passaggi storici.
 
-## 2026-10-01 — Materie continue, anno e storico (in verifica/pubblicazione)
+## Non rilasciato — 7 ottobre 2026, laboratorio Spazio Studio L1
+
+- Aggiunto laboratorio Vite separato per testo/TXT/PDF, originali temporanei, citazioni precise, BM25 e annullamento dei worker; nessun accesso agli Appunti o ai dati dell’account.
+- Fissati runtime/parser/hash in lockfile proprio; download modello esplicito con controllo byte/SHA-256 e cache dei soli pesi. Confronto EmbeddingGemma Text 270M su corpus sintetico; beneficio sotto la soglia di utilità fissata, AI ancora sperimentale.
+- Aggiunti 16 fixture, protocollo/rapporti e 15 test mirati; controllata esclusione degli asset dal bundle/precache dell’app. Escluse dai controlli le copie di output già ignorate da Git. Nessuna pubblicazione.
+
+## Non rilasciato — 7 ottobre 2026, preparazione Spazio Studio L0
+
+- Verificati nel codice workspace, Appunti/outbox, materia/import, account/logout, backup e precache; definito un percorso studio locale distinto da diario e note sincronizzate.
+- Aggiunto il [rapporto operativo L0](docs/SPAZIO-STUDIO-AI-L0.md): candidato EmbeddingGemma 2 solo testo da 165 MB, generatori da confrontare, fonti primarie, protocollo quantitativo iniziale e copertura delle considerazioni su fonti, cancellazione, privacy e recupero.
+- Registrate le discrepanze runtime/file/prefissi e i residui prima del benchmark; aggiornati fattibilità e prompt. Nessun runtime, dipendenza, migrazione, modello scaricato o deploy; L1–L4 non avviati.
+
+## 2026-10-01 — Sites 29 — Materie continue, anno e storico
 
 - Voti/Statistiche condividono Periodo, Anno scolastico e Tutto lo storico, con anno iniziale e materia conservata al ritorno. Conteggi, provenienza, dettaglio periodi, trend cumulativo con anno e accesso allo storico anche dal periodo vuoto.
 - Media dei singoli voti ponderati fra periodi, inclusi archiviati, senza fusioni di etichette o materie omonime. Scritture separate: nuovo voto con materia selezionata e periodo reale esplicito, Home/Agenda/Assenze invariati. Nessuna migrazione.
 - Simulatore riferito al filtro Periodo/Anno, storico senza previsione; corretto il prodotto positivo dei pesi futuri 0,01. Quattro lingue, CSS per nomi lunghi e otto test semantici. Stato effettivo nel [rapporto](docs/improvement-2026-10-01/VERIFICATION.md).
+- Pubblicato in Sites 29: sorgente `02cb8843867987dbb3552e049fd1aecd5f755352`, deployment `appgdep_6abe8ea156008191bdddc2141ffb5162` succeeded; 115 test, 146 controlli API locali e prove browser, domini/TLS preservati.
+
 
 ## Non rilasciato — workflow e modelli
 
@@ -114,4 +172,4 @@ Questa sezione descrive codice esistente senza assegnare numeri o date di pubbli
 - Snapshot D1 per account, copia locale e conflitti; dati demo personali rimossi.
 - Tipi voto con ID stabili, notazione 4-5, simulatore con pesi e service worker con API escluse dalla cache.
 
-Evidenze riferite a quel rilascio: [REVIEW](docs/REVIEW.md). Non attestano automaticamente la versione corrente.
+Evidenze riferite a quel rilascio: [REVIEW](docs/archive/REVIEW.md). Non attestano automaticamente la versione corrente.

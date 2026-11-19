@@ -110,3 +110,25 @@ test('class drafts reject another tab without poisoning subsequent valid writes'
   const last={...second,content:'Ultimo testo',mutationId:crypto.randomUUID(),localVersion:3};await saveClassDraft(last,second);
   assert.equal((await listClassDrafts(first.userId))[0].content,'Ultimo testo');
 });
+
+test('account deletion forgets notes, class drafts and import metadata only for the captured ID',async()=>{
+  const {forgetNotes,saveClassDraft,listClassDrafts,readImportPlan,writeImportPlan,readMeta}=await import('../lib/notes/storage');
+  const {createDiary}=await import('../lib/new-diary');
+  const diary=createDiary({name:'Synthetic',school:'',semester:'S1',schoolYear:'2026/27',startDate:'2026-08-01',endDate:'2027-01-31',preset:'basic'});
+  const a=draft(),b=draft();
+  for(const item of [a,b]){
+    await persistPersonalDraft(item,null);
+    await applyPersonalPage(item.userId,[],0,0,true);
+    await saveClassDraft({...item,space:'class',classId:'class'},null);
+    await writeImportPlan({userId:item.userId,...diary,entries:[item],next:0,diaryCommitted:false,createdAt:1},item.userId);
+  }
+  await forgetNotes(a.userId);
+  assert.equal(await readPersonal(a.userId,a.id),null);
+  assert.deepEqual(await listClassDrafts(a.userId),[]);
+  assert.equal(await readImportPlan(a.userId),null);
+  assert.deepEqual(await readMeta(a.userId),{cursor:0,complete:false});
+  assert.equal((await readPersonal(b.userId,b.id))?.draft?.content,b.content);
+  assert.equal((await listClassDrafts(b.userId)).length,1);
+  assert.equal((await readImportPlan(b.userId))?.userId,b.userId);
+  assert.deepEqual(await readMeta(b.userId),{cursor:0,complete:true});
+});

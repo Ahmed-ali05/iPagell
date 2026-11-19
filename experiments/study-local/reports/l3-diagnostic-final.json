@@ -1,0 +1,130 @@
+{
+  "protocol": "study-local-eval-v1",
+  "promptVersion": "study-proposals-v1",
+  "model": {
+    "id": "gemma-4-E2B-it-gpu",
+    "revision": "b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1",
+    "url": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/b3ca0d2f076785a8f4b2219ddbd2bdb99954eae1/gemma-4-E2B-it-gpu.litertlm",
+    "bytes": 2008432640,
+    "sha256": "a53a59001894c58e6bdb5b9b227709f91a2e3e556baa7d85acf9c55402ba5cf5",
+    "runtime": "@litert-lm/core@0.18.0",
+    "license": "Apache-2.0"
+  },
+  "limits": {
+    "sourceTokens": 1024,
+    "contextTokens": 4096,
+    "outputTokens": 1024,
+    "repairs": 1,
+    "sectionMs": 30000,
+    "nodes": 5,
+    "edges": 6,
+    "responseUnits": 16000
+  },
+  "generationSettings": {
+    "backend": "GPU_ARTISAN",
+    "contextTokens": 4096,
+    "maxOutputTokens": 1024,
+    "thinking": false,
+    "sampler": {
+      "type": "TOP_K",
+      "k": 1,
+      "temperature": 0,
+      "seed": 42
+    },
+    "prefillPrefaceOnInit": true,
+    "filterChannelContentFromKvCache": true,
+    "constrainedDecoding": false
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+    "hardwareConcurrency": 8,
+    "secureContext": true,
+    "crossOriginIsolated": false
+  },
+  "status": "no-valid-proposals",
+  "startedAt": "2026-10-08T08:40:44.750Z",
+  "networkScope": "Guarded fetch and CSP; browser-wide traffic not exhaustively captured",
+  "memory": "Peak CPU/GPU memory not measurable with this browser API",
+  "applied": false,
+  "admission": {
+    "capabilities": {
+      "workerGpuAdapter": true,
+      "shaderF16Available": true,
+      "note": "API admission check; not a precision or device qualification"
+    },
+    "storage": {
+      "quota": 12910532406,
+      "usage": 2173114166,
+      "usageDetails": {
+        "fileSystem": 2008432964,
+        "indexedDB": 164681202
+      }
+    },
+    "requiredFreeBytes": 4083974144
+  },
+  "fetchRequests": [],
+  "annotations": [],
+  "sourceScope": {
+    "documents": 1,
+    "readableSections": 1,
+    "excludedPages": [],
+    "corpus": "custom-not-benchmark"
+  },
+  "weightsVerified": true,
+  "runs": [
+    {
+      "mode": "none",
+      "loadMs": 2312.2999999970198,
+      "results": [
+        {
+          "sectionId": "d-88d1fa1100f3603ac3a92d26c6b8b3bff9b390c16268eede074aa46a2fbf05ae-utf8-v1-paragraph-utf16-v1:p1:0-108",
+          "proposal": null,
+          "attempts": 2,
+          "invalidOutputs": 2,
+          "sourceTokens": 31,
+          "prefaceTokens": 395,
+          "outputTokens": 487,
+          "ms": 22283.5,
+          "code": "PROPOSAL_INVALID",
+          "validationFailures": [
+            "Proposta fuori contratto (JSON_SYNTAX): usa la mappa manuale oppure una nuova prova locale.",
+            "Proposta fuori contratto (JSON_SYNTAX): usa la mappa manuale oppure una nuova prova locale."
+          ]
+        }
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "url": "http://127.0.0.1:5174/runtime/litertlm_wasm_internal.wasm"
+        }
+      ],
+      "promptVersion": "study-proposals-v1"
+    }
+  ],
+  "retrieval": "No eligible existing candidates; comparison unavailable",
+  "summary": [
+    {
+      "mode": "none",
+      "sections": 1,
+      "validSections": 0,
+      "emptySections": 1,
+      "invalidOutputs": 2,
+      "proposedConcepts": 0,
+      "proposedRelations": 0,
+      "essentialCount": 0,
+      "quality": {
+        "coverage": null,
+        "supportedStatements": null,
+        "supportedRelations": null,
+        "duplicates": null,
+        "stableConcepts": null,
+        "seriousContradictions": null,
+        "status": "human-review-required"
+      },
+      "maxSectionMs": 22283.5,
+      "loadMs": 2312.2999999970198,
+      "passed": false
+    }
+  ],
+  "finishedAt": "2026-10-08T08:41:42.004Z"
+}

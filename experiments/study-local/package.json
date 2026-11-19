@@ -1,0 +1,27 @@
+{
+  "name": "ipagell-study-local-lab",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node ../../node_modules/vite/bin/vite.js --config vite.config.ts",
+    "build": "node ../../node_modules/vite/bin/vite.js build --config vite.config.ts",
+    "check": "tsc --noEmit --project tsconfig.json && node --import tsx --test tests/*.test.ts",
+    "fixtures": "node --import tsx scripts/fixtures.ts",
+    "evaluate": "node --import tsx scripts/evaluate.ts",
+    "preinstall": "node ../../scripts/check-node.mjs",
+    "predev": "node ../../scripts/check-node.mjs",
+    "prebuild": "node ../../scripts/check-node.mjs",
+    "precheck": "node ../../scripts/check-node.mjs",
+    "prefixtures": "node ../../scripts/check-node.mjs",
+    "preevaluate": "node ../../scripts/check-node.mjs"
+  },
+  "engines": {
+    "node": "^22.23.4 || ^24.22.1 || ^26.12.1"
+  },
+  "dependencies": {
+    "@litert-lm/core": "0.18.0",
+    "@noble/hashes": "2.4.0",
+    "pdfjs-dist": "6.4.299"
+  }
+}

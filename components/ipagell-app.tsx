@@ -56,7 +56,7 @@ import { initialGradeScope, resolveGradeScope, scopeGrades, scopePeriods, type G
 import { EmptyState } from "@/components/diary-empty-state";
 import { AccountGate } from "@/components/account-gate";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
-import { formatDate as intlDate, formatNumber as intlNumber, selectPlural, type Locale } from "@/lib/i18n";
+import { formatDate as intlDate, formatNumber as intlNumber, greetingKey, selectPlural, type Locale } from "@/lib/i18n";
 import { AccountSecurity } from "@/components/account-security";
 import { useDiary } from "@/hooks/use-diary";
 import { InstallAppOffer } from "@/components/install-app";
@@ -71,6 +71,7 @@ import {
 import { EntryDialog, type ModalType } from "@/components/entry-dialog";
 import { ClassesView } from "@/components/classes-view";
 import { PersonalNotesView } from "@/components/notes-view";
+import { RequestError } from "@/lib/client-http";
 import { flushOpenNotes } from "@/lib/notes/flush";
 import { useNotes } from "@/hooks/use-notes";
 import type { ClassNote, NoteCopySeed, NoteDraft, NotesBackupV3 } from "@/types/notes";
@@ -114,11 +115,13 @@ declare global {
   }
 }
 
+// Primary destinations, shared by the desktop sidebar and the five-item mobile bar.
+// Absences is used less often: it sits in the sidebar's secondary group and is reached from Home on phones.
 const nav = [
   { id: "home", icon: Home },
   { id: "agenda", icon: CalendarDays },
   { id: "grades", icon: GraduationCap },
-  { id: "absences", icon: UserRoundCheck },
+  { id: "notes", icon: BookOpen },
   { id: "classes", icon: UsersRound },
 ] as const;
 const navKeys = { home: "common.home", agenda: "nav.agenda", grades: "nav.grades", absences: "nav.absences", classes: "nav.classes", stats: "nav.stats", notes: "notes.my" } as const;
@@ -202,7 +205,13 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const allAgenda = useMemo(() => [...data.agenda, ...subscriptionAgenda(classAgenda.items.filter(s => !data.agenda.some(a => a.id === `class-snapshot-${s.id}`)))], [data.agenda, classAgenda.items]);
   const [personalEvent, setPersonalEvent] = useState<ClassSubscription | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
-  const [notesIntent,setNotesIntent]=useState<{subjectId:string;newNote:boolean;openId:string;serial:number}>({subjectId:"",newNote:false,openId:"",serial:0});
+  // Re-checked every minute so an open app moves from "Buongiorno" to "Buonasera" on its own.
+  const [greeting, setGreeting] = useState(() => greetingKey(new Date()));
+  useEffect(() => {
+    const timer = window.setInterval(() => setGreeting(greetingKey(new Date())), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const [notesIntent,setNotesIntent]=useState<{subjectId:string;newNote:boolean;openId:string;serial:number;fromNav?:boolean}>({subjectId:"",newNote:false,openId:"",serial:0});
   const [notesOrigin,setNotesOrigin]=useState<{tab:TabId;agendaItemId?:string}>({tab:"home"});
   const [copyToClass,setCopyToClass]=useState<NoteCopySeed|null>(null);
   const [classesVisited, setClassesVisited] = useState(false);
@@ -220,6 +229,14 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [editingSemester, setEditingSemester] = useState<Semester | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsTriggerRef = useRef<HTMLButtonElement>(null);
+  const desktopSettingsTriggerRef = useRef<HTMLButtonElement>(null);
+  const settingsReturnFocusRef = {
+    get current() {
+      return settingsTriggerRef.current?.getClientRects().length
+        ? settingsTriggerRef.current : desktopSettingsTriggerRef.current;
+    },
+  };
   const [deleteSubjectId, setDeleteSubjectId] = useState<string | null>(null);
   const [deleteSemesterId, setDeleteSemesterId] = useState<string | null>(null);
   const [pendingBackup, setPendingBackup] = useState<BackupPayload | NotesBackupV3 | null>(
@@ -448,12 +465,14 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
     setActiveTab(tab);
     return true;
   };
-  const openNotes=async(subjectId="",newNote=false,openId="",agendaItemId?:string)=>{
+  const openNotes=async(subjectId="",newNote=false,openId="",agendaItemId?:string,fromNav=false)=>{
     if(await navigate("notes")){
       if(activeTab!=="notes")setNotesOrigin({tab:activeTab,agendaItemId:agendaItemId??agendaFocusId??undefined});
-      setNotesIntent({subjectId,newNote,openId,serial:Date.now()});
+      setNotesIntent({subjectId,newNote,openId,serial:Date.now(),fromNav});
     }
   };
+  // Navigation bars open the Notes list without the "back to" link, since Notes is a primary destination.
+  const openNotesFromNav = () => void openNotes("", false, "", undefined, true);
   const copyClassToPersonal=async(note:ClassNote)=>{
     const id=crypto.randomUUID();
     const draft:NoteDraft={userId:session.user!.id,id,space:"personal",subjectId:"",subjectName:note.subjectName,title:note.title,content:note.content,contentFormat:note.contentFormat,pinned:false,baseRevision:0,mutationId:crypto.randomUUID(),localVersion:0,localEditedAt:Date.now()};
@@ -595,23 +614,34 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               className={activeTab === id ? "nav-item active" : "nav-item"}
               key={id}
               aria-current={activeTab === id ? "page" : undefined}
-              onClick={() => navigate(id)}
+              onClick={id === "notes" ? openNotesFromNav : () => void navigate(id)}
             >
               <Icon size={20} strokeWidth={2.1} />
               <span>{t(navKeys[id])}</span>
             </button>
           ))}
+          <span className="nav-separator" aria-hidden="true" />
+          <button
+            className={activeTab === "absences" ? "nav-item secondary active" : "nav-item secondary"}
+            aria-current={activeTab === "absences" ? "page" : undefined}
+            onClick={() => void navigate("absences")}
+          >
+            <UserRoundCheck size={18} strokeWidth={2} />
+            <span>{t(navKeys.absences)}</span>
+          </button>
         </nav>
-        <button className="settings-nav" onClick={() => setSettingsOpen(true)}>
+        <button ref={desktopSettingsTriggerRef} className="settings-nav" onClick={() => setSettingsOpen(true)}>
           <Settings2 size={19} /> {t("common.settings")}
         </button>
-        <div className="profile-chip">
-          <span>{preferences.studentName.slice(0, 2).toUpperCase()}</span>
-          <div>
+        {/* The account chip is a second, familiar way into Settings (account, periods, preferences). */}
+        <button type="button" className="profile-chip" onClick={() => setSettingsOpen(true)} aria-label={`${preferences.studentName} · ${t("workspace.openSettings")}`}>
+          <span aria-hidden="true">{preferences.studentName.slice(0, 2).toUpperCase()}</span>
+          <div aria-hidden="true">
             <b>{preferences.studentName}</b>
             <small>{currentSemester.name}</small>
           </div>
-        </div>
+          <ChevronRight size={16} aria-hidden="true" />
+        </button>
       </aside>
 
       <section className="workspace">
@@ -620,7 +650,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             <p>{titleCase(formatLongDate(locale, new Date()))}</p>
             <h1>
               {activeTab === "home"
-                ? t("workspace.greeting", { name: preferences.studentName })
+                ? t(greeting, { name: preferences.studentName })
                 : activeTab === "stats"
                   ? t("nav.stats")
                   : t(navKeys[activeTab])}
@@ -632,10 +662,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             {session.status === "saved" ? <><Check size={14} aria-hidden="true"/><span>{t("sync.savedShort")}</span></> : t(({ saved: "sync.saved", saving: "sync.saving", offline: "sync.offline", conflict: "sync.conflict", "device-conflict": "sync.deviceConflict", error: "sync.error", expired: "sync.expired" } as const)[session.status])}
           </span>
             <button
-              aria-label={t("common.settings")}
+              ref={settingsTriggerRef}
+              className="account-avatar-button"
+              aria-label={`${preferences.studentName} · ${t("workspace.openSettings")}`}
               onClick={() => setSettingsOpen(true)}
             >
-              <Settings2 size={20} />
+              <span aria-hidden="true">{preferences.studentName.slice(0, 2).toUpperCase()}</span>
             </button>
           </div>
         </header>
@@ -801,7 +833,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               onBackToGrades={() => navigate("grades")}
             />
           )}
-          {activeTab === "notes" && <PersonalNotesView key={notesIntent.serial} controller={notes} userId={session.user!.id} data={data} initialSubjectId={notesIntent.subjectId} initialNew={notesIntent.newNote} initialOpenId={notesIntent.openId} onBackToContext={()=>void navigate(notesOrigin.tab,notesOrigin.agendaItemId)} contextLabel={t(navKeys[notesOrigin.tab])} onAddSubject={()=>openSubjectEditor()} onCopyToClass={(note)=>{void navigate("classes").then(ok=>{if(ok)setCopyToClass(note);});}} />}
+          {activeTab === "notes" && <PersonalNotesView key={notesIntent.serial} controller={notes} userId={session.user!.id} data={data} initialSubjectId={notesIntent.subjectId} initialNew={notesIntent.newNote} initialOpenId={notesIntent.openId} onBackToContext={notesIntent.fromNav?undefined:()=>void navigate(notesOrigin.tab,notesOrigin.agendaItemId)} contextLabel={t(navKeys[notesOrigin.tab])} onAddSubject={()=>openSubjectEditor()} onCopyToClass={(note)=>{void navigate("classes").then(ok=>{if(ok)setCopyToClass(note);});}} />}
         </div>
           {agendaVisited&&<div hidden={activeTab !== "agenda"}>
             <AgendaView
@@ -875,16 +907,18 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           <button
             className={activeTab === id ? "active" : ""}
             key={id}
-            onClick={() => navigate(id)}
+            aria-current={activeTab === id ? "page" : undefined}
+            onClick={id === "notes" ? openNotesFromNav : () => void navigate(id)}
           >
             <Icon size={21} />
-            <span>{t(navKeys[id])}</span>
+            <span>{t(id === "notes" ? "nav.notes" : navKeys[id])}</span>
           </button>
         ))}
       </nav>
 
       <EntryDialog
         type={modal}
+        fallbackFocusRef={settingsReturnFocusRef}
         onClose={() => {
           setModal(null);
           setEditingSubject(null);
@@ -911,6 +945,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       />
       <SettingsDialog
         open={settingsOpen}
+        fallbackFocusRef={settingsReturnFocusRef}
         onOpenChange={setSettingsOpen}
         data={data}
         preferences={preferences}
@@ -965,9 +1000,18 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           } catch { toast.error(t("notes.saveFailed")); }
         }}
         accountEmail={session.user!.username}
-        accountId={session.user!.id}
+        accountMethod={session.user!.method}
         securityDisabled={session.diary!.dirty || session.status !== "saved" || notes.pending>0}
-        onSecurityChanged={async(operation)=>{await flushOpenNotes();if(operation==="delete")await forgetNotes(session.user!.id);session.reauthenticate();}}
+        onSecuritySubmit={async(operation,fields)=>{
+          try { await session.security(operation,fields,flushOpenNotes,forgetNotes); }
+          catch(error) {
+            if(error instanceof RequestError && error.code === "SECURITY_LOCAL_CLEANUP_FAILED") {
+              toast.error(t("security.localCleanupFailed"));
+              return;
+            }
+            throw error;
+          }
+        }}
       />
       <input
         ref={importRef}
@@ -1185,6 +1229,12 @@ function Dashboard({
 
       {grades.length > 0 ? <button className="grade-summary" onClick={() => onNavigate("grades")}><span>{t("home.gradeSituation")}</span><strong>{t("home.average", { value: gradeText(locale, average) })}</strong><small>{selectPlural(locale, grades.length, t("home.gradeCountOne"), t("home.gradeCount", { count: grades.length }))} · {selectPlural(locale, gradedSubjects, t("home.subjectCountOne"), t("home.subjectCount", { count: gradedSubjects }))}</small><ChevronRight size={18} /></button> : !emptyDiary && <section className="grade-prompt"><div><b>{t("home.noGrades")}</b></div><button onClick={() => data.subjects.length ? onAdd("grade") : onManageSubjects()}>{data.subjects.length ? t("grades.add") : t("home.addSubject")}</button></section>}
       <section className="panel notes-home-card"><div className="panel-title"><div><h3>{t("notes.my")}</h3></div><BookOpen size={22}/></div>{recent.length>0&&<div className="notes-recent-list">{recent.map(record=>{const note=(record.draft??record.remote)!;return <button className="notes-recent-row" key={record.id} onClick={()=>onResumeNote(record.id)}><div><b>{note.title||t("notes.untitled")}</b><small>{data.subjects.find(s=>s.id===note.subjectId)?.name||note.subjectName||t("notes.chooseSubject")}</small></div><ChevronRight size={18}/></button>;})}</div>}<div className="notes-actions"><button className="soft-button" onClick={onOpenNotes}>{t("notes.viewAll")}</button><button className="primary-button" onClick={onNewNote}><Plus size={17}/>{t("notes.new")}</button></div></section>
+      {/* Absences left the mobile bar; this quiet row keeps them reachable from Home on every screen size. */}
+      <nav className="dashboard-quiet-links" aria-label={t("home.moreLinks")}>
+        <button className="dashboard-quiet-link" onClick={() => onNavigate("absences")}><UserRoundCheck size={18} aria-hidden="true" /><span>{t("nav.absences")}</span><ChevronRight size={18} aria-hidden="true" /></button>
+        <button className="dashboard-quiet-link" onClick={() => onNavigate("stats")}><BarChart3 size={18} aria-hidden="true" /><span>{t("nav.stats")}</span><ChevronRight size={18} aria-hidden="true" /></button>
+        <button className="dashboard-quiet-link" onClick={onManageSubjects}><Settings2 size={18} aria-hidden="true" /><span>{t("common.settings")}</span><ChevronRight size={18} aria-hidden="true" /></button>
+      </nav>
     </div>
   );
 }
@@ -1663,6 +1713,7 @@ function GradesView({
 
 function SettingsDialog({
   open,
+  fallbackFocusRef,
   onOpenChange,
   data,
   preferences,
@@ -1678,11 +1729,12 @@ function SettingsDialog({
   onImport,
   onLogout,
   accountEmail,
-  accountId,
+  accountMethod,
   securityDisabled,
-  onSecurityChanged,
+  onSecuritySubmit,
 }: {
   open: boolean;
+  fallbackFocusRef: { readonly current: HTMLButtonElement | null };
   onOpenChange: (open: boolean) => void;
   data: SchoolData;
   preferences: Preferences;
@@ -1698,14 +1750,14 @@ function SettingsDialog({
   onImport: () => void;
   onLogout: () => void;
   accountEmail: string;
-  accountId: string;
+  accountMethod?: "password" | "google";
   securityDisabled: boolean;
-  onSecurityChanged: (operation:"password"|"delete") => Promise<void>;
+  onSecuritySubmit: (operation:"password"|"delete", fields: Record<string, FormDataEntryValue>) => Promise<void>;
 }) {
   const { t, locale } = useI18n();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="settings-dialog" aria-describedby={undefined}>
+      <DialogContent className="settings-dialog" aria-describedby={undefined} fallbackFocusRef={fallbackFocusRef}>
         <DialogHeader>
           <DialogTitle>{t("common.settings")}</DialogTitle>
           <LanguageSelect className="language-select" />
@@ -1898,10 +1950,10 @@ function SettingsDialog({
               {t("settings.logoutRemoveCopy")}
             </button>
             <AccountSecurity
-              id={accountId}
               username={accountEmail}
+              passwordless={accountMethod === "google"}
               disabled={securityDisabled}
-              onChanged={onSecurityChanged}
+              onSubmit={onSecuritySubmit}
             />
           </TabsContent>
         </Tabs>

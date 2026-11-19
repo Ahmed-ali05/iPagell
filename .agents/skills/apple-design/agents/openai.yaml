@@ -1,0 +1,4 @@
+interface:
+  display_name: "Apple Design per iPagell"
+  short_description: "Interfacce fluide e accessibili per iPagell"
+  default_prompt: "Usa $apple-design per migliorare questa interfaccia di iPagell rispettando i componenti esistenti e Riduci movimento."

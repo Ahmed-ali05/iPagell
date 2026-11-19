@@ -5,14 +5,21 @@
   "compatibility_date": "2026-09-16",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  "routes": [
+    { "pattern": "ipagell.website", "custom_domain": true },
+    { "pattern": "www.ipagell.website", "custom_domain": true }
+  ],
   "vars": {
-    "IPAGELL_CLASSES": "enabled"
+    "IPAGELL_CLASSES": "enabled",
+    // Google sign-in stays hidden until GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+    // are set with `wrangler secret put`. See docs/DEPLOYMENT.md.
+    "GOOGLE_REDIRECT_URI": "https://ipagell.website/api/auth/oauth/google/callback"
   },
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "ipagell-production",
-      "database_id": "a45281d4-7fea-4ba1-8f04-439aab8d1b93",
+      "database_name": "ipagell-live",
+      "database_id": "588e7605-60a5-4bdf-8b1f-b1f8ce2df28b",
       "migrations_dir": "drizzle"
     }
   ],
@@ -20,7 +27,37 @@
     "enabled": true,
     "logs": {
       "enabled": true,
-      "head_sampling_rate": 1
+      "head_sampling_rate": 1,
+      // Nessun log automatico per richiesta (IP, posizione, user agent, account):
+      // restano solo gli errori registrati dal codice. Vedi docs/legal.
+      "invocation_logs": false
+    }
+  },
+  "env": {
+    "staging": {
+      "name": "ipagell-staging",
+      "workers_dev": true,
+      "routes": [],
+      "vars": {
+        "IPAGELL_CLASSES": "enabled",
+        "GOOGLE_REDIRECT_URI": "https://ipagell-staging.ahmedbasto59.workers.dev/api/auth/oauth/google/callback"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "ipagell-staging",
+          "database_id": "64346ec7-f2aa-4926-8a98-c0f2f487634e",
+          "migrations_dir": "drizzle"
+        }
+      ],
+      "observability": {
+        "enabled": true,
+        "logs": {
+          "enabled": true,
+          "head_sampling_rate": 1,
+          "invocation_logs": false
+        }
+      }
     }
   }
 }

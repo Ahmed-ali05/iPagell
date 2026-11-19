@@ -1,0 +1,258 @@
+
+> ipagell@0.1.0 release:prepare
+> npm run check && npm run build
+
+
+> ipagell@0.1.0 check
+> npm run lint && tsc --noEmit && npm test && npm run check:i18n && npm run docs:check
+
+
+> ipagell@0.1.0 lint
+> eslint . --ignore-pattern dist --ignore-pattern .next
+
+
+> ipagell@0.1.0 test
+> node --import tsx --test tests/*.test.ts
+
+✔ completed history never precedes open work, cancelled overrides completion, detached active stays open (9.26575ms)
+✔ local day boundaries include earlier hours today, midnight and DST without UTC misclassification (0.885584ms)
+✔ sort compares instants with offsets and ties remain deterministic; history uses latest due date (0.268875ms)
+✔ completion, reopening and midnight reclassify without losing activities; empty filters stay empty (0.176667ms)
+✔ large history counts every item without hiding outstanding past work or changing input (3.265125ms)
+✔ unexpected server errors never log SQL, passwords, tokens or provider exception text (20.160625ms)
+✔ Deferred 0007 is schema-only and excluded from the active release journal (10.961333ms)
+✔ security release keeps exactly the Sites 39 schema and migration journal (9.259916ms)
+✔ same UI action starts once before React renders; independent keys run together (2.451042ms)
+✔ a confirmed class creation or join is not reported as a failed write when its refresh fails (0.181042ms)
+✔ duplicate subscription update sends one request and releases pending after reconciliation (0.325709ms)
+✔ independent writes and reversed full snapshots cannot roll back UI or cache (0.563167ms)
+✔ an early response stays pending until the final read finishes (0.408458ms)
+✔ 409 reconciles revision; stale retry is rejected before another write (0.313583ms)
+✔ confirmed mutation remains successful when the following read fails (0.261583ms)
+✔ network or server error releases pending and does not reuse an uncertain revision (0.364416ms)
+✔ all consumers resolve the private, depth-bounded braces patch (3.027208ms)
+✔ deep brace, parentheses and unfinished patterns are rejected before stack exhaustion (1.389959ms)
+✔ direct and cyclic AST input cannot bypass traversal bounds (1.205333ms)
+✔ ordinary expansion, escapes, quoted literals and flat input remain compatible (6.127792ms)
+✔ actual lint and dynamic-import glob consumers still find the reader files (57.085833ms)
+✔ source-map-js huge indexed offset completes within a process deadline (44.042916ms)
+✔ every sharp copy uses the patched version and its native decoder loads (237.917708ms)
+✔ offline edits survive reopen and reconnect; no success before durable save (7.22975ms)
+✔ two offline tabs cannot overwrite the other tab's pending draft (1.300416ms)
+✔ refresh and commit share a queue: a delayed GET cannot erase an edit (0.624917ms)
+✔ lost response after remote commit is reconciled without a second write (2.650042ms)
+✔ reopen also reconciles a lost acknowledgement; a real conflict stays dirty (1.734958ms)
+✔ storage failure after identifying B never falls back to account A (2.523333ms)
+✔ quota error does not publish or mutate data, even for an impure recipe (0.979083ms)
+✔ storage failure after server success keeps dirty data and reports an error (0.581042ms)
+✔ 401 during a mutation preserves the draft and blocks further edits (0.346083ms)
+✔ 401 and 503 never become offline logins; an open draft remains accessible (0.58225ms)
+✔ account transition invalidates in-flight responses and queued edits (2.1185ms)
+✔ another tab changing account invalidates responses and cannot be logged out (0.59525ms)
+✔ logout and use-server cannot discard a draft written by another tab (1.046917ms)
+✔ a GET started before another tab's save cannot roll back its newer revision (0.481166ms)
+✔ HTTP errors preserve their status even with HTML or malformed JSON (23.644959ms)
+✔ unmount invalidates a pending load and cannot reactivate its account (0.462ms)
+✔ entry authentication keeps the form on network failure and never opens a cached account (0.746833ms)
+✔ entry authentication keeps its current phase if activation fails (0.229709ms)
+✔ entry authentication reuses the verified identity to open an existing diary (2.92675ms)
+✔ reduce motion persists offline, synchronizes and stays scoped to its account (4.867542ms)
+✔ reduce motion roundtrips in backups, including legacy diaries without the preference (1.739792ms)
+✔ security flush fails before request; dirty diary also blocks security (1.468417ms)
+✔ security success hides deleted account before cleanup and clears only its local copy (0.554958ms)
+✔ late security response and storage cleanup preserve a new account (0.324833ms)
+✔ server security success remains anonymous even when local deletion fails (0.234917ms)
+✔ password change flushes first, retains local copies and revokes the current UI generation (0.16325ms)
+✔ class agenda backups become valid private copies without altering the diary (8.950292ms)
+✔ shared event schema rejects private fields and invalid timestamps (1.542125ms)
+✔ new accounts start without any personal demo results (0.560542ms)
+✔ onboarding supports generic subjects, an empty diary and cached clients (0.8125ms)
+✔ current 1–6 grades accept half notation and comma, reject malformed values (0.561709ms)
+✔ validation rejects broken references, duplicates, invalid dates and unsafe color (2.636125ms)
+✔ weighted averages and simulator use both type and assessment weights (0.587792ms)
+✔ new passwords accept 12 characters and retain upper and repetition limits (0.571625ms)
+✔ passwords have unique salts and constant-time verification (593.205375ms)
+✔ CSRF and streamed body size checks (9.599541ms)
+✔ class role permissions match the product matrix (0.080292ms)
+✔ class access rejects unknown roles and stays disabled by default (0.04325ms)
+✔ class invite codes are unambiguous and normalize separators (0.632042ms)
+✔ empty, single, simple and weighted lists use the shared mean (0.642584ms)
+✔ default weight, removal and grade boundaries (0.609834ms)
+✔ comma, point and adjacent-half input; invalid and zero weights (0.107625ms)
+✔ extreme finite weights preserve the mean without overflow or underflow (0.080833ms)
+✔ all localized tool metadata share canonical, hreflang and translated copy (43.330834ms)
+✔ annual consultation aggregates individual weights across archived periods, not period means (1.781792ms)
+✔ school year uses exact label and period membership, never dates or names (0.320125ms)
+✔ same-name subjects stay distinct and overall average uses subject coefficients (0.210167ms)
+✔ current type weights recalculate the annual past without invented snapshots (0.128708ms)
+✔ cumulative trend keeps ISO years, chronological order, same-day grouping and final weighted mean (7.807917ms)
+✔ empty current period can show its populated year; empty scope stays null (0.179584ms)
+✔ removed/imported periods resolve to a real annual scope; reading leaves backup and preferences unchanged (3.032375ms)
+✔ simulation preserves small positive effective weight from grade weight times type weight (0.427084ms)
+✔ current preset describes numeric 1–6 with higher values better and pass at 4 (1.198834ms)
+✔ grade bounds, finite-number validation and schema preserve existing data rules (4.366791ms)
+✔ current input accepts decimals and existing comma and adjacent-half notation (0.568042ms)
+✔ pass threshold and comparison use the current higher-is-better order (0.239375ms)
+✔ simple and weighted means and required-grade calculation remain unrounded (1.797375ms)
+✔ number display uses the current precision and simulator rounds up to half points (0.078333ms)
+✔ grade statistics trend keeps the current weighted arithmetic progression (10.498916ms)
+✔ public landing metadata shares all four message catalogs and language URLs (38.095958ms)
+✔ noncanonical preview hosts are noindex and JSON-LD escapes HTML delimiters (2.683917ms)
+✔ the root landing stays Italian and localized pages omit duplicate /it canonical (5.171458ms)
+✔ homepage structured data only identifies the canonical website (0.108833ms)
+✔ all supported languages have the same complete keys and placeholders (23.923375ms)
+✔ locale values normalize and explicit preference wins (0.322917ms)
+✔ missing translation falls back to Italian and variables remain semantic (0.118458ms)
+✔ a stored error key renders in the selected language without revalidation (0.09025ms)
+✔ plural labels use the locale category in application copy (7.033375ms)
+✔ main date and decimal formatting follow locale (28.0495ms)
+✔ changing interface language stores only a local preference, not diary data (0.498833ms)
+✔ calculator visits do not install the diary precache; app and landing still do (2.070791ms)
+✔ Android Chromium uses the native prompt only after the browser offers it (0.26525ms)
+✔ Samsung Internet, Edge and Firefox have browser-specific manual fallbacks (0.118708ms)
+✔ Safari on iPhone and iPad gets the Share guide, not a fake prompt (0.289291ms)
+✔ Desktop CTA requires a real install event; unknown browsers get none (0.164709ms)
+✔ standalone and installed state suppress every installation invitation (0.180125ms)
+✔ Home offer waits for useful content and time, then respects 90-day dismissal (0.225166ms)
+✔ manifest points to the app, declares standalone and ships required icons (1.477875ms)
+✔ localized public routes use the shared offline shell without four route precaches (0.650208ms)
+✔ localized manifests reuse catalog copy and the same installed app identity and assets (1.15375ms)
+✔ overlapping autosave, visibility and Done drain the latest edit once (0.768708ms)
+✔ a rejected local write remains dirty and Retry does not poison subsequent saves (0.604458ms)
+✔ opening and closing a blank editor does not save; forced preview saves only once (0.187167ms)
+✔ a committed draft survives a failed refresh; storage failure is still rejected (0.230042ms)
+✔ Select All can format every block as a list without dropping text (3.637084ms)
+✔ section heading toggles back across a full note and preserves bold text (0.975417ms)
+✔ a toolbar bookmark maps through an input composition and retains its range (0.35675ms)
+✔ removing a middle list item retains neighbouring items and a backward selection (0.186375ms)
+✔ plain notes preserve exact visible code points until formatting is requested (18.599542ms)
+✔ canonical limited Markdown round trips and malformed syntax stays visible (1.919125ms)
+✔ reader escapes hostile content and never creates links, images or scripts (3.252583ms)
+✔ short and long PDF use the validated AST and preserve title metadata (399.105125ms)
+✔ soft line breaks in headings and list items remain canonical after typing and paste (0.388625ms)
+✔ typing during an in-flight write rebases only the server-confirmed ancestor (9.497417ms)
+✔ a lost response retains the exact submitted payload while later edits remain local (1.50475ms)
+✔ a concurrently committed acknowledgement and next local save cannot overwrite text (7.446708ms)
+✔ another tab changes the draft: stale writer is rejected and neither text is overwritten (0.847084ms)
+✔ a real remote conflict stays explicit and does not become a blind rebase (0.691541ms)
+✔ stale paginated reads cannot roll back an acknowledgement or the cursor (1.512417ms)
+✔ a confirmed delete clears its pending tombstone instead of creating a conflict (1.874625ms)
+✔ an incomplete draft cannot become an in-flight write while another edit repairs it (1.11025ms)
+✔ a definitively rejected write is released so corrected text can be synchronized (1.398291ms)
+✔ an IndexedDB write failure aborts atomically and the next retry can succeed (0.748541ms)
+✔ class drafts reject another tab without poisoning subsequent valid writes (0.8755ms)
+✔ account deletion forgets notes, class drafts and import metadata only for the captured ID (3.237958ms)
+✔ format migration preserves old rows and advances sequence for format-only edits (7.095166ms)
+✔ additive note migration seeds legacy class labels and keeps authored text after class deletion (2.347458ms)
+✔ personal note sequence, tombstone and quotas are independent from diary snapshots (1.860791ms)
+✔ note validation and backup V1/V2 remap diary references without mutating source (4.940125ms)
+✔ create and edit payloads match strict API schemas without extra IDs (0.237458ms)
+✔ backup keeps a private class draft and restores class text only as unassigned personal copies (0.818666ms)
+✔ V2 imports as plain while V3 retains Markdown in notes, drafts and conflict snapshots (1.227792ms)
+✔ an existing worker defers full precache on calculator visits and keeps it for app entry (22.473ms)
+✔ offline navigation uses a fresh response when Sites redirects the shared shell (3.066875ms)
+ℹ tests 137
+ℹ suites 0
+ℹ pass 137
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1228.643416
+
+> ipagell@0.1.0 check:i18n
+> node scripts/check-i18n.mjs
+
+i18n: 769 complete, referenced keys across it/de/fr/en
+
+> ipagell@0.1.0 docs:check
+> node scripts/repo-inventory.mjs --check && node scripts/check-docs.mjs
+
+Inventario allineato: 27 route API, 15 tabelle, 7 migrazioni.
+54 documenti, 423 collegamenti locali verificati.
+Rifiutati anche i collegamenti a percorsi ignorati da Git.
+Esclusi: URL esterni, ancore, link reference-style e correttezza del contenuto.
+
+> ipagell@0.1.0 build
+> node scripts/run-framework.mjs build && node scripts/generate-precache.mjs
+
+
+  vinext build  (Vite 8.0.16)
+
+[1/5] analyze client references...
+[2K
+transforming...✓ 347 modules transformed.
+rendering chunks...
+✓ built in 652ms
+[2/5] analyze server references...
+[2K
+transforming...✓ 987 modules transformed.
+rendering chunks...
+✓ built in 1.17s
+[3/5] build rsc environment...
+[2K
+transforming...✓ 339 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 494ms
+[4/5] build client environment...
+[2K
+transforming...✓ 2939 modules transformed.
+rendering chunks...
+computing gzip size...
+[plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 2.34s
+[5/5] build ssr environment...
+[2K
+transforming...✓ 1058 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 1.20s
+[0m
+  Route (app)
+  ┌ ? /
+  ├ ƒ /:locale
+  ├ ƒ /:locale/:tool
+  ├ λ /api/account
+  ├ λ /api/auth/login
+  ├ λ /api/auth/logout
+  ├ λ /api/auth/recover
+  ├ λ /api/auth/register
+  ├ λ /api/auth/security
+  ├ λ /api/class-agenda
+  ├ λ /api/class-agenda/:subscriptionId
+  ├ λ /api/class-events/:eventId/subscription
+  ├ λ /api/classes
+  ├ λ /api/classes/:classId
+  ├ λ /api/classes/:classId/events
+  ├ λ /api/classes/:classId/events/:eventId
+  ├ λ /api/classes/:classId/invites
+  ├ λ /api/classes/:classId/invites/:inviteId
+  ├ λ /api/classes/:classId/members/:userId
+  ├ λ /api/classes/:classId/notes
+  ├ λ /api/classes/:classId/notes/:noteId
+  ├ λ /api/classes/:classId/notes/:noteId/pin
+  ├ λ /api/classes/:classId/subjects
+  ├ λ /api/classes/:classId/subjects/:subjectId
+  ├ λ /api/classes/join
+  ├ λ /api/diary
+  ├ λ /api/my-class-notes
+  ├ λ /api/my-class-notes/:noteId
+  ├ λ /api/notes
+  ├ λ /api/notes/:noteId
+  ├ ? /app
+  └ ? /calcolo-media-voti
+
+  λ API  ƒ Dynamic  ? Unknown
+
+  ? Some routes could not be classified. vinext currently uses static analysis
+    and cannot detect dynamic API usage (headers(), cookies(), etc.) at build time.
+    Automatic classification will be improved in a future release.
+
+  Build complete. Run `vinext start` to start the production server.
+
+Offline shell prepared: 31 hashed assets

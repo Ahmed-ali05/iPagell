@@ -1,0 +1,3 @@
+Die Spannung wird in Volt gemessen. Sie beschreibt den Unterschied des elektrischen Potentials zwischen zwei Punkten.
+
+Der elektrische Widerstand begrenzt bei gleicher Spannung den Strom. Nach dem Ohmschen Gesetz gilt U = R * I.

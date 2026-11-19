@@ -11,12 +11,16 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
-    "next-env.d.ts",
+    "output/**",
+    "outputs/**",
+    "work/**",
+    "experiments/study-local/dist/**",
     // Third-party CommonJS source; patched behavior is checked before audit.
     "vendor/**",
+    "next-env.d.ts",
   ]),
   {
-    files: ["components/ui/**/*.{ts,tsx}", "hooks/use-mobile.ts"],
+    files: ["components/ui/**/*.{ts,tsx}"],
     rules: {
       // These files are vendored verbatim from shadcn@4.17.0. Keep the
       // registry source intact while applying the stricter rules to Site code.

@@ -4,6 +4,8 @@
 
 Visione funzionale e architetturale per una fase futura. **Non è implementata né promessa nella versione corrente.** L'obiettivo è trasformare dispense e documenti delle lezioni in una mappa progressiva e verificabile del corso, non aggiungere un chatbot generico.
 
+**Aggiornamento di direzione, 7 ottobre 2026:** l'[analisi dell'esecuzione locale](SPAZIO-STUDIO-AI-LOCALE.md) confronta questa proposta con EmbeddingGemma 2 e modelli generativi sul dispositivo. Fonti, grafo, versioni e controllo dell'utente restano validi; object storage, code e API descritti sotto rappresentano la variante remota, non prerequisiti del prototipo locale. L'alternativa scelta quando il modello non è disponibile è manuale/semplificata sul dispositivo. I [prompt](SPAZIO-STUDIO-AI-PROMPTS.md) preparano il lavoro futuro senza avviarlo.
+
 ## Proposta di valore
 
 Ogni materia può avere uno spazio personale. Dopo una lezione, lo studente carica la nuova dispensa; iPagell estrae i concetti, li collega a quelli già presenti e mostra cosa è nuovo, approfondito o in conflitto.

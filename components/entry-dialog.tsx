@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent, type RefObject } from "react";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import { Plus, Trash2 } from "lucide-react";
+import { NativeDateInput } from "@/components/ui/native-date-input";
 import {
   Dialog,
   DialogContent,
@@ -42,6 +43,7 @@ type Props = {
   editingSubject: Subject | null;
   editingSemester: Semester | null;
   onRefresh?: () => Promise<void>;
+  fallbackFocusRef?: RefObject<HTMLElement | null>;
   onSave: (
     recipe: (data: SchoolData) => SchoolData,
     message: string,
@@ -54,7 +56,7 @@ export function EntryDialog(props: Props) {
       open={!!props.type}
       onOpenChange={(open) => !open && props.onClose()}
     >
-      <DialogContent className="entry-dialog" aria-describedby={undefined}>
+      <DialogContent className="entry-dialog" aria-describedby={undefined} fallbackFocusRef={props.fallbackFocusRef}>
         {props.type && (
           <EntryForm
             key={`${props.type}-${props.editingSubject?.id ?? props.editingSemester?.id ?? "new"}`}
@@ -285,7 +287,7 @@ function EntryForm({
             </label>
             <label>
               {t("common.date")}
-              <input name="date" type="date" defaultValue={today()} required />
+              <NativeDateInput name="date" defaultValue={today()} required />
             </label>
             <label>
               {t("entry.type")}
@@ -326,7 +328,7 @@ function EntryForm({
             </label>
             <label>
               {t("entry.dueDate")}
-              <input
+              <NativeDateInput
                 name="dueAt"
                 type="datetime-local"
                 defaultValue={`${today()}T16:00`}
@@ -379,7 +381,7 @@ function EntryForm({
           <>
             <label>
               {t("entry.date")}
-              <input name="date" type="date" defaultValue={today()} required />
+              <NativeDateInput name="date" defaultValue={today()} required />
             </label>
             <label>
               {t("entry.absenceType")}
@@ -414,7 +416,8 @@ function EntryForm({
             </label>
             <label>
               {t("entry.note")}
-              <input name="note" maxLength={4000} />
+              <input name="note" maxLength={4000} aria-describedby="absence-note-hint" />
+              <small id="absence-note-hint">{t("absence.noteHint")}</small>
             </label>
           </>
         )}
@@ -566,7 +569,7 @@ function EntryForm({
             </label>
             <label>
               {t("entry.startDate")}
-              <input
+              <NativeDateInput
                 name="startDate"
                 type="date"
                 defaultValue={editingSemester?.startDate ?? today()}
@@ -575,7 +578,7 @@ function EntryForm({
             </label>
             <label>
               {t("entry.endDate")}
-              <input
+              <NativeDateInput
                 name="endDate"
                 type="date"
                 defaultValue={editingSemester?.endDate}

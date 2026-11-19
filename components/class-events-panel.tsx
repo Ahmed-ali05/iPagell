@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { NativeDateInput } from "@/components/ui/native-date-input";
 import type { ClassDetail } from "@/types/classes";
 import type { SchoolData } from "@/types/domain";
 import type { ClassAgendaController } from "@/hooks/use-class-agenda";
@@ -27,7 +28,7 @@ export function EventInputs({event,subjects=[]}: {event?:EventFields;subjects?:s
     <label className="full">{t("classEvents.titleLabel")}<input name="title" required maxLength={160} defaultValue={event?.title}/></label>
     <label>{t("classEvents.sharedSubject")}<input name="subject" list="class-subject-labels" required maxLength={80} defaultValue={event?.subject}/><datalist id="class-subject-labels">{subjects.map(s=><option key={s} value={s}/>)}</datalist></label>
     <label>{t("entry.kind")}<NativeSelect name="kind" defaultValue={event?.kind??"task"}><NativeSelectOption value="task">{t("entry.task")}</NativeSelectOption><NativeSelectOption value="test">{t("entry.test")}</NativeSelectOption></NativeSelect></label>
-    <label className="full">{t("classEvents.dateTime")}<input type="datetime-local" name="dueAt" required defaultValue={event ? localDate(event.dueAt) : undefined}/></label>
+    <label className="full">{t("classEvents.dateTime")}<NativeDateInput type="datetime-local" name="dueAt" required defaultValue={event ? localDate(event.dueAt) : undefined}/></label>
     <label className="full">{t("classes.description")}<textarea name="description" rows={3} maxLength={2000} defaultValue={event?.description}/></label>
     <label>{t("classEvents.status")}<NativeSelect name="status" defaultValue={event?.status??"active"}><NativeSelectOption value="active">{t("classEvents.active")}</NativeSelectOption><NativeSelectOption value="cancelled">{t("classEvents.cancelled")}</NativeSelectOption></NativeSelect></label>
   </>;

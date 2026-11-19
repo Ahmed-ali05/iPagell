@@ -4,6 +4,8 @@
 
 ## Ambiente locale
 
+Prima dei comandi, selezionare Node 22.23.4 con `nvm install && nvm use` oppure una release corretta ammessa in `package.json`. Il controllo runtime blocca versioni vulnerabili o fuori supporto. [Avvisi e verifica del 22 ottobre](RUNTIME-SECURITY-2026-10-22.md).
+
 I comandi seguenti sono per una shell POSIX dalla radice del repository. Non richiedono credenziali di produzione. Il progetto usa npm e `package-lock.json`; non alternare gestori pacchetti. Le impostazioni `.sites-runtime/` sono locali e ignorate da Git.
 
 ```bash
@@ -22,6 +24,8 @@ npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-
 npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0005_heavy_elektra.sql
 npx wrangler d1 execute DB --config dist/server/wrangler.json --local --persist-to "$PWD/.wrangler/state" --file drizzle/0006_daily_stranger.sql
 ```
+
+Il codice auth funziona sia dopo 0000–0006 (`legacy-unexpanded`) sia dopo 0000–0008 (`legacy`). Sul branch `auth/w8b-cloudflare` la 0007 e il bootstrap 0008 sono in `drizzle/`: `deploy:cloudflare` li applicherebbe alla produzione, quindi seguire il [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md) prima di pubblicare da quel branch. Non applicare la 0007 senza la 0008: le scritture resterebbero bloccate. Il [runbook espansione](../operations/w8a/RUNBOOK.md) e la rehearsal locale restano prove del futuro ciclo, non prerequisiti del rilascio senza migrazioni.
 
 Questi comandi non sono idempotenti e non registrano una cronologia Wrangler delle migrazioni: sono il bootstrap manuale dello schema locale iniziale. Non rieseguirli su un database già inizializzato. Il percorso assoluto di persistenza evita di creare accidentalmente un database sotto `dist/server/`. Le migrazioni remote sono gestite dal flusso descritto in [Distribuzione](DEPLOYMENT.md).
 
@@ -68,7 +72,7 @@ La suite accetta solo host locali, crea account sintetici e ne tenta la cancella
 
 `node scripts/test-storage-browser.mjs` avvia una pagina di test su una porta locale casuale distinta dall'app. Aprire l'URL stampato e verificare `DONE: 10 browser storage checks passed`; poi interrompere il server. La pagina usa solo account sintetici e prova IndexedDB reale, inclusi abort e scritture concorrenti. Non servirla dall'origine dell'app in uso. Non è inclusa automaticamente in `release:prepare`.
 
-I test del controller di sessione, della coda autosave e delle transizioni Appunti sono invece inclusi in `npm test`. `tests/note-storage.test.ts` usa fake-indexeddb per failure/concorrenza riproducibili; questo non equivale a una prova su IndexedDB di un telefono fisico. Per scenari, risultati e limiti, vedere [Affidabilità](RELIABILITY.md) e [Matrice corrente](VERIFICATION-MATRIX.md).
+I test del controller di sessione, della coda autosave e delle transizioni Appunti sono invece inclusi in `npm test`. `tests/note-storage.test.ts` usa fake-indexeddb per failure/concorrenza riproducibili; questo non equivale a una prova su IndexedDB di un telefono fisico. Per scenari, risultati e limiti, vedere [Affidabilità](archive/RELIABILITY.md) e [Matrice corrente](VERIFICATION-MATRIX.md).
 
 ## Modifiche schema e pubblicazione
 

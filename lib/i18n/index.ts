@@ -37,3 +37,11 @@ export function formatNumber(locale: Locale, value: number, options?: Intl.Numbe
 export function selectPlural<T>(locale: Locale, count: number, one: T, other: T): T {
   return new Intl.PluralRules(intlLocales[locale]).select(count) === "one" ? one : other;
 }
+
+/** Time-of-day greeting: morning 05–11, afternoon 12–17, evening 18–04 (device local time). */
+export function greetingKey(date: Date): MessageKey {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 12) return "workspace.greetingMorning";
+  if (hour >= 12 && hour < 18) return "workspace.greetingAfternoon";
+  return "workspace.greetingEvening";
+}

@@ -2,7 +2,7 @@ import { PDFDocument, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 import { parseNote, type Inline } from "./format";
 
-export type PdfNote = { title:string; subjectName:string; content:string; contentFormat:string; createdAt?:number; updatedAt:number; className?:string; authorName?:string };
+export type PdfNote = { title:string; subjectName:string; content:string; contentFormat:string; createdAt?:number; updatedAt:number; className?:string; authorName?:string; locale?:string };
 export type FontLoader = (path:string)=>Promise<Uint8Array>;
 const defaultLoad:FontLoader = async path => {
   const resources:Record<string,()=>Promise<{default:string}>>={
@@ -102,7 +102,7 @@ export async function generateNotePdf(note:PdfNote, load:FontLoader=defaultLoad)
     push();
   };
   wrap([{type:"text",text:note.title}],21,0,12,true);
-  const date=new Intl.DateTimeFormat("it",{day:"numeric",month:"long",year:"numeric"}).format(new Date(note.updatedAt));
+  const date=new Intl.DateTimeFormat(note.locale ?? "it",{day:"numeric",month:"long",year:"numeric"}).format(new Date(note.updatedAt));
   const metadata=[note.subjectName,note.className,note.authorName,date].filter(Boolean).join(" · ");
   wrap([{type:"text",text:metadata}],9,0,18);
   if(note.contentFormat==="plain"){

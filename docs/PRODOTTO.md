@@ -1,10 +1,12 @@
 # Cura del prodotto e piano di lavoro
 
-[Indice](../README.md) · [Classi](CLASSI.md) · [Spazio studio AI](SPAZIO-STUDIO-AI.md) · [Revisione storica](REVIEW.md)
+[Indice](../README.md) · [Classi](CLASSI.md) · [Spazio studio AI](SPAZIO-STUDIO-AI.md) · [Revisione storica](archive/REVIEW.md)
 
 Aggiornamento: **1 ottobre 2026**. Stato implementato in [Snapshot](REPO-SNAPSHOT.md); prove e limiti in [Matrice](VERIFICATION-MATRIX.md).
 
 ## Promessa e confini
+
+Dal 21 ottobre 2026 il pubblico prioritario è chi studia in Svizzera con voti da 1 a 6, con 6 come voto migliore. La comunicazione pubblica valorizza questa compatibilità nelle quattro lingue disponibili, con riferimenti sobri ai contesti cantonali. L’espansione ad altri sistemi scolastici è fuori dal posizionamento attuale: non sono supportate altre scale né applicati automaticamente regolamenti cantonali. [Intervento e verifiche](PUBLIC-SPACE-2026-10-19.md#posizionamento-svizzera--21-ottobre-2026).
 
 iPagell aiuta uno studente a sapere cosa scade, come sta andando e quali dati ha registrato. Non sostituisce il registro scolastico, non certifica assenze o promozioni e non è affiliato a scuole o istituti.
 
@@ -51,11 +53,13 @@ La tabella distingue lavoro **aperto** e funzioni consegnate nel codice. P0 indi
 | N01 / consegnato | Appunti personali e di classe | Editor condiviso, formato, sincronizzazione, bozze e conferma di classe, PDF e backup V3; QA fisica resta in Q01 |
 | C03 / P2 | Annunci e materiali | Introdurre prima link/testo; file soltanto con storage privato, scansione e policy dati |
 | A01 / ricerca | Spazio studio AI | Prototipo offline su corpus autorizzato con citazioni, albero incrementale ed evaluation documentata |
-| A02 / futuro | AI personale in produzione | Solo dopo privacy, cancellazione, quote, storage, code e soglie di qualità approvate |
+| A02 / futuro | AI personale in produzione | Solo dopo qualità, privacy, cancellazione, limiti, persistenza e ripristino verificati; storage remoto e code soltanto per una variante che li richieda |
 
 Prima di ogni intervento assegnare una persona responsabile e un criterio d’accettazione. Non sono ancora assegnati proprietari individuali né scadenze. Non introdurre analytics sui dati scolastici solo per misurare l’adozione: prima definire finalità e minimizzazione.
 
 Le specifiche [Classi](CLASSI.md) e [Spazio studio AI](SPAZIO-STUDIO-AI.md) descrivono l'ordine di realizzazione. La collaborazione viene prima dell'AI in produzione; la prova tecnica AI può procedere isolata soltanto con documenti sintetici o autorizzati.
+
+La [fattibilità del 7 ottobre 2026](SPAZIO-STUDIO-AI-LOCALE.md) e i relativi [prompt](SPAZIO-STUDIO-AI-PROMPTS.md) aggiornano A01 verso esecuzione sul dispositivo: EmbeddingGemma 2 per ricerca/confronto, generatore separato per proposte di mappa e modalità manuale quando il modello non è disponibile. È pianificazione; non cambia lo stato implementato o le priorità di affidabilità del diario.
 
 ## Checklist di rilascio
 
@@ -73,6 +77,6 @@ Questa checklist è un modello da compilare per ciascun rilascio, non una dichia
 
 ## Evidenza disponibile
 
-Il rilascio Appunti 27 riporta 103 test e 146 verifiche API locali, build e prove browser con dati sintetici. La [matrice corrente](VERIFICATION-MATRIX.md) distingue prove eseguite, produzione e controlli non coperti; lo [storico](VERIFICATION-HISTORY.md) conserva i risultati precedenti.
+Il rilascio Appunti 27 riporta 103 test e 146 verifiche API locali, build e prove browser con dati sintetici. La [matrice corrente](VERIFICATION-MATRIX.md) distingue prove eseguite, produzione e controlli non coperti; lo [storico](archive/VERIFICATION-HISTORY.md) conserva i risultati precedenti.
 
 Nella revisione del 16 settembre 2026 sono stati riportati 6 test unitari e 29 controlli API superati, build e TypeScript riusciti, audit delle dipendenze di produzione senza vulnerabilità segnalate. Prova browser locale compilata: desktop e viewport 390×844, accesso, voto `4-5`, media `4.5`, ricaricamento. Non equivale a prova su iPhone fisico, test di carico, suite completa di accessibilità o penetration test indipendente.
