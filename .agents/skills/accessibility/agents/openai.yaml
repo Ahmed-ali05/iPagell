@@ -1,0 +1,4 @@
+interface:
+  display_name: "Accessibilità WCAG"
+  short_description: "Verifica WCAG 2.2 con prove reali"
+  default_prompt: "Usa $accessibility su questa parte di iPagell rispettando la sezione Adattamento iPagell e la skill apple-design."
