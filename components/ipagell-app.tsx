@@ -1600,7 +1600,7 @@ function GradesView({
           <section className="panel grades-register">
             <div className="panel-title">
               <div>
-                <h3>{subject.name}</h3>
+                <h2>{subject.name}</h2>
                 <p className="scope-note">{t(selectPlural(locale, subjectGrades.length, "grades.countOne", "grades.countOther"), { count: intlNumber(locale, subjectGrades.length) })}</p>
               </div>
               <div className="big-average" style={{ "--subject-color": subject.color } as React.CSSProperties}>
