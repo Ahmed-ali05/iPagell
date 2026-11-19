@@ -60,6 +60,8 @@ Before adding a selectable system, decide the course-offering and assessment-con
 
 The [multi-system analysis](improvement-2026-10-01/GRADING-EXTENSION-AUDIT.md) builds on this note and the earlier language/SEO discovery. It records primary sources, numeric and qualitative families, current code dependencies, annual views with incompatible systems, versioned assessment contexts, old-client write protection, and backup/import requirements. [Prompts 10–14](improvement-2026-10-01/PROMPTS.md) cover research, architecture, numeric implementation, qualitative/complex methods, and QA. This is planning only: the implemented preset, persisted schema and production behavior above remain unchanged.
 
+The [19 November 2026 product analysis](MULTI-SCALA-VOTI-2026-11-19.md) proposes a lighter alternative to `SubjectTerm` (a scale reference per grade, a diary default and an optional subject override), a first catalogue and a phased rollout starting from the public calculator. Planning only; nothing is implemented.
+
 
 ## Annual consultation (1 October 2026)
 
