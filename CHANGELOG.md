@@ -1,5 +1,12 @@
 # Registro modifiche
 
+## Non rilasciato — 19 novembre 2026, contrasto e focus dopo la verifica di accessibilità
+
+- Pastiglie dei voti: nuovi token `--success-soft`, `--success-ink` e `--danger-soft`; in tema scuro lo sfondo è una tinta scura invece del chiaro fisso. Contrasto misurato da 2,01:1 (insufficiente, scuro) e 3,46:1 (sufficiente) ad almeno 4,7:1.
+- Pulsanti pieni: in tema scuro `--accent-fill` passa da `#0a84ff` a `#0071e3` e il gradiente parte dal token invece di schiarirlo, così il testo bianco resta ad almeno 4,7:1 (prima 3,07–3,76:1).
+- Mobile: `scroll-padding-bottom` sotto i 820 px, così l'elemento con il focus da tastiera non finisce sotto la barra delle schede (WCAG 2.4.11).
+- Simulatore: il campo «Peso prossima verifica» ha bordo e altezza 44 px; il nome della materia nella scheda Voti è un H2 sotto l'H1 della vista. Nessuna modifica a dati, API o schema.
+
 ## Non rilasciato — 19 novembre 2026, revisione usabilità e accessibilità dei Voti
 
 - Simulatore «Che voto mi serve?»: il peso della prossima prova si può cancellare e riscrivere (anche 0.5 o 0,5) e si normalizza solo all'uscita dal campo; l'obiettivo si salva poco dopo la modifica, al rilascio del cursore e cambiando vista, non più solo alla perdita del focus; il risultato è annunciato ai lettori di schermo.
