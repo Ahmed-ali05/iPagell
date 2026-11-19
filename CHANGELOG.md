@@ -1,5 +1,11 @@
 # Registro modifiche
 
+## Non rilasciato — 19 novembre 2026, calcolatore della media con più scale
+
+- Il calcolatore pubblico offre cinque scale: 1–6 con 6 migliore (predefinita, la stessa del diario), decimi 1–10, 0–20, 1–6 con 1 migliore e percentuale 0–100. Il paese accanto a ogni scala è solo un suggerimento.
+- Decimi: `6+` = 6,25, `6-` = 5,75, `6½` e `6/7` = 6,5; il valore contato si vede prima e dopo l'inserimento. Su 0–20 e in percentuale lo 0 è un voto valido. La scala 1–6 del diario accetta gli stessi formati di prima.
+- Ogni scala conserva la propria lista nella scheda: cambiare scala non converte né mescola i voti. Precisione della media secondo la scala (uno o due decimali). Titoli e descrizioni della pagina aggiornati in it/de/fr/en; una nota ricorda che il diario usa ancora solo la scala 1–6. Nessuna modifica a dati, API o schema del diario.
+
 ## Non rilasciato — 19 novembre 2026, contrasto e focus dopo la verifica di accessibilità
 
 - Pastiglie dei voti: nuovi token `--success-soft`, `--success-ink` e `--danger-soft`; in tema scuro lo sfondo è una tinta scura invece del chiaro fisso. Contrasto misurato da 2,01:1 (insufficiente, scuro) e 3,46:1 (sufficiente) ad almeno 4,7:1.
