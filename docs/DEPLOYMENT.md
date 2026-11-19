@@ -49,6 +49,29 @@ Il pulsante resta nascosto finché il Worker non ha tre valori: `GOOGLE_REDIRECT
 4. Verifica: `GET /api/auth/providers` deve rispondere `{"google":true}` solo sull'host del redirect. Su `www` il pulsante non compare (www reindirizza comunque all'apex).
 
 L'accesso Google non usa scrypt, quindi rientra nel limite CPU del piano Workers Free; registrazione e accesso con password no (vedi il piano W8-B).
+### Ridisegno UI — 18 novembre 2026
+
+Pubblicata la versione Worker **`7b26524e-f3e0-4b27-8326-d006ff16b713`** su `ipagell.website`, `www.ipagell.website` e `ipagell.ahmedbasto59.workers.dev`. Sorgente: commit `60cac90` del ramo `ui/liquid-glass-redesign-sync` ([PR 12](https://github.com/Ahmed-ali05/iPagell/pull/12)), cioè la produzione di `sync/checkout-20261116` più il solo [ridisegno UI](UI-REDESIGN-2026-11-18.md). Versione precedente, per un eventuale rollback: `f78d7a92-3106-461e-b485-c6d2f999ee9e`.
+
+Eccezione al flusso «solo da `main`», decisa dal proprietario: la CI di tutte le PR aperte (#9–#12) si ferma all'audit delle dipendenze (avvisi su `wrangler`/`miniflare` e su `zod`, correzione nelle PR #10 e #11). Il rilascio non cambia dipendenze né schema: l'unico avviso runtime (`zod`) era già nella versione precedente. Pubblicato da una copia separata con installazione pulita (`npm run install:ci`, Node 24.22.3), non dal working tree locale con modifiche auth in corso.
+
+Prima: `npm run release:prepare` superato (147 test). `wrangler d1 migrations list` sul D1 remoto: nessuna migrazione da applicare; il deploy lo ha confermato. Dopo: `/`, `/de`, `/fr`, `/en`, `/app`, le tre utility pubbliche, sitemap, robots, service worker e manifest rispondono 200; `/api/account` senza sessione 401; `www` reindirizza con 308 mantenendo percorso e query. Il CSS servito contiene i nuovi token. Nessun account o dato remoto modificato. Il service worker non usa `skipWaiting()`: chi ha l'app aperta vede la nuova interfaccia dopo aver chiuso e riaperto le schede.
+
+### Nuova home pubblica — 18 novembre 2026
+
+Pubblicata la versione Worker **`7a07b2ec-712d-4fcd-8717-74ae8f66ea85`** (20:32 UTC) su `ipagell.website`, `www.ipagell.website` e `ipagell.ahmedbasto59.workers.dev`. Sorgente: commit `941dfc3` del ramo `release/home-20261118`, cioè la versione precedente (`d39609f` di `ui/liquid-glass-redesign-sync`) più il solo commit della nuova home: hero con il marchio, testi brevi di home e pagina «Il diario», schermate di prodotto rigenerate in blu ([fase 4](UI-REDESIGN-2026-11-18.md#fase-4--home-pubblica-marchio-e-testi-brevi-richiesta-del-proprietario)). Versione precedente, per un eventuale rollback: `7b26524e-f3e0-4b27-8326-d006ff16b713`.
+
+Stessa eccezione al flusso «solo da `main`» del rilascio precedente, decisa dal proprietario: escluse le migrazioni 0007/0008 e l'accesso Google del ramo `auth/w8b-cloudflare` (Fase D del piano W8-B non ancora eseguita). Nessun cambio a dipendenze, schema o binding. Pubblicato da un worktree separato con installazione pulita (`npm run install:ci`, Node 24.22.3).
+
+Prima: `npm run check` (147 test, 865 chiavi, inventario e link) e `npm run build` superati sul ramo di rilascio; `wrangler d1 migrations list` sul D1 remoto: nessuna migrazione da applicare, confermato dal deploy. Dopo: `/`, `/de`, `/fr`, `/en`, `/scopri-ipagell`, `/app`, sitemap, robots, service worker e una delle nuove immagini rispondono 200; `/api/account` senza sessione 401; `www` reindirizza con 308. HTML della home: un H1, i quattro nuovi H2, canonical e `index, follow`. Nessun account o dato remoto modificato. Come prima, chi ha l'app aperta vede la nuova versione dopo aver chiuso e riaperto le schede.
+
+### Dipendenze senza vulnerabilità — 19 novembre 2026
+
+Pubblicata la versione Worker **`41dfaad0-e1dc-42a5-930b-24646013a7e0`** su `ipagell.website`, `www.ipagell.website` e `ipagell.ahmedbasto59.workers.dev`. Sorgente: commit `af33682` del ramo `release/deps-20261119` ([PR 14](https://github.com/Ahmed-ali05/iPagell/pull/14)), cioè la versione precedente più le Fasi 1 e 2 del [piano dipendenze](DEPENDENCY-UPGRADE-PLAN-2026-11-17.md): vinext 1.4.6, vite 8.3.8, wrangler 4.164.0, zod 4.6.7. Chiude l'advisory zod GHSA-mrhx-c7xc-m3w5, presente nel bundle del Worker. Versione precedente, per un eventuale rollback: `7a07b2ec-712d-4fcd-8717-74ae8f66ea85`.
+
+Pubblicata su decisione del proprietario prima dell'esito della CI della PR 14; la CI della PR 11, con lo stesso lockfile, era verde. Nessuna migrazione (confermato da `wrangler d1 migrations list` e dal deploy), nessun cambio a schema, binding o domini.
+
+Prima: in locale con installazione pulita audit a zero, `npm run check` (147 test), `test:auth-d1`, `test:auth-restore`, build e 146 controlli API sul Worker compilato ([prove](DEPENDENCY-UPGRADE-PLAN-2026-11-17.md#fase-3-chiusa--19-novembre-2026)). Dopo: le quattro home, `/scopri-ipagell`, le utility pubbliche, `/app`, sitemap, robots, service worker, manifest e immagini 200; `/api/account` 401; `www` 308 con query conservata; login con credenziali inesistenti 401 `AUTH_INVALID_CREDENTIALS`, registrazione invalida 400 `AUTH_INVALID_SIGNUP`; `/app` si avvia nel browser con il solo 401 atteso in console. Il testo grezzo di alcuni errori di validazione è ora quello di zod 4 (l'interfaccia usa il codice). Nessun account o dato remoto creato o modificato.
 
 ### Backup e ripristino del D1 di produzione
 

@@ -43,7 +43,10 @@ async function seedAccount(locale) {
     return data;
   }
   const username = `demo-${locale}-${randomBytes(4).toString("hex")}`;
-  const { user } = await api("/api/auth/register", "POST", { username, password: randomBytes(18).toString("base64url"), ageConfirmed: true });
+  const credentials = { username, password: randomBytes(18).toString("base64url") };
+  // Newer schemas require the age declaration; older strict schemas reject the extra field.
+  const { user } = await api("/api/auth/register", "POST", { ...credentials, ageConfirmed: true })
+    .catch(error => String(error.message).includes("AUTH_INVALID_SIGNUP") ? api("/api/auth/register", "POST", credentials) : Promise.reject(error));
   const { diary } = await api("/api/account", "POST", { name: text.name, school: "", semester: text.semester, schoolYear: "2026/27", startDate: "2026-08-24", endDate: "2027-01-31", preset: "empty" }, { "X-IPagell-Account": user.id });
   const semesterId = diary.data.semesters[0].id;
   const subject = (name, color) => ({ id: randomUUID(), name, color, coefficient: 1, gradeTypes: [{ id: randomUUID(), name: text.written, weight: 1 }, { id: randomUUID(), name: text.oral, weight: 1 }] });
