@@ -1,5 +1,11 @@
 # Registro modifiche
 
+## Non rilasciato — 19 novembre 2026, presentazione GitHub in inglese
+
+- README principale in inglese con screenshot, badge CI e sito, struttura del progetto e deploy; versione italiana in `README.it.md`.
+- CONTRIBUTING e SECURITY tradotti in inglese; SECURITY indica ora un canale di segnalazione privato. Aggiunti codice di condotta, modelli di issue e di pull request; nomi del workflow CI in inglese.
+- `docs:check` controlla anche `README.it.md` e `CODE_OF_CONDUCT.md`. Solo documentazione e metadati: nessuna modifica al runtime, nessun deploy necessario.
+
 ## 22 ottobre 2026 — Sicurezza runtime e toolchain
 
 - Node minimo aggiornato alle release corrette del 21 ottobre; `.nvmrc`, CI e controllo preventivo bloccano runtime vulnerabili, fuori supporto o non ancora verificati.

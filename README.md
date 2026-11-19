@@ -1,116 +1,154 @@
 <p align="center">
-  <img src="public/icons/icon-192.png" width="96" height="96" alt="Icona di iPagell">
+  <img src="public/icons/icon-192.png" width="88" height="88" alt="iPagell icon">
 </p>
 
 <h1 align="center">iPagell</h1>
 
 <p align="center">
-  <strong>Il diario scolastico personale per voti, agenda, assenze e statistiche.</strong><br>
-  La scala attuale è 1–6; materie e periodi sono personalizzabili.
+  <strong>A personal school diary for grades, deadlines, absences and statistics.</strong><br>
+  Installable, works offline, and keeps your grades private.
 </p>
 
 <p align="center">
-  <a href="https://ipagell.website"><strong>Apri l'app</strong></a>
+  <a href="https://ipagell.website"><strong>Open the app</strong></a>
   ·
-  <a href="docs/GUIDA-UTENTE.md">Guida utente</a>
+  <a href="#features">Features</a>
   ·
-  <a href="docs/README.md">Documentazione</a>
+  <a href="#getting-started">Getting started</a>
+  ·
+  <a href="docs/README.md">Documentation</a>
+  ·
+  <a href="README.it.md">Italiano</a>
 </p>
 
 <p align="center">
-  <img alt="Stato: versione iniziale" src="https://img.shields.io/badge/stato-versione%20iniziale-F59E0B">
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white">
-  <img alt="Next.js" src="https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white">
-  <img alt="PWA" src="https://img.shields.io/badge/PWA-installabile-5A0FC8?logo=pwa&logoColor=white">
-  <img alt="Licenza MIT" src="https://img.shields.io/badge/licenza-MIT-22C55E">
+  <a href="https://github.com/Ahmed-ali05/iPagell/actions/workflows/check.yml"><img alt="Checks" src="https://github.com/Ahmed-ali05/iPagell/actions/workflows/check.yml/badge.svg"></a>
+  <a href="https://ipagell.website"><img alt="Website" src="https://img.shields.io/website?url=https%3A%2F%2Fipagell.website&label=ipagell.website"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-22C55E"></a>
+  <img alt="TypeScript 5.9" src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white">
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white">
+  <img alt="Cloudflare Workers" src="https://img.shields.io/badge/Cloudflare-Workers%20%2B%20D1-F38020?logo=cloudflare&logoColor=white">
+  <img alt="Installable PWA" src="https://img.shields.io/badge/PWA-installable-5A0FC8?logo=pwa&logoColor=white">
 </p>
 
-> [!IMPORTANT]
-> iPagell non è un registro ufficiale e non è affiliato a scuole o istituti. Le materie di base sono una configurazione iniziale facoltativa e personalizzabile.
+<p align="center">
+  <a href="https://ipagell.website/en"><img src="public/og-en.png" width="820" alt="iPagell home screen showing the next event, the overall average and this week's activities"></a>
+</p>
 
-## Cosa offre
+> [!NOTE]
+> iPagell is an independent project. It is not an official school register and is not affiliated with any school. The starter subjects are an optional, fully editable template.
 
-- **Voti e medie:** pesi per voto e tipologia, coefficienti per materia, andamento e simulatore del prossimo voto.
-- **Agenda scolastica:** attività, scadenze, filtri e promemoria quando l'app è aperta.
-- **Assenze e statistiche:** riepiloghi per periodo e materia in un'unica interfaccia.
-- **Account e sincronizzazione:** sessioni protette, diario personale su D1 e controllo dei conflitti tramite revisione.
-- **Uso offline:** copia locale in IndexedDB, shell PWA installabile e backup JSON esportabile.
-- **Configurazione flessibile:** semestri, materie, colori e tipologie personalizzabili; i voti usano la scala attuale 1–6.
-- **Classi private:** gruppi su invito con ruoli, membri e codici revocabili, senza condividere voti o assenze.
-- **Appunti per materia:** personali o della classe, editor visivo, bozze sul dispositivo, sincronizzazione e condivisione esplicita, export PDF/Markdown.
-- **Quattro lingue:** italiano, tedesco, francese e inglese; contenuti personali mantenuti nella lingua in cui sono scritti.
-- **Calcolatore pubblico:** media ponderata nella scala attuale 1–6, senza account e senza salvare i voti inseriti.
+## Why iPagell
 
-## Stato del progetto
+School portals tell you what was recorded. iPagell helps you see what needs attention next: which subject is pulling your average down, what grade you need on the next test, and which deadlines are coming up this week. Grades and absences stay in your personal diary; class groups only share the activities you choose to follow.
 
-La versione iniziale è pubblicata e utilizzabile. L'app ha un backend su Cloudflare Workers e D1; IndexedDB conserva una copia del diario per l'uso offline. Le preferenze fanno parte del diario sincronizzato.
+## Features
 
-Il [registro di pubblicazione](docs/DEPLOYMENT.md) riporta Sites **30** del 2 ottobre 2026, con catture reali sulla homepage. La consultazione Periodo/Anno/Storico in Voti e Statistiche è stata introdotta in Sites **29**. Gli appunti hanno persistenza e revisioni separate dal diario; la bozza di classe diventa condivisa solo dopo anteprima e conferma. [Snapshot corrente](docs/REPO-SNAPSHOT.md) e [matrice di verifica](docs/VERIFICATION-MATRIX.md) distinguono codice, prove e produzione.
-
-Ingresso/SEO e le correzioni documentali e delle dipendenze del ciclo precedente sono stati inclusi in Sites 28, come registrato nel [changelog](CHANGELOG.md). Le successive modifiche locali non sono automaticamente pubblicate: il riordino documentale del 2 ottobre non verifica nuovamente lo stato remoto.
-
-Sono ancora aperte verifiche operative e di qualità elencate nel [piano prodotto](docs/PRODOTTO.md). In particolare, il progetto non dichiara cifratura end-to-end, notifiche programmate ad app chiusa o installazione iOS certificata.
-
-## Stack
-
-| Area | Tecnologie |
+| | |
 |---|---|
-| Interfaccia | React 19, TypeScript, Tailwind CSS, componenti Radix/Shadcn |
-| Framework | Next.js 16 con build Vinext/Vite |
-| Grafici e validazione | Recharts, Zod |
-| Backend | Cloudflare Workers, D1, Drizzle ORM |
-| Offline | Service worker, IndexedDB, manifest PWA |
+| **Grades and averages** | Weights per grade and grade type, coefficients per subject, trends over time and a "what do I need next?" simulator. Uses a 1–6 scale (higher is better, 4 is a pass). |
+| **Agenda** | Homework, tests and deadlines with filters, a weekly overview and reminders while the app is open. |
+| **Absences and statistics** | Summaries by term and subject, with period, year and history views. |
+| **Notes** | Per-subject notes with a visual editor, drafts saved on the device, sync across devices and PDF/Markdown export. |
+| **Private classes** | Invite-only groups with roles and revocable codes. Members share activities and class notes, never grades or absences. |
+| **Offline first** | A local copy in IndexedDB, an installable PWA shell and a JSON backup you can export and import at any time. |
+| **Accounts and sync** | Email/password or Google sign-in, protected sessions and revision-based conflict detection. |
+| **Four languages** | English, Italian, German and French. Your own content stays in the language you wrote it in. |
+| **Free grade calculator** | A public weighted-average calculator that needs no account and stores nothing. |
 
-## Avvio locale
+## Tech stack
 
-Requisiti: Node.js 22.23.4 (selezionato in `.nvmrc`) o una release corretta ammessa da `package.json`, e npm. Con nvm: `nvm install && nvm use`. [Motivo e versioni ammesse](docs/RUNTIME-SECURITY-2026-10-22.md). Da un clone pulito:
+| Layer | Technology |
+|---|---|
+| UI | React 19, TypeScript, Tailwind CSS 4, Radix / shadcn components, Recharts |
+| Framework | Next.js 16 built with [Vinext](https://github.com/cloudflare/vinext) and Vite |
+| Backend | Cloudflare Workers, D1 (SQLite), Drizzle ORM, Zod validation |
+| Offline | Service worker, IndexedDB, web app manifest |
+| Editor and export | ProseMirror, pdf-lib |
+
+## Getting started
+
+**Requirements:** Node.js 22.23.4+, 24.22.1+ or 26.12.1+ (the version in `.nvmrc` is the default) and npm. Older and unsupported releases are rejected on purpose; see [runtime security](docs/RUNTIME-SECURITY-2026-10-22.md) for the reasons.
 
 ```bash
+git clone https://github.com/Ahmed-ali05/iPagell.git
+cd iPagell
+nvm install && nvm use   # optional, picks the version from .nvmrc
 npm run install:ci
 npm run build
 ```
 
-Prima del primo accesso locale occorre inizializzare D1 seguendo la guida di [sviluppo e manutenzione](docs/MANUTENZIONE.md). Poi:
+Initialise the local D1 database as described in the [maintenance guide](docs/MANUTENZIONE.md), then start the dev server:
 
 ```bash
 npm run dev
 ```
 
-Controlli principali:
+### Checks
 
 ```bash
-npm test
-npx tsc --noEmit
-npm run lint
-npm run check:i18n
-npm run docs:check
+npm run check        # runtime, lint, types, tests, i18n and docs in one go
+npm test             # unit and integration tests only
+npm run test:api     # API smoke tests, local environment only
 ```
 
-Le prove API creano dati sintetici e devono essere eseguite soltanto contro un ambiente locale.
+The API tests create synthetic accounts and data. Never run them against the production site.
 
-## Documentazione
+## Project structure
 
-Per lavorare sul codice e pubblicarlo segui [Sviluppo e pubblicazione](docs/DEPLOYMENT.md). `npm run release:prepare` esegue controlli e build; la pubblicazione su **ipagell.website** usa `npm run deploy:cloudflare` sull'account Cloudflare del proprietario. GitHub esegue i controlli sulle pull request e su `main`.
+```text
+app/          Next.js routes: public pages, the diary app and API handlers
+components/   UI components
+lib/          Domain logic: grades, sync, auth, notes, i18n
+db/           Drizzle schema         drizzle/   SQL migrations
+public/       Icons, manifest, service worker, screenshots
+tests/        Node test runner suites
+scripts/      Build, deploy, inventory and check scripts
+docs/         Architecture, API, operations and product docs
+```
 
-L'[indice della documentazione](docs/README.md) separa guide correnti, specifiche future e storico. L'[inventario](docs/REPO-INVENTORY.md) deriva da route, schema, migrazioni, script e lockfile: `npm run docs:generate` lo aggiorna, `docs:check` ne rileva il disallineamento.
+An [auto-generated inventory](docs/REPO-INVENTORY.md) lists every route, table, migration and npm script, and CI fails if it drifts from the source.
 
-| Documento | Contenuto |
+## Deployment
+
+Production runs at **[ipagell.website](https://ipagell.website)** on a Cloudflare Worker with a D1 database in the EU jurisdiction. Releases are manual:
+
+```bash
+npx wrangler login
+npm run release:prepare
+npm run deploy:cloudflare
+```
+
+GitHub Actions runs the full check suite, a dependency audit and local D1 compatibility tests on every pull request and on `main`; it never deploys. See [development and deployment](docs/DEPLOYMENT.md) for staging, migrations and the release log.
+
+## Documentation
+
+Most of the technical documentation is written in Italian.
+
+| Document | What it covers |
 |---|---|
-| [Guida utente](docs/GUIDA-UTENTE.md) | Utilizzo, installazione, account, recupero e dati |
-| [Architettura](docs/ARCHITETTURA.md) | Componenti, persistenza, formule e sincronizzazione |
-| [Contratto API](docs/API.md) | Endpoint, richieste, risposte ed errori |
-| [Manutenzione](docs/MANUTENZIONE.md) | Ambiente locale, test, build, migrazioni e incidenti |
-| [Distribuzione](docs/DEPLOYMENT.md) | Sviluppo, controlli GitHub e pubblicazione su ipagell.website |
-| [Piano prodotto](docs/PRODOTTO.md) | Priorità, limiti, qualità e criteri di rilascio |
-| [Sicurezza](SECURITY.md) | Confini di fiducia e segnalazioni riservate |
-| [Changelog](CHANGELOG.md) | Evoluzione e note di rilascio |
+| [Documentation index](docs/README.md) | Map of current guides, specs and history |
+| [User guide](docs/GUIDA-UTENTE.md) | Using the app, installing it, accounts, recovery and data |
+| [Current architecture](docs/ARCHITECTURE-CURRENT.md) | Components, persistence, formulas and sync |
+| [API contract](docs/API.md) | Endpoints, requests, responses and errors |
+| [Grading system](docs/GRADING-SYSTEM.md) | The 1–6 scale, formulas and what is not supported yet |
+| [Internationalisation](docs/I18N.md) | Catalogues, locales and localised public routes |
+| [Maintenance](docs/MANUTENZIONE.md) | Local setup, tests, builds, migrations and incidents |
+| [Product plan](docs/PRODOTTO.md) | Priorities, known limits and release criteria |
+| [Changelog](CHANGELOG.md) | Release notes |
 
-La specifica [Classi](docs/CLASSI.md) distingue gruppi, attività/agenda e appunti implementati da annunci e materiali futuri. [Appunti](docs/APPUNTI-SPEC.md) descrive anche backup V3, copie e recupero. [Spazio studio AI](docs/SPAZIO-STUDIO-AI.md) resta un possibile sviluppo futuro.
+## Project status
 
-## Contribuire
+iPagell is an early release that is live and in use. Known limits, stated plainly: there is no end-to-end encryption, reminders only fire while the app is open, and installation on iOS is not certified. Open work is tracked in the [product plan](docs/PRODOTTO.md), and the [verification matrix](docs/VERIFICATION-MATRIX.md) separates what is implemented, tested and running in production.
 
-Issue e pull request sono benvenute. Prima di proporre modifiche, leggere [CONTRIBUTING](CONTRIBUTING.md) e usare soltanto dati sintetici nelle prove. Le vulnerabilità vanno segnalate seguendo [SECURITY](SECURITY.md), senza pubblicare credenziali o dati reali.
+## Contributing
 
-## Licenza
+Issues and pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) first and use synthetic data only, never real diaries. This project follows a [code of conduct](CODE_OF_CONDUCT.md).
 
-Distribuito con licenza [MIT](LICENSE). Le dipendenze e i componenti vendorizzati mantengono le rispettive licenze.
+## Security
+
+Please do not open public issues for vulnerabilities. Report them privately as described in [SECURITY.md](SECURITY.md), which also documents trust boundaries and where data is stored.
+
+## License
+
+Released under the [MIT License](LICENSE). Dependencies and vendored components keep their own licenses.

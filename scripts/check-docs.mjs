@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 // Deliberately offline: check repository-local Markdown destinations, not live URLs.
 const root = fileURLToPath(new URL("../", import.meta.url));
-const files = ["README.md", "CONTRIBUTING.md", "SECURITY.md", "CHANGELOG.md", "AGENTS.md"];
+const files = ["README.md", "README.it.md", "CONTRIBUTING.md", "CODE_OF_CONDUCT.md", "SECURITY.md", "CHANGELOG.md", "AGENTS.md"];
 async function addDocuments(directory) {
   for (const entry of await readdir(resolve(root, directory), { withFileTypes: true })) {
     const path = `${directory}/${entry.name}`;

@@ -1,0 +1,61 @@
+name: Bug report
+description: Something in iPagell does not work as expected.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Use **synthetic data only**: never paste real grades, backups, passwords, recovery codes or cookies.
+        For security issues, use the private channel in SECURITY.md instead.
+  - type: input
+    id: environment
+    attributes:
+      label: Environment and version
+      description: Device, operating system, browser, installed PWA or browser tab, app language.
+      placeholder: iPhone 15, iOS 26.1, Safari, installed PWA, English
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: What were you trying to do?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use synthetic data.
+      placeholder: |
+        1. Open Grades
+        2. Add a grade of 4.5 to Mathematics
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: behaviour
+    attributes:
+      label: Expected and actual behaviour
+    validations:
+      required: true
+  - type: dropdown
+    id: network
+    attributes:
+      label: Network and sync state
+      options:
+        - Online, synced
+        - Offline
+        - Sync conflict or error shown
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact and recoverability
+      description: Was any data lost? Can it be restored from a backup?
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Screenshots or console output with personal data removed.

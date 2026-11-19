@@ -1,7 +1,7 @@
 {
   "name": "ipagell",
   "version": "0.1.0",
-  "description": "Diario scolastico personale per voti, agenda, assenze e statistiche.",
+  "description": "Personal school diary for grades, deadlines, absences and statistics. Offline-first PWA on Cloudflare Workers.",
   "private": true,
   "license": "MIT",
   "homepage": "https://ipagell.website",
