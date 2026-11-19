@@ -203,6 +203,7 @@
   "grades.deletedTitle": "Eliminare questo voto?",
   "grades.deletedDetail": "Il voto verrà eliminato dal diario e le medie saranno ricalcolate.",
   "grades.delete": "Elimina voto",
+  "grades.deleteItem": "Elimina voto {value} del {date}",
   "grades.needed": "Che voto mi serve?",
   "grades.target": "Obiettivo",
   "grades.nextType": "Prossimo tipo di prova",

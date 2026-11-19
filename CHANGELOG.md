@@ -1,5 +1,12 @@
 # Registro modifiche
 
+## Non rilasciato — 19 novembre 2026, revisione usabilità e accessibilità dei Voti
+
+- Simulatore «Che voto mi serve?»: il peso della prossima prova si può cancellare e riscrivere (anche 0.5 o 0,5) e si normalizza solo all'uscita dal campo; l'obiettivo si salva poco dopo la modifica, al rilascio del cursore e cambiando vista, non più solo alla perdita del focus; il risultato è annunciato ai lettori di schermo.
+- Elenco voti: la media grande usa il colore del testo con la tinta della materia come sottolineatura, per un contrasto indipendente dal colore scelto; note lunghe vanno a capo; senza nota il tipo di prova non è più ripetuto; il pulsante elimina indica voto e data; i pulsanti delle medie espongono la selezione (`aria-pressed`) e il riepilogo per periodo è un gruppo con nome.
+- Inserimento voto: un valore non valido mostra l'errore sotto il campo, lo marca come non valido e vi riporta il focus; un clic fuori dalla finestra non scarta più i dati scritti (Esc e Annulla chiudono); pesi dei tipi formattati secondo la lingua.
+- Francese: il pulsante appunti si chiama «Notes de {materia}», coerente con l'etichetta visibile. Nuova chiave `grades.deleteItem` in it/de/fr/en. Nessuna modifica a dati, API o schema.
+
 ## Non rilasciato — 19 novembre 2026, Classi e Voti più chiari
 
 - Classi: il selettore Attività/Appunti ha due metà fisse e lo stesso peso del testo, quindi non cambia dimensione alla selezione; l'etichetta diventa «Appunti».

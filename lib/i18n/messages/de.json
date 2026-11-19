@@ -203,6 +203,7 @@
   "grades.deletedTitle": "Diese Note löschen?",
   "grades.deletedDetail": "Die Note wird gelöscht und die Durchschnitte werden neu berechnet.",
   "grades.delete": "Note löschen",
+  "grades.deleteItem": "Note {value} vom {date} löschen",
   "grades.needed": "Welche Note brauche ich?",
   "grades.target": "Ziel",
   "grades.nextType": "Nächste Prüfungsart",

@@ -203,6 +203,7 @@
   "grades.deletedTitle": "Delete this grade?",
   "grades.deletedDetail": "The grade will be removed and averages recalculated.",
   "grades.delete": "Delete grade",
+  "grades.deleteItem": "Delete grade {value} from {date}",
   "grades.needed": "What grade do I need?",
   "grades.target": "Target",
   "grades.nextType": "Next assessment type",
