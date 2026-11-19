@@ -1,5 +1,11 @@
 # Registro modifiche
 
+## Non rilasciato — 19 novembre 2026, Classi e Voti più chiari
+
+- Classi: il selettore Attività/Appunti ha due metà fisse e lo stesso peso del testo, quindi non cambia dimensione alla selezione; l'etichetta diventa «Appunti».
+- Voti: tolte le spiegazioni ripetute (etichette sopra i filtri, «Registro voti», avviso sulla media, nota della simulazione). La scheda mostra materia, media e numero di voti; ogni voto ha una sola riga con data, peso solo se diverso da 1× e periodo solo se se ne vedono più di uno. L'avviso «Media indicativa, non voto ufficiale» resta in Statistiche.
+- Intestazioni più brevi: «Privato» e «Condiviso con la classe». Testi aggiornati in it/de/fr/en; rimosse le chiavi non più usate. Nessuna modifica a dati, API o schema.
+
 ## Non rilasciato — 19 novembre 2026, presentazione GitHub in inglese
 
 - README principale in inglese con screenshot, badge CI e sito, struttura del progetto e deploy; versione italiana in `README.it.md`.

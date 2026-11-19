@@ -16,7 +16,7 @@ export function GradeScopeFilter({ scope, semesters, currentSemesterId, onChange
   const years = [...new Set(semesters.map((period) => period.schoolYear))];
   return <div className="grade-scope-filter">
     <label>
-      {t("scope.view")}
+      <span className="sr-only">{t("scope.view")}</span>
       <NativeSelect aria-label={t("scope.view")} value={scope.kind} onChange={(event) => {
         if (event.target.value === "all") onChange({ kind: "all" });
         else if (event.target.value === "period") {
@@ -35,13 +35,13 @@ export function GradeScopeFilter({ scope, semesters, currentSemesterId, onChange
       </NativeSelect>
     </label>
     {scope.kind === "period" && <label>
-      {t("scope.period")}
+      <span className="sr-only">{t("scope.period")}</span>
       <NativeSelect aria-label={t("scope.period")} value={scope.semesterId} onChange={(event) => onChange({ kind: "period", semesterId: event.target.value })}>
         {semesters.map((period) => <NativeSelectOption key={period.id} value={period.id}>{period.name} · {period.schoolYear}{period.archived ? ` · ${t("scope.archived")}` : ""}</NativeSelectOption>)}
       </NativeSelect>
     </label>}
     {scope.kind === "year" && <label>
-      {t("scope.year")}
+      <span className="sr-only">{t("scope.year")}</span>
       <NativeSelect aria-label={t("scope.year")} value={scope.schoolYear} onChange={(event) => onChange({ kind: "year", schoolYear: event.target.value })}>
         {years.map((year) => <NativeSelectOption key={year} value={year}>{year}</NativeSelectOption>)}
       </NativeSelect>
