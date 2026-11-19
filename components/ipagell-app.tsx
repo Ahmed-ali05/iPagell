@@ -1513,8 +1513,32 @@ function GradesView({
   const average = subject ? subjectAverage(subject, grades) : null;
   const [target, setTarget] = useState(goal);
   const [nextType, setNextType] = useState("");
-  const [nextWeight, setNextWeight] = useState(1);
+  // Keep the typed text so the field can be cleared or hold "0." while typing.
+  const [nextWeightInput, setNextWeightInput] = useState("1");
+  const parsedWeight = Number(nextWeightInput.replace(",", "."));
+  const nextWeight = nextWeightInput.trim() && Number.isFinite(parsedWeight) && parsedWeight > 0
+    ? Math.max(0.1, Math.min(100, parsedWeight))
+    : 1;
   const [simulatorOpen, setSimulatorOpen] = useState(false);
+  // Save the goal shortly after the last change, on release, and when the view
+  // unmounts, so a touch drag followed by a tab change is not lost.
+  const pendingGoal = useRef<number | null>(null);
+  const goalTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const onGoalRef = useRef(onGoal);
+  useEffect(() => { onGoalRef.current = onGoal; }, [onGoal]);
+  const commitGoal = useCallback(() => {
+    clearTimeout(goalTimer.current);
+    const value = pendingGoal.current;
+    pendingGoal.current = null;
+    if (value !== null) onGoalRef.current(value);
+  }, []);
+  useEffect(() => commitGoal, [commitGoal]);
+  const changeTarget = (value: number) => {
+    setTarget(value);
+    pendingGoal.current = value === goal ? null : value;
+    clearTimeout(goalTimer.current);
+    if (pendingGoal.current !== null) goalTimer.current = setTimeout(commitGoal, 600);
+  };
   const type =
     subject?.gradeTypes.find((t) => t.id === nextType) ??
     subject?.gradeTypes[0];
@@ -1549,6 +1573,7 @@ function GradesView({
             <button
               className={item.id === subject?.id ? "selected" : ""}
               key={item.id}
+              aria-pressed={item.id === subject?.id}
               onClick={() => onSelectSubject(item.id)}
             >
               <span style={{ background: item.color }}>
@@ -1575,51 +1600,43 @@ function GradesView({
           <section className="panel grades-register">
             <div className="panel-title">
               <div>
-                <h3>{subject.name}</h3>
+                <h2>{subject.name}</h2>
                 <p className="scope-note">{t(selectPlural(locale, subjectGrades.length, "grades.countOne", "grades.countOther"), { count: intlNumber(locale, subjectGrades.length) })}</p>
               </div>
-              <div className="big-average" style={{ color: subject.color }}>
+              <div className="big-average" style={{ "--subject-color": subject.color } as React.CSSProperties}>
                 {gradeText(locale, average)}
               </div>
             </div>
-            {periods.length > 1 && <div className="grade-period-summary" aria-label={t("scope.byPeriod")}>
+            {periods.length > 1 && <div className="grade-period-summary" role="group" aria-label={t("scope.byPeriod")}>
               {periods.map((period) => {
                 const values = subjectGrades.filter((grade) => grade.semesterId === period.id);
                 return <div key={period.id}><span>{period.name} · {period.schoolYear}</span><b>{gradeText(locale, subjectAverage(subject, values))}</b><small>{t(selectPlural(locale, values.length, "grades.countOne", "grades.countOther"), { count: intlNumber(locale, values.length) })}</small></div>;
               })}
             </div>}
             {subjectGrades.length ? (
-              subjectGrades.map((grade) => (
+              subjectGrades.map((grade) => {
+                const typeName = subject.gradeTypes.find((type) => type.id === grade.typeId)?.name;
+                const date = formatDate(locale, grade.date, history ? { day: "numeric", month: "short", year: "numeric" } : { day: "numeric", month: "short" });
+                return (
                 <article key={grade.id}>
                   <div className={`grade-pill ${!isPassingGrade(grade.value) ? "low" : ""}`}>
                     {gradeText(locale, grade.value)}
                   </div>
                   <div>
-                    <b>
-                      {grade.note ||
-                        subject.gradeTypes.find(
-                          (type) => type.id === grade.typeId,
-                        )?.name ||
-                        t("common.grade")}
-                    </b>
+                    <b>{grade.note || typeName || t("common.grade")}</b>
                     <small>
                       {[
-                        formatDate(locale, grade.date, history ? { day: "numeric", month: "short", year: "numeric" } : { day: "numeric", month: "short" }),
+                        date,
                         grade.weight !== 1 ? t("grades.weight", { value: gradeText(locale, grade.weight) }) : "",
                         periods.length > 1 ? semesters.find((period) => period.id === grade.semesterId)?.name : "",
                       ].filter(Boolean).join(" · ")}
                     </small>
                   </div>
-                  <span>
-                    {
-                      subject.gradeTypes.find(
-                        (type) => type.id === grade.typeId,
-                      )?.name
-                    }
-                  </span>
-                  <button className="icon-button subtle" onClick={()=>onDelete(grade.id)} aria-label={t("grades.delete")}><Trash2 size={17}/></button>
+                  {grade.note && typeName ? <span>{typeName}</span> : <span aria-hidden="true" />}
+                  <button className="icon-button subtle" onClick={()=>onDelete(grade.id)} aria-label={t("grades.deleteItem", { value: gradeText(locale, grade.value), date })}><Trash2 size={17}/></button>
                 </article>
-              ))
+                );
+              })
             ) : (
               <EmptyState
                 icon={GraduationCap}
@@ -1641,10 +1658,9 @@ function GradesView({
                 max={CURRENT_GRADING_SYSTEM.values.maximum}
                 step=".1"
                 value={target}
-                onChange={(event) => setTarget(Number(event.target.value))}
-                onBlur={() => {
-                  if (target !== goal) onGoal(target);
-                }}
+                onChange={(event) => changeTarget(Number(event.target.value))}
+                onPointerUp={commitGoal}
+                onBlur={commitGoal}
               />
             </label>
             <label>
@@ -1653,9 +1669,9 @@ function GradesView({
                 value={type?.id ?? ""}
                 onChange={(e) => setNextType(e.target.value)}
               >
-                {subject.gradeTypes.map((t) => (
-                  <NativeSelectOption key={t.id} value={t.id}>
-                    {t.name} · {t.weight}×
+                {subject.gradeTypes.map((gradeType) => (
+                  <NativeSelectOption key={gradeType.id} value={gradeType.id}>
+                    {gradeType.name} · {intlNumber(locale, gradeType.weight)}×
                   </NativeSelectOption>
                 ))}
               </NativeSelect>
@@ -1663,20 +1679,19 @@ function GradesView({
             <label>
               {t("grades.nextWeight")}
               <input
-                type="number"
-                min=".1"
-                max="100"
-                step=".1"
-                value={nextWeight}
-                onChange={(e) =>
-                  setNextWeight(
-                    Math.max(0.1, Math.min(100, Number(e.target.value) || 1)),
-                  )
-                }
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                maxLength={8}
+                value={nextWeightInput}
+                onChange={(e) => setNextWeightInput(e.target.value)}
+                onBlur={() => setNextWeightInput(intlNumber(locale, nextWeight, { maximumFractionDigits: 2, useGrouping: false }))}
               />
             </label>
             <div
               className={`needed-grade ${needed !== null && needed > CURRENT_GRADING_SYSTEM.values.maximum ? "impossible" : ""}`}
+              aria-live="polite"
+              aria-atomic="true"
             >
               <small>{t("grades.required")}</small>
               <strong>

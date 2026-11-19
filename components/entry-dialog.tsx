@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState, type FormEvent, type RefObject } from "react";
+import { useEffect, useRef, useState, type FormEvent, type RefObject } from "react";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
+import { formatNumber } from "@/lib/i18n";
 import { Plus, Trash2 } from "lucide-react";
 import { NativeDateInput } from "@/components/ui/native-date-input";
 import {
@@ -51,16 +52,24 @@ type Props = {
 };
 
 export function EntryDialog(props: Props) {
+  // A click outside must not discard typed data; Escape and Cancel still close.
+  const dirtyRef = useRef(false);
   return (
     <Dialog
       open={!!props.type}
       onOpenChange={(open) => !open && props.onClose()}
     >
-      <DialogContent className="entry-dialog" aria-describedby={undefined} fallbackFocusRef={props.fallbackFocusRef}>
+      <DialogContent
+        className="entry-dialog"
+        aria-describedby={undefined}
+        fallbackFocusRef={props.fallbackFocusRef}
+        onInteractOutside={(event) => { if (dirtyRef.current) event.preventDefault(); }}
+      >
         {props.type && (
           <EntryForm
             key={`${props.type}-${props.editingSubject?.id ?? props.editingSemester?.id ?? "new"}`}
             {...props}
+            dirtyRef={dirtyRef}
           />
         )}
       </DialogContent>
@@ -78,8 +87,14 @@ function EntryForm({
   editingSemester,
   onSave,
   onRefresh,
-}: Props) {
-  const { t } = useI18n();
+  dirtyRef,
+}: Props & { dirtyRef: RefObject<boolean> }) {
+  const { t, locale } = useI18n();
+  const gradeValueRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    dirtyRef.current = false;
+    return () => { dirtyRef.current = false; };
+  }, [dirtyRef]);
   const [selected, setSelected] = useState(data.subjects.find((subject) => subject.id === initialSubjectId)?.id ?? data.subjects[0]?.id ?? "");
   const [types, setTypes] = useState(
     editingSubject?.gradeTypes ?? [
@@ -112,7 +127,11 @@ function EntryForm({
       if (type === "grade") {
         let value: number;
         try { value = parseGrade(str("value")); }
-        catch { setError("error.grade"); return; }
+        catch {
+          setError("error.grade");
+          requestAnimationFrame(() => gradeValueRef.current?.focus());
+          return;
+        }
         const grade: Grade = {
           id: uid(),
           subjectId: str("subjectId"),
@@ -233,7 +252,7 @@ function EntryForm({
   };
   const needsSubject = type === "grade" || type === "agenda";
   return (
-    <form onSubmit={submit}>
+    <form onSubmit={submit} onInput={() => { dirtyRef.current = true; }}>
       <DialogHeader>
         <DialogTitle>{titles[type!]}</DialogTitle>
         <LanguageSelect className="language-select" />
@@ -278,12 +297,22 @@ function EntryForm({
             <label>
               {t("common.grade")}
               <input
+                ref={gradeValueRef}
                 name="value"
                 inputMode="decimal"
+                autoComplete="off"
                 placeholder={t("entry.gradePlaceholder")}
                 maxLength={12}
                 required
+                aria-invalid={error === "error.grade" || undefined}
+                aria-describedby={error === "error.grade" ? "grade-value-error" : undefined}
+                onChange={() => { if (error === "error.grade") setError(null); }}
               />
+              {error === "error.grade" && (
+                <small id="grade-value-error" className="form-error" role="alert">
+                  {t("error.grade")}
+                </small>
+              )}
             </label>
             <label>
               {t("common.date")}
@@ -292,9 +321,9 @@ function EntryForm({
             <label>
               {t("entry.type")}
               <NativeSelect key={selected} name="typeId" required>
-                {subject?.gradeTypes.map((t) => (
-                  <NativeSelectOption key={t.id} value={t.id}>
-                    {t.name} · {t.weight}×
+                {subject?.gradeTypes.map((gradeType) => (
+                  <NativeSelectOption key={gradeType.id} value={gradeType.id}>
+                    {gradeType.name} · {formatNumber(locale, gradeType.weight)}×
                   </NativeSelectOption>
                 ))}
               </NativeSelect>
@@ -588,7 +617,7 @@ function EntryForm({
           </>
         )}
       </fieldset>
-      {error && (
+      {error && error !== "error.grade" && (
         <p className="form-error" role="alert">
           {t(error)}
         </p>

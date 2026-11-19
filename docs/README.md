@@ -56,6 +56,7 @@ Questi documenti contengono lavoro aperto o decisioni da implementare. Le parti 
 | [Studio locale: fattibilità](SPAZIO-STUDIO-AI-LOCALE.md), [preparazione L0](SPAZIO-STUDIO-AI-L0.md), [laboratorio L1](SPAZIO-STUDIO-AI-L1.md), [mappa L2](SPAZIO-STUDIO-AI-L2.md), [prova L3](SPAZIO-STUDIO-AI-L3.md), [diagnosi e nuove misure](SPAZIO-STUDIO-AI-RIPRESA.md), [prompt operativi](SPAZIO-STUDIO-AI-PROMPTS.md) | Prototipo separato: testo/PDF, fonti, ricerca, mappa manuale e recupero L2. Banco generativo L3 implementato, modello non qualificato; nessuna integrazione/pubblicazione |
 | [Programma ingresso, SEO e account standard](improvement-2026-10-01/PLAN.md) | Programma misto: primo ciclo consegnato in Sites 28, annuale/storico in 29, account standard e altri sistemi ancora da implementare |
 | [Altri sistemi di valutazione](improvement-2026-10-01/GRADING-EXTENSION-AUDIT.md) | Ricerca e piano dei prompt 10–14; il contratto implementato resta nel Sistema voti |
+| [Più scale di voto — 19 novembre](MULTI-SCALA-VOTI-2026-11-19.md) | Analisi di prodotto: scale prioritarie, modello leggero con scala per voto, UX del setup e fasi; nessuna implementazione |
 | [Account standard](improvement-2026-10-01/AUTH-PRODUCT-AUDIT.md) | Audit iniziale e decisione W7; provider e nuovo schema non sono nel runtime |
 | [Prompt operativi](improvement-2026-10-01/PROMPTS.md), [workflow e modelli](improvement-2026-10-01/WORKFLOW-MODELS.md) | Sequenza, dipendenze e stime per i cicli successivi; non istruzioni da eseguire automaticamente |
 

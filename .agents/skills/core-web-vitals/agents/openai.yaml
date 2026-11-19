@@ -1,0 +1,4 @@
+interface:
+  display_name: "Core Web Vitals"
+  short_description: "Reattività e stabilità misurate"
+  default_prompt: "Usa $core-web-vitals su questa parte di iPagell rispettando la sezione Adattamento iPagell e la skill apple-design."

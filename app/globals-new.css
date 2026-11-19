@@ -15,6 +15,10 @@
   --danger: #be344b;
   --danger-fill: #be344b;
   --success: #24936a;
+  /* Grade pills: text on tinted surface stays at least 4.5:1 in both themes. */
+  --success-soft: #e5f7ee;
+  --success-ink: #1b7a57;
+  --danger-soft: #feecef;
   --background: #fff;
   --foreground: #171a2a;
   --card: #fff;
@@ -35,8 +39,12 @@
 }
 [data-theme="dark"] {
   --accent: #64b5ff;
-  --accent-fill: #0a84ff;
+  /* White button text needs 4.5:1; #0a84ff gave 3.65:1. */
+  --accent-fill: #0071e3;
   --danger: #ff8797;
+  --success-soft: color-mix(in srgb, #24936a 22%, #191b26);
+  --success-ink: #6fdcae;
+  --danger-soft: color-mix(in srgb, #ff8797 16%, #191b26);
   --ink: #f5f5fb;
   --subtle: #9b9eb1;
   --canvas: #0b0d14;
@@ -378,7 +386,8 @@ button {
   align-items: center;
   margin-bottom: 14px;
 }
-.panel-title h3 {
+.panel-title h3,
+.grades-register .panel-title h2 {
   margin: 4px 0 0;
   font-size: 21px;
   letter-spacing: -0.03em;
@@ -459,6 +468,10 @@ button {
   display: none;
 }
 @media (max-width: 820px) {
+  /* Keyboard focus and scrollIntoView must stop above the fixed tab bar. */
+  html {
+    scroll-padding-bottom: calc(104px + env(safe-area-inset-bottom));
+  }
   .desktop-nav {
     display: none;
   }
@@ -1028,6 +1041,13 @@ button {
   font-size: 36px;
   font-weight: 820;
   letter-spacing: -0.05em;
+  /* The subject colour is user-chosen: keep it as an accent, not as text colour. */
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--subject-color, var(--accent));
+  text-decoration-thickness: 4px;
+  text-underline-offset: 6px;
+  text-decoration-skip-ink: none;
 }
 .grades-register > article {
   display: grid;
@@ -1041,6 +1061,9 @@ button {
   display: grid;
   gap: 4px;
 }
+.grades-register > article > div:nth-child(2) b {
+  overflow-wrap: anywhere;
+}
 .grades-register > article small {
   color: var(--subtle);
   font-size: 12px;
@@ -1052,18 +1075,22 @@ button {
   padding: 6px 8px;
   border-radius: 9px;
 }
+.grades-register > article > span:empty {
+  padding: 0;
+  background: none;
+}
 .grade-pill {
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: #e5f7ee;
-  color: var(--success);
+  background: var(--success-soft);
+  color: var(--success-ink);
   display: grid;
   place-items: center;
   font-weight: 820;
 }
 .grade-pill.low {
-  background: #feecef;
+  background: var(--danger-soft);
   color: var(--danger);
 }
 .simulator-card {
@@ -1091,6 +1118,18 @@ button {
   grid-column: 1/-1;
   width: 100%;
   accent-color: var(--accent);
+}
+.simulator-card input:not([type="range"]) {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--input);
+  border-radius: 12px;
+  background: var(--surface-solid);
+  color: var(--ink);
+}
+.simulator-card input:not([type="range"]):focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 .needed-grade {
   margin: 23px 0 14px;
@@ -2043,6 +2082,8 @@ fieldset { padding:0; border:0; min-width:0; }
 .sync-status { font-size:.875rem; color:var(--subtle); }
 .sync-status.saved { color:var(--success); }
 .sync-status.error,.sync-status.conflict,.form-error { color:var(--danger); }
+.form-grid small.form-error { color:var(--danger); font-weight:600; }
+.form-grid input[aria-invalid="true"] { border-color:var(--danger); }
 .sync-banner { max-width:1120px; margin:0 auto 24px; padding:18px; background:var(--surface-solid); border:1px solid var(--line); border-radius:18px; }
 .sync-banner p { margin:0 0 12px; }
 .sync-banner>div,.auth-links { display:flex; flex-wrap:wrap; gap:12px; }
@@ -2122,6 +2163,7 @@ fieldset { padding:0; border:0; min-width:0; }
   .grade-overview>button { min-width:0; }
   .grades-register>article { grid-template-columns:auto minmax(0,1fr) auto; }
   .grades-register>article>span { grid-column:2; }
+  .grades-register>article>span:empty { display:none; }
   .grades-register>article>.icon-button { display:grid; grid-column:3; grid-row:auto; }
   .absence-stats { grid-template-columns:1fr; }
 }
@@ -2952,7 +2994,8 @@ button.agenda-origin { min-height:32px; text-align:left; }
 .app-shell .eyebrow { letter-spacing: .04em; }
 .app-shell :is(.primary-button, .soft-button), .account-card :is(.primary-button, .soft-button) { border-radius: var(--radius-control); font-weight: 650; }
 .app-shell .primary-button, .account-card .primary-button {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-fill) 86%, white), var(--accent-fill));
+  /* The lightest stop is the token itself, so white text keeps 4.5:1 across the button. */
+  background: linear-gradient(180deg, var(--accent-fill), color-mix(in srgb, var(--accent-fill) 88%, black));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 4px 12px color-mix(in srgb, var(--accent-fill) 24%, transparent);
 }
 .app-shell .nav-item { border-radius: var(--radius-control); }
@@ -2974,7 +3017,7 @@ button.agenda-origin { min-height:32px; text-align:left; }
   .mobile-tabs { background: var(--surface-solid) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 }
 /* Card headings carried weight 400 next to a 700 page title, flattening the hierarchy. */
-.app-shell :is(.hero-card h2, .panel-title h3, .dashboard-section-heading h3) { font-weight: 700; letter-spacing: -.02em; }
+.app-shell :is(.hero-card h2, .panel-title h3, .grades-register .panel-title h2, .dashboard-section-heading h3) { font-weight: 700; letter-spacing: -.02em; }
 /* Home sections as grouped cards: same surface, padding and radius as the notes card, so the
    order of the page reads as a stack of equal blocks instead of mixed flat lists and cards. */
 .app-shell .dashboard-grid > :is(.dashboard-overdue, .today-panel, .grade-summary, .grade-prompt) {
