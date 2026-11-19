@@ -4,7 +4,7 @@ import it from "../lib/i18n/messages/it.json";
 import de from "../lib/i18n/messages/de.json";
 import fr from "../lib/i18n/messages/fr.json";
 import en from "../lib/i18n/messages/en.json";
-import { formatDate, formatNumber, selectPlural, loadMessages, translate } from "../lib/i18n";
+import { formatDate, formatNumber, greetingKey, selectPlural, loadMessages, translate } from "../lib/i18n";
 import { initialLocale, localeStorageKey, locales, normalizeLocale, saveLocale } from "../lib/i18n/locale";
 import { createDiary } from "../lib/new-diary";
 import { apiErrorKey } from "../lib/i18n/errors";
@@ -39,7 +39,7 @@ test("locale values normalize and explicit preference wins", () => {
 
 test("missing translation falls back to Italian and variables remain semantic", () => {
   assert.equal(translate({}, "sync.offline"), it["sync.offline"]);
-  assert.equal(translate(de, "workspace.greeting", { name: "Mia" }), "Guten Tag, Mia");
+  assert.equal(translate(de, "workspace.greetingAfternoon", { name: "Mia" }), "Guten Tag, Mia");
   assert.equal(apiErrorKey("AUTH_INVALID_CREDENTIALS"), "auth.invalidCredentials");
   assert.equal(apiErrorKey("DIARY_CONFLICT"), "sync.conflictDetail");
   assert.equal(apiErrorKey("SECURITY_INVALID_PASSWORD"), "security.invalidPassword");
@@ -86,4 +86,15 @@ test("changing interface language stores only a local preference, not diary data
   }
   assert.deepEqual(writes, locales.map(locale => [localeStorageKey, locale]));
   assert.equal(JSON.stringify(diary), snapshot);
+});
+
+test("the home greeting follows the time of day", () => {
+  const at = (hour: number, minute = 0) => new Date(2026, 10, 19, hour, minute);
+  assert.equal(greetingKey(at(4, 59)), "workspace.greetingEvening");
+  assert.equal(greetingKey(at(5)), "workspace.greetingMorning");
+  assert.equal(greetingKey(at(11, 59)), "workspace.greetingMorning");
+  assert.equal(greetingKey(at(12)), "workspace.greetingAfternoon");
+  assert.equal(greetingKey(at(17, 59)), "workspace.greetingAfternoon");
+  assert.equal(greetingKey(at(18)), "workspace.greetingEvening");
+  assert.equal(translate(it, greetingKey(at(20)), { name: "Mia" }), "Buonasera, Mia");
 });

@@ -56,7 +56,7 @@ import { initialGradeScope, resolveGradeScope, scopeGrades, scopePeriods, type G
 import { EmptyState } from "@/components/diary-empty-state";
 import { AccountGate } from "@/components/account-gate";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
-import { formatDate as intlDate, formatNumber as intlNumber, selectPlural, type Locale } from "@/lib/i18n";
+import { formatDate as intlDate, formatNumber as intlNumber, greetingKey, selectPlural, type Locale } from "@/lib/i18n";
 import { AccountSecurity } from "@/components/account-security";
 import { useDiary } from "@/hooks/use-diary";
 import { InstallAppOffer } from "@/components/install-app";
@@ -205,6 +205,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const allAgenda = useMemo(() => [...data.agenda, ...subscriptionAgenda(classAgenda.items.filter(s => !data.agenda.some(a => a.id === `class-snapshot-${s.id}`)))], [data.agenda, classAgenda.items]);
   const [personalEvent, setPersonalEvent] = useState<ClassSubscription | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("home");
+  // Re-checked every minute so an open app moves from "Buongiorno" to "Buonasera" on its own.
+  const [greeting, setGreeting] = useState(() => greetingKey(new Date()));
+  useEffect(() => {
+    const timer = window.setInterval(() => setGreeting(greetingKey(new Date())), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
   const [notesIntent,setNotesIntent]=useState<{subjectId:string;newNote:boolean;openId:string;serial:number;fromNav?:boolean}>({subjectId:"",newNote:false,openId:"",serial:0});
   const [notesOrigin,setNotesOrigin]=useState<{tab:TabId;agendaItemId?:string}>({tab:"home"});
   const [copyToClass,setCopyToClass]=useState<NoteCopySeed|null>(null);
@@ -644,7 +650,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             <p>{titleCase(formatLongDate(locale, new Date()))}</p>
             <h1>
               {activeTab === "home"
-                ? t("workspace.greeting", { name: preferences.studentName })
+                ? t(greeting, { name: preferences.studentName })
                 : activeTab === "stats"
                   ? t("nav.stats")
                   : t(navKeys[activeTab])}
