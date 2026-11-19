@@ -25,7 +25,7 @@ npm run release:prepare
 npm run deploy:cloudflare
 ```
 
-`deploy:cloudflare` compila con `IPAGELL_DEPLOY_TARGET=cloudflare`, verifica che la config generata in `dist/server/wrangler.json` sia quella di produzione (Worker `ipagell`, D1 `ipagell-live`), esegue un dry run, applica al D1 remoto le migrazioni non ancora applicate e pubblica il Worker con quella config. `wrangler.jsonc` dalla radice non si usa per il deploy: la sua `main` punta all'entry del binding locale. Lo staging si pubblica con `CLOUDFLARE_ENV=staging npm run build:cloudflare` seguito da `npx wrangler deploy -c dist/server/wrangler.json`, senza il passo di migrazione di produzione. Una migrazione applicata non si annulla con un rollback del codice. Richiede Node 22.23.4+ / 24.22.1+ / 26.12.1+; su questo Mac si usa `/opt/homebrew/opt/node@24/bin`.
+`deploy:cloudflare` controlla che il checkout sia `main` pulita e allineata a `origin/main`, compila con `IPAGELL_DEPLOY_TARGET=cloudflare`, verifica che la config generata in `dist/server/wrangler.json` sia quella di produzione (Worker `ipagell`, D1 `ipagell-live`), esegue un dry run, applica al D1 remoto le migrazioni non ancora applicate e pubblica il Worker con quella config. `wrangler.jsonc` dalla radice non si usa per il deploy: la sua `main` punta all'entry del binding locale. Lo staging si pubblica con `CLOUDFLARE_ENV=staging npm run build:cloudflare` seguito da `npx wrangler deploy -c dist/server/wrangler.json`, senza il passo di migrazione di produzione. Una migrazione applicata non si annulla con un rollback del codice. Richiede Node 22.23.4+ / 24.22.1+ / 26.12.1+; su questo Mac si usa `/opt/homebrew/opt/node@24/bin`.
 
 ### Rilascio del 19 novembre 2026
 
@@ -35,7 +35,7 @@ Versione `8e2c7f3d-2bea-423b-b01f-b6334a8b13cb` (commit `9f94d51`): migrazioni 0
 
 Alle 09:44 UTC la versione `41dfaad0` (ramo `release/deps-20261119`, senza Google) aveva sostituito la `8e2c7f3d` con Google e `/legale`. Le due linee sono state unite nel ramo **`release/integrazione-20261119`** (merge `f50c02a`: dipendenze aggiornate, nuova home, Google, `/legale`, conferma età). Prima: `npm run check` 159/159, `test:auth-d1` 29/29, `test:auth-restore`, audit a zero, staging `65c6ae46` verificato. Pubblicata la versione Worker **`0c792282-ac62-485a-8b86-383fdad3a412`** alle 10:16 UTC con `npm run deploy:cloudflare`, nessuna migrazione da applicare. Dopo: `/`, `/de`, `/app`, `/legale`, sitemap, robots e `sw.js` 200; `www` 308; `providers` `{"google":true}`; avvio Google 200; `/api/account` 401; Origin estraneo 403; D1 `7/legacy` con 2 account e 1 identità. Per circa un minuto `/legale` ha alternato 200 e 404 durante la propagazione, poi 12/12 risposte 200.
 
-**Da qui si pubblica solo da `release/integrazione-20261119`** (o da `main` dopo il merge della sua PR). Un deploy da un ramo che non la contiene rimuove Google e `/legale` dalla produzione.
+**Da qui si pubblica solo da `main`** (la PR 16 ha unito `release/integrazione-20261119`). Un deploy da un ramo che non la contiene rimuove Google e `/legale` dalla produzione: per questo `deploy:cloudflare` si ferma se il ramo non è `main`, se ci sono modifiche non committate o se `HEAD` non coincide con `origin/main`. `IPAGELL_DEPLOY_ANY_BRANCH=1` salta il controllo solo per emergenze consapevoli.
 
 ### Accesso con Google: configurazione
 
