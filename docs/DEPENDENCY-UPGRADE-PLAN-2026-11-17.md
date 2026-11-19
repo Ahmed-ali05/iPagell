@@ -111,6 +111,15 @@ Ramo `deps/phase2-zod4`, sopra la Fase 1. `zod` 3.25.76 → **4.6.7**; `eslint-p
 - Browser sul Worker locale: registrazione, creazione del diario, voto (`PUT /api/diary` 200) e nuovo appunto (`POST /api/notes` 201). Database locale eliminato al termine.
 - Non verificati: import di backup reali V1/V2 oltre ai test automatici, telefono fisico, staging e produzione.
 
+### Fase 3 chiusa — 19 novembre 2026
+
+GitHub ha **ritirato** l'advisory GHSA-fc5q-39xc-vjpf il 18 novembre 2026 alle 15:38 UTC (`withdrawn_at` nell'API advisories); picomatch non ha nuove versioni, ma `npm audit` non lo segnala più. Nessuna patch locale né eccezione nel gate: la decisione del 17 novembre (attendere) resta rispettata e la scadenza del 1° dicembre non serve più.
+
+- `npm audit --package-lock-only` sul lockfile della Fase 2: **0 vulnerabilità**. CI della PR #11 rilanciata: **verde** in tutti i passi (patch, audit, `release:prepare`, auth D1, export/restore). La PR #10 da sola resta rossa per il solo zod 3, atteso.
+- Ramo `release/deps-20261119`: la produzione corrente (`release/home-20261118`, versione Worker `7a07b2ec`) unita a `deps/phase2-zod4`, senza conflitti. Con Node 24.22.3 e installazione pulita: audit a zero, `npm run check` (147 test), test patch braces 7/7, `test:auth-d1` 15/15, `test:auth-restore`, build. Worker compilato su D1 locale nuovo (0000–0006): **146 controlli API**, pagine pubbliche, `/app`, service worker e immagini 200; flusso end-to-end con `npm run media:capture -- --explore` (registrazione, diario, voti, consegna, appunto e rendering in Chrome). Database locale eliminato al termine.
+- Lo script di cattura ora registra anche con lo schema di registrazione senza `ageConfirmed` di questo ramo.
+- Non verificati: deploy su staging, telefono fisico, import di backup reali V1/V2 oltre ai test automatici.
+
 ## Ordine consigliato
 
 1. Riallineare il branch locale `sync/checkout-20261116` al remoto: contiene quattro commit non pubblicati.
