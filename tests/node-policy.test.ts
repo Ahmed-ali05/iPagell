@@ -40,9 +40,11 @@ test("actual install, framework and Worker preview entrypoints preload the runti
 });
 
 test("Vite consumers resolve the security release", () => {
-  assert.equal(require("vite/package.json").version, "8.1.6");
+  const declared = JSON.parse(readFileSync(new URL("package.json", root), "utf8")).devDependencies.vite;
+  assert.match(declared, /^\d+\.\d+\.\d+$/, "vite must stay pinned to an exact release");
+  assert.equal(require("vite/package.json").version, declared);
   for (const consumer of ["vinext", "@cloudflare/vite-plugin", "@vitejs/plugin-rsc"]) {
     const consumerRequire = createRequire(import.meta.resolve(consumer));
-    assert.equal(consumerRequire("vite/package.json").version, "8.1.6", consumer);
+    assert.equal(consumerRequire("vite/package.json").version, declared, consumer);
   }
 });
