@@ -89,6 +89,8 @@ C3. Usare un account sintetico creato e cancellato da me solo dopo l'autorizzazi
 4. Smoke test su produzione senza creare account: homepage, `/app`, `/api/auth/*` con richieste negative, sitemap, service worker.
 5. Rollback: il Worker attuale funziona anche dopo 0007 + 0008 (modalità `legacy`), quindi un rollback del solo codice è possibile. Le migrazioni non si annullano: tornare allo schema 0000–0006 richiede il restore del dump. Ogni rollback va deciso per iscritto dal proprietario.
 
+**Eseguita il 19 novembre 2026.** Backup `wrangler d1 export` di `ipagell-live` fuori dal repo, in una cartella con permessi solo per il proprietario (non in Git né in `docs/`), ricaricato in SQLite: 1 account, 1 diario, 17 tabelle. Segnalibro Time Travel prima delle migrazioni: `00000050-00000000-00005128-37705c29cef7e7f68941354c81761f8a`. `npm run deploy:cloudflare` dal commit `9f94d51` ha applicato 0007+0008 e pubblicato la versione `8e2c7f3d-2bea-423b-b01f-b6334a8b13cb`. Dopo: stato `7/legacy`, 27 trigger fence, 1 account e 1 diario intatti, nessuna migrazione in sospeso. Smoke test: `/`, `/de`, `/app`, `/legale`, sitemap, robots e `sw.js` 200; `www` 308 verso l'apex; `/api/account` senza sessione 401; login non valido 400 con codice; Origin estraneo 403; Google 404 e `providers` `{"google":false}` finché mancano i secret di produzione; callback senza stato 303 verso `/app?accesso=google-error`. Il rilascio include anche il ridisegno UI e la conferma età.
+
 ### Fase E — Google (W8)
 
 Gate esterni, da fornire dal proprietario:

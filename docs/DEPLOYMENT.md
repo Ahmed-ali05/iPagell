@@ -27,6 +27,10 @@ npm run deploy:cloudflare
 
 `deploy:cloudflare` compila con `IPAGELL_DEPLOY_TARGET=cloudflare`, verifica che la config generata in `dist/server/wrangler.json` sia quella di produzione (Worker `ipagell`, D1 `ipagell-live`), esegue un dry run, applica al D1 remoto le migrazioni non ancora applicate e pubblica il Worker con quella config. `wrangler.jsonc` dalla radice non si usa per il deploy: la sua `main` punta all'entry del binding locale. Lo staging si pubblica con `CLOUDFLARE_ENV=staging npm run build:cloudflare` seguito da `npx wrangler deploy -c dist/server/wrangler.json`, senza il passo di migrazione di produzione. Una migrazione applicata non si annulla con un rollback del codice. Richiede Node 22.23.4+ / 24.22.1+ / 26.12.1+; su questo Mac si usa `/opt/homebrew/opt/node@24/bin`.
 
+### Rilascio del 19 novembre 2026
+
+Versione `8e2c7f3d-2bea-423b-b01f-b6334a8b13cb` (commit `9f94d51`): migrazioni 0007+0008 applicate a `ipagell-live` (stato `7/legacy`), accesso con Google nel codice ma nascosto finché non ci sono i secret di produzione, ridisegno UI, conferma età e pagina `/legale`. Backup e controlli nel [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md#fase-d--rilascio-produzione-una-sola-finestra).
+
 ### Accesso con Google: configurazione
 
 Il pulsante resta nascosto finché il Worker non ha tre valori: `GOOGLE_REDIRECT_URI` (già in `wrangler.jsonc`, uno per produzione e uno per staging) e i due secret `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Serve anche lo schema 0007+0008, quindi in produzione prima la Fase D del [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md).
