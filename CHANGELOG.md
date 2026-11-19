@@ -5,7 +5,7 @@
 - La CI falliva su `npm audit` per 18 avvisi pubblicati dopo l'ultimo rilascio, fra cui due critici: esecuzione remota di codice in React Server Components (GHSA-xqc2-xf4c-x3h3) e in Next.js (GHSA-2464-fhr4-w9xw, GHSA-673q-mjm6-r5xr).
 - Aggiornati Next 16.3.8 → 16.4.6, React/React DOM/react-server-dom-webpack 19.2.8 → 19.3.1, Vinext 1.0.0-beta.10 → 1.4.6, Wrangler 4.145.0 → 4.165.0, plugin Vite Cloudflare 1.62.3 → 1.70.0, workers-types e plugin RSC; override `fflate` 0.8.3 per satori.
 - Zod 3.25.76 → 4.6.7 (GHSA-mrhx-c7xc-m3w5): `z.guid()` conserva la validazione UUID non restrittiva della v3 per gli ID esistenti; codice issue `"custom"` al posto dell'enum deprecato. Inventario rigenerato.
-- Verificato in un checkout pulito: `npm audit` senza avvisi, 159 test, 7 controlli patch dipendenze, lint, tipi, i18n, documentazione, build, 29 test auth D1, prova export/restore e 146 controlli API sulla build locale. **Non pubblicato**: la produzione resta esposta finché non si esegue `npm run deploy:cloudflare`.
+- Verificato in un checkout pulito: `npm audit` senza avvisi, 159 test, 7 controlli patch dipendenze, lint, tipi, i18n, documentazione, build, 29 test auth D1, prova export/restore e 146 controlli API sulla build locale. Questo ramo non è stato pubblicato; la produzione ha già Next 16.4.6, React 19.3.1 e Zod 4.6.7 dal rilascio della PR 14 (Worker `41dfaad0`, registro in `release/deps-20261119`).
 
 ## Non rilasciato — 19 novembre 2026, presentazione GitHub in inglese
 
