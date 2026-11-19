@@ -769,7 +769,6 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
               grades={visibleGrades}
               semesters={data.semesters}
               periods={visiblePeriods}
-              scopeLabel={scopeLabel}
               history={readingScope.kind === "all"}
               onShowHistory={() => setGradeScope({ kind: "all" })}
               goal={preferences.gradeGoal}
@@ -1479,7 +1478,6 @@ function GradesView({
   grades,
   semesters,
   periods,
-  scopeLabel,
   history,
   onShowHistory,
   goal,
@@ -1495,7 +1493,6 @@ function GradesView({
   grades: Grade[];
   semesters: Semester[];
   periods: Semester[];
-  scopeLabel: string;
   history: boolean;
   onShowHistory: () => void;
   goal: number;
@@ -1578,19 +1575,17 @@ function GradesView({
           <section className="panel grades-register">
             <div className="panel-title">
               <div>
-                <span className="eyebrow">{subject.name}</span>
-                <h3>{t("grades.register")}</h3>
-                <p className="scope-note">{scopeLabel} · {t("scope.count", { count: intlNumber(locale, subjectGrades.length) })}</p>
+                <h3>{subject.name}</h3>
+                <p className="scope-note">{t(selectPlural(locale, subjectGrades.length, "grades.countOne", "grades.countOther"), { count: intlNumber(locale, subjectGrades.length) })}</p>
               </div>
               <div className="big-average" style={{ color: subject.color }}>
                 {gradeText(locale, average)}
               </div>
             </div>
-            <p className="scope-note">{t("scope.calculated")}</p>
             {periods.length > 1 && <div className="grade-period-summary" aria-label={t("scope.byPeriod")}>
               {periods.map((period) => {
                 const values = subjectGrades.filter((grade) => grade.semesterId === period.id);
-                return <div key={period.id}><span>{period.name} · {period.schoolYear}</span><b>{gradeText(locale, subjectAverage(subject, values))}</b><small>{t("scope.count", { count: intlNumber(locale, values.length) })}</small></div>;
+                return <div key={period.id}><span>{period.name} · {period.schoolYear}</span><b>{gradeText(locale, subjectAverage(subject, values))}</b><small>{t(selectPlural(locale, values.length, "grades.countOne", "grades.countOther"), { count: intlNumber(locale, values.length) })}</small></div>;
               })}
             </div>}
             {subjectGrades.length ? (
@@ -1608,10 +1603,11 @@ function GradesView({
                         t("common.grade")}
                     </b>
                     <small>
-                      {formatDate(locale, grade.date, { day: "numeric", month: "short", year: "numeric" })} · {t("grades.weight", { value: gradeText(locale, grade.weight) })}
-                    </small>
-                    <small>
-                      {semesters.find((period) => period.id === grade.semesterId)?.name} · {semesters.find((period) => period.id === grade.semesterId)?.schoolYear}
+                      {[
+                        formatDate(locale, grade.date, history ? { day: "numeric", month: "short", year: "numeric" } : { day: "numeric", month: "short" }),
+                        grade.weight !== 1 ? t("grades.weight", { value: gradeText(locale, grade.weight) }) : "",
+                        periods.length > 1 ? semesters.find((period) => period.id === grade.semesterId)?.name : "",
+                      ].filter(Boolean).join(" · ")}
                     </small>
                   </div>
                   <span>
@@ -1637,7 +1633,6 @@ function GradesView({
             <summary>{t("grades.needed")}</summary>
             <div className="simulator-body">
             {history ? <><p className="scope-note">{t("scope.historySimulation")}</p></> : <>
-            <p className="scope-note">{t("scope.simulation")}</p>
             <label>
               {t("grades.target")} <b>{gradeText(locale, target)}</b>
               <input

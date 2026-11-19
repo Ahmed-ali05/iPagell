@@ -539,7 +539,7 @@ export function ClassesView({
 
                 <div className="class-content-nav" aria-label={t("classes.content")}>
                   <button aria-pressed={classSection==="events"} onClick={()=>void selectSection("events")}>{t("classes.activities")}</button>
-                  <button aria-pressed={classSection==="notes"} onClick={()=>void selectSection("notes")}>{t("notes.classTitle")}</button>
+                  <button aria-pressed={classSection==="notes"} onClick={()=>void selectSection("notes")}>{t("classes.notesTab")}</button>
                 </div>
                 <div hidden={classSection!=="events"}><ClassEventsPanel active={active&&classSection==="events"} cached={eventsCache.get(detail.id)} onLoaded={cacheEvents} onInvalidate={invalidateEvents} detail={detail} userId={currentUserId} data={data} semesterId={semesterId} controller={agenda} actions={actions} /></div>
                 <div hidden={classSection!=="notes"}><ClassNotesPanel active={active&&classSection==="notes"} detail={detail} userId={currentUserId} controller={notes} copySeed={copyToClass} onCopyConsumed={onCopyConsumed} onCopyPersonal={onCopyPersonal} /></div>
