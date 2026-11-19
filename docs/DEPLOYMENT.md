@@ -31,6 +31,12 @@ npm run deploy:cloudflare
 
 Versione `8e2c7f3d-2bea-423b-b01f-b6334a8b13cb` (commit `9f94d51`): migrazioni 0007+0008 applicate a `ipagell-live` (stato `7/legacy`), accesso con Google nel codice ma nascosto finché non ci sono i secret di produzione, ridisegno UI, conferma età e pagina `/legale`. Backup e controlli nel [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md#fase-d--rilascio-produzione-una-sola-finestra).
 
+### Versione unificata — 19 novembre 2026
+
+Alle 09:44 UTC la versione `41dfaad0` (ramo `release/deps-20261119`, senza Google) aveva sostituito la `8e2c7f3d` con Google e `/legale`. Le due linee sono state unite nel ramo **`release/integrazione-20261119`** (merge `f50c02a`: dipendenze aggiornate, nuova home, Google, `/legale`, conferma età). Prima: `npm run check` 159/159, `test:auth-d1` 29/29, `test:auth-restore`, audit a zero, staging `65c6ae46` verificato. Pubblicata la versione Worker **`0c792282-ac62-485a-8b86-383fdad3a412`** alle 10:16 UTC con `npm run deploy:cloudflare`, nessuna migrazione da applicare. Dopo: `/`, `/de`, `/app`, `/legale`, sitemap, robots e `sw.js` 200; `www` 308; `providers` `{"google":true}`; avvio Google 200; `/api/account` 401; Origin estraneo 403; D1 `7/legacy` con 2 account e 1 identità. Per circa un minuto `/legale` ha alternato 200 e 404 durante la propagazione, poi 12/12 risposte 200.
+
+**Da qui si pubblica solo da `release/integrazione-20261119`** (o da `main` dopo il merge della sua PR). Un deploy da un ramo che non la contiene rimuove Google e `/legale` dalla produzione.
+
 ### Accesso con Google: configurazione
 
 Il pulsante resta nascosto finché il Worker non ha tre valori: `GOOGLE_REDIRECT_URI` (già in `wrangler.jsonc`, uno per produzione e uno per staging) e i due secret `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Serve anche lo schema 0007+0008, quindi in produzione prima la Fase D del [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md).
