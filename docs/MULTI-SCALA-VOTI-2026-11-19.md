@@ -66,8 +66,15 @@ Ripresi dall'analisi del 1 ottobre e confermati nel codice:
 - **Backup.** L'import deve continuare ad accettare il formato V1 per sempre: serve anche al trasferimento in corso da Sites a Cloudflare.
 - **Pesi.** `gradeWeight` impone un minimo di 0,1: un'eventuale esclusione dal calcolo va modellata esplicitamente, non con peso 0.
 
-## Decisioni di prodotto aperte
+## Decisioni del proprietario (19 novembre 2026)
 
-- Quali scale entrano nel primo rilascio (proposta: decimi italiani e 0–20 francese, oltre alla 1–6).
-- Valore di `6+`, `6-`, `6/7`: le convenzioni variano fra scuole, quindi va fissata e dichiarata nell'app.
-- Eccezione per materia subito o in una fase successiva.
+- **Scale del primo rilascio:** oltre alla 1–6 crescente, tutte e quattro le scale della tabella: decimi 1–10, 0–20, 1–6 inverso e percentuale 0–100.
+- **Notazione dei decimi:** `6+` = 6,25 · `6-` = 5,75 · `6½` = 6,5 · `6/7` = 6,5. L'app mostra il valore contato prima del salvataggio. Va distinta dalla notazione attuale `4-5` della scala 1–6, che vale 4,5.
+- **Eccezione per materia:** in una fase successiva. Il primo rilascio ha una sola scala per diario.
+- **Punto di partenza:** fase 1, calcolatore pubblico multi-scala.
+
+## Ancora da decidere
+
+- Notazione `+/-` per la 1–6 inversa (per esempio `2+`, `2-`) e per lo 0–20.
+- Voti «su N» per lo 0–20 (`7/10`, `15/20`): fase 4, oppure già nel calcolatore pubblico.
+- Etichette e suggerimento del paese nel selettore, nelle quattro lingue.
