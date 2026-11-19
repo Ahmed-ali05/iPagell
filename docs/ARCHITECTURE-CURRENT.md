@@ -2,13 +2,13 @@
 
 [Indice](README.md) · [Snapshot](REPO-SNAPSHOT.md) · [API](API.md) · [Verifiche](VERIFICATION-MATRIX.md)
 
-Aggiornamento: **10 ottobre 2026**. Descrive il runtime pubblicato in Sites **33**, con consultazione annuale, homepage localizzata e semplificazione delle viste. Evidenze e limiti sono nella matrice; la cronologia resta in [ARCHITECTURE-HISTORY](archive/ARCHITECTURE-HISTORY.md). Il codice attuale prevale sempre sulla guida.
+Aggiornamento: **10 ottobre 2026**, con correzioni puntuali del 19 novembre 2026 su hosting, build e migrazioni. Descrive il runtime pubblicato in Sites **33**, con consultazione annuale, homepage localizzata e semplificazione delle viste; il ridisegno UI e l'accesso con Google di novembre non sono ancora descritti qui (vedi [CHANGELOG](../CHANGELOG.md) e [ridisegno UI](UI-REDESIGN-2026-11-18.md)). Evidenze e limiti sono nella matrice; la cronologia resta in [ARCHITECTURE-HISTORY](archive/ARCHITECTURE-HISTORY.md). Il codice attuale prevale sempre sulla guida.
 
 ## 1. Runtime, ingressi e navigazione
 
 Node è la toolchain locale/CI, non il server di produzione: Workers implementa le API con `nodejs_compat`. `.nvmrc` seleziona 22.23.4; `scripts/check-node.mjs` impone le release corrette dichiarate in `package.json` prima di installazione, sviluppo, build, preview e controlli. [Analisi e limiti](RUNTIME-SECURITY-2026-10-22.md).
 
-Il sorgente segue Next App Router; `scripts/run-framework.mjs`, Vinext, Vite e il plugin Cloudflare producono client e Worker compatibile con Workers. `vite.config.ts` usa `sites({ mockAuth: false })` e binding derivati da `.openai/hosting.json`. Il profilo locale sostituisce i binding del Worker sandbox: non li concatena. `IPAGELL_DEPLOY_TARGET=cloudflare` seleziona il Worker indipendente; non è il percorso della produzione Sites.
+Il sorgente segue Next App Router; `scripts/run-framework.mjs`, Vinext, Vite e il plugin Cloudflare producono client e Worker compatibile con Workers. `vite.config.ts` usa ancora il plugin Sites vendorizzato `sites({ mockAuth: false })`, residuo dell'hosting precedente. Senza `IPAGELL_DEPLOY_TARGET` lo sviluppo e la build locale usano binding segnaposto derivati da `.openai/hosting.json`, che sostituiscono quelli di `wrangler.jsonc` senza concatenarli. `IPAGELL_DEPLOY_TARGET=cloudflare` usa `wrangler.jsonc` ed è il percorso della produzione dal 16 novembre 2026.
 
 - `app/layout.tsx`: lingua, metadata, provider globali, installazione PWA e protezione dell'host canonico.
 - `app/page.tsx` e `app/[locale]/page.tsx`: landing SSR italiana e localizzate.
@@ -148,7 +148,7 @@ it/de/fr/en: cataloghi con chiavi e placeholder verificati, scelta interfaccia i
 
 ## 10. Schema, controlli e produzione
 
-[Inventario](REPO-INVENTORY.md): 23 tabelle e 9 migrazioni: 0000–0006 identiche a Sites 39, 0007 espansione solo schema e 0008 bootstrap in modalità legacy, introdotte sul branch `auth/w8b-cloudflare` e non ancora pubblicate ([piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md)); route/metodi, script e dipendenze verificati dal sorgente. Le migrazioni 0005/0006 aggiungono appunti, materie, pin e formato; non modificare SQL già pubblicato. `diaries.user_id` non ha FK SQL verso accounts: la cancellazione passa dalle API transazionali.
+[Inventario](REPO-INVENTORY.md): 23 tabelle e 9 migrazioni: 0000–0006 identiche a Sites 39, 0007 espansione solo schema e 0008 bootstrap in modalità legacy, applicate al D1 di produzione il 19 novembre 2026 (stato `7/legacy`, [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md)); route/metodi, script e dipendenze verificati dal sorgente. Le migrazioni 0005/0006 aggiungono appunti, materie, pin e formato; non modificare SQL già pubblicato. `diaries.user_id` non ha FK SQL verso accounts: la cancellazione passa dalle API transazionali.
 
 `npm run check` comprende lint, TypeScript, test, cataloghi, inventario e link documentali. `release:prepare` aggiunge build/precache. La CI include audit dipendenze e prove auth/restore su D1 locale sintetico; non esegue le suite API/browser e non pubblica. Risultati reali e lacune: [Matrice di verifica](VERIFICATION-MATRIX.md).
 

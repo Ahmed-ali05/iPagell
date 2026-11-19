@@ -1,5 +1,17 @@
 # Registro modifiche
 
+## Non rilasciato — 19 novembre 2026, controllo del ramo prima del deploy
+
+- `npm run deploy:cloudflare` si ferma se il checkout non è `main`, ha modifiche non committate o non coincide con `origin/main`. Evita che un deploy da un ramo o worktree vecchio tolga funzioni già in produzione. `IPAGELL_DEPLOY_ANY_BRANCH=1` salta il controllo solo per emergenze.
+- Allineati changelog, [snapshot](docs/REPO-SNAPSHOT.md) e [architettura](docs/ARCHITECTURE-CURRENT.md) ai rilasci Cloudflare di novembre. Nessuna modifica al runtime.
+
+## 16–19 novembre 2026 — Produzione su Cloudflare, Google e nuova interfaccia
+
+- **16 novembre.** La produzione lascia OpenAI Sites: https://ipagell.website e `www` sono Custom Domains del Worker `ipagell` con D1 `ipagell-live` (UE). Staging separato `ipagell-staging`, backup D1 e bozze legali riallineate all'hosting Cloudflare. I dati di Sites non sono trasferibili: ogni utente usa il backup JSON. [Deploy e verifiche](docs/DEPLOYMENT.md).
+- **17–19 novembre.** Dipendenze aggiornate in tre fasi: toolchain nello stesso major, Zod 4.6.7, decisione su picomatch; Next 16.4.6 e React 19.3.1 per le RCE critiche dei Server Components. Audit a zero. [Piano e verifiche](docs/DEPENDENCY-UPGRADE-PLAN-2026-11-17.md).
+- **18 novembre.** Ridisegno dell'interfaccia in stile Liquid Glass con accento blu e nuova home pubblica con testi più brevi. [Analisi](docs/UI-REDESIGN-2026-11-18.md).
+- **19 novembre.** Migrazioni 0007+0008 applicate a `ipagell-live` (stato `7/legacy`), accesso con Google, conferma età e pagina `/legale` con informativa aggiornata. Le linee dipendenze e Google sono state unite e pubblicate come Worker `0c792282` (PR 16). [Piano W8-B](docs/improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md).
+
 ## Non rilasciato — 19 novembre 2026, presentazione GitHub in inglese
 
 - README principale in inglese con screenshot, badge CI e sito, struttura del progetto e deploy; versione italiana in `README.it.md`.
