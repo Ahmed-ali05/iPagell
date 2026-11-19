@@ -1,6 +1,6 @@
 # iPagell — Informativa sulla protezione dei dati
 
-**Bozza essenziale aggiornata il 17 novembre 2026.** Riallineata all’hosting su Cloudflare in uso dal 16 novembre 2026. Il testo per gli utenti è separato dalle note interne. Le verifiche residue sono indicate in fondo; il documento non è stato integrato o pubblicato sul sito.
+**Bozza essenziale aggiornata il 19 novembre 2026** (accesso con Google aggiunto; da rivedere dal responsabile prima della pubblicazione in produzione). Riallineata all’hosting su Cloudflare in uso dal 16 novembre 2026. Il testo per gli utenti è separato dalle note interne. Le verifiche residue sono indicate in fondo; il documento non è stato integrato o pubblicato sul sito.
 
 ## Testo proposto per gli utenti
 
@@ -12,13 +12,13 @@ Il responsabile del trattamento è **Ahmed Ali, residente nel Canton Ticino, Svi
 
 iPagell tratta i dati necessari alle funzioni che utilizzi:
 
-- **Account e sicurezza:** nome utente, identificativo, data di creazione, password protetta tramite hash, digest del codice di recupero e sessioni, per accesso e recupero. Il controllo dei tentativi utilizza l’indirizzo IP; i relativi contatori applicativi conservano chiavi hash.
+- **Account e sicurezza:** nome utente, identificativo, data di creazione, password protetta tramite hash, digest del codice di recupero e sessioni, per accesso e recupero. Con «Continua con Google» iPagell riceve e conserva solo l’identificativo univoco dell’account Google (claim `sub`), non email, nome o foto, e l’account non ha password iPagell. Il controllo dei tentativi utilizza l’indirizzo IP; i relativi contatori applicativi conservano chiavi hash.
 - **Diario e appunti:** nome del diario, eventuali scuola/docenti, materie, voti, pesi, periodi, attività, assenze, testi e preferenze, per organizzazione e sincronizzazione con l’account.
 - **Classi:** nome e descrizione, nome visualizzato, ruoli, membri, inviti, attività e appunti condivisi, per il funzionamento dello spazio comune.
 - **Registri tecnici:** iPagell non registra un log per ogni visita. In caso di errore imprevisto del server viene annotato solo il tipo di errore, per correggerlo; questi registri restano **3 giorni**. L’infrastruttura Cloudflare tratta inoltre i dati tecnici delle connessioni (come l’indirizzo IP) per consegnare il sito e proteggerlo da abusi.
 - **Assistenza:** mittente, messaggi e allegati che invii, per gestire la richiesta.
 
-Nome utente e password sono necessari per l’account. Puoi usare uno pseudonimo e lasciare vuote le informazioni facoltative. Inserisci solo dati utili allo studio; evita diagnosi, certificati e informazioni riservate di altre persone non necessarie.
+Per l’account servono nome utente e password, oppure un account Google. Puoi usare uno pseudonimo e lasciare vuote le informazioni facoltative. Inserisci solo dati utili allo studio; evita diagnosi, certificati e informazioni riservate di altre persone non necessarie.
 
 ### Strumenti senza account e archivi locali
 
@@ -38,7 +38,7 @@ Nei browser compatibili possono essere disponibili strumenti per leggere media, 
 
 Sito, database e registri tecnici sono gestiti tramite **Cloudflare, Inc.** (Stati Uniti), che tratta i dati per conto del gestore secondo il [contratto sul trattamento dei dati di Cloudflare](https://www.cloudflare.com/cloudflare-customer-dpa/). Il **database** con account, diari, appunti e classi è vincolato all’**Unione europea**. Le richieste vengono però elaborate dal centro dati Cloudflare più vicino a chi visita il sito, che può trovarsi fuori dalla Svizzera e dall’UE, e i registri tecnici possono essere conservati nei centri dati Cloudflare nel mondo, compresi gli Stati Uniti.
 
-Per i trasferimenti negli Stati Uniti Cloudflare dichiara l’adesione al **Swiss-U.S. Data Privacy Framework**; il contratto prevede in alternativa le clausole contrattuali standard adattate al diritto svizzero. Cloudflare si avvale di società del gruppo e di altri fornitori indicati nella [lista dei subresponsabili](https://www.cloudflare.com/gdpr/subprocessors/cloudflare-services/). Per alcuni dati di rete e di sicurezza Cloudflare agisce come titolare autonomo secondo la propria [informativa](https://www.cloudflare.com/privacypolicy/).
+Per i trasferimenti negli Stati Uniti Cloudflare dichiara l’adesione al **Swiss-U.S. Data Privacy Framework**; il contratto prevede in alternativa le clausole contrattuali standard adattate al diritto svizzero. Cloudflare si avvale di società del gruppo e di altri fornitori indicati nella [lista dei subresponsabili](https://www.cloudflare.com/gdpr/subprocessors/cloudflare-services/). Per alcuni dati di rete e di sicurezza Cloudflare agisce come titolare autonomo secondo la propria [informativa](https://www.cloudflare.com/privacypolicy/). Con «Continua con Google» l’autenticazione avviene presso Google, titolare autonomo secondo le [norme Google](https://policies.google.com/privacy?hl=it); iPagell non riceve la password Google.
 
 Le email al contatto passano attraverso **Gmail/Google** e il fornitore del mittente. Le [norme Google](https://policies.google.com/privacy?hl=it) descrivono anche trattamento all’estero.
 
@@ -48,7 +48,7 @@ Le email al contatto passano attraverso **Gmail/Google** e il fornitore del mitt
 
 I dati dell’account e i contenuti sono conservati per le funzioni richieste, fino a modifica o cancellazione attraverso i percorsi disponibili. Le sessioni hanno validità di 14 giorni. Alcuni dati tecnici e metadati di cancellazione restano per sicurezza o sincronizzazione; la scadenza di utilizzo non comporta sempre la rimozione immediata del record. Non è prevista una cancellazione automatica generale per inattività.
 
-Puoi eliminare l’account verificando l’accesso; se possiedi una classe, il percorso attuale richiede prima di trasferirla o eliminarla. Se non puoi usare quel percorso, scrivi al contatto indicato. Dopo la cancellazione, i dati possono restare nella cronologia di ripristino del database per **7 giorni** e nei registri tecnici per **3 giorni**, poi vengono rimossi. La cancellazione server non rimuove a distanza i file scaricati o le copie su altri dispositivi.
+Puoi eliminare l’account verificando l’accesso (password, oppure per gli account Google un accesso negli ultimi 10 minuti); se possiedi una classe, il percorso attuale richiede prima di trasferirla o eliminarla. Se non puoi usare quel percorso, scrivi al contatto indicato. Dopo la cancellazione, i dati possono restare nella cronologia di ripristino del database per **7 giorni** e nei registri tecnici per **3 giorni**, poi vengono rimossi. La cancellazione server non rimuove a distanza i file scaricati o le copie su altri dispositivi.
 
 ### Diritti e utenti minorenni
 

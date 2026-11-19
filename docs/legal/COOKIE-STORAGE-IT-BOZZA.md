@@ -8,6 +8,8 @@ Responsabile: **Ahmed Ali, Ticino, Svizzera**. Contatto: **[ipagell.service@gmai
 
 iPagell utilizza il cookie **`__Host-ipagell-session`**, valido per **14 giorni**, per riconoscere l’account autenticato. Contiene un identificativo di sessione, non il diario; su HTTPS usa HttpOnly, Secure e SameSite=Lax. La validità è gestita anche dai percorsi di uscita e sicurezza dell’account.
 
+Con «Continua con Google» si aggiunge **`__Host-ipagell-oauth-browser`**, valido **30 giorni**: contiene solo un valore casuale che lega il ritorno da Google allo stesso browser (il server ne conserva solo il digest). Stesse protezioni HttpOnly, Secure e SameSite=Lax; è tecnicamente necessario per l’accesso con Google.
+
 Il browser conserva lingua, preferenze, copie offline e bozze. Il calcolatore senza account conserva valori nella sessione della scheda; gli Appunti senza account mantengono una bozza separata nel browser, senza sincronizzarla con l’account. In modalità solo memoria la bozza non è garantita dopo la chiusura della pagina.
 
 Gli archivi persistenti non hanno tutti una scadenza automatica: possono rimanere fino alla pulizia prevista dal relativo flusso o alla rimozione dei dati del sito. I marcatori d’installazione usano finestre logiche di 90 giorni, che non garantiscono da sole la cancellazione fisica. Le cache dell’interfaccia vengono aggiornate dal service worker, che esclude le API. I dettagli sono nell’inventario sotto.
