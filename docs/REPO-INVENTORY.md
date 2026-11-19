@@ -9,7 +9,7 @@ Generato da `scripts/repo-inventory.mjs` leggendo il sorgente, senza rete o dati
 | Pacchetto | `ipagell@0.1.0` |
 | Node dichiarato | `^22.23.4 || ^24.22.1 || ^26.12.1` |
 | Lockfile | 3 |
-| Cataloghi | it, de, fr, en; 878 chiavi nel riferimento italiano |
+| Cataloghi | it, de, fr, en; 880 chiavi nel riferimento italiano |
 | Schema D1 versionato | 23 tabelle |
 | Migrazioni | 9, SQL e journal concordanti |
 | File route API | 30 |
@@ -136,7 +136,7 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `drizzle-orm` | app | `0.45.2` | `0.45.2` |
 | `jose` | app | `6.2.15` | `6.2.15` |
 | `lucide-react` | app | `^1.31.0` | `1.31.0` |
-| `next` | app | `16.3.8` | `16.3.8` |
+| `next` | app | `16.4.6` | `16.4.6` |
 | `next-themes` | app | `^0.4.6` | `0.4.6` |
 | `pdf-lib` | app | `^1.17.1` | `1.17.1` |
 | `prosemirror-commands` | app | `^1.7.2` | `1.7.2` |
@@ -147,30 +147,30 @@ Versioni dichiarate in `package.json` e risolte in `package-lock.json`. La class
 | `prosemirror-state` | app | `^1.4.4` | `1.4.4` |
 | `prosemirror-view` | app | `^1.42.6` | `1.42.6` |
 | `radix-ui` | app | `^1.6.7` | `1.6.7` |
-| `react` | app | `19.2.8` | `19.2.8` |
-| `react-dom` | app | `19.2.8` | `19.2.8` |
+| `react` | app | `19.3.1` | `19.3.1` |
+| `react-dom` | app | `19.3.1` | `19.3.1` |
 | `recharts` | app | `^3.8.0` | `3.8.0` |
 | `sonner` | app | `^2.0.8` | `2.0.8` |
 | `tailwind-merge` | app | `3.6.0` | `3.6.0` |
-| `zod` | app | `^3.25.76` | `3.25.76` |
-| `@cloudflare/vite-plugin` | tooling/test | `1.62.3` | `1.62.3` |
-| `@cloudflare/workers-types` | tooling/test | `5.20261001.1` | `5.20261001.1` |
+| `zod` | app | `^4.6.7` | `4.6.7` |
+| `@cloudflare/vite-plugin` | tooling/test | `1.70.0` | `1.70.0` |
+| `@cloudflare/workers-types` | tooling/test | `5.20261119.1` | `5.20261119.1` |
 | `@tailwindcss/postcss` | tooling/test | `4.2.1` | `4.2.1` |
 | `@types/node` | tooling/test | `22.19.19` | `22.19.19` |
 | `@types/react` | tooling/test | `19.2.14` | `19.2.14` |
 | `@types/react-dom` | tooling/test | `19.2.3` | `19.2.3` |
 | `@vitejs/plugin-react` | tooling/test | `6.0.2` | `6.0.2` |
-| `@vitejs/plugin-rsc` | tooling/test | `^0.5.35` | `0.5.35` |
+| `@vitejs/plugin-rsc` | tooling/test | `^0.5.39` | `0.5.39` |
 | `braces` | tooling/test | `file:vendor/braces` | `3.0.3-ipagell.1` |
 | `drizzle-kit` | tooling/test | `0.31.10` | `0.31.10` |
 | `eslint` | tooling/test | `9.39.4` | `9.39.4` |
-| `eslint-config-next` | tooling/test | `16.3.8` | `16.3.8` |
+| `eslint-config-next` | tooling/test | `16.4.6` | `16.4.6` |
 | `fake-indexeddb` | tooling/test | `^6.2.5` | `6.2.5` |
-| `react-server-dom-webpack` | tooling/test | `19.2.8` | `19.2.8` |
+| `react-server-dom-webpack` | tooling/test | `19.3.1` | `19.3.1` |
 | `tailwindcss` | tooling/test | `4.2.1` | `4.2.1` |
 | `tsx` | tooling/test | `^4.22.1` | `4.22.1` |
 | `tw-animate-css` | tooling/test | `^1.4.0` | `1.4.0` |
 | `typescript` | tooling/test | `5.9.3` | `5.9.3` |
-| `vinext` | tooling/test | `^1.0.0-beta.10` | `1.0.0-beta.10` |
+| `vinext` | tooling/test | `^1.4.6` | `1.4.6` |
 | `vite` | tooling/test | `8.1.6` | `8.1.6` |
-| `wrangler` | tooling/test | `4.145.0` | `4.145.0` |
+| `wrangler` | tooling/test | `4.165.0` | `4.165.0` |

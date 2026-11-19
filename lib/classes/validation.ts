@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const classIdSchema = z.string().uuid();
+export const classIdSchema = z.guid();
 
 const displayName = z
   .string()

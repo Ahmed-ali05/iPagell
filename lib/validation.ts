@@ -129,7 +129,7 @@ export const schoolDataSchema = z
   .strict()
   .superRefine((data, ctx) => {
     const fail = (message: string) =>
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+      ctx.addIssue({ code: "custom", message });
     for (const list of [
       data.semesters,
       data.subjects,
@@ -167,7 +167,7 @@ export const diarySchema = z
       )
     )
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Semestre selezionato inesistente",
       });
   });
@@ -186,7 +186,7 @@ export const backupSchema = z
       )
     )
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: "custom",
         message: "Semestre selezionato inesistente",
       });
   });

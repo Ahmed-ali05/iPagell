@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { NoteDraft } from "@/types/notes";
 import { parseNote, serializeNote } from "./format";
 
-export const noteId = z.string().uuid();
+export const noteId = z.guid();
 export const subjectId = z.string().min(1).max(150).regex(/^[\w-]+$/);
 const codePoints = (value: string) => [...value].length;
 export const noteTitle = z.string().trim().min(1).refine((value) => codePoints(value) <= 120);
