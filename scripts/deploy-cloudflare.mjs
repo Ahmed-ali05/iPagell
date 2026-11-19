@@ -42,6 +42,41 @@ function assertProductionConfig() {
   }
 }
 
+function git(args) {
+  const result = spawnSync("git", args, { cwd: root, encoding: "utf8" });
+  if (result.error) throw result.error;
+  if (result.status !== 0) {
+    console.error(`git ${args.join(" ")} non riuscito:\n${result.stderr}`);
+    process.exit(1);
+  }
+  return result.stdout.trim();
+}
+
+// Si pubblica solo `main` pulita e allineata a origin/main: un deploy da un altro
+// ramo o worktree può togliere funzioni già in produzione (es. Google, /legale).
+// IPAGELL_DEPLOY_ANY_BRANCH=1 salta il controllo solo per emergenze consapevoli.
+function assertDeployableCheckout() {
+  if (process.env.IPAGELL_DEPLOY_ANY_BRANCH === "1") {
+    console.warn("IPAGELL_DEPLOY_ANY_BRANCH=1: controllo del ramo saltato.");
+    return;
+  }
+  const problems = [];
+  const branch = git(["rev-parse", "--abbrev-ref", "HEAD"]);
+  if (branch !== "main") problems.push(`ramo attuale "${branch}", serve "main"`);
+  if (git(["status", "--porcelain", "--untracked-files=no"])) {
+    problems.push("ci sono modifiche non committate");
+  }
+  git(["fetch", "--quiet", "origin", "main"]);
+  if (git(["rev-parse", "HEAD"]) !== git(["rev-parse", "origin/main"])) {
+    problems.push("HEAD non coincide con origin/main (fai pull o push prima)");
+  }
+  if (problems.length) {
+    console.error(`Deploy interrotto:\n- ${problems.join("\n- ")}`);
+    process.exit(1);
+  }
+}
+
+assertDeployableCheckout();
 run(process.execPath, ["scripts/build-cloudflare.mjs"], env);
 assertProductionConfig();
 run(process.execPath, [wrangler, "deploy", "-c", generatedConfig, "--dry-run"], env);
