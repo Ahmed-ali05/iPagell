@@ -1,0 +1,4 @@
+interface:
+  display_name: "Revisione UI/UX"
+  short_description: "Revisione puntuale di viste e componenti"
+  default_prompt: "Usa $web-design-guidelines su questa parte di iPagell rispettando la sezione Adattamento iPagell e la skill apple-design."

@@ -23,6 +23,15 @@ Se una modifica rende obsoleta una parte della documentazione tecnica, aggiornar
 
 Per progettare o rifinire UI e interazioni, leggere la skill locale [apple-design](.agents/skills/apple-design/SKILL.md). Applicarla nel perimetro della richiesta, riusando token, componenti e preferenze di accessibilità di iPagell. La skill guida feedback, movimento, gerarchia e tipografia; non impone un restyling né nuove dipendenze. Per task solo backend, dati, dipendenze o pubblicazione non è necessaria.
 
+Skill complementari, da usare quando la richiesta lo giustifica (in caso di conflitto prevale apple-design):
+
+- [microinteractions](.agents/skills/microinteractions/SKILL.md): quale momento merita un riscontro, stati, evoluzione nel tempo e gratifica responsabile.
+- [web-design-guidelines](.agents/skills/web-design-guidelines/SKILL.md): revisione UI/UX con segnalazioni `file:riga`, su regole salvate nella repository.
+- [accessibility](.agents/skills/accessibility/SKILL.md): verifica WCAG 2.2 con prove nel browser e tastiera.
+- [core-web-vitals](.agents/skills/core-web-vitals/SKILL.md): reattività e stabilità (INP, LCP, CLS), misurando prima di ottimizzare.
+
+Ogni skill esterna ha una sezione «Adattamento iPagell» che prevale sul testo originale.
+
 # Produzione e pubblicazione
 
 - La produzione richiesta con «deploy» o «pubblica» è **https://ipagell.website**.

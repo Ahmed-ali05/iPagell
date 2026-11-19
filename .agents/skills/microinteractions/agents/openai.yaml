@@ -1,0 +1,4 @@
+interface:
+  display_name: "Microinterazioni"
+  short_description: "Riscontri e gratifica responsabile"
+  default_prompt: "Usa $microinteractions su questa parte di iPagell rispettando la sezione Adattamento iPagell e la skill apple-design."
