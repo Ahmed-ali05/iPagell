@@ -1,12 +1,12 @@
 # Registro modifiche
 
-## Non rilasciato — 19 novembre 2026, Classi e Voti più chiari
+## 19 novembre 2026 — Classi e Voti più chiari (Worker `f858b3cf`)
 
 - Classi: il selettore Attività/Appunti ha due metà fisse e lo stesso peso del testo, quindi non cambia dimensione alla selezione; l'etichetta diventa «Appunti».
 - Voti: tolte le spiegazioni ripetute (etichette sopra i filtri, «Registro voti», avviso sulla media, nota della simulazione). La scheda mostra materia, media e numero di voti; ogni voto ha una sola riga con data, peso solo se diverso da 1× e periodo solo se se ne vedono più di uno. L'avviso «Media indicativa, non voto ufficiale» resta in Statistiche.
 - Intestazioni più brevi: «Privato» e «Condiviso con la classe». Testi aggiornati in it/de/fr/en; rimosse le chiavi non più usate. Nessuna modifica a dati, API o schema.
 
-## Non rilasciato — 19 novembre 2026, controllo del ramo prima del deploy
+## 19 novembre 2026 — Controllo del ramo prima del deploy
 
 - `npm run deploy:cloudflare` si ferma se il checkout non è `main`, ha modifiche non committate o non coincide con `origin/main`. Evita che un deploy da un ramo o worktree vecchio tolga funzioni già in produzione. `IPAGELL_DEPLOY_ANY_BRANCH=1` salta il controllo solo per emergenze.
 - Allineati changelog, [snapshot](docs/REPO-SNAPSHOT.md) e [architettura](docs/ARCHITECTURE-CURRENT.md) ai rilasci Cloudflare di novembre. Nessuna modifica al runtime.
