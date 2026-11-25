@@ -17,6 +17,12 @@ Prima della pubblicazione: `npm run check` con 147 test, lint/tipi/i18n/document
 
 **Dominio (completato il 16 novembre 2026).** `ipagell.website` resta registrato su GoDaddy, ma i nameserver ora sono quelli di Cloudflare (`mark`/`saanvi.ns.cloudflare.com`, zona Free, DNSSEC non attivo). `ipagell.website` e `www.ipagell.website` sono Custom Domains del Worker (`routes` in `wrangler.jsonc`), versione `f78d7a92-3106-461e-b485-c6d2f999ee9e`, con certificato TLS valido. Verificato con `wrangler tail` che le richieste di entrambi gli host arrivano al Worker. Homepage, `/de`, `/app`, sitemap, robots e service worker rispondono 200, `/api/account` senza sessione risponde 401, e `www` reindirizza con 308 a `ipagell.website` mantenendo percorso e query. Nei primi minuti dopo il collegamento il dominio era ancora servito da Sites. Finché le cache DNS pubbliche non scadono, alcuni utenti possono ancora vedere il vecchio sito. Restano invariati i record TXT di Google e `_dmarc`. Gli alias `*.chatgpt.site` in `proxy.ts` e `app/layout.tsx` non servono più e si possono rimuovere in un rilascio successivo.
 
+### Staging delle fasi A e B account — 25 novembre 2026
+
+Ramo `feat/account-reauth` (commit `1df6fb8`, fasi A e B), pubblicato **solo su staging** da una copia di lavoro pulita: la cartella principale contiene copie non tracciate `drizzle/0007_auth_compatibility 2.sql` e `0008_auth_bootstrap_legacy 2.sql`, che `wrangler d1 migrations list` elencava come migrazioni da applicare. Dalla copia pulita mancava solo la `0009_session_metadata`, applicata a `ipagell-staging` (stato `7/legacy` invariato). Worker `ipagell-staging` versione `72995954-84ef-425d-8b37-fa930e78b982`. Dopo: `/`, `/app`, `/legale` 200; `providers` `{"google":true}`; `/api/account`, `/api/auth/security`, `/api/auth/sessions` 401 senza sessione (i primi secondi dopo il deploy rispondevano ancora 405/404 della versione precedente); Origin estraneo 403. Giro reale con Google: [fase B, §6](ACCOUNT-REAUTH-FASE-B-2026-11-25.md#6-prove). Produzione non toccata.
+
+**Prima di un deploy di produzione dalla cartella principale** togliere o spostare le copie « 2» da `drizzle/`: `deploy:cloudflare` applica le migrazioni con `wrangler.jsonc` dalla radice e le includerebbe.
+
 ### Pubblicare un aggiornamento
 
 ```bash

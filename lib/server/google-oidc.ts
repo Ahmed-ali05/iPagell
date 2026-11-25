@@ -48,7 +48,9 @@ export async function pkceChallenge(verifier: string) {
   return base64url(await crypto.subtle.digest("SHA-256", encoder.encode(verifier)));
 }
 
-export async function authorizationUrl(config: GoogleConfig, input: { state: string; nonce: string; verifier: string }) {
+// loginHint (a Google subject) preselects the account when confirming an
+// existing one; select_account still makes the person choose it explicitly.
+export async function authorizationUrl(config: GoogleConfig, input: { state: string; nonce: string; verifier: string; loginHint?: string }) {
   const url = new URL(AUTHORIZATION_ENDPOINT);
   url.search = new URLSearchParams({
     client_id: config.clientId,
@@ -60,6 +62,7 @@ export async function authorizationUrl(config: GoogleConfig, input: { state: str
     code_challenge: await pkceChallenge(input.verifier),
     code_challenge_method: "S256",
     prompt: "select_account",
+    ...(input.loginHint ? { login_hint: input.loginHint } : {}),
   }).toString();
   return url.href;
 }

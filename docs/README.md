@@ -58,6 +58,9 @@ Questi documenti contengono lavoro aperto o decisioni da implementare. Le parti 
 | [Altri sistemi di valutazione](improvement-2026-10-01/GRADING-EXTENSION-AUDIT.md) | Ricerca e piano dei prompt 10–14; il contratto implementato resta nel Sistema voti |
 | [Più scale di voto — 19 novembre](MULTI-SCALA-VOTI-2026-11-19.md) | Analisi di prodotto: scale prioritarie, modello leggero con scala per voto, UX del setup e fasi; nessuna implementazione |
 | [Account standard](improvement-2026-10-01/AUTH-PRODUCT-AUDIT.md) | Audit iniziale e decisione W7; provider e nuovo schema non sono nel runtime |
+| [Conferma Google senza uscire (fase B) — 25 novembre](ACCOUNT-REAUTH-FASE-B-2026-11-25.md) | Transazione `reauth`, conferma monouso in `auth_grants`, eliminazione dell'account Google senza logout; implementata, non pubblicata |
+| [Gestione e controllo dell'account — 25 novembre](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md) | Lacune su sessioni, riautenticazione Google, collegamento metodi e registro attività; fasi proposte, nessuna implementazione |
+| [Fase A — sessioni visibili e revocabili](ACCOUNT-SESSIONI-FASE-A-2026-11-25.md) | Progetto ed esito: migrazione 0009, API `/api/auth/sessions`, «Dispositivi connessi», prove e testi legali; implementato, non pubblicato |
 | [Prompt operativi](improvement-2026-10-01/PROMPTS.md), [workflow e modelli](improvement-2026-10-01/WORKFLOW-MODELS.md) | Sequenza, dipendenze e stime per i cicli successivi; non istruzioni da eseguire automaticamente |
 
 La cartella `improvement-2026-10-01/` resta insieme perché il programma ancora aperto collega le proprie analisi iniziali: [SEO](improvement-2026-10-01/SEO-AUDIT.md), [UX visiva](improvement-2026-10-01/UX-VISUAL-AUDIT.md), [periodi](improvement-2026-10-01/PERIODS-AUDIT.md). Questi audit fotografano il punto di partenza; il [rapporto](improvement-2026-10-01/VERIFICATION.md) registra le verifiche e i rilasci successivi.

@@ -31,7 +31,8 @@ export function ensureBinding(request: Request) {
 }
 
 // Same-origin redirect to the app with a short, non-sensitive outcome flag.
-export function redirectToApp(request: Request, outcome?: "google-error" | "google-cancelled", cookie?: string) {
+export type AppOutcome = "google-error" | "google-cancelled" | "reauth-ok" | "reauth-cancelled" | "reauth-mismatch" | "reauth-error";
+export function redirectToApp(request: Request, outcome?: AppOutcome, cookie?: string) {
   const target = new URL("/app", request.url);
   if (outcome) target.searchParams.set("accesso", outcome);
   const headers = new Headers({

@@ -21,6 +21,9 @@ const errorKeys = {
   SECURITY_OWNED_CLASS_BLOCKS_DELETE: "security.ownedClassBlocksDelete",
   SECURITY_NO_PASSWORD: "security.noPassword",
   SECURITY_REAUTH_REQUIRED: "security.reauthRequired",
+  SECURITY_NOT_GOOGLE: "security.notGoogle",
+  SESSIONS_INVALID_INPUT: "sessions.invalidInput",
+  SESSIONS_CURRENT: "sessions.current",
 } as const satisfies Record<string, MessageKey>;
 
 export function apiErrorKey(code: string | undefined, fallback: MessageKey = "error.generic"): MessageKey {

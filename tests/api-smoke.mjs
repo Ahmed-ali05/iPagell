@@ -512,6 +512,32 @@ try {
       password: a.password,
     })
   ).cookie;
+  // Phase A: connected devices. Only derived ids and closed device codes leave the server.
+  check((await call("/api/auth/sessions")).status, 401, "sessions list needs a session");
+  const androidAgent = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36";
+  const second = await call("/api/auth/login", { username: a.username, password: a.password }, undefined, { "User-Agent": androidAgent });
+  check(second.status, 200, "second device signs in");
+  const listed = await call("/api/auth/sessions", undefined, a.cookie);
+  check(listed.status, 200, "sessions listed");
+  check(listed.headers.get("cache-control"), "private, no-store", "sessions list is not cached");
+  const current = listed.data.sessions.find((s) => s.current);
+  const other = listed.data.sessions.find((s) => !s.current && s.client === "chrome.android");
+  check([!!current, !!other, listed.data.sessions.every((s) => /^[a-f0-9]{32}$/.test(s.id))], [true, true, true], "current and other device listed with derived ids");
+  check([other.method, typeof other.createdAt], ["password", "number"], "session metadata listed");
+  check(JSON.stringify(listed.data).includes(a.cookie.split("=")[1]), false, "no session token in the list");
+  const sessionsPost = (body, cookie = a.cookie, extra) => call("/api/auth/sessions", body, cookie, extra);
+  check((await sessionsPost({ operation: "revoke-others", expectedUserId: a.id }, a.cookie, { Origin: "https://evil.example" })).status, 403, "sessions: foreign origin rejected");
+  check((await sessionsPost({ operation: "revoke-others", expectedUserId: a.id }, null)).status, 401, "sessions: no session rejected");
+  check((await sessionsPost({ operation: "revoke-others", expectedUserId: "someone-else" })).data.code, "ACCOUNT_CHANGED", "sessions: stale account rejected");
+  check((await sessionsPost({ operation: "revoke-others", expectedUserId: a.id, extra: 1 })).data.code, "SESSIONS_INVALID_INPUT", "sessions: extra fields rejected");
+  check((await sessionsPost({ operation: "revoke", expectedUserId: a.id, id: current.id })).data.code, "SESSIONS_CURRENT", "current session closes only through logout");
+  check((await sessionsPost({ operation: "revoke", expectedUserId: a.id, id: other.id })).data, { revoked: 1 }, "other device revoked");
+  check((await call("/api/account", undefined, second.cookie)).status, 401, "revoked device loses access");
+  check((await sessionsPost({ operation: "revoke", expectedUserId: a.id, id: other.id })).data, { revoked: 0 }, "revocation is idempotent");
+  check((await call("/api/account", undefined, a.cookie)).status, 200, "current device keeps access");
+  let limited;
+  for (let i = 0; i < 10; i++) limited = await sessionsPost({ operation: "revoke", expectedUserId: a.id, id: "0".repeat(32) });
+  check(limited.status, 429, "sessions: rate limited per account");
   let last;
   for (let i = 0; i < 13; i++)
     last = await call("/api/auth/login", {
@@ -527,6 +553,15 @@ try {
   }, a.cookie);
   check(badSecurity.data.code, "SECURITY_INVALID_PASSWORD", "security error has a stable code");
   check(typeof badSecurity.data.error, "string", "security error keeps a compatible message");
+  // Phase B: the security panel state and the Google confirmation entry point.
+  check((await call("/api/auth/security")).status, 401, "security state needs a session");
+  check((await call("/api/auth/security", undefined, a.cookie)).data, { method: "password", reauthUntil: null }, "password accounts have no Google confirmation");
+  const reauthAnonymous = await call("/api/auth/oauth/google/start", { purpose: "reauth", expectedUserId: a.id });
+  check([401, 404].includes(reauthAnonymous.status), true, "reauth without a session is refused (404 when Google is not configured)");
+  const reauthPassword = await call("/api/auth/oauth/google/start", { purpose: "reauth", expectedUserId: a.id }, a.cookie);
+  check(reauthPassword.data.code, reauthPassword.status === 404 ? "AUTH_UNAVAILABLE" : "SECURITY_NOT_GOOGLE", "a password account cannot start a Google confirmation");
+  const reauthExtra = await call("/api/auth/oauth/google/start", { purpose: "reauth", expectedUserId: a.id, operation: "delete" }, a.cookie);
+  check([400, 404].includes(reauthExtra.status), true, "reauth body is strict");
 } finally {
   for (const a of accounts) {
     const listed=await api("/api/classes","GET",undefined,a.cookie);

@@ -53,6 +53,16 @@ test("authorization URL uses code flow, minimal scope, state, nonce and PKCE S25
   assert.equal(p.has("client_secret"), false);
 });
 
+test("reauth preselects the account with its subject; sign-in sends no hint", async () => {
+  const config = googleConfig(values, origin)!;
+  const verifier = await pkceVerifier("b".repeat(64), "tx-2");
+  const plain = new URL(await authorizationUrl(config, { state: "s", nonce: "n", verifier })).searchParams;
+  assert.equal(plain.has("login_hint"), false);
+  const hinted = new URL(await authorizationUrl(config, { state: "s", nonce: "n", verifier, loginHint: "109876543210" })).searchParams;
+  assert.equal(hinted.get("login_hint"), "109876543210");
+  assert.equal(hinted.get("prompt"), "select_account", "the person still picks the account explicitly");
+});
+
 test("a valid ID token yields only the canonical issuer and subject", async () => {
   const { privateKey, jwks } = await keys();
   assert.deepEqual(await verifyIdToken(await token(privateKey, { email: "x@example.com" }), { clientId }, "n-1", jwks),

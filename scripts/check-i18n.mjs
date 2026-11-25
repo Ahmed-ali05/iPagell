@@ -42,6 +42,7 @@ for (const [path, ranges] of [
   ["components/classes-view.tsx", []],
   ["components/class-events-panel.tsx", []],
   ["components/account-security.tsx", []],
+  ["components/account-sessions.tsx", []],
   ["components/install-app.tsx", []],
 ]) {
   const code = await readFile(path, "utf8");
