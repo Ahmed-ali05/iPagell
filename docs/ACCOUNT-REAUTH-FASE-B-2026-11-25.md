@@ -57,7 +57,9 @@ La conferma digitando l'handle `u_…` resta: la sua sostituzione è nella fase 
 - **API locale** (`tests/api-smoke.mjs`): stato di sicurezza senza sessione 401; account con password `{ method: "password", reauthUntil: null }`; avvio della conferma rifiutato senza sessione, per un account con password e con corpo non strict.
 - **Browser** (dev locale, account Google sintetico inserito nel D1 locale): ritorno `reauth-mismatch` con messaggio e focus sul pulsante; clic con Google non configurato in locale → errore gestito senza lasciare la pagina; ritorno `reauth-ok` con grant → messaggio con orario, focus sul campo, eliminazione riuscita e righe dell'account rimosse dal D1 locale.
 
-**Non verificato**: il giro reale su Google (in locale mancano le credenziali OAuth). Va provato su staging con un account Google di prova prima della produzione: conferma con lo stesso account, scelta di un altro account, annullamento.
+- **Staging, giro reale con Google** (25 novembre 2026, Worker `72995954`, D1 `ipagell-staging` con la 0009): accesso con Google del proprietario e diario di prova; «Conferma con Google» → Google con `login_hint` e `prompt=select_account` → ritorno con «Account Google confermato … fino alle 20:52», focus sul campo, conferma valida 10 minuti, **una sola sessione** (nessuna nuova sessione creata). Scelta di un altro account Google → «Hai scelto un altro account Google», transazione `failed`, nessun nuovo grant. Eliminazione con la conferma valida → ritorno all'accesso; nel D1 di staging spariti account, identità, sessione, diario e grant, l'altro account già presente intatto, `PRAGMA foreign_key_check` vuoto.
+
+**Non verificato**: l'annullamento sul giro reale (la pagina di scelta account di Google non offre «Annulla»; il ramo `access_denied` è coperto solo dal codice e dalle prove locali dello stesso percorso d'errore). Produzione.
 
 ## 7. Fuori perimetro
 
