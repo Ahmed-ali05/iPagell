@@ -1,5 +1,12 @@
 # Registro modifiche
 
+## Non rilasciato — 25 novembre 2026, pannello Account (fase C)
+
+- Impostazioni → Preferenze → «Account»: metodo d'accesso (nome utente o Google), data di creazione e, per gli account Google, che cosa iPagell conserva e che non c'è password né codice di recupero. L'handle tecnico `u_…` degli account Google non compare più, né nelle Impostazioni né nell'onboarding.
+- Eliminazione di un account Google: dopo la conferma Google si scrive una parola fissa (ELIMINA, LÖSCHEN, SUPPRIMER, DELETE) invece dell'handle; verificata anche dal server. Gli account con password confermano ancora con lo username.
+- Ingresso: sotto «Continua con Google» un avviso spiega che Google apre solo account creati con Google; il testo di consenso non lascia più intendere che Google entri in un account esistente con nome utente.
+- `GET /api/auth/security` aggiunge `createdAt` e `identities` (provider e data, mai identificativi Google). Nessuna migrazione. Testi in it/de/fr/en. Prove: unitarie, D1 reale, browser con account sintetici. [Progetto](docs/ACCOUNT-PANNELLO-FASE-C-2026-11-25.md). Non pubblicato.
+
 ## Non rilasciato — 25 novembre 2026, conferma Google senza uscire (fase B)
 
 - Account Google: per eliminare l'account si usa «Conferma con Google» in Impostazioni → Sicurezza, senza uscire e senza perdere la copia locale. Google propone l'account collegato (`login_hint`); al ritorno le Impostazioni si aprono sul pannello, con la conferma valida 10 minuti. Un altro account Google, l'annullamento o un errore mostrano un messaggio e lasciano tutto invariato.

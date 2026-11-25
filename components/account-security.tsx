@@ -5,6 +5,7 @@ import { RequestError, requestJson } from "@/lib/client-http";
 import { intlLocales, type MessageKey } from "@/lib/i18n";
 import { apiErrorKey } from "@/lib/i18n/errors";
 import type { ReauthOutcome } from "@/lib/reauth";
+import { DELETE_WORDS } from "@/lib/account-confirmation";
 
 const outcomeKeys: Record<Exclude<ReauthOutcome, "ok">, MessageKey> = {
   cancelled: "security.reauthCancelled",
@@ -101,7 +102,10 @@ export function AccountSecurity({
       await onSubmit(mode, fields);
     } catch (error) {
       if (error instanceof RequestError && error.code === "SECURITY_REAUTH_REQUIRED") setReauthUntil(null);
-      setError(error instanceof RequestError ? apiErrorKey(error.code, "error.operationFailed") : "error.connectionUnavailable");
+      // Google accounts confirm with a fixed word, not with their technical handle.
+      if (passwordless && error instanceof RequestError && error.code === "SECURITY_CONFIRMATION_MISMATCH")
+        setError("security.confirmationWordMismatch");
+      else setError(error instanceof RequestError ? apiErrorKey(error.code, "error.operationFailed") : "error.connectionUnavailable");
     } finally {
       busyRef.current = false;
       setBusy(false);
@@ -198,11 +202,16 @@ export function AccountSecurity({
                 {t("security.deleteWarning")}
               </p>
               <label className="full">
-                {t("security.confirmUsername", { username })}
+                {passwordless
+                  ? t("security.confirmWord", { word: DELETE_WORDS[locale] })
+                  : t("security.confirmUsername", { username })}
                 <input
                   ref={confirmRef}
                   name="confirmation"
                   autoComplete="off"
+                  autoCapitalize={passwordless ? "characters" : "none"}
+                  autoCorrect="off"
+                  spellCheck={false}
                   required
                   maxLength={32}
                 />

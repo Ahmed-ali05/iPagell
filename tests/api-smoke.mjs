@@ -555,7 +555,18 @@ try {
   check(typeof badSecurity.data.error, "string", "security error keeps a compatible message");
   // Phase B: the security panel state and the Google confirmation entry point.
   check((await call("/api/auth/security")).status, 401, "security state needs a session");
-  check((await call("/api/auth/security", undefined, a.cookie)).data, { method: "password", reauthUntil: null }, "password accounts have no Google confirmation");
+  const securityState = (await call("/api/auth/security", undefined, a.cookie)).data;
+  check({ method: securityState.method, reauthUntil: securityState.reauthUntil }, { method: "password", reauthUntil: null }, "password accounts have no Google confirmation");
+  // Phase C: the Account panel data, without any identifier of a provider.
+  check(typeof securityState.createdAt, "number", "security state includes the creation date");
+  check(securityState.identities, [], "a password account has no linked identity");
+  const wordOnPassword = await call("/api/auth/security", {
+    operation: "delete",
+    expectedUserId: a.id,
+    currentPassword: a.password,
+    confirmation: "ELIMINA",
+  }, a.cookie);
+  check(wordOnPassword.data.code, "SECURITY_CONFIRMATION_MISMATCH", "password accounts still confirm deletion with their username");
   const reauthAnonymous = await call("/api/auth/oauth/google/start", { purpose: "reauth", expectedUserId: a.id });
   check([401, 404].includes(reauthAnonymous.status), true, "reauth without a session is refused (404 when Google is not configured)");
   const reauthPassword = await call("/api/auth/oauth/google/start", { purpose: "reauth", expectedUserId: a.id }, a.cookie);

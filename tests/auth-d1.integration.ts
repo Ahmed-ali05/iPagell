@@ -448,6 +448,15 @@ test("Phase B: Google reauth becomes a single-use grant for the starting session
       assert.equal(await auth.googleSubject("g"),"sub-g");
       assert.equal(await auth.googleSubject("a"),null,"password accounts have no Google subject");
     });
+    await t.test("Phase C: the Account panel sees creation date and linked providers only",async()=>{
+      const google=(await auth.profile("g","legacy"))!;
+      assert.equal(typeof google.createdAt,"number");
+      assert.deepEqual(google.identities.map(i=>i.provider),["google"]);
+      assert.equal(typeof google.identities[0].createdAt,"number");
+      assert.deepEqual(Object.keys(google.identities[0]).sort(),["createdAt","provider"],"never issuer or subject");
+      assert.deepEqual((await auth.profile("a","legacy"))!.identities,[],"password account");
+      assert.equal(await auth.profile("missing","legacy"),null);
+    });
     await t.test("a reauth transaction needs the account's valid session, version and Google identity",async()=>{
       assert.equal(await start("r-pass","a","session-a"),false,"password account");
       assert.equal(await start("r-other","g","session-a"),false,"another account's session");

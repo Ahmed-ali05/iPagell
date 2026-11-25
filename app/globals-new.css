@@ -1773,6 +1773,20 @@ button {
 }
 .legacy-backup { margin-top:10px; }
 .legacy-backup summary { min-height:44px; padding:10px 0; color:var(--accent); cursor:pointer; font-weight:600; }
+/* Settings → Account (phase C): sign-in methods and creation date, solid surface. */
+.account-overview { margin-top:16px; padding-top:14px; border-top:1px solid var(--line); }
+.account-overview-head { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:4px 12px; }
+.account-overview-head h3 { margin:0; font-size:16px; line-height:1.3; }
+/* Reserves the line while the date loads, so the panel does not shift. */
+.account-overview-head small { min-height:1.4em; color:var(--subtle); font-size:.875rem; }
+.account-methods { display:grid; margin:8px 0 0; padding:0; list-style:none; }
+.account-methods li { display:flex; align-items:center; gap:12px; min-height:56px; padding:8px 0; }
+.account-methods li+li { border-top:1px solid var(--line); }
+.account-methods li>svg { flex:none; width:20px; height:20px; color:var(--accent); }
+.account-methods li>div { display:grid; gap:2px; min-width:0; }
+.account-methods strong { overflow-wrap:anywhere; }
+.account-methods small { color:var(--subtle); font-size:.875rem; overflow-wrap:anywhere; }
+.account-overview>.account-note { margin:4px 0 0; }
 /* Settings → connected devices (phase A). Rows wrap at 320 px and 200% text. */
 .security-settings>summary { min-height:44px; padding:11px 0; color:var(--accent); cursor:pointer; font-weight:600; }
 .account-sessions { margin-top:12px; }
@@ -1806,6 +1820,7 @@ button {
   font-size: 12px;
 }
 .privacy-note svg {
+  flex: none;
   width: 17px;
   color: var(--success);
 }
@@ -2146,6 +2161,7 @@ fieldset { padding:0; border:0; min-width:0; }
 .oauth-button { width:100%; }
 .oauth-button svg { width:18px; height:18px; flex:none; }
 .oauth-consent { margin:10px 0 0; font-size:.8125rem; }
+.oauth-existing { margin:10px 0 0; }
 .oauth-consent a { color:var(--primary); }
 .oauth-divider { display:flex; align-items:center; gap:12px; margin:18px 0 0; color:var(--subtle); font-size:.8125rem; }
 .oauth-divider::before,.oauth-divider::after { content:""; flex:1; height:1px; background:var(--line); }

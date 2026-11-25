@@ -60,6 +60,7 @@ Questi documenti contengono lavoro aperto o decisioni da implementare. Le parti 
 | [Account standard](improvement-2026-10-01/AUTH-PRODUCT-AUDIT.md) | Audit iniziale e decisione W7; provider e nuovo schema non sono nel runtime |
 | [Conferma Google senza uscire (fase B) — 25 novembre](ACCOUNT-REAUTH-FASE-B-2026-11-25.md) | Transazione `reauth`, conferma monouso in `auth_grants`, eliminazione dell'account Google senza logout; implementata, non pubblicata |
 | [Gestione e controllo dell'account — 25 novembre](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md) | Lacune su sessioni, riautenticazione Google, collegamento metodi e registro attività; fasi proposte, nessuna implementazione |
+| [Fase C — pannello Account chiaro](ACCOUNT-PANNELLO-FASE-C-2026-11-25.md) | Metodi d'accesso e data di creazione nelle Impostazioni, niente handle `u_…`, conferma di eliminazione Google con parola fissa, avviso sul doppio account; implementata, non pubblicata |
 | [Fase A — sessioni visibili e revocabili](ACCOUNT-SESSIONI-FASE-A-2026-11-25.md) | Progetto ed esito: migrazione 0009, API `/api/auth/sessions`, «Dispositivi connessi», prove e testi legali; implementato, non pubblicato |
 | [Prompt operativi](improvement-2026-10-01/PROMPTS.md), [workflow e modelli](improvement-2026-10-01/WORKFLOW-MODELS.md) | Sequenza, dipendenze e stime per i cicli successivi; non istruzioni da eseguire automaticamente |
 

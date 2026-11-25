@@ -60,6 +60,7 @@ import { formatDate as intlDate, formatNumber as intlNumber, greetingKey, select
 import { AccountSecurity } from "@/components/account-security";
 import { parseReauthOutcome, type ReauthOutcome } from "@/lib/reauth";
 import { AccountSessions } from "@/components/account-sessions";
+import { AccountOverview } from "@/components/account-overview";
 import { useDiary } from "@/hooks/use-diary";
 import { InstallAppOffer } from "@/components/install-app";
 import { gradeSchema } from "@/lib/validation";
@@ -1017,7 +1018,7 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
           } catch { toast.error(t("notes.saveFailed")); }
         }}
         accountId={session.user!.id}
-        accountEmail={session.user!.username}
+        accountHandle={session.user!.username}
         accountMethod={session.user!.method}
         onConfirm={setRemoval}
         securityDisabled={session.diary!.dirty || session.status !== "saved" || notes.pending>0}
@@ -1759,7 +1760,7 @@ function SettingsDialog({
   onImport,
   onLogout,
   accountId,
-  accountEmail,
+  accountHandle,
   accountMethod,
   securityDisabled,
   onSecuritySubmit,
@@ -1784,7 +1785,8 @@ function SettingsDialog({
   onImport: () => void;
   onLogout: () => void;
   accountId: string;
-  accountEmail: string;
+  /** Username, or the random technical handle of a Google account (never shown). */
+  accountHandle: string;
   accountMethod?: "password" | "google";
   securityDisabled: boolean;
   onSecuritySubmit: (operation:"password"|"delete", fields: Record<string, FormDataEntryValue>) => Promise<void>;
@@ -1981,8 +1983,9 @@ function SettingsDialog({
                 </details>
               </div>
             </div>
+            <AccountOverview username={accountHandle} method={accountMethod} />
             <div className="privacy-note">
-              <CircleGauge /> {t("settings.privacyNote", { account: accountEmail })}
+              <CircleGauge /> {t("settings.privacyNote")}
             </div>
             <button className="soft-button" onClick={onLogout}>
               {t("settings.logoutRemoveCopy")}
@@ -1990,7 +1993,7 @@ function SettingsDialog({
             <AccountSessions userId={accountId} method={accountMethod} confirm={onConfirm} />
             <AccountSecurity
               userId={accountId}
-              username={accountEmail}
+              username={accountHandle}
               passwordless={accountMethod === "google"}
               disabled={securityDisabled}
               reauthOutcome={reauthOutcome}

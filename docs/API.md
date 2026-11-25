@@ -14,7 +14,7 @@ Ogni mutazione richiede `Origin` uguale all’origine della richiesta e `Content
 | `POST /api/auth/login` | `username`, `password` | 200: `user`; nuovo cookie |
 | `POST /api/auth/logout` | `{}` | 200: `ok: true`; revoca sessione corrente, scadenza cookie |
 | `POST /api/auth/recover` | `username`, `recoveryCode`, `password` nuova | 200: nuovo `recoveryCode`; vecchie sessioni invalidate, login da rifare |
-| `GET /api/auth/security` | Nessuno; sessione richiesta | 200: `method` (`password`/`google`), `reauthUntil` (scadenza della conferma Google o `null`) |
+| `GET /api/auth/security` | Nessuno; sessione richiesta | 200: `method` (`password`/`google`), `reauthUntil` (scadenza della conferma Google o `null`), `createdAt` (ms), `identities` (`[{ provider, createdAt }]`, mai issuer o subject) |
 | `POST /api/auth/security` | Vedi sotto; sessione richiesta | 200: `ok: true`; cookie scaduto |
 | `POST /api/auth/oauth/google/start` | `{ ageConfirmed: true }` senza sessione, oppure `{ purpose: "reauth", expectedUserId }` con sessione | 200: `url` di Google; cookie del browser per la transazione |
 | `GET /api/auth/oauth/google/callback` | Ritorno da Google | 303 a `/app`, con `?accesso=` in caso di errore o conferma |
@@ -117,7 +117,7 @@ Il retry conserva ID e payload della mutazione in volo. Ripetere la medesima scr
 ### Operazioni sensibili
 
 - Cambio password: `{ operation: "password", expectedUserId, currentPassword, newPassword }`.
-- Eliminazione: `{ operation: "delete", expectedUserId, currentPassword, confirmation }`, dove `confirmation` è lo username esatto normalizzato. Gli account Google omettono `currentPassword` e devono avere una conferma Google valida per la sessione corrente, altrimenti 403 `SECURITY_REAUTH_REQUIRED`.
+- Eliminazione: `{ operation: "delete", expectedUserId, currentPassword, confirmation }`, dove `confirmation` è lo username esatto normalizzato; per gli account Google è una parola fissa di `lib/account-confirmation.ts` (ELIMINA, LÖSCHEN, SUPPRIMER, DELETE, senza distinzione di maiuscole), altrimenti 400 `SECURITY_CONFIRMATION_MISMATCH`. Gli account Google omettono `currentPassword` e devono avere una conferma Google valida per la sessione corrente, altrimenti 403 `SECURITY_REAUTH_REQUIRED`.
 
 **Conferma Google senza uscire (fase B).** `POST /api/auth/oauth/google/start` con `{ purpose: "reauth", expectedUserId }` richiede una sessione di un account con identità Google attiva (401 `SECURITY_SESSION_REQUIRED`, 401 `ACCOUNT_CHANGED`, 400 `SECURITY_NOT_GOOGLE`) e crea una transazione `purpose='reauth'` legata ad account, sessione e `auth_version`. L'URL di Google include `login_hint` con il `sub` dell'account e `prompt=select_account`. Il callback verifica l'ID token come per l'accesso, poi controlla che la sessione del browser sia la stessa che ha avviato la conferma e che il `sub` coincida con l'identità collegata. L'esito è una riga `auth_grants` monouso (`operation='reauth'`, 10 minuti, legata a sessione e `auth_version`), mai una nuova sessione. Una nuova conferma sostituisce quella aperta. Ritorno a `/app?accesso=` con `reauth-ok`, `reauth-cancelled`, `reauth-mismatch` (altro account Google) o `reauth-error`; il client apre Impostazioni → Preferenze e toglie il parametro. L'eliminazione consuma la conferma nello stesso batch che cancella inviti, diario e account.
 

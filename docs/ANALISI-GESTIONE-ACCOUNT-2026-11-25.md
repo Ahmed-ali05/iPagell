@@ -107,6 +107,8 @@ Progetto ed esito: [Fase B — conferma Google](ACCOUNT-REAUTH-FASE-B-2026-11-25
 
 ### Fase C — Pannello «Account» chiaro (chiude L4, L5)
 
+Progetto ed esito: [Fase C — pannello Account](ACCOUNT-PANNELLO-FASE-C-2026-11-25.md), implementata il 25 novembre 2026 e non ancora pubblicata. Rispetto allo schizzo qui sotto: la parola è accettata dal server in tutte e quattro le lingue, e l'avviso sul doppio account compare solo nella modalità di accesso.
+
 - Sezione con metodo d'accesso («Accedi con Google» / «Accedi con nome utente»), data di creazione e identità collegate. Niente `@u_…` per gli account Google.
 - Conferma di eliminazione Google con una parola fissa localizzata (per esempio «ELIMINA») dopo la riautenticazione; per gli account con password resta lo username.
 - Rinominare internamente `accountEmail` in `accountHandle`.
