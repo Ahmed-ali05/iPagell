@@ -48,7 +48,7 @@ Le email al contatto passano attraverso **Gmail/Google** e il fornitore del mitt
 
 I dati dell’account e i contenuti sono conservati per le funzioni richieste, fino a modifica o cancellazione attraverso i percorsi disponibili. Le sessioni hanno validità di 14 giorni. Alcuni dati tecnici e metadati di cancellazione restano per sicurezza o sincronizzazione; la scadenza di utilizzo non comporta sempre la rimozione immediata del record. Non è prevista una cancellazione automatica generale per inattività.
 
-Puoi eliminare l’account verificando l’accesso (password, oppure per gli account Google un accesso negli ultimi 10 minuti); se possiedi una classe, il percorso attuale richiede prima di trasferirla o eliminarla. Se non puoi usare quel percorso, scrivi al contatto indicato. Dopo la cancellazione, i dati possono restare nella cronologia di ripristino del database per **7 giorni** e nei registri tecnici per **3 giorni**, poi vengono rimossi. La cancellazione server non rimuove a distanza i file scaricati o le copie su altri dispositivi.
+Puoi eliminare l’account verificando l’accesso (password, oppure per gli account Google la conferma dell’account Google dalle impostazioni); se possiedi una classe, il percorso attuale richiede prima di trasferirla o eliminarla. Se non puoi usare quel percorso, scrivi al contatto indicato. Dopo la cancellazione, i dati possono restare nella cronologia di ripristino del database per **7 giorni** e nei registri tecnici per **3 giorni**, poi vengono rimossi. La cancellazione server non rimuove a distanza i file scaricati o le copie su altri dispositivi.
 
 ### Diritti e utenti minorenni
 

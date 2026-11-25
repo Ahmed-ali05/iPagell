@@ -553,6 +553,15 @@ try {
   }, a.cookie);
   check(badSecurity.data.code, "SECURITY_INVALID_PASSWORD", "security error has a stable code");
   check(typeof badSecurity.data.error, "string", "security error keeps a compatible message");
+  // Phase B: the security panel state and the Google confirmation entry point.
+  check((await call("/api/auth/security")).status, 401, "security state needs a session");
+  check((await call("/api/auth/security", undefined, a.cookie)).data, { method: "password", reauthUntil: null }, "password accounts have no Google confirmation");
+  const reauthAnonymous = await call("/api/auth/oauth/google/start", { purpose: "reauth", expectedUserId: a.id });
+  check([401, 404].includes(reauthAnonymous.status), true, "reauth without a session is refused (404 when Google is not configured)");
+  const reauthPassword = await call("/api/auth/oauth/google/start", { purpose: "reauth", expectedUserId: a.id }, a.cookie);
+  check(reauthPassword.data.code, reauthPassword.status === 404 ? "AUTH_UNAVAILABLE" : "SECURITY_NOT_GOOGLE", "a password account cannot start a Google confirmation");
+  const reauthExtra = await call("/api/auth/oauth/google/start", { purpose: "reauth", expectedUserId: a.id, operation: "delete" }, a.cookie);
+  check([400, 404].includes(reauthExtra.status), true, "reauth body is strict");
 } finally {
   for (const a of accounts) {
     const listed=await api("/api/classes","GET",undefined,a.cookie);

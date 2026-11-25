@@ -98,6 +98,8 @@ Progetto dettagliato: [Fase A — sessioni](ACCOUNT-SESSIONI-FASE-A-2026-11-25.m
 
 ### Fase B — Riautenticazione senza uscire (chiude L3, prepara L6)
 
+Progetto ed esito: [Fase B — conferma Google](ACCOUNT-REAUTH-FASE-B-2026-11-25.md), implementata il 25 novembre 2026 e non ancora pubblicata. Rispetto allo schizzo qui sotto: niente `max_age`/`auth_time` (decisione 2), grant generico `operation='reauth'` e password invariata (verificata nella stessa richiesta).
+
 - Google: transazione `purpose='reauth'` legata ad `account_id` e alla sessione corrente, con `max_age=0` e verifica di `auth_time` e che il `sub` coincida con l'identità collegata. Lo start non deve più rifiutare quando la sessione è dello stesso account.
 - L'esito è una riga `auth_grants` monouso (operazione, sessione, `auth_version`, scadenza breve), non una nuova sessione. Diario locale e modifiche in attesa restano intatti.
 - Password: lo stesso grant dopo la verifica della password, così ogni operazione sensibile usa un unico controllo.
@@ -141,7 +143,7 @@ Fuori perimetro: email (verifica, notifiche, recupero), passkey/2FA, Apple, fusi
 ## 5. Decisioni per il proprietario
 
 1. **Metadati di sessione**: basta un'etichetta grossolana (browser + sistema) senza IP? È la proposta più leggera per l'informativa.
-2. **Forza della riautenticazione Google**: obbligare Google a chiedere di nuovo la password (`max_age=0`), con più attrito ma prova reale, oppure accettare la sessione Google attiva?
+2. **Forza della riautenticazione Google**: obbligare Google a chiedere di nuovo la password (`max_age=0`), con più attrito ma prova reale, oppure accettare la sessione Google attiva? **Deciso il 25 novembre: sessione Google attiva**, con `login_hint` e scelta esplicita dell'account.
 3. **Priorità del collegamento**: prima «aggiungi password a un account Google», che dà un metodo di riserva, o «collega Google a un account esistente», che evita doppi account?
 4. **Nome dell'account**: un nome visualizzato a livello di account o solo i nomi per classe e il nome nel diario come oggi?
 5. **Retention del registro attività**: 90 giorni vanno bene?

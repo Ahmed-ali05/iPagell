@@ -15,6 +15,17 @@ export function authWriteGate(mode: AuthMode): string {
     AND (SELECT count(*) FROM pragma_table_info('accounts') WHERE name IN (${legacyColumns}))=6`;
   return `EXISTS(SELECT 1 FROM auth_schema_state WHERE id=1 AND schema_version=${mode === "legacy" ? 7 : 8} AND write_mode='${mode}')`;
 }
+/**
+ * A recent proof of identity for one session (auth_grants, 0007). Generic on
+ * purpose: any sensitive operation consumes it, and each grant is single-use.
+ */
+export const GRANT_OPERATION = "reauth";
+export const GRANT_TTL_MS = 10 * 60 * 1000;
+export type ReauthContext = { accountId: string; sessionHash: string; authVersion: number };
+export type ClaimedTransaction = {
+  id: string; nonce: string; redirect_uri: string;
+  purpose: "login" | "reauth"; account_id: string | null; session_hash: string | null;
+};
 export type PasswordAccount = {
   id: string; username: string; password_hash: string | null;
   recovery_hash: string | null; auth_version: number;
@@ -94,27 +105,47 @@ export class AuthRepository {
 
   // --- Google sign-in (legacy mode only: identities need the 0007 expansion) ---
 
-  async createOAuthTransaction(input: { id: string; stateHash: string; bindingHash: string; nonce: string; redirectUri: string; expiresAt: number }, mode: AuthMode) {
+  /**
+   * A login transaction, or a reauth one bound to the account, its current
+   * session and auth_version (only while that session is valid and the account
+   * has an active Google identity).
+   */
+  async createOAuthTransaction(input: { id: string; stateHash: string; bindingHash: string; nonce: string; redirectUri: string; expiresAt: number; reauth?: ReauthContext }, mode: AuthMode) {
     if (mode !== "legacy") throw new HttpError(503, "Accesso con Google non disponibile.", "AUTH_UNAVAILABLE");
-    const now = Date.now();
+    const now = Date.now(), reauth = input.reauth;
+    const owner = reauth
+      ? `AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.user_id AND a.auth_version=s.auth_version
+          WHERE s.token_hash=? AND s.user_id=? AND a.auth_version=? AND s.expires_at>?)
+        AND EXISTS(SELECT 1 FROM account_identities WHERE account_id=? AND provider='google' AND status='active')`
+      : "";
+    const ownerArgs = reauth ? [reauth.sessionHash, reauth.accountId, reauth.authVersion, now, reauth.accountId] : [];
     const [, inserted] = await this.db.batch([
       this.db.prepare(`DELETE FROM auth_transactions WHERE expires_at<? AND ${this.gate(mode)}`).bind(now),
       // At most 3 pending transactions per browser binding.
-      this.db.prepare(`INSERT INTO auth_transactions(id,state_hash,binding_hash,browser_epoch,provider,purpose,nonce,redirect_uri,status,expires_at)
-        SELECT ?,?,?,0,'google','login',?,?,'pending',? WHERE ${this.gate(mode)}
+      this.db.prepare(`INSERT INTO auth_transactions(id,state_hash,binding_hash,browser_epoch,provider,purpose,account_id,session_hash,auth_version,nonce,redirect_uri,status,expires_at)
+        SELECT ?,?,?,0,'google',?,?,?,?,?,?,'pending',? WHERE ${this.gate(mode)} ${owner}
         AND (SELECT count(*) FROM auth_transactions WHERE binding_hash=? AND status='pending' AND expires_at>?)<3 RETURNING id`)
-        .bind(input.id, input.stateHash, input.bindingHash, input.nonce, input.redirectUri, input.expiresAt, input.bindingHash, now),
+        .bind(input.id, input.stateHash, input.bindingHash, reauth ? "reauth" : "login",
+          reauth?.accountId ?? null, reauth?.sessionHash ?? null, reauth?.authVersion ?? null,
+          input.nonce, input.redirectUri, input.expiresAt, ...ownerArgs, input.bindingHash, now),
     ]);
     return inserted.results.length === 1;
+  }
+
+  /** Google subject of the account's active identity, used as login_hint. */
+  async googleSubject(accountId: string) {
+    const row = await this.db.prepare("SELECT subject FROM account_identities WHERE account_id=? AND provider='google' AND status='active'")
+      .bind(accountId).first<{ subject: string }>();
+    return row?.subject ?? null;
   }
 
   // Single winner: only one callback can move a pending transaction to processing.
   async claimOAuthTransaction(stateHash: string, bindingHash: string, mode: AuthMode) {
     if (mode !== "legacy") return null;
     return this.db.prepare(`UPDATE auth_transactions SET status='processing'
-      WHERE state_hash=? AND binding_hash=? AND provider='google' AND purpose='login' AND status='pending' AND expires_at>? AND ${this.gate(mode)}
-      RETURNING id,nonce,redirect_uri`)
-      .bind(stateHash, bindingHash, Date.now()).first<{ id: string; nonce: string; redirect_uri: string }>();
+      WHERE state_hash=? AND binding_hash=? AND provider='google' AND purpose IN ('login','reauth') AND status='pending' AND expires_at>? AND ${this.gate(mode)}
+      RETURNING id,nonce,redirect_uri,purpose,account_id,session_hash`)
+      .bind(stateHash, bindingHash, Date.now()).first<ClaimedTransaction>();
   }
 
   async failOAuthTransaction(id: string) {
@@ -151,16 +182,72 @@ export class AuthRepository {
     return { userId: session.user_id, created: results[1].results.length === 1 };
   }
 
-  async deleteAccount(account: PasswordAccount, mode: AuthMode, sessionHash: string) {
-    const guard = `EXISTS(SELECT 1 FROM accounts WHERE id=? AND auth_version=? AND ${this.gate(mode)} ${this.sessionGuard(sessionHash)})`;
-    const args = [account.id, account.auth_version, sessionHash, Date.now()];
+  /**
+   * Turns a verified reauth callback into a single-use grant for the session
+   * that started it. "mismatch": Google returned a different account.
+   * null: the transaction, session or identity is no longer valid.
+   */
+  async finishGoogleReauth(input: { transactionId: string; issuer: string; subject: string; grantHash: string; expiresAt: number }, mode: AuthMode): Promise<"granted" | "mismatch" | null> {
+    if (mode !== "legacy") return null;
+    const owner = await this.db.prepare(`SELECT i.issuer,i.subject FROM auth_transactions t JOIN account_identities i
+      ON i.account_id=t.account_id AND i.provider='google' AND i.status='active'
+      WHERE t.id=? AND t.purpose='reauth' AND t.status='processing'`)
+      .bind(input.transactionId).first<{ issuer: string; subject: string }>();
+    if (!owner) return null;
+    if (owner.issuer !== input.issuer || owner.subject !== input.subject) return "mismatch";
+    const operationId = crypto.randomUUID(), now = Date.now(), gate = this.gate(mode);
+    const consumed = `EXISTS(SELECT 1 FROM auth_transactions WHERE id=? AND operation_id=? AND status='consumed')`;
+    const results = await this.db.batch([
+      // The same identity, and the starting session still valid at the same version.
+      this.db.prepare(`UPDATE auth_transactions SET status='consumed',operation_id=?
+        WHERE id=? AND purpose='reauth' AND status='processing' AND ${gate}
+        AND EXISTS(SELECT 1 FROM account_identities i WHERE i.account_id=auth_transactions.account_id
+          AND i.provider='google' AND i.issuer=? AND i.subject=? AND i.status='active')
+        AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.user_id AND a.auth_version=s.auth_version
+          WHERE s.token_hash=auth_transactions.session_hash AND s.user_id=auth_transactions.account_id
+          AND a.auth_version=auth_transactions.auth_version AND s.expires_at>?) RETURNING id`)
+        .bind(operationId, input.transactionId, input.issuer, input.subject, now),
+      // One open grant per session: a new confirmation replaces the previous one.
+      this.db.prepare(`DELETE FROM auth_grants WHERE ${consumed} AND (expires_at<=?
+        OR (session_hash=(SELECT session_hash FROM auth_transactions WHERE id=?) AND consumed_by IS NULL))`)
+        .bind(input.transactionId, operationId, now, input.transactionId),
+      this.db.prepare(`INSERT INTO auth_grants(token_hash,account_id,session_hash,auth_version,method,operation,target,expires_at)
+        SELECT ?,account_id,session_hash,auth_version,'google','${GRANT_OPERATION}',account_id,? FROM auth_transactions
+        WHERE id=? AND operation_id=? AND status='consumed' AND ${gate} RETURNING token_hash`)
+        .bind(input.grantHash, input.expiresAt, input.transactionId, operationId),
+    ]);
+    return results[2].results.length === 1 ? "granted" : null;
+  }
+
+  /** Expiry of the session's open grant, or null. Grants exist only in legacy mode. */
+  async activeGrant(accountId: string, version: number, sessionHash: string, mode: AuthMode) {
+    if (mode !== "legacy") return null;
+    const row = await this.db.prepare(`SELECT expires_at FROM auth_grants WHERE account_id=? AND auth_version=? AND session_hash=?
+      AND operation='${GRANT_OPERATION}' AND consumed_by IS NULL AND expires_at>? ORDER BY expires_at DESC LIMIT 1`)
+      .bind(accountId, version, sessionHash, Date.now()).first<{ expires_at: number }>();
+    return row?.expires_at ?? null;
+  }
+
+  /**
+   * With requireGrant (accounts without a password), the batch also consumes
+   * the session's open grant and every side effect requires that consumption.
+   */
+  async deleteAccount(account: PasswordAccount, mode: AuthMode, sessionHash: string, requireGrant = false) {
+    const now = Date.now(), operationId = crypto.randomUUID();
+    const grant = requireGrant ? "AND EXISTS(SELECT 1 FROM auth_grants WHERE consumed_by=?)" : "";
+    const grantArgs = requireGrant ? [operationId] : [];
+    const guard = `EXISTS(SELECT 1 FROM accounts WHERE id=? AND auth_version=? AND ${this.gate(mode)} ${this.sessionGuard(sessionHash)} ${grant})`;
+    const args = [account.id, account.auth_version, sessionHash, now, ...grantArgs];
     // Every side effect has the SAME guard. Zero rows does not roll back a batch.
     const results = await this.db.batch([
+      ...(requireGrant ? [this.db.prepare(`UPDATE auth_grants SET consumed_by=? WHERE token_hash=(SELECT token_hash FROM auth_grants
+        WHERE account_id=? AND auth_version=? AND session_hash=? AND operation='${GRANT_OPERATION}' AND consumed_by IS NULL AND expires_at>?
+        ORDER BY expires_at DESC LIMIT 1) AND ${this.gate(mode)}`).bind(operationId, account.id, account.auth_version, sessionHash, now)] : []),
       this.db.prepare(`DELETE FROM class_invites WHERE created_by=? AND ${guard}`).bind(account.id, ...args),
       this.db.prepare(`DELETE FROM diaries WHERE user_id=? AND ${guard}`).bind(account.id, ...args),
-      this.db.prepare(`DELETE FROM accounts WHERE id=? AND auth_version=? AND ${this.gate(mode)} ${this.sessionGuard(sessionHash)} RETURNING id`)
+      this.db.prepare(`DELETE FROM accounts WHERE id=? AND auth_version=? AND ${this.gate(mode)} ${this.sessionGuard(sessionHash)} ${grant} RETURNING id`)
         .bind(...args),
     ]);
-    return results[2].results.length === 1;
+    return results[results.length - 1].results.length === 1;
   }
 }

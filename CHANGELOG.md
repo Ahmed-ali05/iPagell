@@ -1,5 +1,11 @@
 # Registro modifiche
 
+## Non rilasciato — 25 novembre 2026, conferma Google senza uscire (fase B)
+
+- Account Google: per eliminare l'account si usa «Conferma con Google» in Impostazioni → Sicurezza, senza uscire e senza perdere la copia locale. Google propone l'account collegato (`login_hint`); al ritorno le Impostazioni si aprono sul pannello, con la conferma valida 10 minuti. Un altro account Google, l'annullamento o un errore mostrano un messaggio e lasciano tutto invariato.
+- Server: transazioni `reauth` legate ad account, sessione e `auth_version`; conferme monouso in `auth_grants` (0007, nessuna nuova migrazione); l'eliminazione consuma la conferma nello stesso batch. Nuovo `GET /api/auth/security` e codice `SECURITY_NOT_GOOGLE`; `SECURITY_REAUTH_REQUIRED` passa a 403. Rimossa la regola «accesso negli ultimi 10 minuti».
+- Testi in it/de/fr/en; `/legale`, bozza di informativa, procedura richieste, API, SECURITY e architettura aggiornati. Prove: unitarie, D1 reale (9 nuove), API locale, browser con account Google sintetico. Giro reale su Google da provare su staging. [Progetto](docs/ACCOUNT-REAUTH-FASE-B-2026-11-25.md). Non pubblicato.
+
 ## Non rilasciato — 25 novembre 2026, dispositivi connessi (fase A)
 
 - Impostazioni → Preferenze → «Dispositivi connessi»: elenco delle sessioni aperte dell'account, con tipo di browser e sistema, metodo d'accesso, data d'accesso e ultima attività; «Esci» su un altro dispositivo ed «Esci da tutti gli altri dispositivi» con conferma. Vale anche per gli account Google, che prima non potevano chiudere sessioni. Il dispositivo chiuso passa alla «sessione scaduta» esistente e conserva le modifiche locali esportabili.

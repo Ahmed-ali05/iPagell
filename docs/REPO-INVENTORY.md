@@ -9,7 +9,7 @@ Generato da `scripts/repo-inventory.mjs` leggendo il sorgente, senza rete o dati
 | Pacchetto | `ipagell@0.1.0` |
 | Node dichiarato | `^22.23.4 || ^24.22.1 || ^26.12.1` |
 | Lockfile | 3 |
-| Cataloghi | it, de, fr, en; 920 chiavi nel riferimento italiano |
+| Cataloghi | it, de, fr, en; 927 chiavi nel riferimento italiano |
 | Schema D1 versionato | 23 tabelle |
 | Migrazioni | 10, SQL e journal concordanti |
 | File route API | 31 |
@@ -28,7 +28,7 @@ L'elenco verifica presenza e metodi, non permessi o forma dei payload: vedere [C
 | `/api/auth/providers` | GET | [route](../app/api/auth/providers/route.ts) |
 | `/api/auth/recover` | POST | [route](../app/api/auth/recover/route.ts) |
 | `/api/auth/register` | POST | [route](../app/api/auth/register/route.ts) |
-| `/api/auth/security` | POST | [route](../app/api/auth/security/route.ts) |
+| `/api/auth/security` | GET, POST | [route](../app/api/auth/security/route.ts) |
 | `/api/auth/sessions` | GET, POST | [route](../app/api/auth/sessions/route.ts) |
 | `/api/class-agenda/:subscriptionId` | PATCH, DELETE | [route](../app/api/class-agenda/[subscriptionId]/route.ts) |
 | `/api/class-agenda` | GET | [route](../app/api/class-agenda/route.ts) |

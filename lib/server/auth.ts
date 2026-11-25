@@ -39,16 +39,6 @@ export async function identity(
   if (!token) return null;
   return new SessionRepository(database()).resolve(tokenHash(token));
 }
-// Seconds since the current session was issued. Rows from before 0009 have no
-// created_at; the TTL has always been fixed, so expires_at - TTL is exact.
-export async function sessionAgeSeconds(request: Request) {
-  const token = readToken(request);
-  if (!token) return null;
-  const row = await database().prepare("SELECT created_at, expires_at FROM sessions WHERE token_hash=?")
-    .bind(tokenHash(token)).first<{ created_at: number | null; expires_at: number }>();
-  if (!row) return null;
-  return (Date.now() - (row.created_at ?? row.expires_at - TTL * 1000)) / 1000;
-}
 export async function issueSession(
   request: Request,
   userId: string,

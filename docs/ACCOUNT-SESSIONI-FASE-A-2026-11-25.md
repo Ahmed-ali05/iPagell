@@ -63,7 +63,7 @@ Un errore di questo aggiornamento non deve mai far fallire la richiesta: va catt
 
 ### 4.3 Età della sessione
 
-`sessionAgeSeconds` usa `created_at`, con ripiego su `expires_at - TTL` per le righe con `NULL`. Il comportamento della riautenticazione Google per l'eliminazione non cambia.
+`sessionAgeSeconds` usa `created_at`, con ripiego su `expires_at - TTL` per le righe con `NULL`. Il comportamento della riautenticazione Google per l'eliminazione non cambia. (La [fase B](ACCOUNT-REAUTH-FASE-B-2026-11-25.md) ha poi sostituito questa regola con una conferma Google monouso e rimosso `sessionAgeSeconds`.)
 
 ### 4.4 Elenco e revoca
 

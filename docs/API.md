@@ -14,7 +14,10 @@ Ogni mutazione richiede `Origin` uguale all’origine della richiesta e `Content
 | `POST /api/auth/login` | `username`, `password` | 200: `user`; nuovo cookie |
 | `POST /api/auth/logout` | `{}` | 200: `ok: true`; revoca sessione corrente, scadenza cookie |
 | `POST /api/auth/recover` | `username`, `recoveryCode`, `password` nuova | 200: nuovo `recoveryCode`; vecchie sessioni invalidate, login da rifare |
+| `GET /api/auth/security` | Nessuno; sessione richiesta | 200: `method` (`password`/`google`), `reauthUntil` (scadenza della conferma Google o `null`) |
 | `POST /api/auth/security` | Vedi sotto; sessione richiesta | 200: `ok: true`; cookie scaduto |
+| `POST /api/auth/oauth/google/start` | `{ ageConfirmed: true }` senza sessione, oppure `{ purpose: "reauth", expectedUserId }` con sessione | 200: `url` di Google; cookie del browser per la transazione |
+| `GET /api/auth/oauth/google/callback` | Ritorno da Google | 303 a `/app`, con `?accesso=` in caso di errore o conferma |
 | `GET /api/auth/sessions` | Nessuno; sessione richiesta | 200: `sessions` (al massimo 20, corrente per prima) |
 | `POST /api/auth/sessions` | `revoke` o `revoke-others`, vedi sotto; sessione richiesta | 200: `revoked` (numero di sessioni chiuse) |
 | `GET /api/account` | Nessuno; sessione richiesta | 200: `user`, `diary` oppure `null` |
@@ -114,9 +117,11 @@ Il retry conserva ID e payload della mutazione in volo. Ripetere la medesima scr
 ### Operazioni sensibili
 
 - Cambio password: `{ operation: "password", expectedUserId, currentPassword, newPassword }`.
-- Eliminazione: `{ operation: "delete", expectedUserId, currentPassword, confirmation }`, dove `confirmation` è lo username esatto normalizzato.
+- Eliminazione: `{ operation: "delete", expectedUserId, currentPassword, confirmation }`, dove `confirmation` è lo username esatto normalizzato. Gli account Google omettono `currentPassword` e devono avere una conferma Google valida per la sessione corrente, altrimenti 403 `SECURITY_REAUTH_REQUIRED`.
 
-Il cambio password incrementa `auth_version`, mantiene il codice di recupero e invalida le sessioni. Il recupero ruota invece anche il codice. La cancellazione elimina inviti creati, diario e account in una transazione; ogni effetto ricontrolla la medesima sessione ancora valida e auth_version dopo la verifica della password. Le sessioni sono eliminate tramite FK. Queste API non cancellano i file scaricati né gli archivi del browser: il client gestisce separatamente la propria copia.
+**Conferma Google senza uscire (fase B).** `POST /api/auth/oauth/google/start` con `{ purpose: "reauth", expectedUserId }` richiede una sessione di un account con identità Google attiva (401 `SECURITY_SESSION_REQUIRED`, 401 `ACCOUNT_CHANGED`, 400 `SECURITY_NOT_GOOGLE`) e crea una transazione `purpose='reauth'` legata ad account, sessione e `auth_version`. L'URL di Google include `login_hint` con il `sub` dell'account e `prompt=select_account`. Il callback verifica l'ID token come per l'accesso, poi controlla che la sessione del browser sia la stessa che ha avviato la conferma e che il `sub` coincida con l'identità collegata. L'esito è una riga `auth_grants` monouso (`operation='reauth'`, 10 minuti, legata a sessione e `auth_version`), mai una nuova sessione. Una nuova conferma sostituisce quella aperta. Ritorno a `/app?accesso=` con `reauth-ok`, `reauth-cancelled`, `reauth-mismatch` (altro account Google) o `reauth-error`; il client apre Impostazioni → Preferenze e toglie il parametro. L'eliminazione consuma la conferma nello stesso batch che cancella inviti, diario e account.
+
+Il cambio password incrementa `auth_version`, mantiene il codice di recupero e invalida le sessioni. Il recupero ruota invece anche il codice. La cancellazione elimina inviti creati, diario e account in una transazione; ogni effetto ricontrolla la medesima sessione ancora valida e auth_version dopo la verifica della password o, per Google, il consumo della conferma. Le sessioni sono eliminate tramite FK. Queste API non cancellano i file scaricati né gli archivi del browser: il client gestisce separatamente la propria copia.
 
 ### Dispositivi connessi
 

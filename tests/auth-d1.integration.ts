@@ -426,3 +426,87 @@ test("Phase A: session metadata, device list, cap and revocation on real D1",asy
     });
   }finally{await dispose();}
 });
+
+test("Phase B: Google reauth becomes a single-use grant for the starting session",async t=>{
+  const {db,auth,dispose}=await fixture(true,true,true);
+  const issuer="https://accounts.google.com", redirectUri="https://ipagell.website/api/auth/oauth/google/callback";
+  const later=()=>Date.now()+60000;
+  const login=async(id:string,subject:string,session:string,account:string,username:string)=>{
+    await auth.createOAuthTransaction({id,stateHash:`state-${id}`,bindingHash:"bind",nonce:"n",redirectUri,expiresAt:later()},"legacy");
+    await auth.claimOAuthTransaction(`state-${id}`,"bind","legacy");
+    return auth.finishGoogleLogin({transactionId:id,issuer,subject,sessionHash:session,sessionExpiresAt:later(),client:null,newAccount:{id:account,username}},"legacy");
+  };
+  const start=(id:string,accountId:string,sessionHash:string,authVersion=1,binding="bind")=>auth.createOAuthTransaction({id,stateHash:`state-${id}`,bindingHash:binding,
+    nonce:"n",redirectUri,expiresAt:later(),reauth:{accountId,sessionHash,authVersion}},"legacy");
+  const finish=(id:string,subject="sub-g",expiresAt=later())=>auth.finishGoogleReauth({transactionId:id,issuer,subject,grantHash:`grant-${id}`,expiresAt},"legacy");
+  const open=async()=>(await db.prepare("SELECT count(*) AS n FROM auth_grants WHERE consumed_by IS NULL").first<{n:number}>())!.n;
+  const account=async()=>(await auth.find("u_gggggggggggggggggggggggggg","legacy"))!;
+  try{
+    await t.test("setup: a Google account with two sessions",async()=>{
+      assert.deepEqual(await login("l1","sub-g","g-s1","g","u_gggggggggggggggggggggggggg"),{userId:"g",created:true});
+      assert.deepEqual(await login("l2","sub-g","g-s2","x","u_xxxxxxxxxxxxxxxxxxxxxxxxxx"),{userId:"g",created:false});
+      assert.equal(await auth.googleSubject("g"),"sub-g");
+      assert.equal(await auth.googleSubject("a"),null,"password accounts have no Google subject");
+    });
+    await t.test("a reauth transaction needs the account's valid session, version and Google identity",async()=>{
+      assert.equal(await start("r-pass","a","session-a"),false,"password account");
+      assert.equal(await start("r-other","g","session-a"),false,"another account's session");
+      assert.equal(await start("r-old","g","g-s1",2),false,"stale auth_version");
+      assert.equal(await start("r1","g","g-s1"),true);
+      const claimed=await auth.claimOAuthTransaction("state-r1","bind","legacy");
+      assert.deepEqual([claimed?.purpose,claimed?.account_id,claimed?.session_hash],["reauth","g","g-s1"]);
+      const login=await db.prepare("SELECT purpose,account_id FROM auth_transactions WHERE id='l1'").first();
+      assert.deepEqual(login,{purpose:"login",account_id:null},"sign-in transactions stay unbound");
+    });
+    await t.test("another Google account is a mismatch and grants nothing",async()=>{
+      assert.equal(await finish("r1","sub-someone-else"),"mismatch");
+      assert.equal(await open(),0);
+      assert.equal((await db.prepare("SELECT status FROM auth_transactions WHERE id='r1'").first<{status:string}>())?.status,"processing");
+    });
+    await t.test("the same account yields one grant for that session only, once",async()=>{
+      assert.equal(await finish("r1"),"granted");
+      assert.equal(await finish("r1"),null,"replayed callback");
+      const a=await account();
+      assert.ok((await auth.activeGrant("g",a.auth_version,"g-s1","legacy"))!>Date.now());
+      assert.equal(await auth.activeGrant("g",a.auth_version,"g-s2","legacy"),null,"other session");
+      assert.equal(await auth.activeGrant("g",a.auth_version,"g-s1","legacy-unexpanded"),null);
+      const grant=await db.prepare("SELECT account_id,session_hash,auth_version,method,operation,target FROM auth_grants").first();
+      assert.deepEqual(grant,{account_id:"g",session_hash:"g-s1",auth_version:1,method:"google",operation:"reauth",target:"g"});
+    });
+    await t.test("a new confirmation replaces the session's open grant",async()=>{
+      assert.equal(await start("r2","g","g-s1"),true);
+      await auth.claimOAuthTransaction("state-r2","bind","legacy");
+      assert.equal(await finish("r2"),"granted");
+      assert.equal(await open(),1);
+    });
+    await t.test("a session closed meanwhile gets no grant",async()=>{
+      assert.equal(await start("r3","g","g-s2"),true);
+      await auth.claimOAuthTransaction("state-r3","bind","legacy");
+      await db.prepare("DELETE FROM sessions WHERE token_hash='g-s2'").run();
+      assert.equal(await finish("r3"),null);
+      assert.equal(await auth.activeGrant("g",1,"g-s2","legacy"),null);
+    });
+    await t.test("deletion without a grant, or from another session, changes nothing",async()=>{
+      await db.prepare("INSERT INTO sessions(token_hash,user_id,auth_version,expires_at) VALUES('g-s3','g',1,?)").bind(later()).run();
+      assert.equal(await auth.deleteAccount(await account(),"legacy","g-s3",true),false);
+      assert.ok(await db.prepare("SELECT 1 FROM accounts WHERE id='g'").first());
+      assert.equal(await open(),1,"the other session's grant is untouched");
+    });
+    await t.test("an expired grant does not authorize deletion",async()=>{
+      await db.prepare("UPDATE auth_grants SET expires_at=1 WHERE session_hash='g-s1'").run();
+      assert.equal(await auth.deleteAccount(await account(),"legacy","g-s1",true),false);
+      assert.ok(await db.prepare("SELECT 1 FROM accounts WHERE id='g'").first());
+      assert.ok(await db.prepare("SELECT 1 FROM diaries WHERE user_id='a'").first(),"no side effect elsewhere");
+    });
+    await t.test("a valid grant is consumed by the deletion with every side effect",async()=>{
+      assert.equal(await start("r4","g","g-s1"),true);
+      await auth.claimOAuthTransaction("state-r4","bind","legacy");
+      assert.equal(await finish("r4"),"granted");
+      assert.equal(await auth.deleteAccount(await account(),"legacy","g-s1",true),true);
+      for(const sql of ["SELECT 1 FROM accounts WHERE id='g'","SELECT 1 FROM account_identities WHERE subject='sub-g'","SELECT 1 FROM sessions WHERE user_id='g'","SELECT 1 FROM auth_grants WHERE account_id='g'"])
+        assert.equal(await db.prepare(sql).first(),null,sql);
+      assert.ok(await db.prepare("SELECT 1 FROM accounts WHERE id='a'").first(),"other accounts untouched");
+      assert.deepEqual((await db.prepare("PRAGMA foreign_key_check").all()).results,[]);
+    });
+  }finally{await dispose();}
+});

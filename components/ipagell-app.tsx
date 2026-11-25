@@ -58,6 +58,7 @@ import { AccountGate } from "@/components/account-gate";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import { formatDate as intlDate, formatNumber as intlNumber, greetingKey, selectPlural, type Locale } from "@/lib/i18n";
 import { AccountSecurity } from "@/components/account-security";
+import { parseReauthOutcome, type ReauthOutcome } from "@/lib/reauth";
 import { AccountSessions } from "@/components/account-sessions";
 import { useDiary } from "@/hooks/use-diary";
 import { InstallAppOffer } from "@/components/install-app";
@@ -229,7 +230,18 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
   const [modal, setModal] = useState<ModalType>(null);
   const [editingSubject, setEditingSubject] = useState<Subject | null>(null);
   const [editingSemester, setEditingSemester] = useState<Semester | null>(null);
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  // Back from a Google confirmation started in Settings: reopen them at the account.
+  // The workspace mounts only in the browser, after the session loaded.
+  const [reauthOutcome, setReauthOutcome] = useState<ReauthOutcome | null>(() =>
+    typeof window === "undefined" ? null : parseReauthOutcome(new URL(window.location.href).searchParams.get("accesso")));
+  const [settingsOpen, setSettingsOpen] = useState(() => reauthOutcome !== null);
+  useEffect(() => {
+    // The outcome is read once; the flag leaves the address (also on reload).
+    const url = new URL(window.location.href);
+    if (!parseReauthOutcome(url.searchParams.get("accesso"))) return;
+    url.searchParams.delete("accesso");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+  }, []);
   const settingsTriggerRef = useRef<HTMLButtonElement>(null);
   const desktopSettingsTriggerRef = useRef<HTMLButtonElement>(null);
   const settingsReturnFocusRef = {
@@ -946,7 +958,12 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
       <SettingsDialog
         open={settingsOpen}
         fallbackFocusRef={settingsReturnFocusRef}
-        onOpenChange={setSettingsOpen}
+        onOpenChange={(open) => {
+          setSettingsOpen(open);
+          if (!open) setReauthOutcome(null);
+        }}
+        reauthOutcome={reauthOutcome}
+        onBeforeReauth={flushOpenNotes}
         data={data}
         preferences={preferences}
         onPreferences={savePreference}
@@ -1747,6 +1764,8 @@ function SettingsDialog({
   securityDisabled,
   onSecuritySubmit,
   onConfirm,
+  reauthOutcome,
+  onBeforeReauth,
 }: {
   open: boolean;
   fallbackFocusRef: { readonly current: HTMLButtonElement | null };
@@ -1770,6 +1789,8 @@ function SettingsDialog({
   securityDisabled: boolean;
   onSecuritySubmit: (operation:"password"|"delete", fields: Record<string, FormDataEntryValue>) => Promise<void>;
   onConfirm: (request: { title: string; description: string; actionLabel: string; run: () => Promise<void> }) => void;
+  reauthOutcome: ReauthOutcome | null;
+  onBeforeReauth: () => Promise<void>;
 }) {
   const { t, locale } = useI18n();
   return (
@@ -1779,7 +1800,7 @@ function SettingsDialog({
           <DialogTitle>{t("common.settings")}</DialogTitle>
           <LanguageSelect className="language-select" />
         </DialogHeader>
-        <Tabs defaultValue="subjects" className="settings-tabs">
+        <Tabs defaultValue={reauthOutcome ? "preferences" : "subjects"} className="settings-tabs">
           <TabsList className="settings-tablist">
             <TabsTrigger value="subjects">
               <Layers3 /> {t("settings.subjects")}
@@ -1968,9 +1989,12 @@ function SettingsDialog({
             </button>
             <AccountSessions userId={accountId} method={accountMethod} confirm={onConfirm} />
             <AccountSecurity
+              userId={accountId}
               username={accountEmail}
               passwordless={accountMethod === "google"}
               disabled={securityDisabled}
+              reauthOutcome={reauthOutcome}
+              onBeforeReauth={onBeforeReauth}
               onSubmit={onSecuritySubmit}
             />
           </TabsContent>

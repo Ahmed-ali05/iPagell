@@ -8,9 +8,28 @@ import {
   readJson,
 } from "@/lib/server/http";
 import { DUMMY_HASH, NO_PASSWORD, hashPassword, verifyPassword } from "@/lib/server/password";
-import { identity, rateLimit, sessionAgeSeconds, sessionCookie, sessionTokenHash } from "@/lib/server/auth";
+import { identity, rateLimit, sessionCookie, sessionTokenHash } from "@/lib/server/auth";
 import { AuthRepository } from "@/lib/server/auth-repository";
 export const dynamic = "force-dynamic";
+
+// What the security panel can offer this session: the sign-in method and, for
+// accounts without a password, until when a Google confirmation is still valid.
+export async function GET(request: Request) {
+  try {
+    const user = await identity(request);
+    const sessionHash = sessionTokenHash(request);
+    if (!user || !sessionHash) return json({ error: "Accedi di nuovo.", code: "SECURITY_SESSION_REQUIRED" }, 401);
+    const auth = new AuthRepository(database());
+    const mode = await auth.mode();
+    const account = await auth.find(user.username, mode);
+    if (!account) return json({ error: "Accedi di nuovo.", code: "SECURITY_SESSION_REQUIRED" }, 401);
+    const google = account.password_hash === NO_PASSWORD;
+    const reauthUntil = google ? await auth.activeGrant(account.id, account.auth_version, sessionHash, mode) : null;
+    return json({ method: google ? "google" : "password", reauthUntil });
+  } catch (error) {
+    return errorResponse(error);
+  }
+}
 const schema = z.discriminatedUnion("operation", [
   z
     .object({
@@ -24,7 +43,7 @@ const schema = z.discriminatedUnion("operation", [
     .object({
       operation: z.literal("delete"),
       expectedUserId: z.string().max(100),
-      // Absent for Google accounts, which prove a recent sign-in instead.
+      // Absent for Google accounts, which consume a recent Google confirmation instead.
       currentPassword: z.string().min(1).max(128).optional(),
       confirmation: z.string().max(32),
     })
@@ -55,12 +74,12 @@ export async function POST(request: Request) {
     const account = await auth.find(user.username, mode);
     const sessionHash = sessionTokenHash(request);
     if (account && sessionHash && account.password_hash === NO_PASSWORD) {
-      // Google account: no password to change; deletion needs a sign-in from the last 10 minutes.
+      // Google account: no password to change; deletion consumes this session's
+      // Google confirmation (checked here for the message, enforced in the batch).
       if (input.operation === "password")
         return json({ error: "Questo account accede con Google e non ha una password.", code: "SECURITY_NO_PASSWORD" }, 400);
-      const age = await sessionAgeSeconds(request);
-      if (age === null || age > 10 * 60)
-        return json({ error: "Per sicurezza esci e accedi di nuovo con Google, poi riprova.", code: "SECURITY_REAUTH_REQUIRED" }, 401);
+      if (!(await auth.activeGrant(account.id, account.auth_version, sessionHash, mode)))
+        return json({ error: "Per sicurezza conferma prima il tuo account Google, poi riprova.", code: "SECURITY_REAUTH_REQUIRED" }, 403);
     } else {
       const valid = await verifyPassword(input.currentPassword ?? "", account?.password_hash ?? DUMMY_HASH);
       if (!account || !account.password_hash || !sessionHash || !valid)
@@ -94,7 +113,7 @@ export async function POST(request: Request) {
           },
           409,
         );
-      const deleted = await auth.deleteAccount(account, mode, sessionHash);
+      const deleted = await auth.deleteAccount(account, mode, sessionHash, account.password_hash === NO_PASSWORD);
       if (!deleted)
         return json({ error: "Account cambiato. Accedi di nuovo.", code: "ACCOUNT_CHANGED" }, 409);
     }

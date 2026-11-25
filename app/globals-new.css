@@ -1788,6 +1788,11 @@ button {
 .session-current { padding:2px 8px; border:1px solid var(--line); border-radius:999px; color:var(--ink); font-size:.75rem; font-weight:600; }
 .sessions-status { font-size:.875rem; font-weight:600; }
 .account-sessions>.sessions-status:empty { margin:0; }
+/* Settings → security: Google confirmation before deleting (phase B). */
+.reauth-step { display:grid; justify-items:start; gap:8px; margin:0 0 12px; }
+.reauth-step .soft-button { min-height:44px; }
+.reauth-step .account-note { margin:0; }
+.security-settings>.sessions-status:empty { margin:0; }
 .session-list li[data-leaving] { opacity:0; }
 @media (prefers-reduced-motion:no-preference) {
   :root:not([data-reduce-motion="true"]) .session-list li { transition:opacity 180ms ease-out; }
