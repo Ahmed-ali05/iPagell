@@ -87,7 +87,7 @@ Ordine scelto per massimo controllo con il minimo di nuovi dati e senza nuovi fo
 
 ### Fase A — Sessioni visibili e revocabili (chiude L1, L2, L9)
 
-Progetto dettagliato: [Fase A — sessioni](ACCOUNT-SESSIONI-FASE-A-2026-11-25.md), implementato il 25 novembre 2026 e non ancora pubblicato. Rispetto allo schizzo qui sotto, il progetto sceglie di cancellare le righe invece di incrementare `auth_version` e salva un codice browser/sistema invece di un'etichetta libera.
+Progetto dettagliato: [Fase A — sessioni](ACCOUNT-SESSIONI-FASE-A-2026-11-25.md), implementato il 25 novembre 2026 e pubblicato in produzione lo stesso giorno (Worker `d97b7254`). Rispetto allo schizzo qui sotto, il progetto sceglie di cancellare le righe invece di incrementare `auth_version` e salva un codice browser/sistema invece di un'etichetta libera.
 
 - **Migrazione additiva** su `sessions`: `created_at`, `last_seen_at`, `method` (`password`/`google`), `label` (etichetta grossolana tipo «Safari · iPhone», derivata dallo User-Agent). Colonne nullable: le sessioni esistenti mostrano «sessione precedente». Niente IP salvato.
 - `last_seen_at` aggiornato al massimo una volta ogni N minuti, per non scrivere su D1 a ogni richiesta.
@@ -98,7 +98,7 @@ Progetto dettagliato: [Fase A — sessioni](ACCOUNT-SESSIONI-FASE-A-2026-11-25.m
 
 ### Fase B — Riautenticazione senza uscire (chiude L3, prepara L6)
 
-Progetto ed esito: [Fase B — conferma Google](ACCOUNT-REAUTH-FASE-B-2026-11-25.md), implementata il 25 novembre 2026 e non ancora pubblicata. Rispetto allo schizzo qui sotto: niente `max_age`/`auth_time` (decisione 2), grant generico `operation='reauth'` e password invariata (verificata nella stessa richiesta).
+Progetto ed esito: [Fase B — conferma Google](ACCOUNT-REAUTH-FASE-B-2026-11-25.md), implementata il 25 novembre 2026 e pubblicata in produzione lo stesso giorno (Worker `d97b7254`). Rispetto allo schizzo qui sotto: niente `max_age`/`auth_time` (decisione 2), grant generico `operation='reauth'` e password invariata (verificata nella stessa richiesta).
 
 - Google: transazione `purpose='reauth'` legata ad `account_id` e alla sessione corrente, con `max_age=0` e verifica di `auth_time` e che il `sub` coincida con l'identità collegata. Lo start non deve più rifiutare quando la sessione è dello stesso account.
 - L'esito è una riga `auth_grants` monouso (operazione, sessione, `auth_version`, scadenza breve), non una nuova sessione. Diario locale e modifiche in attesa restano intatti.
@@ -107,7 +107,7 @@ Progetto ed esito: [Fase B — conferma Google](ACCOUNT-REAUTH-FASE-B-2026-11-25
 
 ### Fase C — Pannello «Account» chiaro (chiude L4, L5)
 
-Progetto ed esito: [Fase C — pannello Account](ACCOUNT-PANNELLO-FASE-C-2026-11-25.md), implementata il 25 novembre 2026 e non ancora pubblicata. Rispetto allo schizzo qui sotto: la parola è accettata dal server in tutte e quattro le lingue, e l'avviso sul doppio account compare solo nella modalità di accesso.
+Progetto ed esito: [Fase C — pannello Account](ACCOUNT-PANNELLO-FASE-C-2026-11-25.md), implementata il 25 novembre 2026 e pubblicata in produzione lo stesso giorno (Worker `d97b7254`). Rispetto allo schizzo qui sotto: la parola è accettata dal server in tutte e quattro le lingue, e l'avviso sul doppio account compare solo nella modalità di accesso.
 
 - Sezione con metodo d'accesso («Accedi con Google» / «Accedi con nome utente»), data di creazione e identità collegate. Niente `@u_…` per gli account Google.
 - Conferma di eliminazione Google con una parola fissa localizzata (per esempio «ELIMINA») dopo la riautenticazione; per gli account con password resta lo username.

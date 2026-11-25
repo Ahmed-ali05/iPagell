@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Analisi gestione account](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md) · [API](API.md) · [Sicurezza](../SECURITY.md)
 
-**Implementato il 25 novembre 2026 sul ramo `feat/account-sessioni`, non pubblicato.** Le cinque decisioni del §9 sono state confermate dal proprietario così come proposte. Le differenze fra progetto e codice sono nel §12. Questo documento traduce la fase A dell'[analisi](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md) in schema, API, interfaccia, rilascio e prove. Le scelte segnate come **proposta** attendono conferma del proprietario (§9).
+**Implementato il 25 novembre 2026 sul ramo `feat/account-sessioni`, pubblicato in produzione il 25 novembre 2026 (Worker `d97b7254`); migrazione 0009 applicata a `ipagell-live`.** Le cinque decisioni del §9 sono state confermate dal proprietario così come proposte. Le differenze fra progetto e codice sono nel §12. Questo documento traduce la fase A dell'[analisi](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md) in schema, API, interfaccia, rilascio e prove. Le scelte segnate come **proposta** attendono conferma del proprietario (§9).
 
 ## 1. Obiettivo e perimetro
 

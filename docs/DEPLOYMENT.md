@@ -47,6 +47,15 @@ Alle 09:44 UTC la versione `41dfaad0` (ramo `release/deps-20261119`, senza Googl
 
 Primo deploy da `main` con il controllo del ramo: commit `75c8912` (PR 17, 18 e 19), versione Worker **`f858b3cf-72b0-4592-84e7-d6b5a1ff170c`** alle 12:23 UTC, nessuna migrazione da applicare. Prima: `npm run release:prepare` con 159/159 test, lint, tipi, i18n, documentazione e build. Dopo: `/`, `/de`, `/app`, `/legale`, sitemap, robots e `sw.js` 200; `www` 308 con percorso e query; `providers` `{"google":true}`; `/api/account` 401; Origin estraneo 403; il bundle servito contiene i nuovi testi di Classi e Voti. Non ripetute prove nel browser autenticato né `test:auth-d1`/`test:api`.
 
+### Account: fasi A, B e C — 25 novembre 2026
+
+Deploy da `main` (commit `e1fbcb4`, PR 23, 24, 26 e 27) da una copia di lavoro pulita con installazione `npm run install:ci`, perché la cartella principale contiene modifiche non committate e le copie non tracciate `drizzle/0007_auth_compatibility 2.sql` e `0008_auth_bootstrap_legacy 2.sql`, che `wrangler d1 migrations list ipagell-live --remote` elencava come da applicare. Dalla copia pulita mancava solo la `0009_session_metadata`.
+
+- **Prima:** CI della PR 27 verde; `npm run release:prepare` con 168/168 test, lint, tipi, i18n, documentazione e build. Staging `ipagell-staging` versione `811b980a` con la fase C: `/`, `/app`, `/legale` 200, `providers` `{"google":true}`, API private 401, Origin estraneo 403, nuovo avviso nell'ingresso (fasi A e B già provate su staging, vedi sopra). Backup `wrangler d1 export ipagell-live --remote` in `~/Backup/ipagell/ipagell-live-2026-11-25-pre-0009.sql` (45 KB: 3 account, 2 identità Google, 4 sessioni, 3 diari).
+- **Rilascio:** `npm run deploy:cloudflare` alle 22:38 UTC: `0009_session_metadata` applicata a `ipagell-live`, Worker **`d97b7254-15c6-44a4-a718-fdeb1b3e3069`**.
+- **Dopo:** `/`, `/de`, `/app`, `/legale`, sitemap, robots e `sw.js` 200; `www` 308 con percorso e query; `providers` `{"google":true}`; `/api/account`, `/api/auth/security`, `/api/auth/sessions` 401 senza sessione; Origin estraneo 403; nel browser l'ingresso mostra il nuovo avviso su Google, console senza errori oltre al 401 atteso. D1: stato `7/legacy`, conteggi identici al backup, `created_at` riempito per tutte le 4 sessioni esistenti, `PRAGMA foreign_key_check` vuoto.
+- **Non verificato in produzione:** pannello Account, dispositivi connessi e conferma Google con un account reale (richiedono l'accesso del proprietario), `test:api` e `test:auth-d1` contro la produzione (non previsti).
+
 ### Accesso con Google: configurazione
 
 Il pulsante resta nascosto finché il Worker non ha tre valori: `GOOGLE_REDIRECT_URI` (già in `wrangler.jsonc`, uno per produzione e uno per staging) e i due secret `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Serve anche lo schema 0007+0008, quindi in produzione prima la Fase D del [piano W8-B](improvement-2026-10-01/W8B-PIANO-CLOUDFLARE.md).
