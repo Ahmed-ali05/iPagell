@@ -27,6 +27,12 @@ export const sessions = sqliteTable(
       .references(() => accounts.id, { onDelete: "cascade" }),
     authVersion: integer("auth_version").notNull(),
     expiresAt: integer("expires_at").notNull(),
+    // Device list metadata (0009). Nullable: rows issued before 0009, or by
+    // older code during a rollout, have none. Never an IP or raw User-Agent.
+    createdAt: integer("created_at"),
+    lastSeenAt: integer("last_seen_at"),
+    method: text("method"),
+    client: text("client"),
   },
   (table) => [
     index("sessions_user_idx").on(table.userId),

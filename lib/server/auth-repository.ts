@@ -123,7 +123,7 @@ export class AuthRepository {
 
   // Consumes the transaction and creates the session in one batch. A new account
   // and its identity are created in the same batch when the subject is unknown.
-  async finishGoogleLogin(input: { transactionId: string; issuer: string; subject: string; sessionHash: string; sessionExpiresAt: number; newAccount: { id: string; username: string } }, mode: AuthMode) {
+  async finishGoogleLogin(input: { transactionId: string; issuer: string; subject: string; sessionHash: string; sessionExpiresAt: number; client: string | null; newAccount: { id: string; username: string } }, mode: AuthMode) {
     if (mode !== "legacy") throw new HttpError(503, "Accesso con Google non disponibile.", "AUTH_UNAVAILABLE");
     const operationId = crypto.randomUUID(), now = Date.now(), gate = this.gate(mode);
     const consumed = `EXISTS(SELECT 1 FROM auth_transactions WHERE id=? AND operation_id=? AND status='consumed')`;
@@ -141,10 +141,10 @@ export class AuthRepository {
         AND EXISTS(SELECT 1 FROM accounts WHERE id=? AND username=?)
         AND NOT EXISTS(SELECT 1 FROM account_identities WHERE issuer=? AND subject=?)`)
         .bind(crypto.randomUUID(), id, input.issuer, input.subject, now, input.transactionId, operationId, id, username, input.issuer, input.subject),
-      this.db.prepare(`INSERT INTO sessions(token_hash,user_id,auth_version,expires_at)
-        SELECT ?,a.id,a.auth_version,? FROM account_identities i JOIN accounts a ON a.id=i.account_id
+      this.db.prepare(`INSERT INTO sessions(token_hash,user_id,auth_version,expires_at,created_at,last_seen_at,method,client)
+        SELECT ?,a.id,a.auth_version,?,?,?,'google',? FROM account_identities i JOIN accounts a ON a.id=i.account_id
         WHERE i.issuer=? AND i.subject=? AND i.provider='google' AND i.status='active' AND ${gate} AND ${consumed} RETURNING user_id`)
-        .bind(input.sessionHash, input.sessionExpiresAt, input.issuer, input.subject, input.transactionId, operationId),
+        .bind(input.sessionHash, input.sessionExpiresAt, now, now, input.client, input.issuer, input.subject, input.transactionId, operationId),
     ]);
     const session = results[3].results[0] as { user_id: string } | undefined;
     if (!session) return null;

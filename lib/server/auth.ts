@@ -1,8 +1,11 @@
 import { database } from "./db";
 import { HttpError } from "./http";
-import { NO_PASSWORD, randomToken, tokenHash } from "./password";
+import { randomToken, tokenHash } from "./password";
 import { AuthRepository, authWriteGate, type AuthMode } from "./auth-repository";
+import { clientCode } from "./session-client";
+import { SessionRepository } from "./session-repository";
 import type { AccountIdentity } from "@/types/domain";
+import type { SessionMethod } from "@/lib/session-devices";
 
 export const TTL = 14 * 24 * 60 * 60;
 function cookieName(request: Request) {
@@ -34,43 +37,42 @@ export async function identity(
 ): Promise<AccountIdentity | null> {
   const token = readToken(request);
   if (!token) return null;
-  return database()
-    .prepare(
-      `SELECT a.id, a.username, CASE WHEN a.password_hash=? THEN 'google' ELSE 'password' END AS method FROM sessions s JOIN accounts a ON a.id=s.user_id AND a.auth_version=s.auth_version WHERE s.token_hash=? AND s.expires_at>?`,
-    )
-    .bind(NO_PASSWORD, tokenHash(token), Date.now())
-    .first<AccountIdentity>();
+  return new SessionRepository(database()).resolve(tokenHash(token));
 }
-// Seconds since the current session was issued (sessions have a fixed TTL).
+// Seconds since the current session was issued. Rows from before 0009 have no
+// created_at; the TTL has always been fixed, so expires_at - TTL is exact.
 export async function sessionAgeSeconds(request: Request) {
   const token = readToken(request);
   if (!token) return null;
-  const row = await database().prepare("SELECT expires_at FROM sessions WHERE token_hash=?")
-    .bind(tokenHash(token)).first<{ expires_at: number }>();
-  return row ? (Date.now() - (row.expires_at - TTL * 1000)) / 1000 : null;
+  const row = await database().prepare("SELECT created_at, expires_at FROM sessions WHERE token_hash=?")
+    .bind(tokenHash(token)).first<{ created_at: number | null; expires_at: number }>();
+  if (!row) return null;
+  return (Date.now() - (row.created_at ?? row.expires_at - TTL * 1000)) / 1000;
 }
 export async function issueSession(
   request: Request,
   userId: string,
   version: number,
   expectedMode: AuthMode,
+  method: SessionMethod = "password",
 ) {
   const db = database();
   const mode = await new AuthRepository(db).mode();
   if (mode !== expectedMode) throw new HttpError(503, "Accesso temporaneamente sospeso. Riprova.", "AUTH_UNAVAILABLE");
-  const token = randomToken();
-  const result = await db
-    .prepare(
-      `INSERT INTO sessions (token_hash,user_id,auth_version,expires_at) SELECT ?,id,auth_version,? FROM accounts WHERE id=? AND auth_version=? AND ${authWriteGate(mode)}`,
-    )
-    .bind(tokenHash(token), Date.now() + TTL * 1000, userId, version)
-    .run();
-  if (result.meta.changes !== 1)
+  const token = randomToken(), now = Date.now();
+  const sessions = new SessionRepository(db);
+  const written = await sessions.insert({
+    hash: tokenHash(token), userId, version, expiresAt: now + TTL * 1000,
+    method, client: clientCode(request.headers), gate: authWriteGate(mode),
+  }, now);
+  if (written !== 1)
     throw new HttpError(401, "Credenziali cambiate. Accedi di nuovo.");
   // Periodic opportunistic cleanup; no personal data or tokens in logs.
+  // Also keeps the account within MAX_SESSIONS: the new session is the newest.
   await db.batch([
-    db.prepare("DELETE FROM sessions WHERE expires_at<?").bind(Date.now()),
-    db.prepare("DELETE FROM auth_limits WHERE expires_at<?").bind(Date.now()),
+    db.prepare("DELETE FROM sessions WHERE expires_at<?").bind(now),
+    db.prepare("DELETE FROM auth_limits WHERE expires_at<?").bind(now),
+    ...sessions.pruneStatements(userId, now),
   ]);
   return sessionCookie(request, token);
 }

@@ -1,5 +1,12 @@
 # Registro modifiche
 
+## Non rilasciato — 25 novembre 2026, dispositivi connessi (fase A)
+
+- Impostazioni → Preferenze → «Dispositivi connessi»: elenco delle sessioni aperte dell'account, con tipo di browser e sistema, metodo d'accesso, data d'accesso e ultima attività; «Esci» su un altro dispositivo ed «Esci da tutti gli altri dispositivi» con conferma. Vale anche per gli account Google, che prima non potevano chiudere sessioni. Il dispositivo chiuso passa alla «sessione scaduta» esistente e conserva le modifiche locali esportabili.
+- Migrazione `0009_session_metadata`: colonne facoltative `created_at`, `last_seen_at`, `method`, `client` su `sessions` e riempimento esatto delle sessioni già aperte. Nessuna modifica ad `accounts`; il codice precedente continua a funzionare dopo la migrazione.
+- Nuova API `GET/POST /api/auth/sessions` con identificativo derivato (mai il digest del token), vincolo al proprietario, limite per azione e codici `SESSIONS_INVALID_INPUT`, `SESSIONS_CURRENT`. Massimo 20 sessioni per account; ultima attività aggiornata al massimo ogni 15 minuti; nessun IP associato alla sessione.
+- Testi in it/de/fr/en; `/legale`, bozza di informativa, procedura richieste, API, SECURITY e architettura aggiornati. Prove: unitarie (riconoscimento dispositivo), D1 reale (riempimento, limite, revoca, IDOR, ultima attività), API locale e browser. [Progetto](docs/ACCOUNT-SESSIONI-FASE-A-2026-11-25.md). Non pubblicato.
+
 ## Non rilasciato — 19 novembre 2026, contrasto e focus dopo la verifica di accessibilità
 
 - Pastiglie dei voti: nuovi token `--success-soft`, `--success-ink` e `--danger-soft`; in tema scuro lo sfondo è una tinta scura invece del chiaro fisso. Contrasto misurato da 2,01:1 (insufficiente, scuro) e 3,46:1 (sufficiente) ad almeno 4,7:1.

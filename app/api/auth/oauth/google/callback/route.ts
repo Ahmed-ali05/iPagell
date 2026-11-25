@@ -2,6 +2,8 @@ import { database } from "@/lib/server/db";
 import { identity, rateLimit, sessionCookie, TTL } from "@/lib/server/auth";
 import { AuthRepository } from "@/lib/server/auth-repository";
 import { randomToken, tokenHash } from "@/lib/server/password";
+import { clientCode } from "@/lib/server/session-client";
+import { SessionRepository } from "@/lib/server/session-repository";
 import { exchangeCode, pkceVerifier, randomHandle, verifyIdToken } from "@/lib/server/google-oidc";
 import { currentGoogleConfig, readBinding, redirectToApp } from "@/lib/server/google-auth";
 export const dynamic = "force-dynamic";
@@ -40,12 +42,15 @@ export async function GET(request: Request) {
       subject: verified.subject,
       sessionHash: tokenHash(token),
       sessionExpiresAt: Date.now() + TTL * 1000,
+      client: clientCode(request.headers),
       newAccount: { id: crypto.randomUUID(), username: randomHandle() },
     }, mode);
     if (!finished) {
       await auth.failOAuthTransaction(transaction.id);
       return redirectToApp(request, "google-error");
     }
+    // Keep the account within the session cap; the sign-in already succeeded.
+    await new SessionRepository(database()).prune(finished.userId).catch(() => undefined);
     return redirectToApp(request, undefined, sessionCookie(request, token));
   } catch {
     if (transactionId) await auth.failOAuthTransaction(transactionId);

@@ -1773,6 +1773,25 @@ button {
 }
 .legacy-backup { margin-top:10px; }
 .legacy-backup summary { min-height:44px; padding:10px 0; color:var(--accent); cursor:pointer; font-weight:600; }
+/* Settings → connected devices (phase A). Rows wrap at 320 px and 200% text. */
+.security-settings>summary { min-height:44px; padding:11px 0; color:var(--accent); cursor:pointer; font-weight:600; }
+.account-sessions { margin-top:12px; }
+.account-sessions>p { margin:6px 0 10px; }
+.session-list { display:grid; margin:0 0 12px; padding:0; list-style:none; }
+.session-list li { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; min-height:64px; padding:10px 0; border-top:1px solid var(--line); }
+.session-list li>svg { flex:none; width:20px; color:var(--accent); }
+.session-list li>div { display:grid; gap:4px; flex:1 1 12rem; min-width:0; }
+.session-list strong { display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; overflow-wrap:anywhere; }
+.session-list small,.sessions-muted { color:var(--subtle); font-size:.875rem; }
+.session-list .soft-button.compact { min-height:44px; }
+@media (max-width:420px) { .session-list li>.soft-button { margin-left:32px; } }
+.session-current { padding:2px 8px; border:1px solid var(--line); border-radius:999px; color:var(--ink); font-size:.75rem; font-weight:600; }
+.sessions-status { font-size:.875rem; font-weight:600; }
+.account-sessions>.sessions-status:empty { margin:0; }
+.session-list li[data-leaving] { opacity:0; }
+@media (prefers-reduced-motion:no-preference) {
+  :root:not([data-reduce-motion="true"]) .session-list li { transition:opacity 180ms ease-out; }
+}
 .privacy-note {
   display: flex;
   align-items: center;

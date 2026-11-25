@@ -15,6 +15,8 @@ Ogni mutazione richiede `Origin` uguale all’origine della richiesta e `Content
 | `POST /api/auth/logout` | `{}` | 200: `ok: true`; revoca sessione corrente, scadenza cookie |
 | `POST /api/auth/recover` | `username`, `recoveryCode`, `password` nuova | 200: nuovo `recoveryCode`; vecchie sessioni invalidate, login da rifare |
 | `POST /api/auth/security` | Vedi sotto; sessione richiesta | 200: `ok: true`; cookie scaduto |
+| `GET /api/auth/sessions` | Nessuno; sessione richiesta | 200: `sessions` (al massimo 20, corrente per prima) |
+| `POST /api/auth/sessions` | `revoke` o `revoke-others`, vedi sotto; sessione richiesta | 200: `revoked` (numero di sessioni chiuse) |
 | `GET /api/account` | Nessuno; sessione richiesta | 200: `user`, `diary` oppure `null` |
 | `POST /api/account` | Profilo iniziale; sessione richiesta | 201: `user`, `diary` con revisione 1 |
 | `PUT /api/diary` | Snapshot e revisione; sessione richiesta | 200: `revision` incrementata |
@@ -116,6 +118,33 @@ Il retry conserva ID e payload della mutazione in volo. Ripetere la medesima scr
 
 Il cambio password incrementa `auth_version`, mantiene il codice di recupero e invalida le sessioni. Il recupero ruota invece anche il codice. La cancellazione elimina inviti creati, diario e account in una transazione; ogni effetto ricontrolla la medesima sessione ancora valida e auth_version dopo la verifica della password. Le sessioni sono eliminate tramite FK. Queste API non cancellano i file scaricati né gli archivi del browser: il client gestisce separatamente la propria copia.
 
+### Dispositivi connessi
+
+`GET /api/auth/sessions` elenca le sessioni valide dell'account (non scadute e con `auth_version` corrente), la corrente per prima:
+
+```ts
+type SessionSummary = {
+  id: string;            // 32 hex, SHA-256 derivato dal digest del token; mai il digest stesso
+  current: boolean;
+  method: "password" | "google" | null;
+  client: string | null; // "browser.sistema" da elenco chiuso, per esempio "chrome.android"
+  createdAt: number | null;
+  lastSeenAt: number | null; // aggiornato al massimo ogni 15 minuti
+  expiresAt: number;
+};
+```
+
+Le sessioni aperte prima della migrazione 0009 hanno `client` e `lastSeenAt` nulli finché non vengono usate. La lettura ripulisce prima le righe scadute o invalidate dello stesso account.
+
+`POST /api/auth/sessions`, corpo strict di massimo 1 KiB:
+
+- `{ operation: "revoke", expectedUserId, id }`: chiude un'altra sessione. Un `id` sconosciuto, già chiuso o di un altro account restituisce `{ revoked: 0 }` (idempotente, nessuna informazione su altri account). L'`id` della sessione corrente restituisce 400 `SESSIONS_CURRENT`: si esce con `POST /api/auth/logout`.
+- `{ operation: "revoke-others", expectedUserId }`: chiude tutte le altre sessioni valide e restituisce quante.
+
+Ordine dei controlli: Origin e Fetch Metadata, sessione (401 `SECURITY_SESSION_REQUIRED`), schema (400 `SESSIONS_INVALID_INPUT`), `expectedUserId` (401 `ACCOUNT_CHANGED`), limite per azione `sessions` (12 ogni 15 minuti per account). Non serve riautenticazione e `auth_version` non cambia: le righe vengono cancellate. Un dispositivo chiuso riceve 401 alla richiesta successiva.
+
+Ogni account mantiene al massimo 20 sessioni: all'emissione di una nuova (login, registrazione, Google) vengono cancellate quelle con `auth_version` superato e le più vicine alla scadenza oltre il limite.
+
 ## Errori e limiti
 
 | Stato | Significato / comportamento del client |
@@ -124,7 +153,7 @@ Il cambio password incrementa `auth_version`, mantiene il codice di recupero e i
 | 401 | Sessione/credenziali mancanti, scadute o account diverso; richiedere accesso |
 | 403 | Origine non consentita; non aggirare i controlli CSRF |
 | 409 | Username/profilo già presente, revisione o credenziali cambiate; distinguere per endpoint |
-| 413 | Corpo oltre limite: 4.096 byte per login/registrazione/recupero/sicurezza; 1.500.000 per profilo/diario |
+| 413 | Corpo oltre limite: 4.096 byte per login/registrazione/recupero/sicurezza; 1.024 per sessioni; 1.500.000 per profilo/diario |
 | 415 | Tipo di contenuto non supportato |
 | 426 | Client note da aggiornare; conservare la bozza locale e ricaricare l'app |
 | 429 | Limite tentativi; attendere, non generare retry automatici |

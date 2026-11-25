@@ -58,6 +58,7 @@ import { AccountGate } from "@/components/account-gate";
 import { LanguageSelect, useI18n } from "@/components/i18n-provider";
 import { formatDate as intlDate, formatNumber as intlNumber, greetingKey, selectPlural, type Locale } from "@/lib/i18n";
 import { AccountSecurity } from "@/components/account-security";
+import { AccountSessions } from "@/components/account-sessions";
 import { useDiary } from "@/hooks/use-diary";
 import { InstallAppOffer } from "@/components/install-app";
 import { gradeSchema } from "@/lib/validation";
@@ -998,8 +999,10 @@ function DiaryWorkspace({ session }: { session: ReturnType<typeof useDiary> }) {
             });
           } catch { toast.error(t("notes.saveFailed")); }
         }}
+        accountId={session.user!.id}
         accountEmail={session.user!.username}
         accountMethod={session.user!.method}
+        onConfirm={setRemoval}
         securityDisabled={session.diary!.dirty || session.status !== "saved" || notes.pending>0}
         onSecuritySubmit={async(operation,fields)=>{
           try { await session.security(operation,fields,flushOpenNotes,forgetNotes); }
@@ -1738,10 +1741,12 @@ function SettingsDialog({
   onExport,
   onImport,
   onLogout,
+  accountId,
   accountEmail,
   accountMethod,
   securityDisabled,
   onSecuritySubmit,
+  onConfirm,
 }: {
   open: boolean;
   fallbackFocusRef: { readonly current: HTMLButtonElement | null };
@@ -1759,10 +1764,12 @@ function SettingsDialog({
   onExport: () => void;
   onImport: () => void;
   onLogout: () => void;
+  accountId: string;
   accountEmail: string;
   accountMethod?: "password" | "google";
   securityDisabled: boolean;
   onSecuritySubmit: (operation:"password"|"delete", fields: Record<string, FormDataEntryValue>) => Promise<void>;
+  onConfirm: (request: { title: string; description: string; actionLabel: string; run: () => Promise<void> }) => void;
 }) {
   const { t, locale } = useI18n();
   return (
@@ -1959,6 +1966,7 @@ function SettingsDialog({
             <button className="soft-button" onClick={onLogout}>
               {t("settings.logoutRemoveCopy")}
             </button>
+            <AccountSessions userId={accountId} method={accountMethod} confirm={onConfirm} />
             <AccountSecurity
               username={accountEmail}
               passwordless={accountMethod === "google"}
