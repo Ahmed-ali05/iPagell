@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Analisi gestione account](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md) · [Fase A](ACCOUNT-SESSIONI-FASE-A-2026-11-25.md) · [Fase B](ACCOUNT-REAUTH-FASE-B-2026-11-25.md) · [API](API.md)
 
-**Implementato il 25 novembre 2026 sul ramo `feat/account-panel` (da `main` con A e B), non pubblicato.** Chiude le lacune L4 e L5 dell'[analisi](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md). Nessuna migrazione, nessun dato nuovo raccolto: il pannello mostra dati già conservati.
+**Implementato il 25 novembre 2026 sul ramo `feat/account-panel` (da `main` con A e B), pubblicato in produzione il 25 novembre 2026 (Worker `d97b7254`).** Chiude le lacune L4 e L5 dell'[analisi](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md). Nessuna migrazione, nessun dato nuovo raccolto: il pannello mostra dati già conservati.
 
 ## 1. Problema
 

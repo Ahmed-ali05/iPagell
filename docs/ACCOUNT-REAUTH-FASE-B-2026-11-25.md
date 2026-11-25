@@ -2,7 +2,7 @@
 
 [Indice](README.md) · [Analisi gestione account](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md) · [Fase A](ACCOUNT-SESSIONI-FASE-A-2026-11-25.md) · [API](API.md) · [Sicurezza](../SECURITY.md)
 
-**Implementato il 25 novembre 2026 sul ramo `feat/account-reauth` (dalla fase A), non pubblicato.** Chiude la lacuna L3 dell'[analisi](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md) e prepara il collegamento dei metodi (fase D). Resta in modalità `7/legacy`, senza nuove migrazioni.
+**Implementato il 25 novembre 2026 sul ramo `feat/account-reauth` (dalla fase A), pubblicato in produzione il 25 novembre 2026 (Worker `d97b7254`).** Chiude la lacuna L3 dell'[analisi](ANALISI-GESTIONE-ACCOUNT-2026-11-25.md) e prepara il collegamento dei metodi (fase D). Resta in modalità `7/legacy`, senza nuove migrazioni.
 
 ## 1. Problema
 

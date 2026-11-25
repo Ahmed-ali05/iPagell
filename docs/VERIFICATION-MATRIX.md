@@ -5,15 +5,15 @@
 Evidenze aggiornate al **1 ottobre 2026**. Riferimento delle prove annuali: Sites 29, sorgente `02cb8843867987dbb3552e049fd1aecd5f755352`; esiti in fondo al documento. Le prove dell’audit iniziale sotto fanno riferimento a Sites 27. Il successivo rilascio homepage Sites 30 è registrato in [Pubblicazione](DEPLOYMENT.md), senza una nuova verifica remota nel riordino documentale del 2 ottobre. Il precedente audit `c780569…`, le contraddizioni allora presenti e i risultati dei rilasci precedenti sono in [VERIFICATION-HISTORY](archive/VERIFICATION-HISTORY.md). Non vanno letti come affermazioni sul codice attuale.
 
 
-## Pannello Account (fase C) — 25 novembre 2026, solo locale
+## Pannello Account (fase C) — 25 novembre 2026, pubblicato (Worker `d97b7254`)
 
 [Progetto](ACCOUNT-PANNELLO-FASE-C-2026-11-25.md). Dimostrato in locale: 3 test unitari sulla parola di conferma; 1 prova D1 reale su `profile` (51/51); browser con account Google e con password sintetici (onboarding senza handle, pannello in chiaro/scuro, 320 px, italiano e tedesco, handle rifiutato, eliminazione con «elimina» e pulizia completa nel D1 locale). Suite API locale: 171 controlli superati, 3 nuovi. **Non dimostrato:** ritorno del focus da Google con pannello visibile, francese e inglese nel browser, lettori di schermo, staging, produzione.
 
-## Conferma Google senza uscire (fase B) — 25 novembre 2026, solo locale
+## Conferma Google senza uscire (fase B) — 25 novembre 2026, pubblicato (Worker `d97b7254`)
 
 [Progetto](ACCOUNT-REAUTH-FASE-B-2026-11-25.md). Dimostrato in locale: test unitario su `login_hint`/`prompt`; 9 prove D1 reali con 0000–0009 (transazione `reauth` solo con sessione, versione e identità Google valide; altro `sub` senza grant; grant monouso per la sola sessione d'avvio; sostituzione; sessione chiusa; eliminazione rifiutata senza grant, da altra sessione o con grant scaduto; eliminazione con grant e cascata completa); controlli nella suite API locale; prova browser con account Google sintetico (ritorno con altro account, errore con Google non configurato, conferma riuscita ed eliminazione). Staging (25 novembre, Worker `72995954`): giro reale con Google per conferma con lo stesso account, scelta di un altro account ed eliminazione con pulizia completa nel D1 di staging. Non dimostrato: annullamento su Google reale, produzione.
 
-## Dispositivi connessi (fase A) — 25 novembre 2026, solo locale
+## Dispositivi connessi (fase A) — 25 novembre 2026, pubblicato (Worker `d97b7254`)
 
 [Progetto](ACCOUNT-SESSIONI-FASE-A-2026-11-25.md). Dimostrato in locale: 5 test unitari sul riconoscimento di browser e sistema (User-Agent reali, client hints, valori anomali) e sull'`id` derivato; 10 prove D1 reali con 0000–0009 (riempimento esatto, `INSERT` del codice precedente dopo la 0009, versione e gate all'inserimento, `last_seen_at` con finestra di 15 minuti e scrittura fallita ignorata, elenco limitato al proprietario e senza digest, revoca singola e IDOR, revoca delle altre, limite di 20, cascata alla cancellazione); 15 controlli API su `localhost` nella suite completa (163 superati); browser con account sintetico a 1024 e 320 px, chiaro/scuro, tastiera e focus, conferma «Esci da tutti gli altri». Riempimento verificato anche sul D1 locale con 19 sessioni esistenti. **Non dimostrato:** staging, produzione, telefono fisico, lettori di schermo reali, lingue diverse dall'italiano nel browser, comportamento del lato revocato oltre al 401 (lo stato `expired` è quello esistente, non riprovato qui).
 

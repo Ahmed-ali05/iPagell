@@ -1,33 +1,33 @@
 # Registro modifiche
 
-## Non rilasciato — 25 novembre 2026, pannello Account (fase C)
+## 25 novembre 2026 — Pannello Account (fase C) (Worker `d97b7254`)
 
 - Impostazioni → Preferenze → «Account»: metodo d'accesso (nome utente o Google), data di creazione e, per gli account Google, che cosa iPagell conserva e che non c'è password né codice di recupero. L'handle tecnico `u_…` degli account Google non compare più, né nelle Impostazioni né nell'onboarding.
 - Eliminazione di un account Google: dopo la conferma Google si scrive una parola fissa (ELIMINA, LÖSCHEN, SUPPRIMER, DELETE) invece dell'handle; verificata anche dal server. Gli account con password confermano ancora con lo username.
 - Ingresso: sotto «Continua con Google» un avviso spiega che Google apre solo account creati con Google; il testo di consenso non lascia più intendere che Google entri in un account esistente con nome utente.
-- `GET /api/auth/security` aggiunge `createdAt` e `identities` (provider e data, mai identificativi Google). Nessuna migrazione. Testi in it/de/fr/en. Prove: unitarie, D1 reale, browser con account sintetici. [Progetto](docs/ACCOUNT-PANNELLO-FASE-C-2026-11-25.md). Non pubblicato.
+- `GET /api/auth/security` aggiunge `createdAt` e `identities` (provider e data, mai identificativi Google). Nessuna migrazione. Testi in it/de/fr/en. Prove: unitarie, D1 reale, browser con account sintetici. [Progetto](docs/ACCOUNT-PANNELLO-FASE-C-2026-11-25.md).
 
-## Non rilasciato — 25 novembre 2026, conferma Google senza uscire (fase B)
+## 25 novembre 2026 — Conferma Google senza uscire (fase B) (Worker `d97b7254`)
 
 - Account Google: per eliminare l'account si usa «Conferma con Google» in Impostazioni → Sicurezza, senza uscire e senza perdere la copia locale. Google propone l'account collegato (`login_hint`); al ritorno le Impostazioni si aprono sul pannello, con la conferma valida 10 minuti. Un altro account Google, l'annullamento o un errore mostrano un messaggio e lasciano tutto invariato.
 - Server: transazioni `reauth` legate ad account, sessione e `auth_version`; conferme monouso in `auth_grants` (0007, nessuna nuova migrazione); l'eliminazione consuma la conferma nello stesso batch. Nuovo `GET /api/auth/security` e codice `SECURITY_NOT_GOOGLE`; `SECURITY_REAUTH_REQUIRED` passa a 403. Rimossa la regola «accesso negli ultimi 10 minuti».
-- Testi in it/de/fr/en; `/legale`, bozza di informativa, procedura richieste, API, SECURITY e architettura aggiornati. Prove: unitarie, D1 reale (9 nuove), API locale, browser con account Google sintetico. Giro reale su Google da provare su staging. [Progetto](docs/ACCOUNT-REAUTH-FASE-B-2026-11-25.md). Non pubblicato.
+- Testi in it/de/fr/en; `/legale`, bozza di informativa, procedura richieste, API, SECURITY e architettura aggiornati. Prove: unitarie, D1 reale (9 nuove), API locale, browser con account Google sintetico. Giro reale su Google verificato su staging. [Progetto](docs/ACCOUNT-REAUTH-FASE-B-2026-11-25.md).
 
-## Non rilasciato — 25 novembre 2026, dispositivi connessi (fase A)
+## 25 novembre 2026 — Dispositivi connessi (fase A) (Worker `d97b7254`)
 
 - Impostazioni → Preferenze → «Dispositivi connessi»: elenco delle sessioni aperte dell'account, con tipo di browser e sistema, metodo d'accesso, data d'accesso e ultima attività; «Esci» su un altro dispositivo ed «Esci da tutti gli altri dispositivi» con conferma. Vale anche per gli account Google, che prima non potevano chiudere sessioni. Il dispositivo chiuso passa alla «sessione scaduta» esistente e conserva le modifiche locali esportabili.
 - Migrazione `0009_session_metadata`: colonne facoltative `created_at`, `last_seen_at`, `method`, `client` su `sessions` e riempimento esatto delle sessioni già aperte. Nessuna modifica ad `accounts`; il codice precedente continua a funzionare dopo la migrazione.
 - Nuova API `GET/POST /api/auth/sessions` con identificativo derivato (mai il digest del token), vincolo al proprietario, limite per azione e codici `SESSIONS_INVALID_INPUT`, `SESSIONS_CURRENT`. Massimo 20 sessioni per account; ultima attività aggiornata al massimo ogni 15 minuti; nessun IP associato alla sessione.
-- Testi in it/de/fr/en; `/legale`, bozza di informativa, procedura richieste, API, SECURITY e architettura aggiornati. Prove: unitarie (riconoscimento dispositivo), D1 reale (riempimento, limite, revoca, IDOR, ultima attività), API locale e browser. [Progetto](docs/ACCOUNT-SESSIONI-FASE-A-2026-11-25.md). Non pubblicato.
+- Testi in it/de/fr/en; `/legale`, bozza di informativa, procedura richieste, API, SECURITY e architettura aggiornati. Prove: unitarie (riconoscimento dispositivo), D1 reale (riempimento, limite, revoca, IDOR, ultima attività), API locale e browser. [Progetto](docs/ACCOUNT-SESSIONI-FASE-A-2026-11-25.md).
 
-## Non rilasciato — 19 novembre 2026, contrasto e focus dopo la verifica di accessibilità
+## 19 novembre 2026 — Contrasto e focus dopo la verifica di accessibilità (pubblicato il 25 novembre, Worker `d97b7254`)
 
 - Pastiglie dei voti: nuovi token `--success-soft`, `--success-ink` e `--danger-soft`; in tema scuro lo sfondo è una tinta scura invece del chiaro fisso. Contrasto misurato da 2,01:1 (insufficiente, scuro) e 3,46:1 (sufficiente) ad almeno 4,7:1.
 - Pulsanti pieni: in tema scuro `--accent-fill` passa da `#0a84ff` a `#0071e3` e il gradiente parte dal token invece di schiarirlo, così il testo bianco resta ad almeno 4,7:1 (prima 3,07–3,76:1).
 - Mobile: `scroll-padding-bottom` sotto i 820 px, così l'elemento con il focus da tastiera non finisce sotto la barra delle schede (WCAG 2.4.11).
 - Simulatore: il campo «Peso prossima verifica» ha bordo e altezza 44 px; il nome della materia nella scheda Voti è un H2 sotto l'H1 della vista. Nessuna modifica a dati, API o schema.
 
-## Non rilasciato — 19 novembre 2026, revisione usabilità e accessibilità dei Voti
+## 19 novembre 2026 — Revisione usabilità e accessibilità dei Voti (pubblicato il 25 novembre, Worker `d97b7254`)
 
 - Simulatore «Che voto mi serve?»: il peso della prossima prova si può cancellare e riscrivere (anche 0.5 o 0,5) e si normalizza solo all'uscita dal campo; l'obiettivo si salva poco dopo la modifica, al rilascio del cursore e cambiando vista, non più solo alla perdita del focus; il risultato è annunciato ai lettori di schermo.
 - Elenco voti: la media grande usa il colore del testo con la tinta della materia come sottolineatura, per un contrasto indipendente dal colore scelto; note lunghe vanno a capo; senza nota il tipo di prova non è più ripetuto; il pulsante elimina indica voto e data; i pulsanti delle medie espongono la selezione (`aria-pressed`) e il riepilogo per periodo è un gruppo con nome.
