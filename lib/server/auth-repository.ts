@@ -220,6 +220,24 @@ export class AuthRepository {
   }
 
   /** Expiry of the session's open grant, or null. Grants exist only in legacy mode. */
+  /**
+   * What the Account panel shows: creation date and the linked sign-in
+   * identities (provider and date only, never issuer or subject).
+   * Schema 6 has no identities table, so it lists none.
+   */
+  async profile(accountId: string, mode: AuthMode) {
+    const account = await this.db.prepare("SELECT created_at FROM accounts WHERE id=?")
+      .bind(accountId).first<{ created_at: number }>();
+    if (!account) return null;
+    const identities = mode === "legacy-unexpanded" ? [] : (await this.db.prepare(
+      "SELECT provider,created_at FROM account_identities WHERE account_id=? AND status='active' ORDER BY created_at",
+    ).bind(accountId).all<{ provider: "google" | "apple"; created_at: number }>()).results;
+    return {
+      createdAt: account.created_at,
+      identities: identities.map((identity) => ({ provider: identity.provider, createdAt: identity.created_at })),
+    };
+  }
+
   async activeGrant(accountId: string, version: number, sessionHash: string, mode: AuthMode) {
     if (mode !== "legacy") return null;
     const row = await this.db.prepare(`SELECT expires_at FROM auth_grants WHERE account_id=? AND auth_version=? AND session_hash=?

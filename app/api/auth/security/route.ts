@@ -10,9 +10,11 @@ import {
 import { DUMMY_HASH, NO_PASSWORD, hashPassword, verifyPassword } from "@/lib/server/password";
 import { identity, rateLimit, sessionCookie, sessionTokenHash } from "@/lib/server/auth";
 import { AuthRepository } from "@/lib/server/auth-repository";
+import { isDeleteWord } from "@/lib/account-confirmation";
 export const dynamic = "force-dynamic";
 
-// What the security panel can offer this session: the sign-in method and, for
+// What the Account and security panels show for this session: the sign-in
+// method, creation date, linked identities (provider and date only) and, for
 // accounts without a password, until when a Google confirmation is still valid.
 export async function GET(request: Request) {
   try {
@@ -24,8 +26,12 @@ export async function GET(request: Request) {
     const account = await auth.find(user.username, mode);
     if (!account) return json({ error: "Accedi di nuovo.", code: "SECURITY_SESSION_REQUIRED" }, 401);
     const google = account.password_hash === NO_PASSWORD;
-    const reauthUntil = google ? await auth.activeGrant(account.id, account.auth_version, sessionHash, mode) : null;
-    return json({ method: google ? "google" : "password", reauthUntil });
+    const [reauthUntil, profile] = await Promise.all([
+      google ? auth.activeGrant(account.id, account.auth_version, sessionHash, mode) : null,
+      auth.profile(account.id, mode),
+    ]);
+    if (!profile) return json({ error: "Accedi di nuovo.", code: "SECURITY_SESSION_REQUIRED" }, 401);
+    return json({ method: google ? "google" : "password", reauthUntil, ...profile });
   } catch (error) {
     return errorResponse(error);
   }
@@ -96,9 +102,14 @@ export async function POST(request: Request) {
           409,
         );
     } else {
-      if (input.confirmation !== user.username)
+      // Google accounts have only a random handle: they type a fixed word instead.
+      const google = account.password_hash === NO_PASSWORD;
+      if (google ? !isDeleteWord(input.confirmation) : input.confirmation !== user.username)
         return json(
-          { error: "Scrivi esattamente il tuo nome utente per confermare.", code: "SECURITY_CONFIRMATION_MISMATCH" },
+          {
+            error: google ? "Scrivi la parola indicata per confermare." : "Scrivi esattamente il tuo nome utente per confermare.",
+            code: "SECURITY_CONFIRMATION_MISMATCH",
+          },
           400,
         );
       const ownedClass = await db
